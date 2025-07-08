@@ -1,6 +1,6 @@
 # libs/cmake/sfml-wrapper.cmake
 
-# Сборка SFML из исходников (подмодуль)
+# Build SFML from submodule sources
 set(SFML_BUILD_GRAPHICS ON CACHE BOOL "" FORCE)
 set(SFML_BUILD_WINDOW ON CACHE BOOL "" FORCE)
 set(SFML_BUILD_AUDIO OFF CACHE BOOL "" FORCE)
@@ -13,9 +13,9 @@ set(SFML_ENABLE_PCH OFF CACHE BOOL "" FORCE)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/sfml)
 
-message(STATUS "[ImGuiX] SFML собран как подмодуль.")
+message(STATUS "[ImGuiX] SFML built as a submodule.")
 
-# --- Копируем заголовки SFML в build/include/SFML ---
+# --- Copy SFML headers to build/include/SFML ---
 file(GLOB_RECURSE SFML_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/sfml/include/SFML/*.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/sfml/include/SFML/*.inl"
@@ -26,4 +26,4 @@ foreach(HDR ${SFML_HEADERS})
     configure_file(${HDR} "${CMAKE_BINARY_DIR}/include/${REL_PATH}" COPYONLY)
 endforeach()
 
-message(STATUS "[ImGuiX] Заголовки SFML скопированы в: ${CMAKE_BINARY_DIR}/include/SFML")
+message(STATUS "[ImGuiX] SFML headers copied to: ${CMAKE_BINARY_DIR}/include/SFML")

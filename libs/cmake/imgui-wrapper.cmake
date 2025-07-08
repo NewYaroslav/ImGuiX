@@ -4,15 +4,15 @@ set(IMGUI_SRC      ${CMAKE_CURRENT_SOURCE_DIR}/imgui)
 set(IMGUI_SFML_SRC ${CMAKE_CURRENT_SOURCE_DIR}/imgui-sfml)
 set(FREETYPE_SRC   ${CMAKE_CURRENT_SOURCE_DIR}/freetype)
 
-# Целевая директория заголовков
+# Target directory for headers
 set(IMGUI_INCLUDE_DIR ${CMAKE_BINARY_DIR}/include)
 
-# --- Создаём include-структуру ---
+# --- Create include structure ---
 file(MAKE_DIRECTORY ${IMGUI_INCLUDE_DIR})
 file(MAKE_DIRECTORY ${IMGUI_INCLUDE_DIR}/misc/freetype)
 file(MAKE_DIRECTORY ${IMGUI_INCLUDE_DIR}/misc/cpp)
 
-# --- Копируем заголовки ImGui и ImGui-SFML ---
+# --- Copy ImGui and ImGui-SFML headers ---
 file(GLOB IMGUI_HEADERS "${IMGUI_SRC}/*.h")
 file(GLOB IMGUI_SFML_HEADERS "${IMGUI_SFML_SRC}/*.h")
 
@@ -20,14 +20,14 @@ foreach(HDR ${IMGUI_HEADERS} ${IMGUI_SFML_HEADERS})
     configure_file(${HDR} ${IMGUI_INCLUDE_DIR}/ COPYONLY)
 endforeach()
 
-# --- Копируем дополнительные заголовки ---
+# --- Copy additional headers ---
 configure_file(${IMGUI_SRC}/misc/freetype/imgui_freetype.h ${IMGUI_INCLUDE_DIR}/misc/freetype/ COPYONLY)
 configure_file(${IMGUI_SRC}/misc/cpp/imgui_stdlib.h        ${IMGUI_INCLUDE_DIR}/misc/cpp/ COPYONLY)
 
-# --- Копируем выбранный конфиг вместо генерации ---
+# --- Copy selected config instead of generating ---
 configure_file(${IMGUI_SFML_SRC}/imconfig-SFML.h ${IMGUI_INCLUDE_DIR}/imconfig-SFML.h COPYONLY)
 
-# --- Список исходников ImGui (используем напрямую из оригинала) ---
+# --- List of ImGui sources (used directly from upstream) ---
 set(IMGUI_SOURCES
     ${IMGUI_SRC}/imgui.cpp
     ${IMGUI_SRC}/imgui_draw.cpp
@@ -39,31 +39,31 @@ set(IMGUI_SOURCES
     ${IMGUI_SFML_SRC}/imgui-SFML.cpp
 )
 
-# --- Подключение FreeType как сабдиректории ---
+# --- Add FreeType as a subdirectory ---
 if (NOT TARGET freetype)
     add_subdirectory(${FREETYPE_SRC} EXCLUDE_FROM_ALL)
 endif()
 
-# --- Создание библиотеки ---
+# --- Create library ---
 add_library(imgui STATIC ${IMGUI_SOURCES})
 
-# --- Пути к заголовкам (публичные — для зависимых проектов) ---
+# --- Include paths (public for dependent projects) ---
 target_include_directories(imgui
     PRIVATE ${FREETYPE_SRC}/include
             ${IMGUI_SRC}
             ${IMGUI_SFML_SRC}
 )
 
-# --- Определение пользовательского конфигурационного файла ---
+# --- Define user configuration file ---
 target_compile_definitions(imgui
     PUBLIC IMGUI_USER_CONFIG=\"imconfig-SFML.h\"
 	PRIVATE IMGUI_ENABLE_FREETYPE
 )
 
-# --- Линковка с зависимостями ---
+# --- Link with dependencies ---
 target_link_libraries(imgui PRIVATE sfml-graphics sfml-window sfml-system freetype)
 
-message(STATUS "[ImGuiX] FreeType поддержка активирована.")
-message(STATUS "[ImGuiX] Заголовки скопированы в: ${IMGUI_INCLUDE_DIR}")
-message(STATUS "[ImGuiX] Конфигурация использует: imconfig-SFML.h")
-message(STATUS "[ImGuiX] ImGui и ImGui-SFML собраны как единая библиотека.")
+message(STATUS "[ImGuiX] FreeType support enabled.")
+message(STATUS "[ImGuiX] Headers copied to: ${IMGUI_INCLUDE_DIR}")
+message(STATUS "[ImGuiX] Using configuration: imconfig-SFML.h")
+message(STATUS "[ImGuiX] ImGui and ImGui-SFML built as a single library.")
