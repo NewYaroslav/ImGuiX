@@ -5,16 +5,13 @@ set(FREETYPE_SRC   ${CMAKE_CURRENT_SOURCE_DIR}/freetype)
 
 set(IMGUI_INCLUDE_DIR ${CMAKE_BINARY_DIR}/include)
 file(MAKE_DIRECTORY ${IMGUI_INCLUDE_DIR})
-file(MAKE_DIRECTORY ${IMGUI_INCLUDE_DIR}/backends)
-file(MAKE_DIRECTORY ${IMGUI_INCLUDE_DIR}/misc/freetype)
-file(MAKE_DIRECTORY ${IMGUI_INCLUDE_DIR}/misc/cpp)
 
 file(GLOB IMGUI_HEADERS "${IMGUI_SRC}/*.h")
 foreach(HDR ${IMGUI_HEADERS})
     configure_file(${HDR} ${IMGUI_INCLUDE_DIR}/ COPYONLY)
 endforeach()
-configure_file(${IMGUI_SRC}/backends/imgui_impl_glfw.h    ${IMGUI_INCLUDE_DIR} COPYONLY)
-configure_file(${IMGUI_SRC}/backends/imgui_impl_opengl3.h ${IMGUI_INCLUDE_DIR} COPYONLY)
+configure_file(${IMGUI_SRC}/backends/imgui_impl_glfw.h     ${IMGUI_INCLUDE_DIR} COPYONLY)
+configure_file(${IMGUI_SRC}/backends/imgui_impl_opengl3.h  ${IMGUI_INCLUDE_DIR} COPYONLY)
 configure_file(${IMGUI_SRC}/misc/freetype/imgui_freetype.h ${IMGUI_INCLUDE_DIR} COPYONLY)
 configure_file(${IMGUI_SRC}/misc/cpp/imgui_stdlib.h        ${IMGUI_INCLUDE_DIR} COPYONLY)
 

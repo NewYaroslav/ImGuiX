@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.18)
 project(ImGuiX LANGUAGES CXX)
 
-option(IMGUIX_BUILD_STATIC_LIB    "Build ImGuiX as a static library" ON)
+option(IMGUIX_BUILD_STATIC_LIB    "Build ImGuiX as a static library" OFF)
 option(IMGUIX_USE_SFML_BACKEND   "Use SFML backend for ImGui" OFF)
 option(IMGUIX_USE_GLFW_BACKEND   "Use GLFW backend for ImGui" OFF)
 option(IMGUIX_USE_SDL2_BACKEND   "Use SDL2 backend for ImGui" OFF)
@@ -58,7 +58,8 @@ if(IMGUIX_BUILD_EXAMPLES)
         if(IMGUIX_BUILD_STATIC_LIB)
             target_link_libraries(${EXAMPLE_NAME} PRIVATE imguix)
         else()
-            target_sources(${EXAMPLE_NAME} PRIVATE ${IMGUIX_HEADERS} ${IMGUIX_SOURCES})
+            target_compile_definitions(${EXAMPLE_NAME} PRIVATE IMGUIX_HEADER_ONLY)
+			target_sources(${EXAMPLE_NAME} PRIVATE ${IMGUIX_HEADERS} ${IMGUIX_SOURCES})
             if(IMGUIX_USE_SFML_BACKEND)
                 target_link_libraries(${EXAMPLE_NAME}
                     PRIVATE freetype sfml-graphics-s sfml-window-s sfml-system-s imgui)
@@ -89,6 +90,10 @@ if(IMGUIX_BUILD_TESTS)
         set_target_properties(${TEST_NAME} PROPERTIES
             RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests
         )
+
+		if(NOT IMGUIX_BUILD_STATIC_LIB)
+			target_compile_definitions(${TEST_NAME} PRIVATE IMGUIX_HEADER_ONLY)
+		endif()
         
         if(IMGUIX_USE_SFML_BACKEND)
             target_compile_definitions(${TEST_NAME} PRIVATE IMGUIX_USE_SFML_BACKEND SFML_STATIC)
