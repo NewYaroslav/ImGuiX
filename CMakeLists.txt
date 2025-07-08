@@ -95,6 +95,6 @@ if(IMGUIX_BUILD_TESTS)
         copy_imgui_fonts(${TEST_NAME})
     endforeach()
 
-    # Также добавим SFML_STATIC в саму imgui (если не сделано раньше)
+    # Also define SFML_STATIC in imgui if it was not set earlier
     target_compile_definitions(imgui PUBLIC SFML_STATIC)
 endif()
