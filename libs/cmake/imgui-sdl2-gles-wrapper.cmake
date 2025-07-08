@@ -13,10 +13,10 @@ file(GLOB IMGUI_HEADERS "${IMGUI_SRC}/*.h")
 foreach(HDR ${IMGUI_HEADERS})
     configure_file(${HDR} ${IMGUI_INCLUDE_DIR}/ COPYONLY)
 endforeach()
-configure_file(${IMGUI_SRC}/backends/imgui_impl_sdl2.h     ${IMGUI_INCLUDE_DIR}/backends/ COPYONLY)
-configure_file(${IMGUI_SRC}/backends/imgui_impl_opengl3.h  ${IMGUI_INCLUDE_DIR}/backends/ COPYONLY)
-configure_file(${IMGUI_SRC}/misc/freetype/imgui_freetype.h ${IMGUI_INCLUDE_DIR}/misc/freetype/ COPYONLY)
-configure_file(${IMGUI_SRC}/misc/cpp/imgui_stdlib.h        ${IMGUI_INCLUDE_DIR}/misc/cpp/ COPYONLY)
+configure_file(${IMGUI_SRC}/backends/imgui_impl_sdl2.h     ${IMGUI_INCLUDE_DIR} COPYONLY)
+configure_file(${IMGUI_SRC}/backends/imgui_impl_opengl3.h  ${IMGUI_INCLUDE_DIR} COPYONLY)
+configure_file(${IMGUI_SRC}/misc/freetype/imgui_freetype.h ${IMGUI_INCLUDE_DIR} COPYONLY)
+configure_file(${IMGUI_SRC}/misc/cpp/imgui_stdlib.h        ${IMGUI_INCLUDE_DIR} COPYONLY)
 
 set(IMGUI_SOURCES
     ${IMGUI_SRC}/imgui.cpp

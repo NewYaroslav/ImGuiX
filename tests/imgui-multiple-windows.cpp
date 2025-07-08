@@ -1,11 +1,10 @@
+#if defined(IMGUIX_USE_SFML_BACKEND)
+
 #include "imgui.h" // necessary for ImGui::*, imgui-SFML.h doesn't include imgui.h
-
 #include "imgui-SFML.h" // for ImGui::SFML::* functions and SFML-specific overloads
-
 #include <SFML/Graphics.hpp>
 
-int main()
-{
+int main() {
     sf::RenderWindow window(sf::VideoMode({1280, 720}), "ImGui + SFML = <3");
     window.setFramerateLimit(60);
     if (!ImGui::SFML::Init(window))
@@ -17,16 +16,12 @@ int main()
         return -1;
 
     sf::Clock deltaClock;
-    while (window.isOpen())
-    {
+    while (window.isOpen()) {
         // Main window event processing
-        while (const auto event = window.pollEvent())
-        {
+        while (const auto event = window.pollEvent()) {
             ImGui::SFML::ProcessEvent(window, *event);
-            if (event->is<sf::Event::Closed>())
-            {
-                if (childWindow.isOpen())
-                {
+            if (event->is<sf::Event::Closed>()) {
+                if (childWindow.isOpen()) {
                     childWindow.close();
                 }
                 window.close();
@@ -36,13 +31,10 @@ int main()
         }
 
         // Child window event processing
-        if (childWindow.isOpen())
-        {
-            while (const auto event = childWindow.pollEvent())
-            {
+        if (childWindow.isOpen()) {
+            while (const auto event = childWindow.pollEvent()) {
                 ImGui::SFML::ProcessEvent(childWindow, *event);
-                if (event->is<sf::Event::Closed>())
-                {
+                if (event->is<sf::Event::Closed>()) {
                     childWindow.close();
                     ImGui::SFML::Shutdown(childWindow);
                 }
@@ -52,8 +44,7 @@ int main()
         // Update
         const sf::Time dt = deltaClock.restart();
         ImGui::SFML::Update(window, dt);
-        if (childWindow.isOpen())
-        {
+        if (childWindow.isOpen()) {
             ImGui::SFML::Update(childWindow, dt);
         }
 
@@ -64,8 +55,7 @@ int main()
         ImGui::End();
         ImGui::ShowDemoWindow();
         // Add ImGui widgets in the child window
-        if (childWindow.isOpen())
-        {
+        if (childWindow.isOpen()) {
             ImGui::SFML::SetCurrentWindow(childWindow);
             ImGui::Begin("Works in a second window!");
             ImGui::Button("Example button");
@@ -82,8 +72,7 @@ int main()
         window.display();
 
         // Child window drawing
-        if (childWindow.isOpen())
-        {
+        if (childWindow.isOpen()) {
             sf::CircleShape shape2(50.f);
             shape2.setFillColor(sf::Color::Red);
 
@@ -94,3 +83,9 @@ int main()
         }
     }
 }
+
+#else
+
+int main() {}
+
+#endif

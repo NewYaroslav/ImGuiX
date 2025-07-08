@@ -21,8 +21,8 @@ foreach(HDR ${IMGUI_HEADERS} ${IMGUI_SFML_HEADERS})
 endforeach()
 
 # --- Copy additional headers ---
-configure_file(${IMGUI_SRC}/misc/freetype/imgui_freetype.h ${IMGUI_INCLUDE_DIR}/misc/freetype/ COPYONLY)
-configure_file(${IMGUI_SRC}/misc/cpp/imgui_stdlib.h        ${IMGUI_INCLUDE_DIR}/misc/cpp/ COPYONLY)
+configure_file(${IMGUI_SRC}/misc/freetype/imgui_freetype.h ${IMGUI_INCLUDE_DIR} COPYONLY)
+configure_file(${IMGUI_SRC}/misc/cpp/imgui_stdlib.h        ${IMGUI_INCLUDE_DIR} COPYONLY)
 
 # --- Copy selected config instead of generating ---
 configure_file(${IMGUI_SFML_SRC}/imconfig-SFML.h ${IMGUI_INCLUDE_DIR}/imconfig-SFML.h COPYONLY)

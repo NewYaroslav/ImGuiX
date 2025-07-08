@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.18)
 project(ImGuiX LANGUAGES CXX)
 
 option(IMGUIX_BUILD_STATIC_LIB    "Build ImGuiX as a static library" ON)
-option(IMGUIX_USE_SFML_BACKEND   "Use SFML backend for ImGui" ON)
+option(IMGUIX_USE_SFML_BACKEND   "Use SFML backend for ImGui" OFF)
 option(IMGUIX_USE_GLFW_BACKEND   "Use GLFW backend for ImGui" OFF)
 option(IMGUIX_USE_SDL2_BACKEND   "Use SDL2 backend for ImGui" OFF)
 option(IMGUIX_BUILD_EXAMPLES     "Build examples in examples/ directory" ON)
@@ -89,31 +89,45 @@ if(IMGUIX_BUILD_TESTS)
         set_target_properties(${TEST_NAME} PROPERTIES
             RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests
         )
+        
         if(IMGUIX_USE_SFML_BACKEND)
-            target_compile_definitions(${TEST_NAME} PRIVATE SFML_STATIC)
+            target_compile_definitions(${TEST_NAME} PRIVATE IMGUIX_USE_SFML_BACKEND SFML_STATIC)
+            target_link_libraries(${TEST_NAME} PRIVATE freetype sfml-graphics-s sfml-window-s sfml-system-s imgui)
+        elseif(IMGUIX_USE_GLFW_BACKEND)
+            target_compile_definitions(${TEST_NAME} PRIVATE IMGUIX_USE_GLFW_BACKEND)
+            if(WIN32)
+                target_link_libraries(${TEST_NAME} PRIVATE freetype glfw opengl32 imgui)
+            else()
+                target_link_libraries(${TEST_NAME} PRIVATE freetype imgui glfw OpenGL::GL)
+            endif()
+        elseif(IMGUIX_USE_SDL2_BACKEND)
+            target_compile_definitions(${TEST_NAME} PRIVATE IMGUIX_USE_SDL2_BACKEND)
+
+            if(EMSCRIPTEN)
+                target_link_libraries(${TEST_NAME}
+                    PRIVATE freetype SDL2::SDL2 OpenGLES2::GLESv2 imgui)
+            elseif(WIN32)
+                target_link_libraries(${TEST_NAME}
+                    PRIVATE freetype SDL2::SDL2 opengl32 imgui)
+            elseif(UNIX)
+                find_package(OpenGL REQUIRED)
+                target_link_libraries(${TEST_NAME}
+                    PRIVATE freetype SDL2::SDL2 OpenGL::GL imgui)
+            endif()
+        endif()
+
+        if(IMGUI_ENABLE_FREETYPE)
+            target_compile_definitions(${TEST_NAME} PRIVATE IMGUI_ENABLE_FREETYPE)
         endif()
 
         target_link_directories(${TEST_NAME} PRIVATE ${CMAKE_BINARY_DIR}/libs)
 
-        if(IMGUIX_USE_SFML_BACKEND)
-            target_link_libraries(${TEST_NAME} PRIVATE freetype sfml-graphics-s sfml-window-s sfml-system-s imgui)
-        elseif(IMGUIX_USE_GLFW_BACKEND)
-            target_link_libraries(${TEST_NAME} PRIVATE freetype glfw OpenGL::GL imgui)
-        elseif(IMGUIX_USE_SDL2_BACKEND)
-            target_link_libraries(${TEST_NAME} PRIVATE freetype SDL2::SDL2 OpenGLES2::GLESv2 imgui)
-        endif()
-
         if (WIN32)
-            target_link_libraries(${TEST_NAME} PRIVATE opengl32 gdi32 user32 kernel32 winmm)
+            target_link_libraries(${TEST_NAME} PRIVATE gdi32 user32 kernel32 winmm)
         elseif(UNIX)
             target_link_libraries(${TEST_NAME} PRIVATE GL)
         endif()
         
         copy_imgui_fonts(${TEST_NAME})
     endforeach()
-
-    if(IMGUIX_USE_SFML_BACKEND)
-        # Also define SFML_STATIC in imgui if it was not set earlier
-        target_compile_definitions(imgui PUBLIC SFML_STATIC)
-    endif()
 endif()
