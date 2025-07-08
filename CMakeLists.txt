@@ -66,34 +66,30 @@ endif()
 
 # --- Build tests ---
 if(IMGUIX_BUILD_TESTS)
-    file(GLOB TESTS "tests/*.cpp")
-    foreach(TEST_FILE ${TESTS})
-        get_filename_component(TEST_NAME ${TEST_FILE} NAME_WE)
+    set(TEST_SRC tests/imgui-backend.cpp)
+    add_executable(imgui-backend ${TEST_SRC})
+    target_include_directories(imgui-backend PRIVATE ${CMAKE_BINARY_DIR}/include)
+    set_target_properties(imgui-backend PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests
+    )
+    target_compile_definitions(imgui-backend PRIVATE SFML_STATIC)
 
-        add_executable(${TEST_NAME} ${TEST_FILE})
-        target_include_directories(${TEST_NAME} PRIVATE ${CMAKE_BINARY_DIR}/include)
-        set_target_properties(${TEST_NAME} PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests
-        )
-        target_compile_definitions(${TEST_NAME} PRIVATE SFML_STATIC)
+    target_link_directories(imgui-backend PRIVATE ${CMAKE_BINARY_DIR}/libs)
+    target_link_libraries(imgui-backend
+        PRIVATE
+            freetype
+            sfml-graphics-s
+            sfml-window-s
+            sfml-system-s
+            imgui
+    )
+    if (WIN32)
+        target_link_libraries(imgui-backend PRIVATE opengl32 gdi32 user32 kernel32 winmm)
+    elseif(UNIX)
+        target_link_libraries(imgui-backend PRIVATE GL)
+    endif()
 
-        target_link_directories(${TEST_NAME} PRIVATE ${CMAKE_BINARY_DIR}/libs)
-        target_link_libraries(${TEST_NAME}
-            PRIVATE
-                freetype
-                sfml-graphics-s
-                sfml-window-s
-                sfml-system-s
-                imgui
-        )
-        if (WIN32)
-            target_link_libraries(${TEST_NAME} PRIVATE opengl32 gdi32 user32 kernel32 winmm)
-        elseif(UNIX)
-            target_link_libraries(${TEST_NAME} PRIVATE GL)
-        endif()
-        
-        copy_imgui_fonts(${TEST_NAME})
-    endforeach()
+    copy_imgui_fonts(imgui-backend)
 
     # Also define SFML_STATIC in imgui if it was not set earlier
     target_compile_definitions(imgui PUBLIC SFML_STATIC)
