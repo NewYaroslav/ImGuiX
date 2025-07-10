@@ -1,6 +1,6 @@
 #include <algorithm>
 
-namespace ImGuiX::utils {
+namespace ImGuiX::Pubsub {
 
     template <typename EventType>
     void EventHub::subscribe(EventListener* owner, std::function<void(const EventType&)> callback) {
@@ -87,7 +87,7 @@ namespace ImGuiX::utils {
         }
 
         for (auto* listener : listeners_copy) {
-            listener->on_event(event);
+            listener->onEvent(event);
         }
     }
 
@@ -95,7 +95,7 @@ namespace ImGuiX::utils {
         notify(&event);
     }
 
-    inline void EventHub::notify_async(std::unique_ptr<Event> event) {
+    inline void EventHub::notifyAsync(std::unique_ptr<Event> event) {
         std::lock_guard<std::mutex> lock(m_queue_mutex);
         m_event_queue.push(std::move(event));
     }
@@ -109,9 +109,9 @@ namespace ImGuiX::utils {
 		lock.unlock();
 
 		while (!local_queue.empty()) {
-			notify(local_queue.front().get());
+            notify(local_queue.front().get());
 			local_queue.pop();
 		}
     }
 
-} // namespace ImGuiX::utils
+} // namespace ImGuiX::Pubsub

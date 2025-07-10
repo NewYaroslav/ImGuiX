@@ -1,11 +1,11 @@
 #pragma once
-#ifndef _IMGUIX_UTILS_EVENT_HUB_HPP_INCLUDED
-#define _IMGUIX_UTILS_EVENT_HUB_HPP_INCLUDED
+#ifndef _IMGUIX_PUBSUB_EVENT_HUB_HPP_INCLUDED
+#define _IMGUIX_PUBSUB_EVENT_HUB_HPP_INCLUDED
 
 /// \file EventHub.hpp
 /// \brief Contains the EventHub class for event-based communication between modules.
 
-namespace ImGuiX::utils {
+namespace ImGuiX::Pubsub {
 
     /// \class EventHub
     /// \brief Manages subscriptions and notifications for event-based communication.
@@ -58,7 +58,7 @@ namespace ImGuiX::utils {
 
         /// \brief Queues an event for asynchronous processing.
         /// \param event Unique pointer to the event.
-        void notify_async(std::unique_ptr<Event> event);
+        void notifyAsync(std::unique_ptr<Event> event);
 
         /// \brief Processes queued events.
         /// Should be called from the main thread to process events safely.
@@ -73,10 +73,10 @@ namespace ImGuiX::utils {
         std::queue<std::unique_ptr<Event>> m_event_queue; ///< Queue for asynchronous event processing
     };
 
-} // namespace ImGuiX::utils
+} // namespace ImGuiX::Pubsub
 
 #if defined(IMGUIX_HEADER_ONLY)
 #include "EventHub.ipp"
 #endif
 
-#endif // _IMGUIX_UTILS_EVENT_HUB_HPP_INCLUDED
+#endif // _IMGUIX_PUBSUB_EVENT_HUB_HPP_INCLUDED

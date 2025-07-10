@@ -1,6 +1,6 @@
 #pragma once
-#ifndef _IMGUIX_UTILS_PUBSUB_HPP_INCLUDED
-#define _IMGUIX_UTILS_PUBSUB_HPP_INCLUDED
+#ifndef _IMGUIX_CORE_PUBSUB_HPP_INCLUDED
+#define _IMGUIX_CORE_PUBSUB_HPP_INCLUDED
 
 /// \file pubsub.hpp
 /// \brief Entry point for the publish-subscribe system.
@@ -16,7 +16,10 @@
 #include <queue>
 #include <mutex>
 #include <functional>
+#include <string>
 #include <typeindex>
+#include <type_traits>
+#include <stdexcept>
 #include <memory>
 
 #include "pubsub/Event.hpp"
@@ -24,4 +27,4 @@
 #include "pubsub/EventHub.hpp"
 #include "pubsub/EventMediator.hpp"
 
-#endif // _IMGUIX_UTILS_PUBSUB_HPP_INCLUDED
+#endif // _IMGUIX_CORE_PUBSUB_HPP_INCLUDED

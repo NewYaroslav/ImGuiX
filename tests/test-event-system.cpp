@@ -2,9 +2,9 @@
 #include <memory>
 #include <string>
 
-#include "imguix/utils/pubsub.hpp"
+#include "imguix/core/pubsub.hpp"
 
-using namespace ImGuiX::utils;
+using namespace ImGuiX::Pubsub;
 
 // Пример конкретного события
 class MyEvent : public Event {
@@ -22,19 +22,31 @@ public:
     }
 };
 
-// Пример слушателя, реализующего интерфейс
+// Example listener that reacts to MyEvent and demonstrates different cast methods.
 class MyListener : public EventMediator {
 public:
     bool received = false;
 
     explicit MyListener(EventHub& hub) : EventMediator(&hub) {}
-    
+
     virtual ~MyListener() = default;
 
-    void on_event(const Event* const event) override {
-        if (auto* e = dynamic_cast<const MyEvent*>(event)) {
-            std::cout << "MyListener received: " << e->message << "\n";
+    void onEvent(const Event* const event) override {
+        // Check using is<T>() before attempting access
+        if (event->is<MyEvent>()) {
+            // Version 1: Throws on type mismatch (safe if checked beforehand)
+            std::cout << "MyListener received:\n";
+            std::cout << "(V1): " << event->asRef<MyEvent>().message << "\n";
+
+            // Version 2: Returns nullptr on type mismatch (safe but needs null-check if used directly)
+            std::cout << "(V2): " << event->as<MyEvent>()->message << "\n";
+
             received = true;
+        }
+
+        // Version 3: Traditional dynamic_cast (returns nullptr if mismatch)
+        if (const auto* e = dynamic_cast<const MyEvent*>(event)) {
+            std::cout << "(V3): " << e->message << "\n";
         }
     }
 };
@@ -66,7 +78,7 @@ int main() {
 
     // Проверка асинхронной очереди
     auto async_event = std::make_unique<MyEvent>("From async queue");
-    listener.notify_async(std::move(async_event));
+    listener.notifyAsync(std::move(async_event));
     hub.process();
 
     std::cout << "Test passed\n";

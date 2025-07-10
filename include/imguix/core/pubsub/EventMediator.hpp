@@ -1,11 +1,11 @@
 #pragma once
-#ifndef _IMGUIX_UTILS_EVENT_MEDIATOR_HPP_INCLUDED
-#define _IMGUIX_UTILS_EVENT_MEDIATOR_HPP_INCLUDED
+#ifndef _IMGUIX_PUBSUB_EVENT_MEDIATOR_HPP_INCLUDED
+#define _IMGUIX_PUBSUB_EVENT_MEDIATOR_HPP_INCLUDED
 
 /// \file EventMediator.hpp
 /// \brief Defines the EventMediator class for managing subscriptions and notifications through EventHub.
 
-namespace ImGuiX::utils {
+namespace ImGuiX::Pubsub {
 
     /// \class EventMediator
     /// \brief Facilitates event subscriptions and notifications through an associated EventHub.
@@ -83,14 +83,14 @@ namespace ImGuiX::utils {
 
         /// \brief Queues an event for asynchronous processing.
         /// \param event Unique pointer to the event.
-        void notify_async(std::unique_ptr<Event> event) {
-            m_event_hub->notify_async(std::move(event));
+        void notifyAsync(std::unique_ptr<Event> event) {
+            m_event_hub->notifyAsync(std::move(event));
         }
 
     private:
         EventHub* m_event_hub; ///< Associated EventHub instance.
     };
 
-} // namespace ImGuiX::utils
+} // namespace ImGuiX::Pubsub
 
-#endif // _IMGUIX_UTILS_EVENT_MEDIATOR_HPP_INCLUDED
+#endif // _IMGUIX_PUBSUB_EVENT_MEDIATOR_HPP_INCLUDED

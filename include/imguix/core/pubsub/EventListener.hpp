@@ -1,11 +1,11 @@
 #pragma once
-#ifndef _IMGUIX_UTILS_EVENT_LISTENER_HPP_INCLUDED
-#define _IMGUIX_UTILS_EVENT_LISTENER_HPP_INCLUDED
+#ifndef _IMGUIX_PUBSUB_EVENT_LISTENER_HPP_INCLUDED
+#define _IMGUIX_PUBSUB_EVENT_LISTENER_HPP_INCLUDED
 
 /// \file EventListener.hpp
 /// \brief Defines the EventListener class for receiving event notifications.
 
-namespace ImGuiX::utils {
+namespace ImGuiX::Pubsub {
 
     /// \class EventListener
     /// \brief Abstract base class for receiving event notifications.
@@ -18,9 +18,9 @@ namespace ImGuiX::utils {
 
         /// \brief Handles an event notification received as a raw pointer.
         /// \param event Raw pointer to the received event.
-        virtual void on_event(const Event* const event) = 0;
+        virtual void onEvent(const Event* const event) = 0;
     };
 
-} // namespace ImGuiX::utils
+} // namespace ImGuiX::Pubsub
 
-#endif // _IMGUIX_UTILS_EVENT_LISTENER_HPP_INCLUDED
+#endif // _IMGUIX_PUBSUB_EVENT_LISTENER_HPP_INCLUDED
