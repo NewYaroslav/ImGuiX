@@ -10,6 +10,17 @@
 #   include <imgui-SFML.h>
 #   include <SFML/Graphics.hpp>
 #endif
+#ifdef IMGUIX_USE_GLFW_BACKEND
+#   include <imgui_impl_glfw.h>
+#   include <imgui_impl_opengl3.h>
+#   include <GLFW/glfw3.h>
+#endif
+#ifdef IMGUIX_USE_SDL2_BACKEND
+#   include <imgui_impl_sdl2.h>
+#   include <imgui_impl_opengl3.h>
+#   include <SDL.h>
+#   include <SDL_opengles2.h>
+#endif
 
 namespace ImGuiX {
 
@@ -92,6 +103,11 @@ namespace ImGuiX {
     protected:
 #       ifdef IMGUIX_USE_SFML_BACKEND
         sf::RenderWindow m_window;
+#       elif defined(IMGUIX_USE_GLFW_BACKEND)
+        GLFWwindow* m_window = nullptr;
+#       elif defined(IMGUIX_USE_SDL2_BACKEND)
+        SDL_Window* m_window = nullptr;
+        SDL_GLContext m_gl_context = nullptr;
 #       endif
         int m_window_id;
         std::string m_window_name;
@@ -111,6 +127,10 @@ namespace ImGuiX {
 #   include "WindowInstance.ipp"
 #   ifdef IMGUIX_USE_SFML_BACKEND
 #       include "SfmlWindowInstance.ipp"
+#   elif defined(IMGUIX_USE_GLFW_BACKEND)
+#       include "GlfwWindowInstance.ipp"
+#   elif defined(IMGUIX_USE_SDL2_BACKEND)
+#       include "Sdl2WindowInstance.ipp"
 #   endif
 #endif
 
