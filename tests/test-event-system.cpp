@@ -27,7 +27,7 @@ class MyListener : public EventMediator {
 public:
     bool received = false;
 
-    explicit MyListener(EventHub& hub) : EventMediator(&hub) {}
+    explicit MyListener(EventBus& bus) : EventMediator(&bus) {}
 
     virtual ~MyListener() = default;
 
@@ -53,8 +53,8 @@ public:
 
 // Главный тест
 int main() {
-    EventHub hub;
-    MyListener listener(hub);
+    EventBus bus;
+    MyListener listener(bus);
 
     // Подписка на MyEvent
     listener.subscribe<MyEvent>();
@@ -79,7 +79,7 @@ int main() {
     // Проверка асинхронной очереди
     auto async_event = std::make_unique<MyEvent>("From async queue");
     listener.notifyAsync(std::move(async_event));
-    hub.process();
+    bus.process();
 
     std::cout << "Test passed\n";
     std::cin.get();

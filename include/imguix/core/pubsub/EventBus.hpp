@@ -1,15 +1,15 @@
 #pragma once
-#ifndef _IMGUIX_PUBSUB_EVENT_HUB_HPP_INCLUDED
-#define _IMGUIX_PUBSUB_EVENT_HUB_HPP_INCLUDED
+#ifndef _IMGUIX_PUBSUB_EVENT_BUS_HPP_INCLUDED
+#define _IMGUIX_PUBSUB_EVENT_BUS_HPP_INCLUDED
 
-/// \file EventHub.hpp
-/// \brief Contains the EventHub class for event-based communication between modules.
+/// \file EventBus.hpp
+/// \brief Contains the EventBus class for event-based communication between modules.
 
 namespace ImGuiX::Pubsub {
 
-    /// \class EventHub
+    /// \class EventBus
     /// \brief Manages subscriptions and notifications for event-based communication.
-    class EventHub {
+    class EventBus {
     public:
 		using callback_t = std::function<void(const Event* const)>;
 
@@ -76,7 +76,7 @@ namespace ImGuiX::Pubsub {
 } // namespace ImGuiX::Pubsub
 
 #if defined(IMGUIX_HEADER_ONLY)
-#include "EventHub.ipp"
+#include "EventBus.ipp"
 #endif
 
-#endif // _IMGUIX_PUBSUB_EVENT_HUB_HPP_INCLUDED
+#endif // _IMGUIX_PUBSUB_EVENT_BUS_HPP_INCLUDED

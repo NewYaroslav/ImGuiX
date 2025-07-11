@@ -18,7 +18,7 @@ namespace ImGuiX::Pubsub {
 
         /// \brief Handles an event notification received as a raw pointer.
         /// \param event Raw pointer to the received event.
-        virtual void onEvent(const Event* const event) = 0;
+        virtual void onEvent(const Event* const event) {};
     };
 
 } // namespace ImGuiX::Pubsub

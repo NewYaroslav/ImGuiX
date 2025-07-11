@@ -14,6 +14,6 @@ cmake -S . -B %BUILD_DIR% -G "MinGW Makefiles" ^
   -DIMGUIX_BUILD_TESTS=ON
 
 echo [INFO] Building...
-cmake --build %BUILD_DIR% -j
+cmake --build %BUILD_DIR% -j > build.log 2>&1
 
 pause

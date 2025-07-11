@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include "imguix/core/ResourceRegistry.hpp"
+#include "imguix/core/resource/ResourceRegistry.hpp"
 
 using namespace ImGuiX;
 

@@ -3,7 +3,7 @@
 namespace ImGuiX::Pubsub {
 
     template <typename EventType>
-    void EventHub::subscribe(EventListener* owner, std::function<void(const EventType&)> callback) {
+    void EventBus::subscribe(EventListener* owner, std::function<void(const EventType&)> callback) {
         static_assert(std::is_base_of<Event, EventType>::value, "EventType must be derived from Event");
 
         auto type = std::type_index(typeid(EventType));
@@ -17,7 +17,7 @@ namespace ImGuiX::Pubsub {
     }
 
     template <typename EventType>
-    void EventHub::subscribe(EventListener* owner, std::function<void(const Event* const)> callback) {
+    void EventBus::subscribe(EventListener* owner, std::function<void(const Event* const)> callback) {
         static_assert(std::is_base_of<Event, EventType>::value, "EventType must be derived from Event");
 
         auto type = std::type_index(typeid(EventType));
@@ -29,7 +29,7 @@ namespace ImGuiX::Pubsub {
     }
 
     template <typename EventType>
-    void EventHub::subscribe(EventListener* listener) {
+    void EventBus::subscribe(EventListener* listener) {
         static_assert(std::is_base_of<Event, EventType>::value, "EventType must be derived from Event");
 
         auto type = std::type_index(typeid(EventType));
@@ -42,7 +42,7 @@ namespace ImGuiX::Pubsub {
     }
 
     template <typename EventType>
-    void EventHub::unsubscribe(EventListener* owner) {
+    void EventBus::unsubscribe(EventListener* owner) {
         static_assert(std::is_base_of<Event, EventType>::value, "EventType must be derived from Event");
 
         auto type = std::type_index(typeid(EventType));
@@ -64,7 +64,7 @@ namespace ImGuiX::Pubsub {
         }
     }
 
-    inline void EventHub::notify(const Event* const event) const {
+    inline void EventBus::notify(const Event* const event) const {
 		auto type = std::type_index(typeid(*event));
 		
 		callback_list_t callbacks_copy;
@@ -91,16 +91,16 @@ namespace ImGuiX::Pubsub {
         }
     }
 
-    inline void EventHub::notify(const Event& event) const {
+    inline void EventBus::notify(const Event& event) const {
         notify(&event);
     }
 
-    inline void EventHub::notifyAsync(std::unique_ptr<Event> event) {
+    inline void EventBus::notifyAsync(std::unique_ptr<Event> event) {
         std::lock_guard<std::mutex> lock(m_queue_mutex);
         m_event_queue.push(std::move(event));
     }
 
-    inline void EventHub::process() {
+    inline void EventBus::process() {
 		std::queue<std::unique_ptr<Event>> local_queue;
 		
 		std::unique_lock<std::mutex> lock(m_queue_mutex);

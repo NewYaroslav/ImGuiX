@@ -68,7 +68,7 @@ namespace ImGuiX {
 
 } // namespace ImGuiX
 
-#if defined(IMGUIX_HEADER_ONLY)
+#ifdef IMGUIX_HEADER_ONLY
 #include "ResourceRegistry.ipp"
 #endif
 
