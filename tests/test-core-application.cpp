@@ -5,11 +5,71 @@
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
+#include <atomic>
+#include <chrono>
+#include <thread>
+
+class DemoWindow;
+
+/// \brief Event carrying seconds elapsed since application start.
+class SecondsElapsedEvent : public ImGuiX::Pubsub::Event {
+public:
+    int value;
+
+    explicit SecondsElapsedEvent(int seconds) : value(seconds) {}
+
+    std::type_index type() const override { return typeid(SecondsElapsedEvent); }
+    const char* name() const override { return "SecondsElapsedEvent"; }
+};
+
+/// \brief Model running a timer thread that posts SecondsElapsedEvent.
+class TimerModel : public ImGuiX::Model {
+public:
+    using Model::Model;
+
+    void onInit() override {
+        m_thread = std::thread([this]() { timerThread(); });
+    }
+
+    void process() override {}
+
+    ~TimerModel() override {
+        m_stop = true;
+        if (m_thread.joinable()) {
+            m_thread.join();
+        }
+    }
+
+private:
+    void timerThread() {
+        auto start = std::chrono::steady_clock::now();
+        while (!m_stop) {
+            int secs = static_cast<int>(
+                std::chrono::duration_cast<std::chrono::seconds>(
+                    std::chrono::steady_clock::now() - start)
+                    .count());
+            auto evt = std::make_unique<SecondsElapsedEvent>(secs);
+            notifyAsync(std::move(evt));
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            if (isClosing()) m_stop = true;
+        }
+    }
+
+    std::thread m_thread;
+    std::atomic<bool> m_stop{false};
+};
 
 /// \brief Контроллер, рисующий кнопку в ImGui и круг через SFML.
 class DemoController : public ImGuiX::Controller {
 public:
-    using Controller::Controller;
+    DemoController(ImGuiX::WindowControl& window, ImGuiX::Application& app)
+        : Controller(window), m_app(app) {
+        subscribe<SecondsElapsedEvent>([this](const SecondsElapsedEvent& e) {
+            if (window().id() == 0) {
+                m_seconds = e.value;
+            }
+        });
+    }
 
     void drawContent() override {
         sf::CircleShape shape(window().id() == 0 ? 100.f : 50.f);
@@ -20,13 +80,24 @@ public:
 
     void drawUi() override {
         ImGui::Begin(window().id() == 0 ? "Hello, world!" : "Works in a second window!");
-        ImGui::Button(window().id() == 0 ? "Look at this pretty button" : "Example button");
+        if (ImGui::Button(window().id() == 0 ? "Open new window" : "Example button")) {
+            if (window().id() == 0) {
+                m_app.createWindow<DemoWindow>("Additional Window");
+            }
+        }
+        if (window().id() == 0) {
+            ImGui::Text("Seconds elapsed: %d", m_seconds);
+        }
         ImGui::End();
 
         if (window().id() == 0) {
             ImGui::ShowDemoWindow();
         }
     }
+
+private:
+    ImGuiX::Application& m_app;
+    int m_seconds{0};
 };
 
 /// \brief Окно, к которому привязан DemoController.
@@ -38,8 +109,8 @@ public:
     }
 
     void onInit() override {
-        createController<DemoController>();
-		create(id() == 0 ? 800 : 640, id() == 0 ? 600 : 480U);
+        createController<DemoController>(static_cast<ImGuiX::Application&>(m_application));
+        create(id() == 0 ? 800 : 640, id() == 0 ? 600 : 480U);
     }
     
     virtual ~DemoWindow() {};
@@ -48,7 +119,7 @@ public:
 int main() {
     ImGuiX::Application app;
     app.createWindow<DemoWindow>("Main Window");
-    app.createWindow<DemoWindow>("Child Window");
+    app.createModel<TimerModel>();
     app.run();
     return 0;
 }
