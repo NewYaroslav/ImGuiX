@@ -53,7 +53,84 @@ int main() {
     return 0;
 }
 
+#elif defined(IMGUIX_USE_GLFW_BACKEND)
+
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+#include <GLFW/glfw3.h>
+
+class DemoController : public ImGuiX::Controller {
+public:
+    using Controller::Controller;
+
+    void drawContent() override {}
+
+    void drawUi() override {
+        ImGui::Begin("Hello, world!");
+        ImGui::Button("Look at this pretty button");
+        ImGui::End();
+        ImGui::ShowDemoWindow();
+    }
+};
+
+class DemoWindow : public ImGuiX::WindowInstance {
+public:
+    DemoWindow(int id, ImGuiX::ApplicationControl& app, std::string name)
+        : WindowInstance(id, app, std::move(name)) {}
+
+    void onInit() override {
+        createController<DemoController>();
+        create(800, 600);
+    }
+};
+
+int main() {
+    ImGuiX::Application app;
+    app.createWindow<DemoWindow>("Main Window");
+    app.run();
+    return 0;
+}
+
+#elif defined(IMGUIX_USE_SDL2_BACKEND)
+
+#include <imgui_impl_sdl2.h>
+#include <imgui_impl_opengl3.h>
+#include <SDL.h>
+
+class DemoController : public ImGuiX::Controller {
+public:
+    using Controller::Controller;
+
+    void drawContent() override {}
+
+    void drawUi() override {
+        ImGui::Begin("Hello, world!");
+        ImGui::Button("Look at this pretty button");
+        ImGui::End();
+        ImGui::ShowDemoWindow();
+    }
+};
+
+class DemoWindow : public ImGuiX::WindowInstance {
+public:
+    DemoWindow(int id, ImGuiX::ApplicationControl& app, std::string name)
+        : WindowInstance(id, app, std::move(name)) {}
+
+    void onInit() override {
+        createController<DemoController>();
+        create(800, 600);
+    }
+};
+
+int main() {
+    ImGuiX::Application app;
+    app.createWindow<DemoWindow>("Main Window");
+    app.run();
+    return 0;
+}
+
 #else
+
 
 /// \brief Простой контроллер для теста.
 class DummyController : public ImGuiX::Controller {
