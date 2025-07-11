@@ -42,7 +42,9 @@ namespace ImGuiX {
         WindowInstance(WindowInstance&&) = delete;
         WindowInstance& operator=(WindowInstance&&) = delete;
 
-        virtual ~WindowInstance() = default;
+        virtual ~WindowInstance() {
+			unsubscribeAll();
+		}
         
         /// \brief Optional callback invoked after the window is added to the manager.
         virtual void onInit() {}

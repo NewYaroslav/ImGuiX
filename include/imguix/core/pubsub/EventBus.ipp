@@ -63,24 +63,39 @@ namespace ImGuiX::Pubsub {
             list.erase(std::remove(list.begin(), list.end(), owner), list.end());
         }
     }
+    
+    inline void EventBus::unsubscribeAll(EventListener* owner) {
+        std::lock_guard<std::mutex> lock(m_subscriptions_mutex);
+
+        for (auto& [type, callback_list] : m_event_callbacks) {
+            callback_list.erase(std::remove_if(callback_list.begin(), callback_list.end(),
+                [owner](const CallbackRecord& rec) {
+                    return rec.owner == owner;
+                }), callback_list.end());
+        }
+
+        for (auto& [type, listener_list] : m_event_listeners) {
+            listener_list.erase(std::remove(listener_list.begin(), listener_list.end(), owner), listener_list.end());
+        }
+    }
 
     inline void EventBus::notify(const Event* const event) const {
-		auto type = std::type_index(typeid(*event));
-		
-		callback_list_t callbacks_copy;
-		listener_list_t listeners_copy;
-		
-		std::unique_lock<std::mutex> lock(m_subscriptions_mutex);
-		auto it = m_event_callbacks.find(type);
-		if (it != m_event_callbacks.end()) {
-			callbacks_copy = it->second;
-		}
+        auto type = std::type_index(typeid(*event));
+        
+        callback_list_t callbacks_copy;
+        listener_list_t listeners_copy;
+        
+        std::unique_lock<std::mutex> lock(m_subscriptions_mutex);
+        auto it = m_event_callbacks.find(type);
+        if (it != m_event_callbacks.end()) {
+            callbacks_copy = it->second;
+        }
 
-		auto it_listeners = m_event_listeners.find(type);
-		if (it_listeners != m_event_listeners.end()) {
-			listeners_copy = it_listeners->second;
-		}
-		lock.unlock();
+        auto it_listeners = m_event_listeners.find(type);
+        if (it_listeners != m_event_listeners.end()) {
+            listeners_copy = it_listeners->second;
+        }
+        lock.unlock();
 
         for (const auto& rec : callbacks_copy) {
             rec.callback(event);
@@ -101,17 +116,17 @@ namespace ImGuiX::Pubsub {
     }
 
     inline void EventBus::process() {
-		std::queue<std::unique_ptr<Event>> local_queue;
-		
-		std::unique_lock<std::mutex> lock(m_queue_mutex);
-		if (m_event_queue.empty()) return;
-		std::swap(local_queue, m_event_queue);
-		lock.unlock();
+        std::queue<std::unique_ptr<Event>> local_queue;
+        
+        std::unique_lock<std::mutex> lock(m_queue_mutex);
+        if (m_event_queue.empty()) return;
+        std::swap(local_queue, m_event_queue);
+        lock.unlock();
 
-		while (!local_queue.empty()) {
+        while (!local_queue.empty()) {
             notify(local_queue.front().get());
-			local_queue.pop();
-		}
+            local_queue.pop();
+        }
     }
 
 } // namespace ImGuiX::Pubsub

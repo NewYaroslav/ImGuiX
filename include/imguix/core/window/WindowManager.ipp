@@ -7,7 +7,7 @@ namespace ImGuiX {
 
     void WindowManager::addWindow(std::unique_ptr<WindowInstance> window) {
         m_pending_init.push_back(window.get());
-        m_windows.push_back(std::move(window));
+        m_pending_add.push_back(std::move(window));
     }
     
     void WindowManager::onEvent(const Pubsub::Event* const event) {
@@ -15,11 +15,12 @@ namespace ImGuiX {
             closeAll();
         }
     }
-	
-    void WindowManager::initializeAll() {
-        for (auto& window : m_windows) {
-            window->onInit();
+    
+    void WindowManager::flushPending() {
+        for (auto& window : m_pending_add) {
+            m_windows.push_back(std::move(window));
         }
+        m_pending_add.clear();
     }
 
     void WindowManager::initializePending() {
@@ -52,18 +53,21 @@ namespace ImGuiX {
 
     void WindowManager::drawUiAll() {
         for (auto& window : m_windows) {
+            if (!window->isOpen()) continue;
             window->drawUi();
         }
     }
 
     void WindowManager::drawContentAll() {
         for (auto& window : m_windows) {
+            if (!window->isOpen()) continue;
             window->drawContent();
         }
     }
 
     void WindowManager::presentAll() {
         for (auto& window : m_windows) {
+            if (!window->isOpen()) continue;
             window->present();
         }
     }

@@ -55,7 +55,6 @@ namespace ImGuiX {
         m_event_bus.notifyAsync(std::move(async_event));
     }
 
-    /// \brief Returns true if application is in closing state.
     bool Application::isClosing() const {
         return m_is_closing;
     }
@@ -84,27 +83,31 @@ namespace ImGuiX {
     }
 
     void Application::mainLoop() {
-        m_window_manager.initializeAll();
+        m_window_manager.flushPending();
+        m_window_manager.initializePending();
         initializePendingModels();
         while (true) {
+            m_window_manager.flushPending();
+
+            m_window_manager.initializePending();
+            initializePendingModels();
+
             m_window_manager.removeClosed();
             if (allWindowsClosed()) {
                 break;
             }
 
-            m_window_manager.initializePending();
-            initializePendingModels();
-
+            for (auto& model : m_models) {
+                model->process();
+            }
+            
             m_event_bus.process();
+
             m_window_manager.handleEvents();
             m_window_manager.tickAll();
             m_window_manager.drawContentAll();
             m_window_manager.drawUiAll();
             m_window_manager.presentAll();
-
-            for (auto& model : m_models) {
-                model->process();
-            }
         }
         m_is_closing = true;
     }

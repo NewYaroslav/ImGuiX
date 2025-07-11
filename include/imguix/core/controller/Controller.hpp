@@ -24,7 +24,9 @@ namespace ImGuiX {
         Controller(Controller&&) = delete;
         Controller& operator=(Controller&&) = delete;
 
-        virtual ~Controller() = default;
+        virtual ~Controller() {
+            unsubscribeAll();
+        }
 
         /// \brief Renders frame content (background, world, etc.).
         virtual void drawContent() = 0;

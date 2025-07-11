@@ -17,15 +17,17 @@ namespace ImGuiX {
         /// \param app Reference to application control interface.
         explicit WindowManager(ApplicationControl& app);
 
-        virtual ~WindowManager() = default;
+        virtual ~WindowManager() {
+			unsubscribeAll();
+		}
         
         void onEvent(const Pubsub::Event* const event) override;
 
         /// \brief Adds a new window to the manager.
         void addWindow(std::unique_ptr<WindowInstance> window);
 
-        /// \brief Calls onInit() on all windows (after they are added).
-        void initializeAll();
+        /// \brief
+        void flushPending();
 
         /// \brief Calls onInit() on newly added windows.
         void initializePending();
@@ -61,6 +63,7 @@ namespace ImGuiX {
 
     protected:
         std::vector<std::unique_ptr<WindowInstance>> m_windows;
+        std::vector<std::unique_ptr<WindowInstance>> m_pending_add;
         std::vector<WindowInstance*> m_pending_init;
         ApplicationControl& m_application;
 

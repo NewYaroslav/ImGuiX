@@ -43,22 +43,27 @@ namespace ImGuiX::Pubsub {
             m_event_bus->subscribe<EventType>(this, std::move(callback));
         }
 
-		/// \brief Subscribes this object as a listener to the specified event type.
-		/// \tparam EventType Type of the event to subscribe to.
+        /// \brief Subscribes this object as a listener to the specified event type.
+        /// \tparam EventType Type of the event to subscribe to.
         template <typename EventType>
         void subscribe() {
             m_event_bus->subscribe<EventType>(this);
         }
-		
-		/// \brief Unsubscribes this mediator from a specific event type.
-		/// \tparam EventType Type of the event to unsubscribe from.
-		template <typename EventType>
-		void unsubscribe() {
-			m_event_bus->unsubscribe<EventType>(this);
-		}
+        
+        /// \brief Unsubscribes this mediator from a specific event type.
+        /// \tparam EventType Type of the event to unsubscribe from.
+        template <typename EventType>
+        void unsubscribe() {
+            m_event_bus->unsubscribe<EventType>(this);
+        }
+        
+        /// \brief Unsubscribes this mediator from all event types.
+        void unsubscribeAll() {
+            m_event_bus->unsubscribeAll(this);
+        }
 
         /// \brief Notifies all subscribers of an event (shared pointer dereferenced).
-		/// \param event Shared pointer to the event.
+        /// \param event Shared pointer to the event.
         void notify(const std::shared_ptr<Event>& event) const {
             m_event_bus->notify(event.get());
         }

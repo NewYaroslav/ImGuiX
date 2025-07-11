@@ -1,3 +1,4 @@
+#include <iostream>
 #include <imguix/core.hpp>
 #include "imgui.h"
 
@@ -64,11 +65,15 @@ class DemoController : public ImGuiX::Controller {
 public:
     DemoController(ImGuiX::WindowControl& window, ImGuiX::Application& app)
         : Controller(window), m_app(app) {
-        subscribe<SecondsElapsedEvent>([this](const SecondsElapsedEvent& e) {
+        subscribe<SecondsElapsedEvent>();
+    }
+    
+    void onEvent(const ImGuiX::Pubsub::Event* const event) override {
+        if (event->is<SecondsElapsedEvent>()) {
             if (window().id() == 0) {
-                m_seconds = e.value;
+                m_seconds = event->asRef<SecondsElapsedEvent>().value;
             }
-        });
+        }
     }
 
     void drawContent() override {
@@ -79,6 +84,8 @@ public:
     }
 
     void drawUi() override {
+        ImGui::PushID(window().id());
+
         ImGui::Begin(window().id() == 0 ? "Hello, world!" : "Works in a second window!");
         if (ImGui::Button(window().id() == 0 ? "Open new window" : "Example button")) {
             if (window().id() == 0) {
@@ -93,6 +100,8 @@ public:
         if (window().id() == 0) {
             ImGui::ShowDemoWindow();
         }
+        
+        ImGui::PopID();
     }
 
 private:
