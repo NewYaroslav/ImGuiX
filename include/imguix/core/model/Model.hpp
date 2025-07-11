@@ -24,10 +24,13 @@ namespace ImGuiX {
         Model(Model&&) = delete;
         Model& operator=(Model&&) = delete;
 
-		virtual ~Model() = default;
+        virtual ~Model() = default;
 
-		/// \brief Called every frame by the application.
-		virtual void process() = 0;
+                /// \brief Optional initialization callback invoked once.
+        virtual void onInit() {}
+
+                /// \brief Called every frame by the application.
+        virtual void process() = 0;
 
 		/// \brief Requests the application to close gracefully.
 		virtual void close() {
