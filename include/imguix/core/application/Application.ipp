@@ -30,13 +30,14 @@ namespace ImGuiX {
         static_assert(std::is_base_of<WindowInstance, T>::value,
                       "T must derive from WindowInstance");
 
-        int id = static_cast<int>(m_window_manager.windowCount());
+        int id = m_next_window_id++;
 
         auto window = std::make_unique<T>(id, *this,
                                           std::forward<Args>(args)...);
+        T& ref = *window;
 
         m_window_manager.addWindow(std::move(window));
-        return *window;
+        return ref;
     }
     
     template<typename T, typename... Args>
@@ -44,6 +45,7 @@ namespace ImGuiX {
         static_assert(std::is_base_of<Model, T>::value, "T must be derived from Model");
         auto model = std::make_unique<T>(*this, std::forward<Args>(args)...);
         T& ref = *model;
+        m_pending_models.push_back(model.get());
         m_models.emplace_back(std::move(model));
         return ref;
     }
@@ -73,20 +75,38 @@ namespace ImGuiX {
     bool Application::allWindowsClosed() const {
         return m_window_manager.allWindowsClosed();
     }
-    
+
+    void Application::initializePendingModels() {
+        for (auto* model : m_pending_models) {
+            if (model) model->onInit();
+        }
+        m_pending_models.clear();
+    }
+
     void Application::mainLoop() {
         m_window_manager.initializeAll();
-		while (!allWindowsClosed()) {
+        initializePendingModels();
+        while (true) {
+            m_window_manager.removeClosed();
+            if (allWindowsClosed()) {
+                break;
+            }
+
+            m_window_manager.initializePending();
+            initializePendingModels();
+
             m_event_bus.process();
             m_window_manager.handleEvents();
             m_window_manager.tickAll();
             m_window_manager.drawContentAll();
             m_window_manager.drawUiAll();
             m_window_manager.presentAll();
-			for (auto &model : m_models) {
-				model->process();
-			}
+
+            for (auto& model : m_models) {
+                model->process();
+            }
         }
         m_is_closing = true;
     }
-} // namespace imguix
+} // namespace ImGuiX
+

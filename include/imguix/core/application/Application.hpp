@@ -69,8 +69,10 @@ namespace ImGuiX {
         WindowManager m_window_manager;
         std::thread m_main_thread;
         std::atomic<bool> m_is_closing{false};
+        std::atomic<int> m_next_window_id{0};
         std::string m_app_name = "ImGuiX Application";
-		std::vector<std::unique_ptr<Model>> m_models;
+        std::vector<std::unique_ptr<Model>> m_models;
+        std::vector<Model*> m_pending_models;
 
         /// \brief Main application loop.
         void mainLoop();
@@ -78,6 +80,9 @@ namespace ImGuiX {
         /// \brief Checks if all windows have been closed.
         /// \return True if no windows remain open.
         bool allWindowsClosed() const;
+
+        /// \brief Initializes all pending models.
+        void initializePendingModels();
     };
 
 } // namespace ImGuiX
@@ -87,3 +92,4 @@ namespace ImGuiX {
 #endif
 
 #endif // _IMGUIX_CORE_APPLICATION_HPP_INCLUDED
+

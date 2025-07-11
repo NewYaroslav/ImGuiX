@@ -1,9 +1,12 @@
+#include <algorithm>
+
 namespace ImGuiX {
 
     WindowManager::WindowManager(ApplicationControl& app)
         : EventMediator(app.eventBus()), m_application(app) {}
 
     void WindowManager::addWindow(std::unique_ptr<WindowInstance> window) {
+        m_pending_init.push_back(window.get());
         m_windows.push_back(std::move(window));
     }
     
@@ -17,6 +20,13 @@ namespace ImGuiX {
         for (auto& window : m_windows) {
             window->onInit();
         }
+    }
+
+    void WindowManager::initializePending() {
+        for (auto* window : m_pending_init) {
+            if (window) window->onInit();
+        }
+        m_pending_init.clear();
     }
 
     void WindowManager::closeAll() {
@@ -58,17 +68,21 @@ namespace ImGuiX {
         }
     }
 
+    void WindowManager::removeClosed() {
+        m_windows.erase(
+            std::remove_if(m_windows.begin(), m_windows.end(),
+                           [](const std::unique_ptr<WindowInstance>& w) {
+                               return w == nullptr || !w->isOpen();
+                           }),
+            m_windows.end());
+    }
+
     std::size_t WindowManager::windowCount() const {
         return m_windows.size();
     }
 
     bool WindowManager::allWindowsClosed() const {
-        for (const auto& window : m_windows) {
-            if (window && window->isOpen()) {
-                return false;
-            }
-        }
-        return true;
+        return m_windows.empty();
     }
 
     ResourceRegistry& WindowManager::registry() {
@@ -76,3 +90,4 @@ namespace ImGuiX {
     }
 
 } // namespace ImGuiX
+

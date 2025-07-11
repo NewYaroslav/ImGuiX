@@ -23,9 +23,15 @@ namespace ImGuiX {
 
         /// \brief Adds a new window to the manager.
         void addWindow(std::unique_ptr<WindowInstance> window);
-        
+
         /// \brief Calls onInit() on all windows (after they are added).
         void initializeAll();
+
+        /// \brief Calls onInit() on newly added windows.
+        void initializePending();
+
+        /// \brief Removes windows that are no longer open.
+        void removeClosed();
 
         /// \brief Closes all managed windows.
         void closeAll();
@@ -55,6 +61,7 @@ namespace ImGuiX {
 
     protected:
         std::vector<std::unique_ptr<WindowInstance>> m_windows;
+        std::vector<WindowInstance*> m_pending_init;
         ApplicationControl& m_application;
 
         /// \brief Shortcut to the application resource registry.
@@ -68,3 +75,4 @@ namespace ImGuiX {
 #endif
 
 #endif // _IMGUIX_CORE_WINDOW_MANAGER_HPP_INCLUDED
+
