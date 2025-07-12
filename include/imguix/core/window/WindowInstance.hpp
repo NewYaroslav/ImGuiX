@@ -100,6 +100,7 @@ namespace ImGuiX {
 
         Pubsub::EventBus& eventBus() override;
         ResourceRegistry& registry() override;
+        ApplicationControl& application() override;
 #       ifdef IMGUIX_USE_SFML_BACKEND
         sf::RenderWindow& getRenderTarget() override;
 #       endif

@@ -58,6 +58,10 @@ namespace ImGuiX {
     ResourceRegistry& WindowInstance::registry() {
         return m_application.registry();
     }
+	
+    ApplicationControl& WindowInstance::application() {
+        return m_application;
+    }
     
 #   ifdef IMGUIX_USE_SFML_BACKEND
     sf::RenderWindow& WindowInstance::getRenderTarget() {

@@ -30,10 +30,10 @@ namespace ImGuiX {
         /// \param async If true, runs the main loop in a separate thread.
         void run(bool async = false);
 
-        /// \brief Creates a window with a given type and arguments.
-        /// \tparam T Type derived from WindowInstance.
+        /// \brief Creates a new window instance of the specified type.
+        /// \tparam WindowType Type derived from WindowInstance.
         /// \tparam Args Arguments forwarded to the window constructor.
-        /// \return Reference to the created window.
+        /// \return Reference to the created window instance.
         template<typename T, typename... Args>
         T& createWindow(Args&&... args);
         

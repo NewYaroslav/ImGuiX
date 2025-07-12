@@ -1,15 +1,15 @@
 #include <iostream>
 #include <imguix/core.hpp>
 #include <imguix/windows/ImGuiFramedWindow.hpp>
+#include <imguix/controllers/ExtendedController.hpp>
 
 #if defined(IMGUIX_USE_SFML_BACKEND)
 
 class DemoFramedWindow;
 
-class DemoFramedController : public ImGuiX::Controller {
+class DemoFramedController : public ImGuiX::Controllers::ExtendedController {
 public:
-    DemoFramedController(ImGuiX::WindowControl& window, ImGuiX::Application& app)
-        : Controller(window), m_app(app) {}
+    using ExtendedController::ExtendedController;
 
     void drawContent() override {
         sf::RenderWindow& target = window().getRenderTarget();
@@ -23,7 +23,7 @@ public:
         ImGui::Begin("ImGui Framed Controller");
         ImGui::Text("This is a custom ImGui-framed window");
         if (ImGui::Button("Open Another Window")) {
-            m_app.createWindow<DemoFramedWindow>("Framed Window", "ImGui Window");
+            createWindow<DemoFramedWindow>("Framed Window", "ImGui Window");
         }
         if (ImGui::Button("Close Window")) {
             window().close();
@@ -32,9 +32,6 @@ public:
 
         ImGui::ShowDemoWindow();
     }
-
-private:
-    ImGuiX::Application& m_app;
 };
 
 class DemoFramedWindow : public ImGuiX::Windows::ImGuiFramedWindow {
@@ -47,7 +44,7 @@ public:
             WindowFlags::DefaultControlButtons) {}
 
     void onInit() override {
-        createController<DemoFramedController>(static_cast<ImGuiX::Application&>(m_application));
+        createController<DemoFramedController>();
         create(800, 600);
         ImGui::StyleColorsLight();
         ImGui::GetStyle().WindowRounding = 8.0f;
