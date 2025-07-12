@@ -48,6 +48,12 @@ namespace ImGuiX {
 
         /// \brief Restores the window from minimized or maximized state.
         virtual void restore() = 0;
+        
+        /// \brief Returns true if window is currently maximized.
+        virtual bool isMaximized() const = 0;
+
+        /// \brief Toggles between maximized and restored states.
+        virtual void toggleMaximizeRestore() = 0;
 
         /// \brief Sets whether the window is active (focused).
         virtual bool setActive(bool active) = 0;

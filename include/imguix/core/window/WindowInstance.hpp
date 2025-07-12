@@ -43,8 +43,8 @@ namespace ImGuiX {
         WindowInstance& operator=(WindowInstance&&) = delete;
 
         virtual ~WindowInstance() {
-			unsubscribeAll();
-		}
+            unsubscribeAll();
+        }
         
         /// \brief Optional callback invoked after the window is added to the manager.
         virtual void onInit() {}
@@ -89,6 +89,8 @@ namespace ImGuiX {
         void minimize() override;
         void maximize() override;
         void restore() override;
+        bool isMaximized() const override;
+        void toggleMaximizeRestore() override;
 
         bool setActive(bool active) override;
         bool isActive() const override;

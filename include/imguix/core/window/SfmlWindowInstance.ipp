@@ -139,6 +139,25 @@ namespace ImGuiX {
         }
     }
     
+    bool WindowInstance::isMaximized() const {
+#       ifdef _WIN32
+        HWND hwnd = m_window.getNativeHandle();
+        if (::IsZoomed(hwnd)) return true;
+#       endif
+        return false;
+    }
+    
+    void WindowInstance::toggleMaximizeRestore() {
+#       ifdef _WIN32
+        HWND hwnd = m_window.getNativeHandle();
+        if (isMaximized()) {
+            ::ShowWindow(hwnd, SW_RESTORE);
+        } else {
+            ::ShowWindow(hwnd, SW_MAXIMIZE);
+        }
+#       endif
+    }
+    
     bool WindowInstance::setActive(bool active) {
         if (m_window.isOpen()) {
             m_is_active = m_window.setActive(active);
