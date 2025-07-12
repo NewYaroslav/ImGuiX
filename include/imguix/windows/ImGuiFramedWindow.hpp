@@ -61,20 +61,11 @@ namespace ImGuiX::Windows {
 #       endif
     
     protected:
-		/// \brief Draws the title bar text. Can be overridden to add icons or change alignment.
+        /// \brief Draws the title bar text. Can be overridden to add icons or change alignment.
         virtual void drawTitleBarText();
         void drawControlButtons(float title_padding_x);
         void drawMacStyledControlButtons(float title_padding_x);
         void drawImGuiStyledControlButtons(float title_padding_x);
-        bool drawCircleButton(const char* id, float diameter, const ImVec4& color);
-        
-        enum class SystemButtonType {
-            Close,
-            Minimize,
-            Maximize
-        };
-
-        bool drawSystemButton(const char* id, SystemButtonType type, ImVec2 size);
         void renderFrameManually();
     };
 

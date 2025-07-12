@@ -1,4 +1,6 @@
 #include <imgui.h>
+#include <imguix/widgets/circle_button.hpp>
+#include <imguix/widgets/system_button.hpp>
 
 namespace ImGuiX::Windows {
     
@@ -98,7 +100,7 @@ namespace ImGuiX::Windows {
         ImVec2 btn_min, btn_max;
         float center_y = (m_config.title_bar_height - btn_size.y) * 0.5f;
         ImGui::SetCursorPos(ImVec2(ImGui::GetWindowWidth() - btn_padding, center_y));
-        if (drawCircleButton("##imguix_btn_minimize", btn_diameter, ImVec4(1.0f, 0.74f, 0.18f, 1.0f))) {
+        if (Widgets::CircleButton("##imguix_btn_minimize", btn_diameter, ImVec4(1.0f, 0.74f, 0.18f, 1.0f))) {
             minimize();
         }
 
@@ -114,7 +116,7 @@ namespace ImGuiX::Windows {
 #       endif
         
         ImGui::SameLine();
-        if (drawCircleButton("##imguix_btn_maximize", btn_diameter, ImVec4(0.15f, 0.79f, 0.25f, 1.0f))) {
+        if (Widgets::CircleButton("##imguix_btn_maximize", btn_diameter, ImVec4(0.15f, 0.79f, 0.25f, 1.0f))) {
             toggleMaximizeRestore();
         }
 
@@ -130,7 +132,7 @@ namespace ImGuiX::Windows {
 #       endif
 
         ImGui::SameLine();
-        if (drawCircleButton("##imguix_btn_close", btn_diameter, ImVec4(1.0f, 0.0f, 0.0f, 1.0f))) {
+        if (Widgets::CircleButton("##imguix_btn_close", btn_diameter, ImVec4(1.0f, 0.0f, 0.0f, 1.0f))) {
             close();
         }
  
@@ -158,7 +160,7 @@ namespace ImGuiX::Windows {
         ImVec2 btn_min, btn_max;
         float center_y = (m_config.title_bar_height - btn_size.y) * 0.5f;
         ImGui::SetCursorPos(ImVec2(ImGui::GetWindowWidth() - btn_padding, center_y));
-        if (drawSystemButton("##imguix_btn_minimize", SystemButtonType::Minimize, btn_size)) {
+        if (Widgets::SystemButton("##imguix_btn_minimize", Widgets::SystemButtonType::Minimize, btn_size)) {
             minimize();
         }
 
@@ -174,7 +176,7 @@ namespace ImGuiX::Windows {
 #       endif
         
         ImGui::SameLine();
-        if (drawSystemButton("##imguix_btn_maximize", SystemButtonType::Maximize, btn_size)) {
+        if (Widgets::SystemButton("##imguix_btn_maximize", Widgets::SystemButtonType::Maximize, btn_size)) {
             toggleMaximizeRestore();
         }
 
@@ -190,7 +192,7 @@ namespace ImGuiX::Windows {
 #       endif
 
         ImGui::SameLine();
-        if (drawSystemButton("##imguix_btn_close", SystemButtonType::Close, btn_size)) {
+        if (Widgets::SystemButton("##imguix_btn_close", Widgets::SystemButtonType::Close, btn_size)) {
             close();
         }
  
@@ -206,72 +208,6 @@ namespace ImGuiX::Windows {
 #       endif
 
         ImGui::PopStyleVar();
-    }
-
-    bool ImGuiFramedWindow::drawCircleButton(const char* id, float diameter, const ImVec4& color) {
-        ImVec2 size = ImVec2(diameter, diameter);
-        ImVec2 pos = ImGui::GetCursorScreenPos();
-        ImGui::InvisibleButton(id, size);
-
-        ImDrawList* draw_list = ImGui::GetWindowDrawList();
-        ImVec2 center = ImVec2(pos.x + diameter * 0.5f, pos.y + diameter * 0.5f);
-
-        ImVec4 final_col = color;
-        if (ImGui::IsItemHovered()) final_col = ImGui::GetStyleColorVec4(ImGuiCol_ButtonHovered);
-        if (ImGui::IsItemActive())  final_col = ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive);
-
-        draw_list->AddCircleFilled(center, diameter * 0.5f, ImGui::ColorConvertFloat4ToU32(final_col), 16);
-
-        return ImGui::IsItemClicked();
-    }
-    
-    bool ImGuiFramedWindow::drawSystemButton(const char* id, SystemButtonType type, ImVec2 size) {
-        ImVec2 pos = ImGui::GetCursorScreenPos();
-        ImGui::InvisibleButton(id, size);
-        ImDrawList* draw_list = ImGui::GetWindowDrawList();
-
-        const bool is_hovered = ImGui::IsItemHovered();
-        const bool is_active  = ImGui::IsItemActive();
-
-        // Используем прямоугольник только при наведении или нажатии
-        if (is_hovered || is_active) {
-            ImVec4 bg_col = ImGui::GetStyleColorVec4(is_active ? ImGuiCol_ButtonActive : ImGuiCol_ButtonHovered);
-            draw_list->AddRectFilled(pos,
-                                     ImVec2(pos.x + size.x, pos.y + size.y),
-                                     ImGui::ColorConvertFloat4ToU32(bg_col),
-                                     2.0f);
-        }
-
-        // Цвет символа
-        ImVec4 fg_col = ImGui::GetStyleColorVec4(ImGuiCol_Text);
-        ImU32 col_u32 = ImGui::ColorConvertFloat4ToU32(fg_col);
-
-        // Центр кнопки
-        ImVec2 center = ImVec2(pos.x + size.x * 0.5f, pos.y + size.y * 0.5f);
-        float cross_extent = size.x * 0.25f;
-        float line_thickness = 1.0f;
-
-        if (type == SystemButtonType::Close) {
-            ImVec2 a1 = ImVec2(center.x - cross_extent, center.y - cross_extent);
-            ImVec2 b1 = ImVec2(center.x + cross_extent, center.y + cross_extent);
-            ImVec2 a2 = ImVec2(center.x - cross_extent, center.y + cross_extent);
-            ImVec2 b2 = ImVec2(center.x + cross_extent, center.y - cross_extent);
-            draw_list->AddLine(a1, b1, col_u32, line_thickness);
-            draw_list->AddLine(a2, b2, col_u32, line_thickness);
-        }
-        else if (type == SystemButtonType::Minimize) {
-            ImVec2 a = ImVec2(center.x - cross_extent, center.y);
-            ImVec2 b = ImVec2(center.x + cross_extent, center.y);
-            draw_list->AddLine(a, b, col_u32, line_thickness);
-        }
-        else if (type == SystemButtonType::Maximize) {
-            float half = cross_extent * 0.85f;
-            ImVec2 tl = ImVec2(center.x - half, center.y - half);
-            ImVec2 br = ImVec2(center.x + half, center.y + half);
-            draw_list->AddRect(tl, br, col_u32, 0.0f, 0, line_thickness);
-        }
-
-        return ImGui::IsItemClicked();
     }
 
     void ImGuiFramedWindow::renderFrameManually() {
