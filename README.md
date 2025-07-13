@@ -4,7 +4,13 @@
 
 Библиотека предназначена для тех, кто хочет структурировать UI через классы, управлять экранами через контроллеры, обрабатывать события через EventBus и легко расширять интерфейс новыми компонентами.
 
-> **Важно:** ImGuiX реализует *MVC-like* архитектуру, адаптированную под Immediate Mode GUI. Контроллеры в себе совмещают логику и отображение (update/render), а модельные компоненты общаются с ними через событийную шину.
+> **Примечание:** ImGuiX использует *MVC-like* архитектуру, подробнее см. раздел [Архитектура](#архитектура).
+
+## Архитектура
+
+ImGuiX следует адаптированному под Immediate Mode GUI подходу, напоминающему **MVC**.
+
+В отличие от классического *MVC*, здесь роли *View* и *Controller* объединены: каждый контроллер отвечает и за логику, и за отрисовку виджетов в одном кадре. Модели взаимодействуют с контроллерами через событийную шину (EventBus), что обеспечивает слабую связанность и гибкую маршрутизацию событий.
 
 ## Особенности
 
@@ -19,6 +25,15 @@
 ## Установка
 
 (описание будет позже)
+
+## Fonts and Licensing
+
+This repository includes third-party font files under the following licenses:
+
+- **FontAwesome, ForkAwesome, Fontaudio** – licensed under the [SIL Open Font License 1.1](licenses/OFL.txt)
+- **Material Icons, Roboto** – licensed under the [Apache License 2.0](licenses/LICENSE-APACHE-2.0.txt)
+
+All fonts are used as-is, without modification. See individual font licenses for more details.
 
 ## Лицензия
 

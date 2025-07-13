@@ -1,0 +1,6 @@
+Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+...
+(This is a truncated version — the full license is in the file)
+Full text: https://www.apache.org/licenses/LICENSE-2.0
