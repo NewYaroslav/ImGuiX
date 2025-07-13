@@ -50,7 +50,7 @@ namespace ImGuiX {
         }
 
     protected:
-        WindowControl& m_window;
+        WindowControl& m_window; ///< Controlled window instance.
     };
 
 } // namespace ImGuiX

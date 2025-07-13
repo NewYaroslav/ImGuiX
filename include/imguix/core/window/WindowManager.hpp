@@ -17,16 +17,18 @@ namespace ImGuiX {
         /// \param app Reference to application control interface.
         explicit WindowManager(ApplicationControl& app);
 
+        /// \brief Destructor. Unsubscribes from all events.
         virtual ~WindowManager() {
-			unsubscribeAll();
-		}
-        
+                        unsubscribeAll();
+                }
+
+        /// \brief Handles events posted to the global bus.
         void onEvent(const Pubsub::Event* const event) override;
 
         /// \brief Adds a new window to the manager.
         void addWindow(std::unique_ptr<WindowInstance> window);
 
-        /// \brief
+        /// \brief Moves pending windows into the active list.
         void flushPending();
 
         /// \brief Calls onInit() on newly added windows.
@@ -62,12 +64,13 @@ namespace ImGuiX {
         bool allWindowsClosed() const;
 
     protected:
-        std::vector<std::unique_ptr<WindowInstance>> m_windows;
-        std::vector<std::unique_ptr<WindowInstance>> m_pending_add;
-        std::vector<WindowInstance*> m_pending_init;
-        ApplicationControl& m_application;
+        std::vector<std::unique_ptr<WindowInstance>> m_windows;      ///< Managed windows.
+        std::vector<std::unique_ptr<WindowInstance>> m_pending_add; ///< Newly created windows waiting to be added.
+        std::vector<WindowInstance*> m_pending_init;                 ///< Windows pending initialization.
+        ApplicationControl& m_application;                           ///< Reference to the owning application.
 
         /// \brief Shortcut to the application resource registry.
+        /// \return Reference to the ResourceRegistry owned by the application.
         ResourceRegistry& registry();
     };
 

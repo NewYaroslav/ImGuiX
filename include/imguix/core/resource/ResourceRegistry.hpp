@@ -59,11 +59,11 @@ namespace ImGuiX {
         void clearAll();
 
     private:
-        std::unordered_map<std::type_index, std::shared_ptr<void>> m_resources;
-        std::unordered_set<std::type_index> m_in_progress;
+        std::unordered_map<std::type_index, std::shared_ptr<void>> m_resources; ///< Stored resources by type.
+        std::unordered_set<std::type_index> m_in_progress; ///< Types currently being created.
 
-        mutable std::shared_mutex m_resources_mutex;
-        mutable std::shared_mutex m_progress_mutex;
+        mutable std::shared_mutex m_resources_mutex; ///< Protects resource map.
+        mutable std::shared_mutex m_progress_mutex;  ///< Protects initialization set.
     };
 
 } // namespace ImGuiX

@@ -78,11 +78,19 @@ namespace ImGuiX {
 
         // --- WindowControl interface ---
 
+        /// \brief Returns the unique ID of this window.
         int id() const override;
+
+        /// \brief Returns the window name used as title.
         const std::string& name() const override;
 
+        /// \brief Current width of the window in pixels.
         int width() const override;
+
+        /// \brief Current height of the window in pixels.
         int height() const override;
+
+        /// \brief Sets window dimensions in pixels.
         void setSize(int w, int h) override;
         
         /// \brief Sets the window icon from an image file (currently SFML only).
@@ -90,23 +98,46 @@ namespace ImGuiX {
         /// \return True if the icon was loaded and applied successfully.
         bool setWindowIcon(const std::string& path) override;
 		
-		void setDisableBackground(bool disable) override {};
+        /// \brief Enables or disables clearing the background between frames.
+                void setDisableBackground(bool disable) override {};
 
+        /// \brief Requests the window to close.
         void close() override;
+
+        /// \brief Minimizes the window.
         void minimize() override;
+
+        /// \brief Maximizes the window.
         void maximize() override;
+
+        /// \brief Restores the window from minimized or maximized state.
         void restore() override;
+
+        /// \brief Checks whether the window is maximized.
         bool isMaximized() const override;
+
+        /// \brief Toggles between maximized and restored states.
         void toggleMaximizeRestore() override;
 
+        /// \brief Activates or deactivates the window.
         bool setActive(bool active) override;
+
+        /// \brief Returns true if the window currently has focus.
         bool isActive() const override;
 
+        /// \brief Shows or hides the window.
         void setVisible(bool visible) override;
+
+        /// \brief Returns true if the window is open.
         bool isOpen() const override;
 
+        /// \brief Access to the global event bus.
         Pubsub::EventBus& eventBus() override;
+
+        /// \brief Access to the shared resource registry.
         ResourceRegistry& registry() override;
+
+        /// \brief Reference to the owning application.
         ApplicationControl& application() override;
 #       ifdef IMGUIX_USE_SFML_BACKEND
         sf::RenderWindow& getRenderTarget() override;
@@ -114,23 +145,23 @@ namespace ImGuiX {
 
     protected:
 #       ifdef IMGUIX_USE_SFML_BACKEND
-        sf::RenderWindow m_window;
+        sf::RenderWindow m_window; ///< Underlying SFML render window.
 #       elif defined(IMGUIX_USE_GLFW_BACKEND)
-        GLFWwindow* m_window = nullptr;
+        GLFWwindow* m_window = nullptr; ///< Pointer to the GLFW window.
 #       elif defined(IMGUIX_USE_SDL2_BACKEND)
-        SDL_Window* m_window = nullptr;
-        SDL_GLContext m_gl_context = nullptr;
+        SDL_Window* m_window = nullptr;   ///< SDL window handle.
+        SDL_GLContext m_gl_context = nullptr; ///< Associated GL context.
 #       endif
-        int m_window_id;
-        std::string m_window_name;
-        int m_width = 1280;
-        int m_height = 720;
-        bool m_is_active = true;
-        bool m_is_open = false;
-        bool m_is_visible = true;
+        int m_window_id;                    ///< Unique window identifier.
+        std::string m_window_name;          ///< Internal window name.
+        int m_width = 1280;                 ///< Current window width.
+        int m_height = 720;                 ///< Current window height.
+        bool m_is_active = true;            ///< Whether the window has focus.
+        bool m_is_open = false;             ///< Whether the window is currently open.
+        bool m_is_visible = true;           ///< Visibility flag.
 
-        ApplicationControl& m_application;
-        std::vector<std::unique_ptr<Controller>> m_controllers;
+        ApplicationControl& m_application;  ///< Reference to the owning application.
+        std::vector<std::unique_ptr<Controller>> m_controllers; ///< Attached controllers.
     };
 
 } // namespace imguix

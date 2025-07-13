@@ -1,6 +1,10 @@
+
 #pragma once
 #ifndef _IMGUIX_WINDOWS_WINDOW_FLAG_HPP_INCLUDED
 #define _IMGUIX_WINDOWS_WINDOW_FLAG_HPP_INCLUDED
+
+/// \file window_flags.hpp
+/// \brief Flag enumeration for configuring ImGuiX window behavior.
 
 #include <cstdint>
 

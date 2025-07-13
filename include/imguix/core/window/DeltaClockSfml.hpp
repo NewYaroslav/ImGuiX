@@ -2,6 +2,9 @@
 #ifndef _IMGUIX_CORE_TIME_DELTA_CLOCK_SFML_HPP_INCLUDED
 #define _IMGUIX_CORE_TIME_DELTA_CLOCK_SFML_HPP_INCLUDED
 
+/// \file DeltaClockSfml.hpp
+/// \brief Lightweight wrapper around sf::Clock for delta timing.
+
 #include <SFML/System/Clock.hpp>
 #include <SFML/System/Time.hpp>
 
@@ -21,8 +24,8 @@ namespace ImGuiX {
         }
 
     private:
-        sf::Clock m_clock;
-        sf::Time m_delta;
+        sf::Clock m_clock; ///< Underlying SFML clock.
+        sf::Time m_delta;  ///< Time elapsed since last update.
     };
 
 } // namespace ImGuiX

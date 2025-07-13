@@ -23,29 +23,36 @@ namespace ImGuiX {
         virtual ~WindowControl() = default;
 
         /// \brief Returns unique window ID.
-        /// \return 
+        /// \return Window identifier.
         virtual int id() const = 0;
 
         /// \brief Returns window name (title).
-        /// \return 
+        /// \return String with window title.
         virtual const std::string& name() const = 0;
 
         /// \brief Returns current window width in pixels.
-        /// \return 
+        /// \return Width in pixels.
         virtual int width() const = 0;
 
         /// \brief Returns current window height in pixels.
-        /// \return 
+        /// \return Height in pixels.
         virtual int height() const = 0;
 		
 		/// \brief Sets the window icon from an image file (currently SFML only).
 		/// \param path Path to the icon image file (must be .png or .bmp, 32x32 or 64x64 recommended).
 		/// \return True if the icon was loaded and applied successfully.
+        /// \brief Sets the window icon from an image file.
+        /// \param path Path to an image file.
+        /// \return True if the icon was applied successfully.
         virtual bool setWindowIcon(const std::string& path) = 0;
-		
+
+        /// \brief Enables or disables background clearing between frames.
+        /// \param disable True to disable clearing.
         virtual void setDisableBackground(bool disable) = 0;
 
         /// \brief Sets window dimensions in pixels.
+        /// \param w New width.
+        /// \param h New height.
         virtual void setSize(int w, int h) = 0;
 
         /// \brief Closes the window.
@@ -61,37 +68,37 @@ namespace ImGuiX {
         virtual void restore() = 0;
         
         /// \brief Returns true if window is currently maximized.
-        /// \return 
+        /// \return True when maximized.
         virtual bool isMaximized() const = 0;
 
         /// \brief Toggles between maximized and restored states.
         virtual void toggleMaximizeRestore() = 0;
 
         /// \brief Sets whether the window is active (focused).
-        /// \return 
+        /// \return True if the operation succeeded.
         virtual bool setActive(bool active) = 0;
 
         /// \brief Returns true if the window is currently active (focused).
-        /// \return 
+        /// \return True when active.
         virtual bool isActive() const = 0;
 
         /// \brief Sets whether the window is visible.
         virtual void setVisible(bool visible) = 0;
 
         /// \brief Returns true if the window is currently open.
-        /// \return 
+        /// \return True while the window exists.
         virtual bool isOpen() const = 0;
 
         /// \brief Provides access to the global event bus.
-        /// \return 
+        /// \return Reference to the EventBus.
         virtual Pubsub::EventBus& eventBus() = 0;
 
         /// \brief Provides access to the global resource registry.
-        /// \return 
+        /// \return Reference to the ResourceRegistry.
         virtual ResourceRegistry& registry() = 0;
         
-        /// \brief 
-        /// \return 
+        /// \brief Returns the owning application interface.
+        /// \return Reference to ApplicationControl.
         virtual ApplicationControl& application() = 0;
 
 #       ifdef IMGUIX_USE_SFML_BACKEND
