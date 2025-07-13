@@ -21,10 +21,10 @@ function(copy_imgui_fonts TARGET)
             get_filename_component(FONT_NAME ${FONT_FILE} NAME)
             add_custom_command(TARGET ${TARGET} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E make_directory
-                    $<TARGET_FILE_DIR:${TARGET}>/data/fonts
+                    $<TARGET_FILE_DIR:${TARGET}>/data/resources/fonts
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
                     "${FONT_FILE}"
-                    $<TARGET_FILE_DIR:${TARGET}>/data/fonts/${FONT_NAME}
+                    $<TARGET_FILE_DIR:${TARGET}>/data/resources/fonts/${FONT_NAME}
                 COMMENT "Copying ${FONT_NAME} to output fonts directory for ${TARGET}"
             )
         endforeach()

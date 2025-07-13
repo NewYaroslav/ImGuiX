@@ -7,6 +7,8 @@
 #   include <X11/Xutil.h>
 #endif
 
+#include <imguix/utils/path_utils.hpp>
+
 namespace ImGuiX {
 
     bool WindowInstance::create() {
@@ -25,6 +27,15 @@ namespace ImGuiX {
         m_window.setFramerateLimit(60);
         m_is_open = ImGui::SFML::Init(m_window);
         return m_is_open;
+    }
+    
+    bool WindowInstance::setWindowIcon(const std::string& path) {
+        std::string icon_path = Utils::resolveExecPath(path);
+        sf::Image icon;
+        if (!icon.loadFromFile(icon_path))
+            return false;
+        m_window.setIcon(icon);
+        return true;
     }
 
     void WindowInstance::handleEvents() {

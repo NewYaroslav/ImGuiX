@@ -37,6 +37,11 @@ namespace ImGuiX {
         /// \brief Returns current window height in pixels.
         /// \return 
         virtual int height() const = 0;
+		
+		/// \brief Sets the window icon from an image file (currently SFML only).
+		/// \param path Path to the icon image file (must be .png or .bmp, 32x32 or 64x64 recommended).
+		/// \return True if the icon was loaded and applied successfully.
+        virtual bool setWindowIcon(const std::string& path) = 0;
 
         /// \brief Sets window dimensions in pixels.
         virtual void setSize(int w, int h) = 0;

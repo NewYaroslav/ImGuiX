@@ -84,6 +84,11 @@ namespace ImGuiX {
         int width() const override;
         int height() const override;
         void setSize(int w, int h) override;
+        
+        /// \brief Sets the window icon from an image file (currently SFML only).
+        /// \param path Path to the icon image file (must be .png or .bmp, 32x32 or 64x64 recommended).
+        /// \return True if the icon was loaded and applied successfully.
+        bool setWindowIcon(const std::string& path) override;
 
         void close() override;
         void minimize() override;

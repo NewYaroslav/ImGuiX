@@ -119,7 +119,8 @@ public:
 
     void onInit() override {
         createController<DemoController>(static_cast<ImGuiX::Application&>(m_application));
-        create(id() == 0 ? 800 : 640, id() == 0 ? 600 : 480U);
+        create(id() == 0 ? 800 : 640, id() == 0 ? 600 : 480);
+        setWindowIcon("data/resources/icons/icon.png");
     }
     
     virtual ~DemoWindow() {};
