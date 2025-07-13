@@ -90,6 +90,10 @@ namespace ImGuiX {
         m_window_manager.flushPending();
         m_window_manager.initializePending();
         initializePendingModels();
+        
+        int ini_save_frame_counter = 0;
+        const int ini_save_interval = 300;
+    
         while (true) {
             m_window_manager.flushPending();
 
@@ -123,21 +127,24 @@ namespace ImGuiX {
                 m_is_ini_loaded = true;
                 std::string ini_path = Utils::resolveExecPath(IMGUIX_INI_PATH);
                 Utils::createDirectories(Utils::resolveExecPath(IMGUIX_CONFIG_DIR));
-#               ifdef _WIN32
-                //ini_path = Utils::Utf8ToAnsi(ini_path);
-#               endif
                 ImGui::LoadIniSettingsFromDisk(ini_path.c_str());
+            }
+            
+            if (++ini_save_frame_counter >= ini_save_interval) {
+                ini_save_frame_counter = 0;
+                if (ImGui::GetIO().WantSaveIniSettings) {
+                    std::string ini_path = Utils::resolveExecPath(IMGUIX_INI_PATH);
+                    Utils::createDirectories(Utils::resolveExecPath(IMGUIX_CONFIG_DIR));
+                    ImGui::SaveIniSettingsToDisk(ini_path.c_str());
+                    ImGui::GetIO().WantSaveIniSettings = false;
+                }
             }
         }
 
         std::string ini_path = Utils::resolveExecPath(IMGUIX_INI_PATH);
         Utils::createDirectories(Utils::resolveExecPath(IMGUIX_CONFIG_DIR));
-#       ifdef _WIN32
-        //ini_path = Utils::Utf8ToAnsi(ini_path);
-#       endif
         ImGui::SaveIniSettingsToDisk(ini_path.c_str());
         
         m_is_closing = true;
     }
 } // namespace ImGuiX
-
