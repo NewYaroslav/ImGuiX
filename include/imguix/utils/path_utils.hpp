@@ -1,6 +1,6 @@
 #pragma once
-#ifndef IMGUIX_UTILS_PATH_UTILS_HPP_INCLUDED
-#define IMGUIX_UTILS_PATH_UTILS_HPP_INCLUDED
+#ifndef _IMGUIX_UTILS_PATH_UTILS_HPP_INCLUDED
+#define _IMGUIX_UTILS_PATH_UTILS_HPP_INCLUDED
 
 /// \file path_utils.hpp
 /// \brief Path utilities for resolving executable-relative paths and file manipulations.
@@ -52,20 +52,22 @@ namespace ImGuiX::Utils {
 
     /// \brief Returns directory path of the executable.
     std::string getExecDir() {
-        const std::string path = getExecPath();
-        return fs::path(path).parent_path().string();
+        //const std::string path = getExecPath();
+        fs::path path = fs::u8path(getExecPath());
+        return path.parent_path().u8string();
     }
 
     /// \brief Resolves a relative path to absolute, based on executable location.
     /// \param relative_path Relative path from executable directory.
     /// \return Absolute path string.
     std::string resolveExecPath(const std::string& relative_path) {
-        return (fs::path(getExecDir()) / relative_path).string();
+        //fs::path path = fs::u8path(relative_path);
+        return (fs::u8path(getExecDir()) / fs::u8path(relative_path)).u8string();
     }
 
     /// \brief Extracts filename from full path.
     std::string getFileName(const std::string& full_path) {
-        return fs::path(full_path).filename().string();
+        return fs::u8path(full_path).filename().u8string();
     }
 
     /// \brief Computes relative path from base to target.
@@ -82,7 +84,7 @@ namespace ImGuiX::Utils {
 
     /// \brief Recursively creates directory if it doesn't exist.
     void createDirectories(const std::string& path) {
-        fs::path dir(path);
+        fs::path dir = fs::u8path(path);
         if (!fs::exists(dir)) {
             std::error_code ec;
             if (!fs::create_directories(dir, ec)) {
@@ -93,4 +95,4 @@ namespace ImGuiX::Utils {
 
 } // namespace ImGuiX::utils
 
-#endif // IMGUIX_UTILS_PATH_UTILS_HPP_INCLUDED
+#endif // _IMGUIX_UTILS_PATH_UTILS_HPP_INCLUDED

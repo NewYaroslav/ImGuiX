@@ -1,3 +1,7 @@
+#include <imgui.h>
+#include <imguix/utils/path_utils.hpp>
+#include <imguix/utils/encoding_utils.hpp>
+
 namespace ImGuiX {
 
     Application::Application()
@@ -96,6 +100,12 @@ namespace ImGuiX {
             if (allWindowsClosed()) {
                 break;
             }
+            
+            if (!m_is_ini_once) {
+                m_is_ini_once = true;
+                ImGuiIO& io = ImGui::GetIO();
+                io.IniFilename = nullptr;
+            }
 
             for (auto& model : m_models) {
                 model->process();
@@ -108,7 +118,25 @@ namespace ImGuiX {
             m_window_manager.drawContentAll();
             m_window_manager.drawUiAll();
             m_window_manager.presentAll();
+            
+            if (!m_is_ini_loaded) {
+                m_is_ini_loaded = true;
+                std::string ini_path = Utils::resolveExecPath(IMGUIX_INI_PATH);
+                Utils::createDirectories(Utils::resolveExecPath(IMGUIX_CONFIG_DIR));
+#               ifdef _WIN32
+                //ini_path = Utils::Utf8ToAnsi(ini_path);
+#               endif
+                ImGui::LoadIniSettingsFromDisk(ini_path.c_str());
+            }
         }
+
+        std::string ini_path = Utils::resolveExecPath(IMGUIX_INI_PATH);
+        Utils::createDirectories(Utils::resolveExecPath(IMGUIX_CONFIG_DIR));
+#       ifdef _WIN32
+        //ini_path = Utils::Utf8ToAnsi(ini_path);
+#       endif
+        ImGui::SaveIniSettingsToDisk(ini_path.c_str());
+        
         m_is_closing = true;
     }
 } // namespace ImGuiX

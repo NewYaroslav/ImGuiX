@@ -8,6 +8,14 @@
 #include <atomic>
 #include <thread>
 
+#ifndef IMGUIX_CONFIG_DIR
+#   define IMGUIX_CONFIG_DIR "data/config"
+#endif
+
+#ifndef IMGUIX_INI_PATH
+#	define IMGUIX_INI_PATH   IMGUIX_CONFIG_DIR "/imgui.ini"
+#endif
+
 namespace ImGuiX {
 
     /// \brief Main application class.
@@ -69,6 +77,8 @@ namespace ImGuiX {
         WindowManager m_window_manager;
         std::thread m_main_thread;
         std::atomic<bool> m_is_closing{false};
+        std::atomic<bool> m_is_ini_once{false};
+        std::atomic<bool> m_is_ini_loaded{false};
         std::atomic<int> m_next_window_id{0};
         std::string m_app_name = "ImGuiX Application";
         std::vector<std::unique_ptr<Model>> m_models;
