@@ -5,6 +5,8 @@
 #include <imgui-SFML.h>
 #include <SFML/Window/Mouse.hpp>
 #include <SFML/Graphics/Color.hpp>
+#include <imguix/extensions/blend_colors.hpp>
+#include <imguix/extensions/color_utils.hpp>
 
 #define IMGUIX_WM_USER_ROUNDED_REGION (WM_USER + 201)
 
@@ -27,8 +29,7 @@ namespace ImGuiX::Windows {
         if (hasFlag(m_flags, WindowFlags::EnableTransparency)) {
             m_window.clear(sf::Color::Transparent);
         } else {
-            const ImVec4& bg_color = ImGui::GetStyle().Colors[ImGuiCol_WindowBg];
-            m_window.clear();
+            m_window.clear(Extensions::ColorToSfml(m_config.clear_color));
         }
     }
 
@@ -43,32 +44,42 @@ namespace ImGuiX::Windows {
         ImVec2 padding = ImGui::GetStyle().WindowPadding;
         float title_padding_x = padding.x + char_size.x * 2.0f;
 
+        const ImGuiWindowFlags flags = 
+            ImGuiWindowFlags_NoDecoration |
+            ImGuiWindowFlags_NoMove |
+            ImGuiWindowFlags_NoResize |
+            ImGuiWindowFlags_NoSavedSettings |
+            ImGuiWindowFlags_NoScrollbar |
+            ImGuiWindowFlags_NoBringToFrontOnFocus;
+
+        if (hasFlag(m_flags, WindowFlags::DisableBackground) || m_disable_background) {
+            ImVec4 border_color = ImGui::GetStyle().Colors[ImGuiCol_Border];
+            ImVec4 background_color = ImGui::GetStyle().Colors[ImGuiCol_WindowBg];
+            ImVec4 new_color = Extensions::BlendColors(border_color, background_color);
+            ImGui::PushStyleColor(ImGuiCol_Border, new_color);
+            ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0));
+        }
+
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-        ImGui::Begin("##imguix_framed_window", nullptr,
-                     ImGuiWindowFlags_NoDecoration |
-                     ImGuiWindowFlags_NoMove |
-                     ImGuiWindowFlags_NoResize |
-                     ImGuiWindowFlags_NoSavedSettings |
-                     ImGuiWindowFlags_NoScrollbar |
-                     ImGuiWindowFlags_NoBringToFrontOnFocus);
+        ImGui::Begin("##imguix_framed_window", nullptr, flags);
         ImGui::PopStyleVar();
+        
+        if (hasFlag(m_flags, WindowFlags::DisableBackground) || m_disable_background) {
+            ImGui::PopStyleColor(2);
+        }
 
         // --- Title bar
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
         ImGui::BeginChild("##imguix_title_bar", ImVec2(0, m_config.title_bar_height), false,
                           ImGuiWindowFlags_NoScrollbar | 
                           ImGuiWindowFlags_NoDecoration);
-        ImGui::PopStyleVar();
-                          
+                 
         {
             ImVec2 p_min = ImGui::GetWindowPos();
             ImVec2 p_max = ImVec2(p_min.x + ImGui::GetWindowWidth(), p_min.y + m_config.title_bar_height);
-            ImU32 col = ImGui::GetColorU32(ImGuiCol_TitleBgActive);
-            ImGui::GetWindowDrawList()->AddRectFilled(p_min, p_max, col);
+            ImGui::GetWindowDrawList()->AddRectFilled(p_min, p_max, ImGui::GetColorU32(ImGuiCol_TitleBgActive));
         }
 
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + title_padding_x);
-        //ImGui::SetCursorPosY(ImGui::GetCursorPosY() + padding.y);
         drawTitleBarText();
         
         if (hasFlag(m_flags, WindowFlags::ShowControlButtons)) {

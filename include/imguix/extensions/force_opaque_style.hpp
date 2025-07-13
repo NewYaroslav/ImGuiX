@@ -7,7 +7,7 @@
 
 #include <imgui.h>
 
-namespace ImGui {
+namespace ImGuiX::Extensions {
 
     /// \brief Sets ImGui style to be fully opaque.
     ///
@@ -52,6 +52,6 @@ namespace ImGui {
         float m_old_alpha = 1.0f;
     };
 
-} // namespace ImGui
+} // namespace ImGuiX::Extensions
 
 #endif // _IMGUIX_EXTENSIONS_FORCE_OPAQUE_STYLE_HPP_INCLUDED

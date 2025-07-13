@@ -22,6 +22,10 @@ namespace ImGuiX::Windows {
         return create();
     }
     
+    void ImGuiFramedWindow::setDisableBackground(bool disable) {
+        m_disable_background = disable;
+    }
+    
     void ImGuiFramedWindow::drawTitleBarText() {
         float padding_y = (m_config.title_bar_height - ImGui::GetTextLineHeight()) * 0.5f;
         ImGui::SetCursorPosY(padding_y);

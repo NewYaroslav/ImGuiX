@@ -17,6 +17,7 @@ namespace ImGuiX::Windows {
         const char* close_button_text = "X##imguix_btn_close";
         const char* minimize_button_text = "_##imguix_btn_minimize";
         const char* maximize_button_text = "[]##imguix_btn_maximize";
+        ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f); ///<
     };
 
     /// \brief Window with custom ImGui-styled title bar and buttons.
@@ -37,11 +38,13 @@ namespace ImGuiX::Windows {
         virtual void drawMenuBar() {};
         void tick() override;
         void drawUi() override;
+        void setDisableBackground(bool disable) override;
 
     protected:
         std::string m_title; ///< Text displayed on the title bar
         WindowFlags m_flags = WindowFlags::None;
         ImGuiFramedWindowConfig m_config;
+        bool m_disable_background = false;
 #       ifdef IMGUIX_USE_SFML_BACKEND
         int m_prev_width = -1;
         int m_prev_height = -1;

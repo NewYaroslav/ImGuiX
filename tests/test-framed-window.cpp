@@ -25,6 +25,10 @@ public:
         if (ImGui::Button("Open Another Window")) {
             createWindow<DemoFramedWindow>("Framed Window", "ImGui Window");
         }
+        if (ImGui::Button("Toggle Background")) { 
+            m_background_off = !m_background_off;
+            window().setDisableBackground(m_background_off);
+        }
         if (ImGui::Button("Close Window")) {
             window().close();
         }
@@ -32,6 +36,9 @@ public:
 
         ImGui::ShowDemoWindow();
     }
+
+private:
+    bool m_background_off = false;
 };
 
 class DemoFramedWindow : public ImGuiX::Windows::ImGuiFramedWindow {

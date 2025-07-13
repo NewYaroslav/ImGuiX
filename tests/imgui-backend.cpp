@@ -15,7 +15,7 @@ int main() {
     io.Fonts->FontLoader = ImGuiFreeType::GetFontLoader();
     io.Fonts->FontLoaderFlags = ImGuiFreeTypeBuilderFlags_NoHinting;
     
-    ImFont* font = io.Fonts->AddFontFromFileTTF("data/fonts/Roboto-Medium.ttf", 18.0f);
+    ImFont* font = io.Fonts->AddFontFromFileTTF("data/resources/fonts/Roboto-Medium.ttf", 18.0f);
     io.FontDefault = font;
 
     if (!ImGui::SFML::UpdateFontTexture()) return -1;

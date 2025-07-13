@@ -89,6 +89,8 @@ namespace ImGuiX {
         /// \param path Path to the icon image file (must be .png or .bmp, 32x32 or 64x64 recommended).
         /// \return True if the icon was loaded and applied successfully.
         bool setWindowIcon(const std::string& path) override;
+		
+		void setDisableBackground(bool disable) override {};
 
         void close() override;
         void minimize() override;

@@ -11,9 +11,10 @@ namespace ImGuiX::Windows {
         None                       = 0,
         HasMenuBar                 = 1 << 0, ///< Enable ImGui menu bar region
         EnableTransparency         = 1 << 1, ///< Use DWM transparency (Windows only)
-        ShowControlButtons         = 1 << 2, ///< Show minimize/maximize/close buttons
-        MacStyledControlButtons    = 1 << 3, ///< macOS style control buttons
-        ImGuiStyledControlButtons  = 1 << 4, ///< ImGui style control buttons
+        DisableBackground          = 1 << 2, ///< Disable background color in ImGui::Begin
+        ShowControlButtons         = 1 << 3, ///< Show minimize/maximize/close buttons
+        MacStyledControlButtons    = 1 << 4, ///< macOS style control buttons
+        ImGuiStyledControlButtons  = 1 << 5, ///< ImGui style control buttons
 
         /// \brief Shortcut flag to enable both control buttons and ImGui styling.
         DefaultControlButtons      = ShowControlButtons | ImGuiStyledControlButtons
