@@ -76,6 +76,7 @@ if(IMGUIX_BUILD_EXAMPLES)
         endif()
 
         copy_imgui_fonts(${EXAMPLE_NAME})
+        copy_imguix_fonts(${EXAMPLE_NAME})
     endforeach()
 endif()
 
@@ -132,7 +133,10 @@ if(IMGUIX_BUILD_TESTS)
         elseif(UNIX)
             target_link_libraries(${TEST_NAME} PRIVATE GL)
         endif()
-        
+
         copy_imgui_fonts(${TEST_NAME})
+        copy_imguix_fonts(${TEST_NAME})
+		copy_and_embed_app_icon(${TEST_NAME})
+
     endforeach()
 endif()
