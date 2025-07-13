@@ -26,6 +26,7 @@ namespace ImGuiX {
         /// \brief Constructs the application instance.
         Application();
 
+        /// \brief Destructor.
         ~Application() = default;
 
         Application(const Application&) = delete;
@@ -72,17 +73,17 @@ namespace ImGuiX {
         const std::string& name() const override;
 
     private:
-        Pubsub::EventBus m_event_bus;
-        ResourceRegistry m_registry;
-        WindowManager m_window_manager;
-        std::thread m_main_thread;
-        std::atomic<bool> m_is_closing{false};
-        std::atomic<bool> m_is_ini_once{false};
-        std::atomic<bool> m_is_ini_loaded{false};
-        std::atomic<int> m_next_window_id{0};
-        std::string m_app_name = "ImGuiX Application";
-        std::vector<std::unique_ptr<Model>> m_models;
-        std::vector<Model*> m_pending_models;
+        Pubsub::EventBus m_event_bus;                 ///< Global event bus.
+        ResourceRegistry m_registry;                   ///< Shared resource registry.
+        WindowManager m_window_manager;                ///< Manages all windows.
+        std::thread m_main_thread;                     ///< Thread running the main loop when async.
+        std::atomic<bool> m_is_closing{false};         ///< Indicates shutdown in progress.
+        std::atomic<bool> m_is_ini_once{false};        ///< Ensures imgui ini is saved only once.
+        std::atomic<bool> m_is_ini_loaded{false};      ///< Tracks initial ini load.
+        std::atomic<int> m_next_window_id{0};          ///< Incremental ID for new windows.
+        std::string m_app_name = "ImGuiX Application"; ///< Application name string.
+        std::vector<std::unique_ptr<Model>> m_models;  ///< Owned model objects.
+        std::vector<Model*> m_pending_models;          ///< Models waiting for initialization.
 
         /// \brief Main application loop.
         void mainLoop();

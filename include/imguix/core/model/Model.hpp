@@ -63,7 +63,7 @@ namespace ImGuiX {
         void notify(const Pubsub::Event&) const = delete;
 
     protected:
-        ApplicationControl& m_app;
+        ApplicationControl& m_app; ///< Reference to the owning application.
     };
 
 } // namespace ImGuiX
