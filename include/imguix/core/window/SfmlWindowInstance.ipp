@@ -16,17 +16,21 @@ namespace ImGuiX {
         m_window.create(sf::VideoMode({static_cast<unsigned int>(width()),  static_cast<unsigned int>(height())}), name());
         m_window.setFramerateLimit(60);
         m_is_open = ImGui::SFML::Init(m_window);
+#       ifdef _WIN32
+        HWND hwnd = m_window.getNativeHandle();
+        if (GetForegroundWindow() != hwnd) {
+            SetForegroundWindow(hwnd);
+            SetFocus(hwnd);
+            SetActiveWindow(hwnd);
+        }
+#       endif
         return m_is_open;
     }
     
     bool WindowInstance::create(int w, int h) {
         m_width = w;
         m_height = h;
-        if (m_window.isOpen() || m_is_open) return true;
-        m_window.create(sf::VideoMode({static_cast<unsigned int>(width()),  static_cast<unsigned int>(height())}), name());
-        m_window.setFramerateLimit(60);
-        m_is_open = ImGui::SFML::Init(m_window);
-        return m_is_open;
+        return create();
     }
     
     bool WindowInstance::setWindowIcon(const std::string& path) {

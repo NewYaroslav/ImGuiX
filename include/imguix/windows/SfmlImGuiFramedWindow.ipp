@@ -18,6 +18,11 @@ namespace ImGuiX::Windows {
             HWND hwnd = m_window.getNativeHandle();
             SetWindowSubclass(hwnd, SubclassProc, 1, reinterpret_cast<DWORD_PTR>(this));
             setupWindowEffects(hwnd);
+            if (GetForegroundWindow() != hwnd) {
+                SetForegroundWindow(hwnd);
+                SetFocus(hwnd);
+                SetActiveWindow(hwnd);
+            }
         }
 #       endif
         return m_is_open;
