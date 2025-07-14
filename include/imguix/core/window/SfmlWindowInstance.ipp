@@ -158,10 +158,42 @@ namespace ImGuiX {
 #       ifdef _WIN32
         HWND hwnd = m_window.getNativeHandle();
         if (::IsZoomed(hwnd)) return true;
-#       endif
+#       elif defined(__linux__)
+        auto handle = m_window.getNativeHandle();
+        Display* display = XOpenDisplay(nullptr);
+        if (!display || !handle)
+            return false;
+
+        Atom wmState = XInternAtom(display, "_NET_WM_STATE", False);
+        Atom maxHorz = XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_HORZ", False);
+        Atom maxVert = XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_VERT", False);
+        Atom actualType;
+        int actualFormat;
+        unsigned long nitems, bytesAfter;
+        unsigned char* prop = nullptr;
+        bool maximized = false;
+
+        if (Success == XGetWindowProperty(display, handle, wmState, 0, 1024, False,
+                                          AnyPropertyType, &actualType, &actualFormat,
+                                          &nitems, &bytesAfter, &prop)) {
+            if (prop) {
+                Atom* atoms = reinterpret_cast<Atom*>(prop);
+                for (unsigned long i = 0; i < nitems; ++i) {
+                    if (atoms[i] == maxHorz || atoms[i] == maxVert) {
+                        maximized = true;
+                        break;
+                    }
+                }
+                XFree(prop);
+            }
+        }
+        XCloseDisplay(display);
+        return maximized;
+#       else
         return false;
+#       endif
     }
-    
+
     void WindowInstance::toggleMaximizeRestore() {
 #       ifdef _WIN32
         HWND hwnd = m_window.getNativeHandle();
@@ -170,6 +202,31 @@ namespace ImGuiX {
         } else {
             ::ShowWindow(hwnd, SW_MAXIMIZE);
         }
+#       elif defined(__linux__)
+        auto handle = m_window.getNativeHandle();
+        Display* display = XOpenDisplay(nullptr);
+        if (!display || !handle)
+            return;
+
+        Atom wmState = XInternAtom(display, "_NET_WM_STATE", False);
+        Atom maxHorz = XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_HORZ", False);
+        Atom maxVert = XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_VERT", False);
+
+        XEvent xev{};
+        xev.type = ClientMessage;
+        xev.xclient.window = handle;
+        xev.xclient.message_type = wmState;
+        xev.xclient.format = 32;
+        xev.xclient.data.l[0] = isMaximized() ? 0 : 1;
+        xev.xclient.data.l[1] = maxHorz;
+        xev.xclient.data.l[2] = maxVert;
+        xev.xclient.data.l[3] = 0;
+        xev.xclient.data.l[4] = 0;
+
+        XSendEvent(display, DefaultRootWindow(display), False,
+                   SubstructureRedirectMask | SubstructureNotifyMask, &xev);
+        XFlush(display);
+        XCloseDisplay(display);
 #       endif
     }
     
