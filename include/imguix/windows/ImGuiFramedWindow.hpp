@@ -102,9 +102,9 @@ namespace ImGuiX::Windows {
 #   ifdef IMGUIX_USE_SFML_BACKEND
 #       include "SfmlImGuiFramedWindow.ipp"
 #   elif defined(IMGUIX_USE_GLFW_BACKEND)
-
+#       include "GlfwImGuiFramedWindow.ipp"
 #   elif defined(IMGUIX_USE_SDL2_BACKEND)
-
+#       include "Sdl2ImGuiFramedWindow.ipp"
 #   endif
 #include "ImGuiFramedWindow.ipp"
 #endif
