@@ -99,6 +99,20 @@ namespace ImGuiX {
         return m_is_active;
     }
 
+    bool WindowInstance::isMaximized() const {
+        if (m_window)
+            return glfwGetWindowAttrib(m_window, GLFW_MAXIMIZED);
+        return false;
+    }
+
+    void WindowInstance::toggleMaximizeRestore() {
+        if (!m_window) return;
+        if (glfwGetWindowAttrib(m_window, GLFW_MAXIMIZED))
+            glfwRestoreWindow(m_window);
+        else
+            glfwMaximizeWindow(m_window);
+    }
+
     void WindowInstance::setVisible(bool visible) {
         m_is_visible = visible;
         if (m_window) {

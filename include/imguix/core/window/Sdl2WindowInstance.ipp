@@ -106,6 +106,20 @@ namespace ImGuiX {
         return m_is_active;
     }
 
+    bool WindowInstance::isMaximized() const {
+        if (m_window)
+            return SDL_GetWindowFlags(m_window) & SDL_WINDOW_MAXIMIZED;
+        return false;
+    }
+
+    void WindowInstance::toggleMaximizeRestore() {
+        if (!m_window) return;
+        if (SDL_GetWindowFlags(m_window) & SDL_WINDOW_MAXIMIZED)
+            SDL_RestoreWindow(m_window);
+        else
+            SDL_MaximizeWindow(m_window);
+    }
+
     void WindowInstance::setVisible(bool visible) {
         m_is_visible = visible;
         if (m_window) {
