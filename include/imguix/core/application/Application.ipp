@@ -1,6 +1,9 @@
 #include <imgui.h>
 #include <imguix/utils/path_utils.hpp>
 #include <imguix/utils/encoding_utils.hpp>
+#ifdef __EMSCRIPTEN__
+#   include <emscripten.h>
+#endif
 
 namespace ImGuiX {
 
@@ -14,19 +17,28 @@ namespace ImGuiX {
             throw std::runtime_error("Failed to register DeltaClockSfml resource");
         }
 #       endif
+
+#if defined(__EMSCRIPTEN__)
+        (void)async;
+        startLoop();
+        mainLoop();
+#else
         if (async) {
             m_main_thread = std::thread([this]() {
 #               ifdef IMGUIX_USE_SFML_BACKEND
                 registry().getResource<DeltaClockSfml>().update();
 #               endif
-                this->mainLoop();
+                startLoop();
+                mainLoop();
             });
         } else {
 #           ifdef IMGUIX_USE_SFML_BACKEND
             registry().getResource<DeltaClockSfml>().update();
 #           endif
+            startLoop();
             mainLoop();
         }
+#endif
     }
 
     template<typename T, typename... Args>
@@ -86,65 +98,114 @@ namespace ImGuiX {
         m_pending_models.clear();
     }
 
-    void Application::mainLoop() {
+    void Application::startLoop() {
+#ifdef __EMSCRIPTEN__
+#   ifdef IMGUIX_EMSCRIPTEN_IDBFS
+        EM_ASM({
+            FS.mkdir('/imguix_fs');
+            FS.mount(IDBFS, {}, '/imguix_fs');
+            FS.syncfs(true, function(){});
+        });
+#   endif
+#endif
         m_window_manager.flushPending();
         m_window_manager.initializePending();
         initializePendingModels();
-        
-        int ini_save_frame_counter = 0;
-        const int ini_save_interval = 300;
-    
-        while (true) {
-            m_window_manager.flushPending();
+    }
 
-            m_window_manager.initializePending();
-            initializePendingModels();
+    bool Application::loopIteration() {
+        m_window_manager.flushPending();
+        m_window_manager.initializePending();
+        initializePendingModels();
 
-            m_window_manager.removeClosed();
-            if (allWindowsClosed()) {
-                break;
-            }
-            
-            if (!m_is_ini_once) {
-                m_is_ini_once = true;
-                ImGuiIO& io = ImGui::GetIO();
-                io.IniFilename = nullptr;
-            }
+        m_window_manager.removeClosed();
+        if (allWindowsClosed()) {
+#ifdef __EMSCRIPTEN__
+            endLoop();
+            emscripten_cancel_main_loop();
+#endif
+            return false;
+        }
 
-            for (auto& model : m_models) {
-                model->process();
-            }
-            
-            m_event_bus.process();
+        if (!m_is_ini_once) {
+            m_is_ini_once = true;
+#ifdef __EMSCRIPTEN__
+#   ifdef IMGUIX_EMSCRIPTEN_IDBFS
+            ImGui::GetIO().IniFilename = "/imguix_fs/imgui.ini";
+#   else
+            ImGui::GetIO().IniFilename = nullptr;
+#   endif
+#else
+            ImGuiIO& io = ImGui::GetIO();
+            io.IniFilename = nullptr;
+#endif
+        }
 
-            m_window_manager.handleEvents();
-            m_window_manager.tickAll();
-            m_window_manager.drawContentAll();
-            m_window_manager.drawUiAll();
-            m_window_manager.presentAll();
-            
-            if (!m_is_ini_loaded) {
-                m_is_ini_loaded = true;
-                std::string ini_path = Utils::resolveExecPath(IMGUIX_INI_PATH);
-                Utils::createDirectories(Utils::resolveExecPath(IMGUIX_CONFIG_DIR));
-                ImGui::LoadIniSettingsFromDisk(ini_path.c_str());
-            }
-            
-            if (++ini_save_frame_counter >= ini_save_interval) {
-                ini_save_frame_counter = 0;
-                if (ImGui::GetIO().WantSaveIniSettings) {
-                    std::string ini_path = Utils::resolveExecPath(IMGUIX_INI_PATH);
-                    Utils::createDirectories(Utils::resolveExecPath(IMGUIX_CONFIG_DIR));
-                    ImGui::SaveIniSettingsToDisk(ini_path.c_str());
-                    ImGui::GetIO().WantSaveIniSettings = false;
-                }
+        for (auto& model : m_models) {
+            model->process();
+        }
+
+        m_event_bus.process();
+
+        m_window_manager.handleEvents();
+        m_window_manager.tickAll();
+        m_window_manager.drawContentAll();
+        m_window_manager.drawUiAll();
+        m_window_manager.presentAll();
+
+        if (!m_is_ini_loaded) {
+            m_is_ini_loaded = true;
+#ifdef __EMSCRIPTEN__
+#   ifdef IMGUIX_EMSCRIPTEN_IDBFS
+            // Ini settings will be loaded from mounted IDBFS automatically
+            ImGui::LoadIniSettingsFromDisk("/imguix_fs/imgui.ini");
+#   else
+            ImGui::GetIO().IniFilename = nullptr;
+#   endif
+#else
+            std::string ini_path = Utils::resolveExecPath(IMGUIX_INI_PATH);
+            Utils::createDirectories(Utils::resolveExecPath(IMGUIX_CONFIG_DIR));
+            ImGui::LoadIniSettingsFromDisk(ini_path.c_str());
+#endif
+        }
+
+        if (++m_ini_save_frame_counter >= m_ini_save_interval) {
+            m_ini_save_frame_counter = 0;
+            if (ImGui::GetIO().WantSaveIniSettings) {
+                saveIniSettings();
+                ImGui::GetIO().WantSaveIniSettings = false;
             }
         }
 
+        return true;
+    }
+
+    void Application::endLoop() {
+        saveIniSettings();
+        m_is_closing = true;
+    }
+
+    void Application::mainLoop() {
+#ifdef __EMSCRIPTEN__
+        emscripten_set_main_loop_arg([](void* arg) {
+            static_cast<Application*>(arg)->loopIteration();
+        }, this, 0, true);
+#else
+        while (loopIteration()) {}
+        endLoop();
+#endif
+    }
+
+    void Application::saveIniSettings() {
+#ifdef __EMSCRIPTEN__
+#   ifdef IMGUIX_EMSCRIPTEN_IDBFS
+        ImGui::SaveIniSettingsToDisk("/imguix_fs/imgui.ini");
+        EM_ASM({ FS.syncfs(false, function(){}); });
+#   endif
+#else
         std::string ini_path = Utils::resolveExecPath(IMGUIX_INI_PATH);
         Utils::createDirectories(Utils::resolveExecPath(IMGUIX_CONFIG_DIR));
         ImGui::SaveIniSettingsToDisk(ini_path.c_str());
-        
-        m_is_closing = true;
+#endif
     }
 } // namespace ImGuiX
