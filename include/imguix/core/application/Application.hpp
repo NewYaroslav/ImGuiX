@@ -85,8 +85,24 @@ namespace ImGuiX {
         std::vector<std::unique_ptr<Model>> m_models;  ///< Owned model objects.
         std::vector<Model*> m_pending_models;          ///< Models waiting for initialization.
 
+        int m_ini_save_frame_counter{0};                ///< Frame counter for ini saving.
+        static constexpr int m_ini_save_interval{300};  ///< Frames between ini saves.
+
         /// \brief Main application loop.
         void mainLoop();
+
+        /// \brief Single iteration of the main loop.
+        /// \return false if the loop should terminate.
+        bool loopIteration();
+
+        /// \brief Called before entering the main loop.
+        void startLoop();
+
+        /// \brief Called after exiting the main loop.
+        void endLoop();
+
+        /// \brief Saves ImGui ini settings to disk.
+        void saveIniSettings();
 
         /// \brief Checks if all windows have been closed.
         /// \return True if no windows remain open.
