@@ -125,6 +125,56 @@ namespace ImGuiX::Utils {
     }
 
 } // namespace ImGuiX::Utils
+#else
+#include <string>
+namespace ImGuiX::Utils {
+    namespace detail {
+        template<typename T>
+        inline constexpr bool dependent_false_v = false;
+    }
+
+    template<typename Dummy = void>
+    std::string Utf8ToAnsi(const std::string&) {
+        static_assert(detail::dependent_false_v<Dummy>, "Utf8ToAnsi is not supported on this platform");
+        return {};
+    }
+
+    template<typename Dummy = void>
+    std::string AnsiToUtf8(const std::string&) {
+        static_assert(detail::dependent_false_v<Dummy>, "AnsiToUtf8 is not supported on this platform");
+        return {};
+    }
+
+    template<typename Dummy = void>
+    std::string Utf8ToCp866(const std::string&) {
+        static_assert(detail::dependent_false_v<Dummy>, "Utf8ToCp866 is not supported on this platform");
+        return {};
+    }
+
+    template<typename Dummy = void>
+    bool IsValidUtf8(const char*) {
+        static_assert(detail::dependent_false_v<Dummy>, "IsValidUtf8 is not supported on this platform");
+        return false;
+    }
+
+    template<typename Dummy = void>
+    std::string Cp1251ToUtf8(const std::string&) {
+        static_assert(detail::dependent_false_v<Dummy>, "Cp1251ToUtf8 is not supported on this platform");
+        return {};
+    }
+
+    template<typename Dummy = void>
+    std::string Utf16ToUtf8(void*) {
+        static_assert(detail::dependent_false_v<Dummy>, "Utf16ToUtf8 is not supported on this platform");
+        return {};
+    }
+
+    template<typename Dummy = void>
+    std::wstring Utf8ToUtf16(const std::string&) {
+        static_assert(detail::dependent_false_v<Dummy>, "Utf8ToUtf16 is not supported on this platform");
+        return {};
+    }
+} // namespace ImGuiX::Utils
 
 #endif // defined(_WIN32) || defined(_WIN64)
 

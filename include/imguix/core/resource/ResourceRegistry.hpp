@@ -10,7 +10,11 @@
 #include <unordered_set>
 #include <memory>
 #include <typeindex>
-#include <shared_mutex>
+#if defined(__EMSCRIPTEN__)
+#   include <mutex>
+#else
+#   include <shared_mutex>
+#endif
 #include <optional>
 #include <functional>
 
@@ -62,8 +66,13 @@ namespace ImGuiX {
         std::unordered_map<std::type_index, std::shared_ptr<void>> m_resources; ///< Stored resources by type.
         std::unordered_set<std::type_index> m_in_progress; ///< Types currently being created.
 
+        #if defined(__EMSCRIPTEN__)
+        mutable std::mutex m_resources_mutex; ///< Protects resource map.
+        mutable std::mutex m_progress_mutex;  ///< Protects initialization set.
+        #else
         mutable std::shared_mutex m_resources_mutex; ///< Protects resource map.
         mutable std::shared_mutex m_progress_mutex;  ///< Protects initialization set.
+        #endif
     };
 
 } // namespace ImGuiX
