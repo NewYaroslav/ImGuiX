@@ -1,7 +1,13 @@
 #include <stdexcept>
-#include <mutex>
+#if defined(__EMSCRIPTEN__)
+#   include <mutex>
+#else
+#   include <shared_mutex>
+#   include <mutex>
+#endif
 
 namespace ImGuiX {
+
 
     template <typename T>
     bool ResourceRegistry::registerResource(std::function<std::shared_ptr<T>()> creator) {
@@ -38,13 +44,21 @@ namespace ImGuiX {
     T& ResourceRegistry::getResource() {
         const std::type_index type = typeid(T);
         
-        std::shared_lock progress_lock(m_progress_mutex);
+        #if defined(__EMSCRIPTEN__)
+        std::unique_lock<std::mutex> progress_lock(m_progress_mutex);
+        #else
+        std::shared_lock<std::shared_mutex> progress_lock(m_progress_mutex);
+        #endif
         if (m_in_progress.find(type) != m_in_progress.end()) {
             throw std::runtime_error("Resource is being initialized");
         }
         progress_lock.unlock();
         
-        std::shared_lock resource_lock(m_resources_mutex);
+        #if defined(__EMSCRIPTEN__)
+        std::unique_lock<std::mutex> resource_lock(m_resources_mutex);
+        #else
+        std::shared_lock<std::shared_mutex> resource_lock(m_resources_mutex);
+        #endif
         auto it = m_resources.find(type);
         if (it == m_resources.end()) {
             throw std::runtime_error("Resource not registered");
@@ -57,14 +71,22 @@ namespace ImGuiX {
     std::optional<std::reference_wrapper<T>> ResourceRegistry::tryGetResource() {
         const std::type_index type = typeid(T);
         
-        std::shared_lock progress_lock(m_progress_mutex);
+        #if defined(__EMSCRIPTEN__)
+        std::unique_lock<std::mutex> progress_lock(m_progress_mutex);
+        #else
+        std::shared_lock<std::shared_mutex> progress_lock(m_progress_mutex);
+        #endif
         if (m_in_progress.find(type) != m_in_progress.end()) {
             return std::nullopt;
         }
         progress_lock.unlock();
         
         
-        std::shared_lock resource_lock(m_resources_mutex);
+        #if defined(__EMSCRIPTEN__)
+        std::unique_lock<std::mutex> resource_lock(m_resources_mutex);
+        #else
+        std::shared_lock<std::shared_mutex> resource_lock(m_resources_mutex);
+        #endif
         auto it = m_resources.find(type);
         if (it == m_resources.end()) {
             return std::nullopt;

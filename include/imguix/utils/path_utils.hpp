@@ -10,10 +10,14 @@
 #include <stdexcept>
 #include <filesystem>
 
-#ifdef _WIN32
+#if defined(_WIN32)
 #   include <Windows.h>
 #   include <codecvt>
 #   include <locale>
+#elif defined(__APPLE__)
+#   include <mach-o/dyld.h>
+#   include <limits.h>
+#   include <unistd.h>
 #else
 #   include <limits.h>
 #   include <unistd.h>
@@ -21,10 +25,18 @@
 
 namespace ImGuiX::Utils {
     namespace fs = std::filesystem;
+    namespace detail {
+        template<typename T>
+        inline constexpr bool dependent_false_v = false;
+    }
 
     /// \brief Returns full path to the current executable.
+    template<typename Dummy = void>
     std::string getExecPath() {
-#ifdef _WIN32
+#ifdef __EMSCRIPTEN__
+        static_assert(detail::dependent_false_v<Dummy>, "getExecPath is not supported on Emscripten");
+        return {};
+#elif defined(_WIN32)
         std::vector<wchar_t> buffer(MAX_PATH);
         HMODULE hModule = GetModuleHandle(nullptr);
 
@@ -40,6 +52,15 @@ namespace ImGuiX::Utils {
         std::wstring exe_path(buffer.begin(), buffer.begin() + size);
         std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
         return converter.to_bytes(exe_path);
+#elif defined(__APPLE__)
+        std::vector<char> buffer(PATH_MAX);
+        uint32_t size = buffer.size();
+        if (_NSGetExecutablePath(buffer.data(), &size) != 0) {
+            buffer.resize(size);
+            if (_NSGetExecutablePath(buffer.data(), &size) != 0)
+                throw std::runtime_error("Failed to get executable path.");
+        }
+        return std::string(buffer.data());
 #else
         char result[PATH_MAX];
         ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
@@ -51,27 +72,48 @@ namespace ImGuiX::Utils {
     }
 
     /// \brief Returns directory path of the executable.
+    template<typename Dummy = void>
     std::string getExecDir() {
-        //const std::string path = getExecPath();
+#ifdef __EMSCRIPTEN__
+        static_assert(detail::dependent_false_v<Dummy>, "getExecDir is not supported on Emscripten");
+        return {};
+#else
         fs::path path = fs::u8path(getExecPath());
         return path.parent_path().u8string();
+#endif
     }
 
     /// \brief Resolves a relative path to absolute, based on executable location.
     /// \param relative_path Relative path from executable directory.
     /// \return Absolute path string.
+    template<typename Dummy = void>
     std::string resolveExecPath(const std::string& relative_path) {
-        //fs::path path = fs::u8path(relative_path);
+#ifdef __EMSCRIPTEN__
+        static_assert(detail::dependent_false_v<Dummy>, "resolveExecPath is not supported on Emscripten");
+        return relative_path;
+#else
         return (fs::u8path(getExecDir()) / fs::u8path(relative_path)).u8string();
+#endif
     }
 
     /// \brief Extracts filename from full path.
+    template<typename Dummy = void>
     std::string getFileName(const std::string& full_path) {
+#ifdef __EMSCRIPTEN__
+        static_assert(detail::dependent_false_v<Dummy>, "getFileName is not supported on Emscripten");
+        return full_path;
+#else
         return fs::u8path(full_path).filename().u8string();
+#endif
     }
 
     /// \brief Computes relative path from base to target.
+    template<typename Dummy = void>
     std::string makeRelative(const std::string& file_path, const std::string& base_path) {
+#ifdef __EMSCRIPTEN__
+        static_assert(detail::dependent_false_v<Dummy>, "makeRelative is not supported on Emscripten");
+        return file_path;
+#else
         if (base_path.empty()) return file_path;
 
         fs::path file = fs::u8path(file_path);
@@ -80,10 +122,16 @@ namespace ImGuiX::Utils {
         std::error_code ec;
         fs::path rel = fs::relative(file, base, ec);
         return ec ? file_path : rel.u8string();
+#endif
     }
 
     /// \brief Recursively creates directory if it doesn't exist.
+    template<typename Dummy = void>
     void createDirectories(const std::string& path) {
+#ifdef __EMSCRIPTEN__
+        static_assert(detail::dependent_false_v<Dummy>, "createDirectories is not supported on Emscripten");
+        (void)path;
+#else
         fs::path dir = fs::u8path(path);
         if (!fs::exists(dir)) {
             std::error_code ec;
@@ -91,6 +139,7 @@ namespace ImGuiX::Utils {
                 throw std::runtime_error("Failed to create directories: " + path);
             }
         }
+#endif
     }
 
 } // namespace ImGuiX::utils
