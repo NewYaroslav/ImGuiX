@@ -137,13 +137,13 @@ static void main_loop(void*) {
         if (event.type == SDL_WINDOWEVENT && 
             event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
 			int w, h, dw, dh;
-			SDL_GetWindowSize(g_window, &w, &h); // Физические размеры окна
-			SDL_GL_GetDrawableSize(g_window, &dw, &dh); // Реальные размеры для рендеринга
-			// Получаем DPI экрана
-			float dpi;
-			SDL_GetDisplayDPI(0, &dpi, nullptr, nullptr);  // 0 — индекс дисплея, на котором отображается окно
-			// Масштабирование шрифта с учётом DPI
-			//g_font_scale = static_cast<float>(dh) / static_cast<float>(h) * (dpi / 96.0f);  // 96.0f — стандарт DPI
+                        SDL_GetWindowSize(g_window, &w, &h); // Physical window size
+                        SDL_GL_GetDrawableSize(g_window, &dw, &dh); // Actual size used for rendering
+                        // Obtain screen DPI
+                        float dpi;
+                        SDL_GetDisplayDPI(0, &dpi, nullptr, nullptr);  // 0 is the display index on which the window appears
+                        // Scale font according to DPI
+                        //g_font_scale = static_cast<float>(dh) / static_cast<float>(h) * (dpi / 96.0f);  // 96.0f is the standard DPI
 			g_font_scale = static_cast<float>(dh) / static_cast<float>(h);
 			printf("g_font_scale: %f\n", g_font_scale);
 		}
@@ -183,7 +183,7 @@ int main() {
 
 #   ifdef __EMSCRIPTEN__
     SDL_SetHint(SDL_HINT_EMSCRIPTEN_CANVAS_SELECTOR, "#canvas");
-    SDL_SetHint(SDL_HINT_VIDEO_HIGHDPI_DISABLED, "0"); // включаем high-DPI
+    SDL_SetHint(SDL_HINT_VIDEO_HIGHDPI_DISABLED, "0"); // enable high-DPI support
 	SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "1");
 #   endif
 
@@ -214,10 +214,10 @@ int main() {
         (float)drawable_h / window_h
     );
     
-    // Устанавливаем флаг поддержки vtx offset
+    // Enable vtx offset support flag
     io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;
 
-    // Настройка шрифта с учётом HiDPI
+    // Font configuration for HiDPI
     float scale = io.DisplayFramebufferScale.y;
     //float font_size = 13.0f * scale * 2.0f;
 	float font_size = 13.0f * 2.0f;
@@ -241,7 +241,7 @@ int main() {
 	style.Colors[ImGuiCol_TabHovered] = style.Colors[ImGuiCol_Tab];
 #   endif
 
-    // Имплементации
+    // Backend implementations
     ImGui_ImplSDL2_InitForOpenGL(g_window, g_gl_ctx);
     ImGui_ImplOpenGL3_Init("#version 100");
 

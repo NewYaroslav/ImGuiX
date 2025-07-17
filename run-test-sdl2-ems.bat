@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableDelayedExpansion
 
-:: Чтение emsdk и build path из конфигурационного файла
+:: Read emsdk and build path from configuration file
 set EMSDK_CONF_FILE=%~dp0\emsdk-path.txt
 if not exist "%EMSDK_CONF_FILE%" (
     echo emsdk-path.txt not found at %EMSDK_CONF_FILE%
@@ -30,27 +30,27 @@ if "%BUILD_PATH%"=="" (
     exit /b
 )
 
-:: Проверка, начинается ли путь с буквы диска (например, C:) или с "\\"
+:: Check if the path begins with a drive letter (e.g., C:) or with "\\"
 echo Checking BUILD_PATH...
 
-:: Если путь НЕ начинается с "X:\", то это относительный путь
+:: If the path does NOT start with "X:\" it's considered relative
 echo %BUILD_PATH% | findstr /B /R "^[A-Za-z]:\\\|^\\\\">nul
 if errorlevel 1 (
     echo BUILD_PATH is relative, prepending script path...
     set "BUILD_PATH=%~dp0%BUILD_PATH%"
 )
 
-:: Убираем возможный завершающий слэш
+:: Strip possible trailing slash
 if "%BUILD_PATH:~-1%"=="\" set "BUILD_PATH=%BUILD_PATH:~0,-1%"
 
 echo Using EMSDK_PATH: %EMSDK_PATH%
 echo Using BUILD_PATH: %BUILD_PATH%
 
-:: Активация emsdk
+:: Activate emsdk
 cd /d "%EMSDK_PATH%"
 call emsdk_env.bat
 cd /d "%BUILD_PATH%"
 
-:: Запуск emrun
+:: Run emrun
 emrun --verbose --no_browser --port 8081 index.html > emrun_log.txt 2>&1
 PAUSE

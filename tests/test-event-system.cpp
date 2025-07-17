@@ -6,7 +6,7 @@
 
 using namespace ImGuiX::Pubsub;
 
-// Пример конкретного события
+// Example of a concrete event
 class MyEvent : public Event {
 public:
     std::string message;
@@ -51,22 +51,22 @@ public:
     }
 };
 
-// Главный тест
+// Main test
 int main() {
     EventBus bus;
     MyListener listener(bus);
 
-    // Подписка на MyEvent
+    // Subscribe to MyEvent
     listener.subscribe<MyEvent>();
 
-    // Подписка на MyEvent через callback
+    // Subscribe to MyEvent via callback
     bool callback_received = false;
     listener.subscribe<MyEvent>([&callback_received](const MyEvent& e) {
         std::cout << "Callback received: " << e.message << "\n";
         callback_received = true;
     });
 
-    // Уведомление напрямую
+    // Direct notification
     MyEvent event("Hello world!");
     listener.notify(event);
 
@@ -76,7 +76,7 @@ int main() {
         return 1;
     }
 
-    // Проверка асинхронной очереди
+    // Test asynchronous queue
     auto async_event = std::make_unique<MyEvent>("From async queue");
     listener.notifyAsync(std::move(async_event));
     bus.process();

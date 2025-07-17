@@ -37,14 +37,12 @@ namespace ImGuiX {
         /// \brief Returns current window height in pixels.
         /// \return Height in pixels.
         virtual int height() const = 0;
-		
-		/// \brief Sets the window icon from an image file (currently SFML only).
-		/// \param path Path to the icon image file (must be .png or .bmp, 32x32 or 64x64 recommended).
-		/// \return True if the icon was loaded and applied successfully.
-        /// \brief Sets the window icon from an image file.
-        /// \param path Path to an image file.
-        /// \return True if the icon was applied successfully.
+
+        /// \brief Sets the window icon from an image file (SFML only).
+        /// \param path Path to the icon image file (PNG/BMP, 32x32 or 64x64 recommended).
+        /// \return True if the icon was loaded and applied successfully.
         virtual bool setWindowIcon(const std::string& path) = 0;
+
 
         /// \brief Enables or disables background clearing between frames.
         /// \param disable True to disable clearing.

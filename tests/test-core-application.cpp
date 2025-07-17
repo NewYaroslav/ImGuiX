@@ -60,7 +60,7 @@ private:
     std::atomic<bool> m_stop{false};
 };
 
-/// \brief Контроллер, рисующий кнопку в ImGui и круг через SFML.
+/// \brief Controller that draws a button in ImGui and a circle using SFML.
 class DemoController : public ImGuiX::Controller {
 public:
     DemoController(ImGuiX::WindowControl& window, ImGuiX::Application& app)
@@ -109,7 +109,7 @@ private:
     int m_seconds{0};
 };
 
-/// \brief Окно, к которому привязан DemoController.
+/// \brief Window that hosts the DemoController.
 class DemoWindow : public ImGuiX::WindowInstance {
 public:
 
@@ -213,21 +213,21 @@ int main() {
 #else
 
 
-/// \brief Простой контроллер для теста.
+/// \brief Simple controller for testing.
 class DummyController : public ImGuiX::Controller {
 public:
     using Controller::Controller;
 
     void drawContent() override {
-        // Ничего не рисуем
+        // Draw nothing
     }
 
     void drawUi() override {
-        // Ничего не рисуем
+        // Draw nothing
     }
 };
 
-/// \brief Простое окно с тиком и отрисовкой.
+/// \brief Simple window with ticking and rendering.
 class DummyWindow : public ImGuiX::WindowInstance {
 public:
     DummyWindow(int id, std::string name, ImGuiX::ApplicationControl& app)
@@ -236,7 +236,7 @@ public:
 
 int main() {
     ImGuiX::Application app;
-    app.run(false); // запуск синхронно
+    app.run(false); // run synchronously
     return 0;
 }
 

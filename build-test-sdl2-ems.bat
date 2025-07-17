@@ -1,12 +1,12 @@
 @echo off
 setlocal EnableDelayedExpansion
 
-:: Получаем путь к директории текущего скрипта (предположим, что это и есть папка с ImGuiX)
+:: Get the directory of this script (assumed to be the ImGuiX folder)
 set IMGUIX_PATH=%~dp0
-:: Убираем завершающий слэш, если есть
+:: Remove trailing slash if present
 if "%IMGUIX_PATH:~-1%"=="\" set IMGUIX_PATH=%IMGUIX_PATH:~0,-1%
 
-:: Чтение emsdk и build path из конфигурационного файла
+:: Read emsdk and build path from configuration file
 set EMSDK_CONF_FILE=%~dp0\emsdk-path.txt
 if not exist "%EMSDK_CONF_FILE%" (
     echo emsdk-path.txt not found at %EMSDK_CONF_FILE%
@@ -35,17 +35,17 @@ if "%BUILD_PATH%"=="" (
     exit /b
 )
 
-:: Проверка, начинается ли путь с буквы диска (например, C:) или с "\\"
+:: Check if the path begins with a drive letter (e.g., C:) or with "\\"
 echo Checking BUILD_PATH...
 
-:: Если путь НЕ начинается с "X:\", то это относительный путь
+:: If the path does NOT start with "X:\" it's considered relative
 echo %BUILD_PATH% | findstr /B /R "^[A-Za-z]:\\\|^\\\\">nul
 if errorlevel 1 (
     echo BUILD_PATH is relative, prepending script path...
     set "BUILD_PATH=%~dp0%BUILD_PATH%"
 )
 
-:: Убираем возможный завершающий слэш
+:: Strip possible trailing slash
 if "%BUILD_PATH:~-1%"=="\" set "BUILD_PATH=%BUILD_PATH:~0,-1%"
 
 echo Using EMSDK_PATH: %EMSDK_PATH%
@@ -57,7 +57,7 @@ call emsdk_env.bat
 if errorlevel 1 exit /b %errorlevel%
 cd /d %IMGUIX_PATH%
 
-:: Создание директории сборки
+:: Create build directory
 if not exist "%BUILD_PATH%" mkdir "%BUILD_PATH%"
 
 echo Starting compilation...
@@ -91,7 +91,7 @@ if errorlevel 1 (
     exit /b %errorlevel%
 )
 
-:: Выводим сообщение об успешной сборке
+:: Display success message
 echo Compilation successful! The build is located in %BUILD_PATH%.
 echo You can now run the application in your browser.
 PAUSE

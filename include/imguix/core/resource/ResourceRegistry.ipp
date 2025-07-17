@@ -15,7 +15,7 @@ namespace ImGuiX {
         
         std::unique_lock progress_lock(m_progress_mutex);
         if (!m_in_progress.insert(type).second) {
-            return false; // уже в процессе
+            return false; // already in progress
         }
         progress_lock.unlock();
         
