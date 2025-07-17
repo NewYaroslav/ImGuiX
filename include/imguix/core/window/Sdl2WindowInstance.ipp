@@ -8,11 +8,17 @@ namespace ImGuiX {
     bool WindowInstance::create() {
         if (m_window || m_is_open) return true;
         if (SDL_Init(SDL_INIT_VIDEO) != 0) return false;
+#ifdef __EMSCRIPTEN__
+        SDL_SetHint(SDL_HINT_EMSCRIPTEN_CANVAS_SELECTOR, "#canvas");
+        SDL_SetHint(SDL_HINT_VIDEO_HIGHDPI_DISABLED, "0");
+        SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "1");
+#endif
         m_window = SDL_CreateWindow(name().c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                   width(), height(), SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+                                   width(), height(), SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
         if (!m_window) return false;
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
         m_gl_context = SDL_GL_CreateContext(m_window);
         SDL_GL_MakeCurrent(m_window, m_gl_context);
         IMGUI_CHECKVERSION();
@@ -20,6 +26,15 @@ namespace ImGuiX {
             ImGui::CreateContext();
         ImGui_ImplSDL2_InitForOpenGL(m_window, m_gl_context);
         ImGui_ImplOpenGL3_Init("#version 100");
+        ImGuiIO& io = ImGui::GetIO();
+        io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;
+        int window_w, window_h, drawable_w, drawable_h;
+        SDL_GetWindowSize(m_window, &window_w, &window_h);
+        SDL_GL_GetDrawableSize(m_window, &drawable_w, &drawable_h);
+        io.DisplayFramebufferScale = ImVec2(
+            (float)drawable_w / window_w,
+            (float)drawable_h / window_h
+        );
         m_is_open = true;
         return true;
     }
