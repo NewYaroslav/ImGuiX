@@ -1,0 +1,5 @@
+# Ignore local emsdk config
+emsdk-path.txt
+
+# Ignore build output (example)
+build-*/

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>ImGuiX</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+      background-color: #111;
+    }
+
+    canvas {
+      /* image-rendering: pixelated; */
+      /* image-rendering: crisp-edges; */
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      touch-action: none; /* disables double-tap zoom, long press, etc. */
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas" tabindex="-1" oncontextmenu="event.preventDefault()"></canvas>
+
+  <script>
+    // Resize canvas to match device resolution
+    function resizeCanvas() {
+      const canvas = Module.canvas;
+      const dpr = window.devicePixelRatio || 1;
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      canvas.style.width = width + "px";
+      canvas.style.height = height + "px";
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      if (Module.setCanvasSize) {
+        Module.setCanvasSize(canvas.width, canvas.height);
+      }
+    }
+
+    var Module = {
+      canvas: document.getElementById('canvas'),
+      preRun: [resizeCanvas],
+      postRun: [],
+      print: (...args) => console.log(...args),
+      setStatus: (text) => console.log('[status]', text),
+      monitorRunDependencies: (left) => {
+        Module.setStatus(left ? `Loading... (${left})` : 'All downloads complete.');
+      },
+      // setCanvasSize: null // Optional SDL callback hook
+	  setCanvasSize: function(w, h) {
+        if (Module.ccall) {
+          Module.ccall('resize_sdl_window', null, ['number', 'number'], [w, h]);
+        }
+      }
+    };
+
+    // Handle WebGL context loss
+    Module.canvas.addEventListener("webglcontextlost", (e) => {
+      alert("WebGL context lost. Please reload the page.");
+      e.preventDefault();
+    }, false);
+
+    // Handle resize and orientation change
+    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('orientationchange', resizeCanvas);
+
+    // Trigger resize after Wasm starts
+    Module.postRun.push(() => setTimeout(resizeCanvas, 100));
+  </script>
+
+  <!-- Emscripten script will be inserted here -->
+  {{{ SCRIPT }}}
+</body>
+</html>

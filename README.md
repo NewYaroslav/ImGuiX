@@ -26,6 +26,38 @@ ImGuiX следует адаптированному под Immediate Mode GUI �
 
 (описание будет позже)
 
+## 🔧 Сборка под WebAssembly (Emscripten)
+
+Для сборки ImGuiX под WebAssembly с использованием SDL2 и OpenGL ES 2.0, используется `emcc` (из состава [Emscripten SDK](https://emscripten.org/)).
+
+### ⚙️ Конфигурация через `emsdk-path.txt`
+
+Чтобы не хардкодить пути к SDK и директории сборки, используется файл `emsdk-path.txt` в корне репозитория. Скрипты `build-test-sdl2-ems.bat` и `run-test-sdl2-ems.bat` автоматически читают его.
+
+**Формат файла:**
+```txt
+D:/tools/emsdk
+D:/repo/ImGuiX/build-test-sdl2-ems
+```
+
+- **1-я строка**: путь к установленному Emscripten SDK
+- **2-я строка**: путь к директории сборки и запуска
+
+### 📦 Зависимости
+
+- [emsdk](https://emscripten.org/docs/getting_started/downloads.html) (активирован через `emsdk_env.bat`)
+- [SDL2](https://emscripten.org/docs/porting/using_sdl.html) (через `-s USE_SDL=2`)
+- [FreeType](https://emscripten.org/docs/porting/using_freetype.html) (через `-s USE_FREETYPE=1`)
+
+### 🚀 Сборка и запуск
+
+```bat
+build-test-sdl2-ems.bat   :: собирает пример и кладёт index.html в указанную папку
+run-test-sdl2-ems.bat     :: запускает emrun на локальном сервере
+```
+
+После сборки можно открыть `http://localhost:8081/index.html` в браузере.
+
 ## Fonts and Licensing
 
 This repository includes third-party font files under the following licenses:
