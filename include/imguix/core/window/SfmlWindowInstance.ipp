@@ -158,6 +158,7 @@ namespace ImGuiX {
 #       ifdef _WIN32
         HWND hwnd = m_window.getNativeHandle();
         if (::IsZoomed(hwnd)) return true;
+        return false;
 #       elif defined(__linux__)
         auto handle = m_window.getNativeHandle();
         Display* display = XOpenDisplay(nullptr);

@@ -22,13 +22,13 @@ namespace ImGuiX {
         }
     }
 
-    template<typename T, typename... Args>
-    T& WindowInstance::createController(Args&&... args) {
-        static_assert(std::is_base_of<Controller, T>::value,
-                      "T must derive from Controller");
+    template <typename ControllerType, typename... Args>
+    ControllerType& WindowInstance::createController(Args&&... args) {
+        static_assert(std::is_base_of<Controller, ControllerType>::value,
+                      "ControllerType must derive from Controller");
 
-        auto ctrl = std::make_unique<T>(*this, std::forward<Args>(args)...);
-        T& ref = *ctrl;
+        auto ctrl = std::make_unique<ControllerType>(*this, std::forward<Args>(args)...);
+        ControllerType& ref = *ctrl;
         m_controllers.push_back(std::move(ctrl));
         return ref;
     }
@@ -58,7 +58,7 @@ namespace ImGuiX {
     ResourceRegistry& WindowInstance::registry() {
         return m_application.registry();
     }
-	
+    
     ApplicationControl& WindowInstance::application() {
         return m_application;
     }

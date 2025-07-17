@@ -70,11 +70,11 @@ namespace ImGuiX {
         virtual void present();
 
         /// \brief Creates and registers a controller of given type.
-        /// \tparam T Controller type derived from Controller.
+        /// \tparam ControllerType Controller type derived from Controller.
         /// \tparam Args Arguments passed to the controller constructor.
         /// \return Reference to the created controller.
-        template<typename T, typename... Args>
-        T& createController(Args&&... args);
+        template <typename ControllerType, typename... Args>
+        ControllerType& createController(Args&&... args);
 
         // --- WindowControl interface ---
 
@@ -97,7 +97,7 @@ namespace ImGuiX {
         /// \param path Path to the icon image file (must be .png or .bmp, 32x32 or 64x64 recommended).
         /// \return True if the icon was loaded and applied successfully.
         bool setWindowIcon(const std::string& path) override;
-		
+        
         /// \brief Enables or disables clearing the background between frames.
                 void setDisableBackground(bool disable) override {};
 
