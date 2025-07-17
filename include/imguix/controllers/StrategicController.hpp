@@ -56,12 +56,18 @@ namespace ImGuiX::Controllers {
             }
         }
 
-        /// \brief
+        /// \brief Draws content using the active strategy.
+        ///
+        /// Calls \ref drawStrategyContent to forward rendering to the currently
+        /// selected strategy.
         void drawContent() override {
             drawStrategyContent();
         }
 
-        /// \brief
+        /// \brief Draws UI using the active strategy.
+        ///
+        /// Calls \ref drawStrategyUi to display widgets from the selected
+        /// strategy controller.
         void drawUi() override {
             drawStrategyUi();
         }

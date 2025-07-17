@@ -11,14 +11,14 @@ struct DummyResource {
 int main() {
     ResourceRegistry registry;
 
-    // Регистрация ресурса
+    // Register a resource
     bool registered = registry.registerResource<DummyResource>([]() {
         return std::make_unique<DummyResource>(DummyResource{"MyResource"});
     });
 
     std::cout << "Resource registered: " << std::boolalpha << registered << "\n";
 
-    // Попытка получить ресурс
+    // Attempt to retrieve the resource
     auto& res = registry.getResource<DummyResource>();
     std::cout << "Resource retrieved: " << res.name << "\n";
     
@@ -29,7 +29,7 @@ int main() {
         std::cout << "Resource not found!\n";
     }
 
-    // Проверка повторной регистрации
+    // Test duplicate registration
     bool duplicate = registry.registerResource<DummyResource>([] {
         return std::make_unique<DummyResource>(DummyResource{"Duplicate"});
     });

@@ -1,6 +1,6 @@
 #include <windowsx.h>
 #include <commctrl.h>
-#include <Dwmapi.h>     // Для прозрачности окна: https://gist.github.com/Alia5/5d8c48941d1f73c1ef14967a5ffe33d5
+#include <Dwmapi.h>     // For window transparency: https://gist.github.com/Alia5/5d8c48941d1f73c1ef14967a5ffe33d5
 #include <imgui.h>
 #include <imgui-SFML.h>
 #include <SFML/Window/Mouse.hpp>
@@ -126,7 +126,7 @@ namespace ImGuiX::Windows {
 
     void ImGuiFramedWindow::setupWindowEffects(HWND hwnd) {
         if (hasFlag(m_flags, WindowFlags::EnableTransparency)) {
-            // Прозрачность окна: https://gist.github.com/Alia5/5d8c48941d1f73c1ef14967a5ffe33d5
+            // Enable window transparency: https://gist.github.com/Alia5/5d8c48941d1f73c1ef14967a5ffe33d5
             MARGINS margins;
             margins.cxLeftWidth = -1;
             SetWindowLong(hwnd, GWL_STYLE, WS_POPUP | WS_VISIBLE);
