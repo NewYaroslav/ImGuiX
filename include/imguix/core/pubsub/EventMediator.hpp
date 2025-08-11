@@ -92,6 +92,23 @@ namespace ImGuiX::Pubsub {
             m_event_bus->notifyAsync(std::move(event));
         }
 
+        /// \brief Awaits a single occurrence of an event matching a predicate.
+        /// \tparam EventType Type of the event to await.
+        /// \param pred Predicate determining whether the event matches.
+        /// \param cb   Callback invoked when the event is received.
+        template <typename EventType, typename Pred, typename Cb>
+        void await_once(Pred pred, Cb cb) {
+            ::ImGuiX::Pubsub::await_once<EventType>(*m_event_bus, std::move(pred), std::move(cb));
+        }
+
+        /// \brief Awaits a single occurrence of an event without a predicate.
+        /// \tparam EventType Type of the event to await.
+        /// \param cb Callback invoked when the event is received.
+        template <typename EventType, typename Cb>
+        void await_once(Cb cb) {
+            ::ImGuiX::Pubsub::await_once<EventType>(*m_event_bus, std::move(cb));
+        }
+
     private:
         EventBus* m_event_bus; ///< Associated EventBus instance.
     };
