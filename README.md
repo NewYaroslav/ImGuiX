@@ -12,6 +12,45 @@ ImGuiX следует адаптированному под Immediate Mode GUI �
 
 В отличие от классического *MVC*, здесь роли *View* и *Controller* объединены: каждый контроллер отвечает и за логику, и за отрисовку виджетов в одном кадре. Модели взаимодействуют с контроллерами через событийную шину (EventBus), что обеспечивает слабую связанность и гибкую маршрутизацию событий.
 
+### System Map
+
+#### Компоненты
+
+```mermaid
+graph TD
+    A[Application]
+    WM[WindowManager]
+    W[WindowInstance]
+    C[Controller]
+    M[Model]
+    EB[EventBus]
+    RR[ResourceRegistry]
+
+    A-->WM
+    A-->M
+    A-->EB
+    A-->RR
+    WM-->W
+    W-->C
+    C-->EB
+    M-->EB
+    C-->RR
+    M-->RR
+```
+
+#### Поток событий
+
+```mermaid
+sequenceDiagram
+    participant Model
+    participant EventBus
+    participant Controller
+    Model->>EventBus: notifyAsync(Event)
+    Note right of EventBus: queued
+    EventBus-->>EventBus: process()
+    EventBus->>Controller: notify(Event)
+```
+
 ## Особенности
 
 - 💡 Архитектура, вдохновлённая MVC: контроллеры, модель, отображение

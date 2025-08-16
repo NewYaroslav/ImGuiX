@@ -12,7 +12,8 @@
 - [10. Agent Playbooks (Recipes)](#10-agent-playbooks-recipes)
 - [11. Anti-Patterns & Pitfalls](#11-anti-patterns--pitfalls)
 - [12. Code Style: Git Commit Convention](#12-code-style-git-commit-convention)
-- [13. Reference Index](#13-reference-index)
+- [13. Naming & Documentation Conventions](#13-naming--documentation-conventions)
+- [14. Reference Index](#14-reference-index)
 
 ## 1. Mission & Scope
 - Purpose: reference for developers and AI agents working on ImGuiX.
@@ -56,6 +57,24 @@ sequenceDiagram
     Note right of EventBus: queued
     EventBus-->>EventBus: process()
     EventBus->>Controller: notify(Event)
+```
+
+### Module Overview
+```mermaid
+graph LR
+    core[core]
+    windows[windows]
+    controllers[controllers]
+    widgets[widgets]
+    extensions[extensions]
+    utils[utils]
+
+    core --> windows
+    core --> controllers
+    windows --> controllers
+    controllers --> widgets
+    controllers --> extensions
+    controllers --> utils
 ```
 
 ## 3. Architectural Patterns & Invariants
@@ -180,7 +199,33 @@ Follow the [Conventional Commits](https://www.conventionalcommits.org/) style:
 
 Format: `type(scope): short description` where the scope is optional. Keep messages short and imperative.
 
-## 13. Reference Index
+## 13. Naming & Documentation Conventions
+
+### Variable Naming
+- Prefix `m_` for all class fields (e.g., `m_event_hub`, `m_task_manager`).
+- Optional prefixes `p_` and `str_` when a function or method handles more than five variables or arguments of different types.
+- Boolean variables start with `is`, `has`, `use`, `enable` or `m_is_`, `m_has_`, etc., for fields.
+- Do not use prefixes `b_`, `n_`, or `f_`.
+
+### Doxygen Comments
+- Write all code and Doxygen comments in English.
+- Use `/// \brief` before functions and classes.
+- Avoid starting descriptions with "The".
+
+### File Names
+- Single-class files use `CamelCase` (e.g., `TradeManager.hpp`).
+- Multi-class or utility files use `snake_case` (e.g., `trade_utils.hpp`).
+
+### Entity Names
+- Names of classes, structs, and enums use `CamelCase`.
+- Method names use `snake_case`.
+
+### Method Names
+- Methods are written in `snake_case`.
+- Getter methods may drop the `get_` prefix when returning existing references or values, exposing internal objects, or acting like a property (e.g., `size()`, `empty()`).
+- Keep the `get_` prefix when a method performs computation or when omission could mislead.
+
+## 14. Reference Index
 ### Key Directories
 | Path | Role |
 |---|---|
