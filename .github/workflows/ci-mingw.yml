@@ -34,6 +34,7 @@ jobs:
           CXX: x86_64-w64-mingw32-g++
         run: |
           set -e
+          mkdir -p build
           cmake -S . -B build -G "Ninja" \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX="$PWD/dist/sdk" \
@@ -50,6 +51,7 @@ jobs:
             -DIMGUIX_SDK_BUNDLE_DEPS=ON \
             -DIMGUIX_SDK_INSTALL_QUICKSTART=ON \
             -DIMGUIX_SDK_FLATTEN_MISC_HEADERS=ON \
+            -DCMAKE_POLICY_DEFAULT_CMP0152=NEW \
           2>&1 | tee build/configure.log
 
       - name: Build
