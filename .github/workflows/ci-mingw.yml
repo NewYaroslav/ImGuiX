@@ -31,10 +31,18 @@ jobs:
             mingw-w64-x86_64-ninja
             mingw-w64-x86_64-pkg-config
 
-      - name: Ensure submodule tags (libmdbx)
+      - name: Ensure full submodule history & tags (libmdbx)
         run: |
           git submodule update --init --recursive
-          git -C libs/libmdbx fetch --tags --force || true
+          # убедиться, что видны все ветки и теги
+          git -C libs/libmdbx config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+          git -C libs/libmdbx fetch --prune --tags --force
+          # если репозиторий сабмодуля shallow — убираем shallow
+          if git -C libs/libmdbx rev-parse --is-shallow-repository 2>/dev/null | grep -qi true; then
+          git -C libs/libmdbx fetch --unshallow || git -C libs/libmdbx fetch --deepen=1000
+          fi
+          # для логов: покажем, что тег доступен
+          git -C libs/libmdbx describe --tags --abbrev=0 || true
 
       - name: Configure (Release, Ninja)
         env:

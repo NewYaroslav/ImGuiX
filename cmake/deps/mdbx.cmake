@@ -60,25 +60,70 @@ function(imguix_use_or_fetch_mdbx out_target)
         endif()
         
         # --- Ensure version file exists for libmdbx (CI-friendly) ---
-        # Требуется: git-репозиторий ИЛИ файл VERSION.json в каталоге сабмодуля.
-        # Пытаемся взять тег из git; если не получилось — пишем "0.0.0".
+        # Требуется: git-репозиторий ИЛИ корректный VERSION.json с полями:
+        # git_describe, git_timestamp, git_tree, git_commit, semver.
+
         if(NOT EXISTS "${_MDBX_SRC}/VERSION.json")
           find_program(GIT_EXECUTABLE git)
-          set(_mdbx_ver "0.0.0")
+
+          set(_ver "0.0.0")
+          set(_tag "")
+          set(_commit "")
+          set(_tree "")
+          set(_ts 0)
+
           if(GIT_EXECUTABLE)
+            # semver из тега
             execute_process(
               COMMAND ${GIT_EXECUTABLE} -C "${_MDBX_SRC}" describe --tags --abbrev=0
               OUTPUT_VARIABLE _tag
               OUTPUT_STRIP_TRAILING_WHITESPACE
-              RESULT_VARIABLE _rc
+              RESULT_VARIABLE _rc1
             )
-            if(_rc EQUAL 0 AND _tag)
-              string(REGEX REPLACE "^v" "" _mdbx_ver "${_tag}") # убрать префикс v
+            if(_rc1 EQUAL 0 AND _tag)
+              string(REGEX REPLACE "^v" "" _ver "${_tag}")  # убрать префикс v
+            endif()
+
+            # commit / tree / timestamp
+            execute_process(
+              COMMAND ${GIT_EXECUTABLE} -C "${_MDBX_SRC}" rev-parse --verify HEAD
+              OUTPUT_VARIABLE _commit
+              OUTPUT_STRIP_TRAILING_WHITESPACE
+              RESULT_VARIABLE _rc2
+            )
+            execute_process(
+              COMMAND ${GIT_EXECUTABLE} -C "${_MDBX_SRC}" show -s --format=%T HEAD
+              OUTPUT_VARIABLE _tree
+              OUTPUT_STRIP_TRAILING_WHITESPACE
+              RESULT_VARIABLE _rc3
+            )
+            execute_process(
+              COMMAND ${GIT_EXECUTABLE} -C "${_MDBX_SRC}" log -1 --format=%ct
+              OUTPUT_VARIABLE _ts
+              OUTPUT_STRIP_TRAILING_WHITESPACE
+              RESULT_VARIABLE _rc4
+            )
+            if(NOT _rc4 EQUAL 0 OR _ts STREQUAL "")  # страховка
+              set(_ts 0)
             endif()
           endif()
-          # Важно: этой ревизии mdbx достаточно просто строки с семвером в VERSION.json
-          file(WRITE "${_MDBX_SRC}/VERSION.json" "${_mdbx_ver}\n")
-          message(STATUS "libmdbx: wrote VERSION.json = ${_mdbx_ver}")
+
+          set(_git_describe "v${_ver}")
+          if(NOT _tag STREQUAL "")
+            set(_git_describe "${_tag}")
+          endif()
+
+          # Пишем корректный JSON-объект
+          file(WRITE "${_MDBX_SRC}/VERSION.json"
+            "{\n"
+            "  \"git_describe\": \"${_git_describe}\",\n"
+            "  \"git_timestamp\": ${_ts},\n"
+            "  \"git_tree\": \"${_tree}\",\n"
+            "  \"git_commit\": \"${_commit}\",\n"
+            "  \"semver\": \"${_ver}\"\n"
+            "}\n"
+          )
+          message(STATUS "libmdbx: wrote VERSION.json (semver=${_ver})")
         endif()
 
         # Unique binary dir
