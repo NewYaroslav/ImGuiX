@@ -3,9 +3,16 @@
 #define _IMGUIX_PUBSUB_EVENT_AWAITER_HPP_INCLUDED
 
 /// \file EventAwaiter.hpp
-/// \brief Provides utilities for awaiting specific events with optional predicates.
+/// \brief RAII helper to wait for a single event that matches a predicate and then auto-unsubscribe.
 
 namespace ImGuiX::Pubsub {
+
+    /// \brief Minimal awaiter interface for mediator bookkeeping.
+    struct IAwaiter {
+        virtual void cancel() noexcept = 0;
+        virtual bool isActive() const noexcept = 0;
+        virtual ~IAwaiter() = default;
+    };
 
     /// \class EventAwaiter
     /// \brief Helper listener that waits for events matching a predicate.
@@ -13,84 +20,92 @@ namespace ImGuiX::Pubsub {
     /// Instances manage their own lifetime by holding a shared_ptr to themselves
     /// until cancelled or, if single-shot, after the first match.
     template <typename EventType>
-    class EventAwaiter : public EventListener, public std::enable_shared_from_this<EventAwaiter<EventType>> {
+    class EventAwaiter : public EventListener,
+                         public IAwaiter,
+                         public std::enable_shared_from_this<EventAwaiter<EventType>> {
+        static_assert(std::is_base_of<Event, EventType>::value,
+                      "EventType must derive from ImGuiX::Pubsub::Event");
     public:
-        using predicate_t = std::function<bool(const EventType&)>;
-        using match_cb_t = std::function<void(const EventType&)>;
+        using Predicate = std::function<bool(const EventType&)>;
+        using Callback  = std::function<void(const EventType&)>;
 
         /// \brief Creates and subscribes a new awaiter.
         /// \param bus Event bus to subscribe on.
         /// \param pred Predicate to filter events. If empty, all events match.
-        /// \param on_match Callback invoked when a matching event is received.
-        /// \param single_shot Whether the awaiter should automatically cancel after first match.
+        /// \param onMatch Callback invoked when a matching event is received.
+        /// \param singleShot Whether the awaiter should automatically cancel after first match.
         /// \return Shared pointer keeping the awaiter alive.
-        static std::shared_ptr<EventAwaiter> create(EventBus& bus,
-                                                    predicate_t pred = {},
-                                                    match_cb_t on_match = {},
-                                                    bool single_shot = false) {
-            auto ptr = std::shared_ptr<EventAwaiter>(
-                new EventAwaiter(bus, std::move(pred), std::move(on_match), single_shot));
-            ptr->m_self = ptr;
-            bus.template subscribe<EventType>(ptr.get());
-            return ptr;
+        [[nodiscard]] static std::shared_ptr<EventAwaiter> create(
+                EventBus& bus,
+                Predicate predicate,
+                Callback onMatch,
+                bool singleShot = true) {
+            auto self = std::shared_ptr<EventAwaiter>(new EventAwaiter(
+                bus, std::move(predicate), std::move(onMatch), singleShot
+            ));
+            self->subscribeInternal();
+            return self;
+        }
+
+        bool isActive() const noexcept override {
+            return !m_cancelled.load(std::memory_order_relaxed);
+        }
+
+        /// \brief Cancels the awaiter (unsubscribe). Idempotent.
+        void cancel() noexcept override {
+            bool expected = false;
+            if (!m_cancelled.compare_exchange_strong(expected, true)) return;
+            m_bus.template unsubscribe<EventType>(this);
+            m_retain_self.reset();
         }
 
         ~EventAwaiter() override { cancel(); }
 
-        /// \brief Cancels the awaiter and unsubscribes from the bus.
-        void cancel() {
-            if (m_cancelled) return;
-            m_cancelled = true;
-            m_bus.template unsubscribe<EventType>(this);
-            m_self.reset();
-        }
-
-        /// \brief EventListener override invoked by the EventBus.
-        void onEvent(const Event* const event) override {
-            if (m_cancelled) return;
-            const auto& e = *static_cast<const EventType*>(event);
-            if (m_pred && !m_pred(e)) return;
-            if (m_on_match) m_on_match(e);
-            if (m_single_shot) cancel();
-        }
+        // EventListener hook (unused when subscribing via typed API)
+        void onEvent(const Event* const) override {}
 
     private:
-        EventAwaiter(EventBus& bus, predicate_t pred, match_cb_t on_match, bool single_shot)
+        EventAwaiter(EventBus& bus,
+                     Predicate predicate,
+                     Callback on_match,
+                     bool single_shot)
             : m_bus(bus),
-              m_pred(std::move(pred)),
+              m_predicate(std::move(predicate)),
               m_on_match(std::move(on_match)),
               m_single_shot(single_shot) {}
 
-        EventBus& m_bus;
-        predicate_t m_pred;
-        match_cb_t m_on_match;
-        bool m_single_shot{false};
-        bool m_cancelled{false};
-        std::shared_ptr<EventAwaiter> m_self; ///< Keeps this object alive until cancellation
+        void subscribeInternal() {
+            if (m_single_shot) m_retain_self = this->shared_from_this(); // keep until first hit
+            auto weakSelf = this->weak_from_this();
+            m_bus.subscribe<EventType>(this, [weakSelf](const EventType& ev){
+                if (auto self = weakSelf.lock()) self->handleEvent(ev);
+            });
+        }
+
+        void handleEvent(const EventType& ev) {
+            if (m_cancelled.load(std::memory_order_relaxed)) return;
+
+            // Stabilize lifetime during callback
+            auto hold = this->shared_from_this();
+
+            bool matched = true;
+            if (m_predicate) matched = m_predicate(ev);
+            if (!matched) return;
+
+            // For single-shot: unsubscribe BEFORE user callback to avoid reentrancy surprises
+            if (m_single_shot) cancel();
+
+            if (m_on_match) m_on_match(ev);
+        }
+
+    private:
+        EventBus&  m_bus;
+        Predicate  m_predicate;
+        Callback   m_on_match;
+        const bool m_single_shot{true};
+        std::atomic<bool> m_cancelled{false};
+        std::shared_ptr<EventAwaiter> m_retain_self; ///< Keeps this object alive until cancellation
     };
-
-    /// \brief Sugar helper: await once with self-captured lifetime; no handle needed.
-    /// \details Creates an awaiter and keeps it alive by capturing its shared_ptr in the callback.
-    template <typename EventType, typename Pred, typename Cb>
-    inline void await_once(EventBus& bus, Pred pred, Cb cb) {
-        using AW = EventAwaiter<EventType>;
-        auto aw = AW::create(bus, pred, nullptr, /*single_shot=*/true);
-        auto keeper = AW::create(
-            bus,
-            std::move(pred),
-            [cb = std::move(cb), hold = aw](const EventType& e) mutable {
-                cb(e);
-                // `hold` goes out of scope after callback — both awaiters are single-shot
-            },
-            /*single_shot=*/true);
-        (void)keeper;
-    }
-
-    /// \brief Await a single event without a predicate.
-    template <typename EventType, typename Cb>
-    inline void await_once(EventBus& bus, Cb cb) {
-        await_once<EventType>(bus, [](const EventType&) { return true; }, std::move(cb));
-    }
 
 } // namespace ImGuiX::Pubsub
 

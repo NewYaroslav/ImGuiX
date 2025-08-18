@@ -15,6 +15,7 @@
 #include <vector>
 #include <queue>
 #include <mutex>
+#include <atomic>
 #include <functional>
 #include <string>
 #include <typeindex>

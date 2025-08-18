@@ -26,9 +26,12 @@ namespace ImGuiX::Pubsub {
         explicit EventMediator(std::unique_ptr<EventBus>& bus) : m_event_bus(bus.get()) {}
 
         ~EventMediator() noexcept override {
+            cancelAllAwaiters();
             unsubscribeAll();
         }
         
+        // --- Subscriptions ---
+         
         /// \brief Subscribes to an event type with a custom callback function taking a concrete event reference.
         /// \tparam EventType Type of the event to subscribe to.
         /// \param callback Callback function accepting a const reference to the event.
@@ -51,7 +54,7 @@ namespace ImGuiX::Pubsub {
         void subscribe() {
             m_event_bus->subscribe<EventType>(this);
         }
-        
+
         /// \brief Unsubscribes this mediator from a specific event type.
         /// \tparam EventType Type of the event to unsubscribe from.
         template <typename EventType>
@@ -63,6 +66,8 @@ namespace ImGuiX::Pubsub {
         void unsubscribeAll() {
             m_event_bus->unsubscribeAll(this);
         }
+        
+        // --- Notify/dispatch ---
 
         /// \brief Notifies all subscribers of an event (shared pointer dereferenced).
         /// \param event Shared pointer to the event.
@@ -93,26 +98,93 @@ namespace ImGuiX::Pubsub {
         void notifyAsync(std::unique_ptr<Event> event) {
             m_event_bus->notifyAsync(std::move(event));
         }
+        
+        // --- Await helpers (optionx semantics; ImGuiX naming) ---
 
-        /// \brief Awaits a single occurrence of an event matching a predicate.
-        /// \tparam EventType Type of the event to await.
-        /// \param pred Predicate determining whether the event matches.
-        /// \param cb   Callback invoked when the event is received.
+        /// \brief Await a single occurrence of EventType that matches predicate; auto-unsubscribe.
         template <typename EventType, typename Pred, typename Cb>
-        void await_once(Pred pred, Cb cb) {
-            ::ImGuiX::Pubsub::await_once<EventType>(*m_event_bus, std::move(pred), std::move(cb));
+        void awaitOnce(Pred&& pred, Cb&& cb) {
+            pruneDeadAwaiters();
+
+            using AW = EventAwaiter<EventType>;
+            auto aw = AW::create(
+                *m_event_bus,
+                std::function<bool(const EventType&)>(std::forward<Pred>(pred)),
+                std::function<void(const EventType&)>(std::forward<Cb>(cb)),
+                /*singleShot=*/true
+            );
+
+            std::lock_guard<std::mutex> lk(m_mutex);
+            m_awaiters.emplace_back(aw);
         }
 
-        /// \brief Awaits a single occurrence of an event without a predicate.
-        /// \tparam EventType Type of the event to await.
-        /// \param cb Callback invoked when the event is received.
+        /// \brief Await the first EventType (no predicate).
         template <typename EventType, typename Cb>
-        void await_once(Cb cb) {
-            ::ImGuiX::Pubsub::await_once<EventType>(*m_event_bus, std::move(cb));
+        void awaitOnce(Cb&& cb) {
+            awaitOnce<EventType>(
+                [](const EventType&) { return true; },
+                std::forward<Cb>(cb)
+            );
         }
+
+        /// \brief Multi-shot awaiter; returns token (IAwaiter) to cancel manually.
+        template <typename EventType, typename Pred, typename Cb>
+        std::shared_ptr<IAwaiter> awaitEach(Pred&& pred, Cb&& cb) {
+            pruneDeadAwaiters();
+
+            using AW = EventAwaiter<EventType>;
+            auto aw = AW::create(
+                *m_event_bus,
+                std::function<bool(const EventType&)>(std::forward<Pred>(pred)),
+                std::function<void(const EventType&)>(std::forward<Cb>(cb)),
+                /*singleShot=*/false
+            );
+
+            std::lock_guard<std::mutex> lk(m_mutex);
+            m_awaiters.emplace_back(aw);
+            return aw;
+        }
+
+        template <typename EventType, typename Cb>
+        std::shared_ptr<IAwaiter> awaitEach(Cb&& cb) {
+            return awaitEach<EventType>(
+                [](const EventType&) { return true; },
+                std::forward<Cb>(cb)
+            );
+        }
+
+        // Untyped hook if needed
+        void onEvent(const Event* const) override {}
 
     private:
-        EventBus* m_event_bus; ///< Associated EventBus instance.
+        EventBus* m_event_bus{nullptr}; ///< Associated EventBus instance.
+        std::mutex m_mutex;
+        std::vector<std::weak_ptr<IAwaiter>> m_awaiters; ///< Weak list of active awaiters
+        
+        void pruneDeadAwaiters() {
+            std::lock_guard<std::mutex> lk(m_mutex);
+            auto& v = m_awaiters;
+            v.erase(std::remove_if(v.begin(), v.end(),
+                [](const std::weak_ptr<IAwaiter>& w){
+                    if (w.expired()) return true;
+                    if (auto sp = w.lock()) return !sp->isActive();
+                    return true;
+                }), v.end());
+        }
+
+        void cancelAllAwaiters() {
+            std::vector<std::shared_ptr<IAwaiter>> live;
+
+            std::unique_lock<std::mutex> lock(m_mutex);
+            live.reserve(m_awaiters.size());
+            for (auto& w : m_awaiters) {
+                if (auto sp = w.lock()) live.emplace_back(std::move(sp));
+            }
+            m_awaiters.clear();
+            lock.unlock();
+
+            for (auto& sp : live) sp->cancel();
+        }
     };
 
 } // namespace ImGuiX::Pubsub
