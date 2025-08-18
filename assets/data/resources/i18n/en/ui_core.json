@@ -1,0 +1,27 @@
+{
+  "Docs.GettingStarted": "Setup Instructions",
+  "About.App": "About the App",
+
+  "Menu.File": "File",
+  "Menu.Edit": "Edit",
+
+  "Buttons.ResetDefaults": "Reset to defaults",
+
+  "Settings.General.Username": "Username",
+  "Settings.Network.Server": "Server",
+  "Settings.Network.Server.Custom": "Custom",
+
+  "Errors.ServerUnreachable": "Server '{host}' is unreachable (code={0})",
+  "Errors.FileNotFound": "File '{path}' not found (code={0})",
+
+  "Build.Version": "Version {0}.{1}.{2}",
+
+  "Polyglot.Example": "Example text",
+  "Polyglot.OnlyEn": "Only in English",
+
+  "Items.one": "{n} item",
+  "Items.other": "{n} items",
+
+  "Notifications.one": "{n} notification",
+  "Notifications.other": "{n} notifications"
+}

@@ -1,0 +1,27 @@
+{
+  "Docs.GettingStarted": "Инструкция по началу работы",
+  "About.App": "О приложении",
+
+  "Menu.File": "Файл",
+  "Menu.Edit": "Правка",
+
+  "Buttons.ResetDefaults": "Сбросить параметры",
+
+  // "Settings.General.Username": "Имя пользователя",
+  // "Settings.Network.Server": "Сервер",
+  // "Settings.Network.Server.Custom": "Другое",
+
+  "Errors.ServerUnreachable": "Сервер '{host}' недоступен (код={0})",
+
+  "Build.Version": "Версия {0}.{1}.{2}",
+
+  "Polyglot.Example": "Пример текста",
+
+  "Items.one": "{n} элемент",
+  "Items.few": "{n} элемента",
+  "Items.many": "{n} элементов",
+
+  "Notifications.one": "{n} уведомление",
+  "Notifications.few": "{n} уведомления",
+  "Notifications.many": "{n} уведомлений"
+}

@@ -14,12 +14,18 @@
 #   include <imgui_impl_glfw.h>
 #   include <imgui_impl_opengl3.h>
 #   include <GLFW/glfw3.h>
+#   include "imgui_glsl_version.hpp"
 #endif
 #ifdef IMGUIX_USE_SDL2_BACKEND
 #   include <imgui_impl_sdl2.h>
 #   include <imgui_impl_opengl3.h>
 #   include <SDL.h>
 #   include <SDL_opengles2.h>
+#   include "imgui_glsl_version.hpp"
+#endif
+
+#ifndef IMGUIX_CONFIG_DIR
+#   define IMGUIX_CONFIG_DIR "data/config"
 #endif
 
 namespace ImGuiX {
@@ -42,9 +48,7 @@ namespace ImGuiX {
         WindowInstance(WindowInstance&&) = delete;
         WindowInstance& operator=(WindowInstance&&) = delete;
 
-        virtual ~WindowInstance() {
-            unsubscribeAll();
-        }
+        virtual ~WindowInstance() noexcept;
         
         /// \brief Optional callback invoked after the window is added to the manager.
         virtual void onInit() {}
@@ -99,7 +103,7 @@ namespace ImGuiX {
         bool setWindowIcon(const std::string& path) override;
         
         /// \brief Enables or disables clearing the background between frames.
-                void setDisableBackground(bool disable) override {};
+        void setDisableBackground(bool disable) override {};
 
         /// \brief Requests the window to close.
         void close() override;
@@ -139,18 +143,43 @@ namespace ImGuiX {
 
         /// \brief Reference to the owning application.
         ApplicationControl& application() override;
+
 #       ifdef IMGUIX_USE_SFML_BACKEND
         sf::RenderWindow& getRenderTarget() override;
 #       endif
+
+        /// \brief Сделать контекст окна (GL/OS + ImGui) текущим.
+        /// Вызывать ТОЛЬКО между кадрами (до ImGui::NewFrame()).
+        virtual void setCurrentWindow();
+
+        /// \brief
+        virtual void requestLanguageChange(const std::string& lang) {};
+        
+        /// \brief
+        std::string iniPath() const;
+        
+        /// \brief
+        void initIni();
+
+        /// \brief
+        void loadIni();
+
+        /// \brief Saves ImGui ini settings to disk.
+        void saveIniNow();
 
     protected:
 #       ifdef IMGUIX_USE_SFML_BACKEND
         sf::RenderWindow m_window; ///< Underlying SFML render window.
 #       elif defined(IMGUIX_USE_GLFW_BACKEND)
         GLFWwindow* m_window = nullptr; ///< Pointer to the GLFW window.
+        ImGuiContext* m_imgui_ctx = nullptr;
+        const char* selectGlslForGlfw(GLFWwindow* w) noexcept;
 #       elif defined(IMGUIX_USE_SDL2_BACKEND)
         SDL_Window* m_window = nullptr;   ///< SDL window handle.
         SDL_GLContext m_gl_context = nullptr; ///< Associated GL context.
+        SDL_Window*   m_window = nullptr;
+        ImGuiContext* m_imgui_ctx = nullptr;
+        const char* selectGlslForSdl(SDL_Window* w) noexcept;
 #       endif
         int m_window_id;                    ///< Unique window identifier.
         std::string m_window_name;          ///< Internal window name.
@@ -162,6 +191,9 @@ namespace ImGuiX {
 
         ApplicationControl& m_application;  ///< Reference to the owning application.
         std::vector<std::unique_ptr<Controller>> m_controllers; ///< Attached controllers.
+        std::string m_ini_path;             ///< 
+        bool m_is_ini_once = false;         ///< Ensures imgui ini is saved only once.
+        bool m_is_ini_loaded = false;       ///< 
     };
 
 } // namespace imguix

@@ -18,9 +18,7 @@ namespace ImGuiX {
         explicit WindowManager(ApplicationControl& app);
 
         /// \brief Destructor. Unsubscribes from all events.
-        virtual ~WindowManager() {
-                        unsubscribeAll();
-                }
+        virtual ~WindowManager() = default;
 
         /// \brief Handles events posted to the global bus.
         void onEvent(const Pubsub::Event* const event) override;
@@ -55,6 +53,18 @@ namespace ImGuiX {
         /// \brief Forwards present to all windows.
         void presentAll();
         
+        /// \brief 
+        void initIniAll();
+        
+        /// \brief 
+        void loadIniAll();
+        
+        /// \brief 
+        void saveIniNowAll();
+        
+        /// \brief 
+        void saveIniAll();
+        
         /// \brief Returns the number of managed windows.
         /// \return Number of windows.
         std::size_t windowCount() const;
@@ -62,16 +72,26 @@ namespace ImGuiX {
         /// \brief Checks whether all windows have been closed.
         /// \return true if no window remains open.
         bool allWindowsClosed() const;
+        
+        /// \brief
+        void shutdown();
 
     protected:
         std::vector<std::unique_ptr<WindowInstance>> m_windows;      ///< Managed windows.
-        std::vector<std::unique_ptr<WindowInstance>> m_pending_add; ///< Newly created windows waiting to be added.
+        std::vector<std::unique_ptr<WindowInstance>> m_pending_add;  ///< Newly created windows waiting to be added.
         std::vector<WindowInstance*> m_pending_init;                 ///< Windows pending initialization.
-        ApplicationControl& m_application;                           ///< Reference to the owning application.
+        ApplicationControl&          m_application;                  ///< Reference to the owning application.
+        std::deque<Events::LangChangeEvent> m_lang_events;           ///< 
+        int                          m_ini_save_frame_counter{0};    ///< Frame counter for ini saving.
+        static constexpr int m_ini_save_interval{300};               ///< Frames between ini saves.
 
         /// \brief Shortcut to the application resource registry.
         /// \return Reference to the ResourceRegistry owned by the application.
         ResourceRegistry& registry();
+        
+        void processLanguageEvents();
+        WindowInstance*       findWindowById(int id) noexcept;
+        const WindowInstance* findWindowById(int id) const noexcept;
     };
 
 } // namespace ImGuiX

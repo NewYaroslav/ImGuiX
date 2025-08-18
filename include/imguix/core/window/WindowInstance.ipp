@@ -1,3 +1,6 @@
+#include <imgui.h>
+#include <imguix/utils/path_utils.hpp>
+
 namespace ImGuiX {
 
     WindowInstance::WindowInstance(int id, ApplicationControl& app, std::string name)
@@ -8,15 +11,14 @@ namespace ImGuiX {
     }
 
     void WindowInstance::drawContent() {
+        setCurrentWindow();
         for (auto& ctrl : m_controllers) {
             ctrl->drawContent();
         }
     }
 
     void WindowInstance::drawUi() {
-#       ifdef IMGUIX_USE_SFML_BACKEND
-        ImGui::SFML::SetCurrentWindow(m_window);
-#       endif
+        setCurrentWindow();
         for (auto& ctrl : m_controllers) {
             ctrl->drawUi();
         }
@@ -68,4 +70,66 @@ namespace ImGuiX {
         return m_window;
     }
 #   endif
+
+    std::string WindowInstance::iniPath() const {
+#   ifdef __EMSCRIPTEN__
+#       ifdef IMGUIX_EMSCRIPTEN_IDBFS
+        return "/imguix_fs/imgui-" + std::to_string(m_window_id) + ".ini";
+#       else
+        return {};
+#       endif
+#   else
+        return ImGuiX::Utils::resolveExecPath(
+            std::string(IMGUIX_CONFIG_DIR) + "/imgui-" + std::to_string(m_window_id) + ".ini");
+#   endif
+    }
+
+    void WindowInstance::initIni() {
+        if (m_is_ini_once) return;
+        setCurrentWindow();
+        m_ini_path = iniPath();
+#   ifdef __EMSCRIPTEN__
+#       ifdef IMGUIX_EMSCRIPTEN_IDBFS
+        ImGui::GetIO().IniFilename = m_ini_path.c_str();
+#       else
+        ImGui::GetIO().IniFilename = nullptr;
+#       endif
+#   else
+        ImGui::GetIO().IniFilename = nullptr;
+#   endif
+        m_is_ini_once = true;
+    }
+
+    void WindowInstance::loadIni() {
+        if (m_is_ini_loaded) return;
+        setCurrentWindow();
+#   ifdef __EMSCRIPTEN__
+#       ifdef IMGUIX_EMSCRIPTEN_IDBFS
+        // Ini settings will be loaded from mounted IDBFS automatically
+        ImGui::LoadIniSettingsFromDisk(m_ini_path.c_str());
+#       else
+        ImGui::GetIO().IniFilename = nullptr;
+#       endif
+#   else
+        Utils::createDirectories(Utils::resolveExecPath(IMGUIX_CONFIG_DIR));
+        ImGui::LoadIniSettingsFromDisk(m_ini_path.c_str());
+#   endif
+        m_is_ini_loaded = true;
+    }
+
+    void WindowInstance::saveIniNow() {
+        setCurrentWindow();
+        ImGui::SaveIniSettingsToDisk(iniPath().c_str());
+        if (!ImGui::GetIO().WantSaveIniSettings) return;
+#   ifdef __EMSCRIPTEN__
+#       ifdef IMGUIX_EMSCRIPTEN_IDBFS
+        ImGui::SaveIniSettingsToDisk(m_ini_path.c_str());
+        EM_ASM({ FS.syncfs(false, function(){}); });
+#       endif
+#   else
+        Utils::createDirectories(Utils::resolveExecPath(IMGUIX_CONFIG_DIR));
+        ImGui::SaveIniSettingsToDisk(m_ini_path.c_str());
+#   endif
+        ImGui::GetIO().WantSaveIniSettings = false;
+    }
 }

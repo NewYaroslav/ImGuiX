@@ -1,0 +1,4 @@
+{
+  "Welcome.User": "Welcome, {name}!",
+  "Build.Version": "Build {0}.{1}.{2}"
+}

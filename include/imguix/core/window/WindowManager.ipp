@@ -3,7 +3,10 @@
 namespace ImGuiX {
 
     WindowManager::WindowManager(ApplicationControl& app)
-        : EventMediator(app.eventBus()), m_application(app) {}
+        : EventMediator(app.eventBus()), m_application(app) {
+        subscribe<Events::ApplicationExitEvent>();
+        subscribe<Events::LangChangeEvent>();
+    }
 
     void WindowManager::addWindow(std::unique_ptr<WindowInstance> window) {
         m_pending_init.push_back(window.get());
@@ -13,6 +16,9 @@ namespace ImGuiX {
     void WindowManager::onEvent(const Pubsub::Event* const event) {
         if (event->is<Events::ApplicationExitEvent>()) {
             closeAll();
+        } else
+        if (event->is<Events::LangChangeEvent>()) {
+            m_lang_events.push_back(event->asRef<Events::LangChangeEvent>());
         }
     }
     
@@ -41,11 +47,59 @@ namespace ImGuiX {
             window->handleEvents();
         }
     }
+    
+    void WindowManager::processLanguageEvents() {
+        while (!m_lang_events.empty()) {
+            Events::LangChangeEvent ev = std::move(m_lang_events.front());
+            m_lang_events.pop_front();
+
+            if (ev.apply_to_all) {
+                for (auto& window : m_windows) {
+                    window->setCurrentWindow();
+                    window->requestLanguageChange(ev.lang);
+                }
+            } else {
+                auto* window = findWindowById(ev.window_id);
+                if (window) {
+                    window->setCurrentWindow();
+                    window->requestLanguageChange(ev.lang);
+                }
+            }
+        }
+    }
+    
+    void WindowManager::initIniAll() {
+        for (auto& window : m_windows) {
+            window->initIni();
+        }
+    }
+    
+    void WindowManager::loadIniAll() {
+        for (auto& window : m_windows) {
+            window->loadIni();
+        }
+    }
+    
+    void WindowManager::saveIniNowAll() {
+        for (auto& window : m_windows) {
+            window->saveIniNow();
+        }
+    }
+    
+    void WindowManager::saveIniAll() {
+        if (++m_ini_save_frame_counter >= m_ini_save_interval) {
+            m_ini_save_frame_counter = 0;
+            saveIniNowAll();
+        }
+    }
 
     void WindowManager::tickAll() {
+        processLanguageEvents();
+
 #       ifdef IMGUIX_USE_SFML_BACKEND
         registry().getResource<DeltaClockSfml>().update();
 #       endif
+
         for (auto& window : m_windows) {
             window->tick();
         }
@@ -91,6 +145,28 @@ namespace ImGuiX {
 
     ResourceRegistry& WindowManager::registry() {
         return m_application.registry();
+    }
+    
+    inline WindowInstance* WindowManager::findWindowById(int id) noexcept {
+        for (auto& window : m_windows) {
+            WindowInstance* ptr = window.get();
+            if (ptr && ptr->id() == id) return ptr;
+        }
+        return nullptr;
+    }
+
+    inline const WindowInstance* WindowManager::findWindowById(int id) const noexcept {
+        for (auto const& window : m_windows) {
+            auto const* ptr = window.get();
+            if (ptr && ptr->id() == id) return ptr;
+        }
+        return nullptr;
+    }
+
+    void WindowManager::shutdown() {
+#       ifdef IMGUIX_USE_SFML_BACKEND
+        //ImGui::SFML::Shutdown();
+#       endif
     }
 
 } // namespace ImGuiX

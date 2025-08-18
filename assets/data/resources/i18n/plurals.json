@@ -1,0 +1,32 @@
+{
+  "en": {
+    "cardinal": [
+      { "cat": "one",   "eq": 1 },
+      { "cat": "other", "true": true }
+    ]
+  },
+  "ru": {
+    "cardinal": [
+      { "cat": "one",
+        "all": [
+          { "mod_eq": { "mod": 10, "eq": 1 } },
+          { "not": { "mod_in_range": { "mod": 100, "range": [11, 11] } } }
+        ]
+      },
+      { "cat": "few",
+        "all": [
+          { "mod_in_list": { "mod": 10, "list": [2, 3, 4] } },
+          { "not": { "mod_in_range": { "mod": 100, "range": [12, 14] } } }
+        ]
+      },
+      { "cat": "many",
+        "any": [
+          { "mod_eq": { "mod": 10, "eq": 0 } },
+          { "mod_in_list": { "mod": 10, "list": [5, 6, 7, 8, 9] } },
+          { "mod_in_range": { "mod": 100, "range": [11, 14] } }
+        ]
+      },
+      { "cat": "other", "true": true }
+    ]
+  }
+}

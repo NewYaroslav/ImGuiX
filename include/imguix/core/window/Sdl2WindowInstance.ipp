@@ -5,6 +5,26 @@
 
 namespace ImGuiX {
 
+    WindowInstance::~WindowInstance() noexcept  {
+        saveIniNow();
+        if (m_imgui_ctx) {
+            ImGui::SetCurrentContext(m_imgui_ctx);
+            ImGui_ImplOpenGL3_Shutdown();
+            ImGui_ImplSDL2_Shutdown();
+            ImGui::DestroyContext(m_imgui_ctx);
+            m_imgui_ctx = nullptr;
+        }
+
+        if (m_gl_context) { 
+            SDL_GL_DeleteContext(m_gl_context); 
+            m_gl_context = nullptr; 
+        }
+        if (m_window)     { 
+            SDL_DestroyWindow(m_window);        
+            m_window = nullptr;     
+        }
+    }
+
     bool WindowInstance::create() {
         if (m_window || m_is_open) return true;
         if (SDL_Init(SDL_INIT_VIDEO) != 0) return false;
@@ -19,13 +39,18 @@ namespace ImGuiX {
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+        
         m_gl_context = SDL_GL_CreateContext(m_window);
         SDL_GL_MakeCurrent(m_window, m_gl_context);
+        
         IMGUI_CHECKVERSION();
-        if (!ImGui::GetCurrentContext())
-            ImGui::CreateContext();
+
+        m_imgui_ctx = ImGui::CreateContext();
+        ImGui::SetCurrentContext(m_imgui_ctx);
+        
         ImGui_ImplSDL2_InitForOpenGL(m_window, m_gl_context);
-        ImGui_ImplOpenGL3_Init("#version 100");
+        ImGui_ImplOpenGL3_Init(selectGlslForSdl(m_window));
+        
         ImGuiIO& io = ImGui::GetIO();
         io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;
         int window_w, window_h, drawable_w, drawable_h;
@@ -44,6 +69,30 @@ namespace ImGuiX {
         m_height = h;
         return create();
     }
+	
+	const char* WindowInstance::selectGlslForSdl(SDL_Window* w) noexcept {
+#	if !defined(IMGUIX_USE_SDL2_BACKEND)
+		(void)w; return IMGUIX_GLSL_VERSION;
+#	else
+		if (!w) return IMGUIX_GLSL_VERSION;
+
+		int major=0, minor=0, profile=0;
+		if (SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &major) != 0) return IMGUIX_GLSL_VERSION;
+		if (SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &minor) != 0) return IMGUIX_GLSL_VERSION;
+		if (SDL_GL_GetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, &profile) != 0) return IMGUIX_GLSL_VERSION;
+
+		if (profile & SDL_GL_CONTEXT_PROFILE_ES)
+			return (major >= 3) ? "#version 300 es" : "#version 100";
+
+#   	if defined(__APPLE__)
+		return "#version 150";
+#   	else
+		if (major > 3 || (major == 3 && minor >= 2) || (profile & SDL_GL_CONTEXT_PROFILE_CORE))
+			return "#version 150";
+		return "#version 130";
+#   	endif
+#	endif
+	}
 
     void WindowInstance::handleEvents() {
         SDL_Event event;
@@ -62,12 +111,16 @@ namespace ImGuiX {
     }
 
     void WindowInstance::tick() {
+        if (!m_window) return;
+        setCurrentWindow();
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
     }
 
     void WindowInstance::present() {
+        if (!m_window) return;
+        setCurrentWindow();
         ImGui::Render();
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -145,6 +198,12 @@ namespace ImGuiX {
 
     bool WindowInstance::isOpen() const {
         return m_is_open && m_window != nullptr;
+    }
+    
+    void WindowInstance::setCurrentWindow() {
+        if (!m_window || !m_gl_context || !m_imgui_ctx) return;
+        SDL_GL_MakeCurrent(m_window, m_gl_context);
+        ImGui::SetCurrentContext(m_imgui_ctx);
     }
 
 } // namespace ImGuiX

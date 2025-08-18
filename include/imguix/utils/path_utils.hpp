@@ -136,7 +136,7 @@ namespace ImGuiX::Utils {
         if (!fs::exists(dir)) {
             std::error_code ec;
             if (!fs::create_directories(dir, ec)) {
-                throw std::runtime_error("Failed to create directories: " + path);
+                throw std::runtime_error("Failed to create directories: " + dir.u8string());
             }
         }
 #endif

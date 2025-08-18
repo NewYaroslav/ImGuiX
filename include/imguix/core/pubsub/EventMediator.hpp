@@ -25,7 +25,9 @@ namespace ImGuiX::Pubsub {
         /// \param bus Unique pointer to the EventBus instance.
         explicit EventMediator(std::unique_ptr<EventBus>& bus) : m_event_bus(bus.get()) {}
 
-        virtual ~EventMediator() = default;
+        ~EventMediator() noexcept override {
+            unsubscribeAll();
+        }
         
         /// \brief Subscribes to an event type with a custom callback function taking a concrete event reference.
         /// \tparam EventType Type of the event to subscribe to.

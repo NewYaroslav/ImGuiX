@@ -1,0 +1,9 @@
+{
+  "Polyglot.Example": {
+    "ru": "Полиглот ключ (RU)",
+    "en": "Polyglot key (EN)"
+  },
+  "Polyglot.OnlyEn": {
+    "en": "Only EN value (polyglot); RU should fallback to EN"
+  }
+}

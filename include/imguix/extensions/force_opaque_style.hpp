@@ -15,7 +15,7 @@ namespace ImGuiX::Extensions {
     /// (`Colors[i].w`) to be 1.0f, disabling any transparency.
     /// Useful when using DWM transparency or to prevent unwanted blending with the background.
     inline void ForceOpaqueStyle() {
-        ImGuiStyle& style = GetStyle();
+        ImGuiStyle& style = ImGui::GetStyle();
         style.Alpha = 1.0f;
         for (int i = 0; i < ImGuiCol_COUNT; ++i) {
             style.Colors[i].w = 1.0f;
@@ -29,7 +29,7 @@ namespace ImGuiX::Extensions {
     public:
         /// \brief Saves the current style and applies a fully opaque one.
         ScopedOpaqueStyle() {
-            ImGuiStyle& style = GetStyle();
+            ImGuiStyle& style = ImGui::GetStyle();
             m_old_alpha = style.Alpha;
             for (int i = 0; i < ImGuiCol_COUNT; ++i) {
                 m_old_colors[i] = style.Colors[i];
@@ -40,7 +40,7 @@ namespace ImGuiX::Extensions {
 
         /// \brief Restores the previous style upon destruction.
         ~ScopedOpaqueStyle() {
-            ImGuiStyle& style = GetStyle();
+            ImGuiStyle& style = ImGui::GetStyle();
             style.Alpha = m_old_alpha;
             for (int i = 0; i < ImGuiCol_COUNT; ++i) {
                 style.Colors[i] = m_old_colors[i];

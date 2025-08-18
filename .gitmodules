@@ -13,3 +13,12 @@
 [submodule "libs/glfw"]
 	path = libs/glfw
 	url = https://github.com/glfw/glfw.git
+[submodule "libs/fmt"]
+	path = libs/fmt
+	url = https://github.com/fmtlib/fmt.git
+[submodule "libs/json"]
+	path = libs/json
+	url = https://github.com/nlohmann/json
+[submodule "libs/libmdbx"]
+	path = libs/libmdbx
+	url = https://github.com/erthink/libmdbx.git

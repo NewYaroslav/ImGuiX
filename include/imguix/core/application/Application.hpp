@@ -8,14 +8,6 @@
 #include <atomic>
 #include <thread>
 
-#ifndef IMGUIX_CONFIG_DIR
-#   define IMGUIX_CONFIG_DIR "data/config"
-#endif
-
-#ifndef IMGUIX_INI_PATH
-#	define IMGUIX_INI_PATH   IMGUIX_CONFIG_DIR "/imgui.ini"
-#endif
-
 namespace ImGuiX {
 
     /// \brief Main application class.
@@ -79,14 +71,11 @@ namespace ImGuiX {
         std::thread m_main_thread;                     ///< Thread running the main loop when async.
         std::atomic<bool> m_is_closing{false};         ///< Indicates shutdown in progress.
         std::atomic<bool> m_is_ini_once{false};        ///< Ensures imgui ini is saved only once.
-        std::atomic<bool> m_is_ini_loaded{false};      ///< Tracks initial ini load.
+
         std::atomic<int> m_next_window_id{0};          ///< Incremental ID for new windows.
         std::string m_app_name = "ImGuiX Application"; ///< Application name string.
         std::vector<std::unique_ptr<Model>> m_models;  ///< Owned model objects.
         std::vector<Model*> m_pending_models;          ///< Models waiting for initialization.
-
-        int m_ini_save_frame_counter{0};                ///< Frame counter for ini saving.
-        static constexpr int m_ini_save_interval{300};  ///< Frames between ini saves.
 
         /// \brief Main application loop.
         void mainLoop();
@@ -100,9 +89,6 @@ namespace ImGuiX {
 
         /// \brief Called after exiting the main loop.
         void endLoop();
-
-        /// \brief Saves ImGui ini settings to disk.
-        void saveIniSettings();
 
         /// \brief Checks if all windows have been closed.
         /// \return True if no windows remain open.

@@ -11,6 +11,11 @@
 
 namespace ImGuiX {
 
+    WindowInstance::~WindowInstance() noexcept  {
+        saveIniNow();
+        ImGui::SFML::Shutdown(m_window);
+    }
+
     bool WindowInstance::create() {
         if (m_window.isOpen() || m_is_open) return true;
         m_window.create(sf::VideoMode({static_cast<unsigned int>(width()),  static_cast<unsigned int>(height())}), name());
@@ -151,6 +156,7 @@ namespace ImGuiX {
             Events::WindowClosedEvent evt(id(), name());
             notify(evt);
             m_window.close();
+            //ImGui::SFML::Shutdown(m_window);
         }
     }
     
@@ -254,5 +260,9 @@ namespace ImGuiX {
 
     bool WindowInstance::isOpen() const {
         return m_window.isOpen() && m_is_open;
+    }
+    
+    void WindowInstance::setCurrentWindow() {
+        ImGui::SFML::SetCurrentWindow(m_window);
     }
 }

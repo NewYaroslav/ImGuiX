@@ -24,9 +24,7 @@ namespace ImGuiX {
         Model(Model&&) = delete;
         Model& operator=(Model&&) = delete;
 
-        virtual ~Model() {
-            unsubscribeAll();
-        }
+        virtual ~Model() = default;
 
                 /// \brief Optional initialization callback invoked once.
         virtual void onInit() {}

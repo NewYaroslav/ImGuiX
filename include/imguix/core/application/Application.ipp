@@ -1,6 +1,3 @@
-#include <imgui.h>
-#include <imguix/utils/path_utils.hpp>
-#include <imguix/utils/encoding_utils.hpp>
 #ifdef __EMSCRIPTEN__
 #   include <emscripten.h>
 #endif
@@ -120,6 +117,11 @@ namespace ImGuiX {
 
         m_window_manager.removeClosed();
         if (allWindowsClosed()) {
+            m_event_bus.process();
+            for (auto& model : m_models) {
+                model->process();
+            }
+            m_event_bus.process();
 #ifdef __EMSCRIPTEN__
             endLoop();
             emscripten_cancel_main_loop();
@@ -127,62 +129,26 @@ namespace ImGuiX {
             return false;
         }
 
-        if (!m_is_ini_once) {
-            m_is_ini_once = true;
-#ifdef __EMSCRIPTEN__
-#   ifdef IMGUIX_EMSCRIPTEN_IDBFS
-            ImGui::GetIO().IniFilename = "/imguix_fs/imgui.ini";
-#   else
-            ImGui::GetIO().IniFilename = nullptr;
-#   endif
-#else
-            ImGuiIO& io = ImGui::GetIO();
-            io.IniFilename = nullptr;
-#endif
-        }
-
+        m_window_manager.initIniAll();
         for (auto& model : m_models) {
             model->process();
         }
-
         m_event_bus.process();
-
+        
         m_window_manager.handleEvents();
         m_window_manager.tickAll();
         m_window_manager.drawContentAll();
         m_window_manager.drawUiAll();
         m_window_manager.presentAll();
-
-        if (!m_is_ini_loaded) {
-            m_is_ini_loaded = true;
-#ifdef __EMSCRIPTEN__
-#   ifdef IMGUIX_EMSCRIPTEN_IDBFS
-            // Ini settings will be loaded from mounted IDBFS automatically
-            ImGui::LoadIniSettingsFromDisk("/imguix_fs/imgui.ini");
-#   else
-            ImGui::GetIO().IniFilename = nullptr;
-#   endif
-#else
-            std::string ini_path = Utils::resolveExecPath(IMGUIX_INI_PATH);
-            Utils::createDirectories(Utils::resolveExecPath(IMGUIX_CONFIG_DIR));
-            ImGui::LoadIniSettingsFromDisk(ini_path.c_str());
-#endif
-        }
-
-        if (++m_ini_save_frame_counter >= m_ini_save_interval) {
-            m_ini_save_frame_counter = 0;
-            if (ImGui::GetIO().WantSaveIniSettings) {
-                saveIniSettings();
-                ImGui::GetIO().WantSaveIniSettings = false;
-            }
-        }
+        m_window_manager.loadIniAll();
+        m_window_manager.saveIniAll();
 
         return true;
     }
 
     void Application::endLoop() {
-        saveIniSettings();
         m_is_closing = true;
+        m_window_manager.shutdown();
     }
 
     void Application::mainLoop() {
@@ -196,16 +162,4 @@ namespace ImGuiX {
 #endif
     }
 
-    void Application::saveIniSettings() {
-#ifdef __EMSCRIPTEN__
-#   ifdef IMGUIX_EMSCRIPTEN_IDBFS
-        ImGui::SaveIniSettingsToDisk("/imguix_fs/imgui.ini");
-        EM_ASM({ FS.syncfs(false, function(){}); });
-#   endif
-#else
-        std::string ini_path = Utils::resolveExecPath(IMGUIX_INI_PATH);
-        Utils::createDirectories(Utils::resolveExecPath(IMGUIX_CONFIG_DIR));
-        ImGui::SaveIniSettingsToDisk(ini_path.c_str());
-#endif
-    }
 } // namespace ImGuiX
