@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.18)
 project(ImGuiX LANGUAGES CXX VERSION 0.1.0)
 
+# Normalize REAL_PATH behaviour (MSYS/Windows paths → native first)
+if(POLICY CMP0152)
+    cmake_policy(SET CMP0152 NEW)
+endif()
+
 # ===== Options =====
 option(IMGUIX_HEADER_ONLY      "Header-only mode (no .cpp compiled)" OFF)
 option(IMGUIX_BUILD_SHARED     "Build ImGuiX as shared library" OFF)

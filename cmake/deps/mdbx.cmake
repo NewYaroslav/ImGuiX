@@ -58,6 +58,14 @@ function(imguix_use_or_fetch_mdbx out_target)
             # чтобы install() сабпроекта поставил статическую либу (+заголовки у них тоже инсталлятся)
             set(MDBX_INSTALL_STATIC ON CACHE BOOL "" FORCE)
         endif()
+        
+        # --- Ensure version file exists for libmdbx (CI-friendly) ---
+        # libmdbx CMake requires either git repo metadata OR VERSION.json/VERSION.txt in source dir.
+        # In CI submodules may miss tags/metadata; create minimal VERSION.txt to unblock configure.
+        if(NOT EXISTS "${_MDBX_SRC}/VERSION.json" AND NOT EXISTS "${_MDBX_SRC}/VERSION.txt")
+            message(STATUS "libmdbx: version file not found → writing fallback VERSION.txt (0.0.0)")
+            file(WRITE "${_MDBX_SRC}/VERSION.txt" "0.0.0\n")
+        endif()
 
         # Unique binary dir
         add_subdirectory("${_MDBX_SRC}" "${CMAKE_BINARY_DIR}/_deps/mdbx-build")
