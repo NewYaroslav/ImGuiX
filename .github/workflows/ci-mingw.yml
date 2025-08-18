@@ -1,0 +1,80 @@
+name: CI MinGW (build & install SDK)
+
+on:
+  push:
+    branches: [ main, stable ]
+  pull_request:
+    branches: [ main, stable ]
+
+jobs:
+  build-mingw64:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}   # выполнять шаги в MSYS2 MINGW64-шелле
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup MSYS2 (MINGW64)
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            base-devel
+            git
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-ninja
+            mingw-w64-x86_64-pkg-config
+
+      - name: Configure (Release, Ninja)
+        env:
+          CC:  x86_64-w64-mingw32-gcc
+          CXX: x86_64-w64-mingw32-g++
+        run: |
+          set -e
+          cmake -S . -B build -G "Ninja" \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX="$PWD/dist/sdk" \
+            -DBUILD_SHARED_LIBS=OFF \
+            -DIMGUIX_DEPS_MODE=BUNDLED \
+            -DIMGUIX_BUILD_SHARED=OFF \
+            -DIMGUIX_BUILD_TESTS=OFF \
+            -DIMGUIX_BUILD_EXAMPLES=OFF \
+            -DIMGUIX_USE_SFML_BACKEND=ON \
+            -DIMGUIX_IMGUI_FREETYPE=ON \
+            -DIMGUIX_VENDOR_JSON=ON \
+            -DIMGUIX_SFML_MAJOR=3 \
+            -DIMGUIX_SDK_INSTALL=ON \
+            -DIMGUIX_SDK_BUNDLE_DEPS=ON \
+            -DIMGUIX_SDK_INSTALL_QUICKSTART=ON \
+            -DIMGUIX_SDK_FLATTEN_MISC_HEADERS=ON \
+          2>&1 | tee build/configure.log
+
+      - name: Build
+        run: |
+          set -e
+          cmake --build build --config Release --parallel \
+          2>&1 | tee build/build.log
+
+      - name: Install (SDK)
+        run: |
+          set -e
+          cmake --build build --config Release --target install \
+          2>&1 | tee build/install.log
+
+      - name: Check SDK layout
+        run: |
+          test -d dist/sdk/include || (echo "include/ missing" && exit 1)
+          test -d dist/sdk/lib     || (echo "lib/ missing" && exit 1)
+          test -d dist/sdk/lib/cmake || echo "WARN: lib/cmake missing (package config not exported?)"
+
+      - name: Upload artifacts (SDK + logs)
+        uses: actions/upload-artifact@v4
+        with:
+          name: imguix-sdk-mingw64
+          path: |
+            dist/sdk
+            build/*.log
+          if-no-files-found: error
