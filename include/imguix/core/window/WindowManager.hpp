@@ -53,16 +53,16 @@ namespace ImGuiX {
         /// \brief Forwards present to all windows.
         void presentAll();
         
-        /// \brief 
+        /// \brief Initializes ImGui ini handling for all windows.
         void initIniAll();
-        
-        /// \brief 
+
+        /// \brief Loads ImGui settings for all windows.
         void loadIniAll();
-        
-        /// \brief 
+
+        /// \brief Saves ImGui settings for all windows immediately.
         void saveIniNowAll();
-        
-        /// \brief 
+
+        /// \brief Periodically saves ImGui settings for all windows.
         void saveIniAll();
         
         /// \brief Returns the number of managed windows.
@@ -73,7 +73,7 @@ namespace ImGuiX {
         /// \return true if no window remains open.
         bool allWindowsClosed() const;
         
-        /// \brief
+        /// \brief Performs backend-specific shutdown tasks.
         void shutdown();
 
     protected:
@@ -81,7 +81,7 @@ namespace ImGuiX {
         std::vector<std::unique_ptr<WindowInstance>> m_pending_add;  ///< Newly created windows waiting to be added.
         std::vector<WindowInstance*> m_pending_init;                 ///< Windows pending initialization.
         ApplicationControl&          m_application;                  ///< Reference to the owning application.
-        std::deque<Events::LangChangeEvent> m_lang_events;           ///< 
+        std::deque<Events::LangChangeEvent> m_lang_events;           ///< Queued language change events.
         int                          m_ini_save_frame_counter{0};    ///< Frame counter for ini saving.
         static constexpr int m_ini_save_interval{300};               ///< Frames between ini saves.
 
