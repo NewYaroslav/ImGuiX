@@ -148,20 +148,22 @@ namespace ImGuiX {
         sf::RenderWindow& getRenderTarget() override;
 #       endif
 
-        /// \brief Сделать контекст окна (GL/OS + ImGui) текущим.
-        /// Вызывать ТОЛЬКО между кадрами (до ImGui::NewFrame()).
+        /// \brief Makes the window context current for rendering.
+        /// Call only between frames before ImGui::NewFrame().
         virtual void setCurrentWindow();
 
-        /// \brief
+        /// \brief Requests the window to switch its UI language.
+        /// \param lang Language code to apply.
         virtual void requestLanguageChange(const std::string& lang) {};
-        
-        /// \brief
+
+        /// \brief Computes the file path for storing ImGui ini settings.
+        /// \return Absolute path to the ini file.
         std::string iniPath() const;
-        
-        /// \brief
+
+        /// \brief Prepares ImGui to use the window-specific ini file.
         void initIni();
 
-        /// \brief
+        /// \brief Loads ImGui settings from the ini file if not already loaded.
         void loadIni();
 
         /// \brief Saves ImGui ini settings to disk.
@@ -191,9 +193,9 @@ namespace ImGuiX {
 
         ApplicationControl& m_application;  ///< Reference to the owning application.
         std::vector<std::unique_ptr<Controller>> m_controllers; ///< Attached controllers.
-        std::string m_ini_path;             ///< 
+        std::string m_ini_path;             ///< Path to the window-specific ImGui ini file.
         bool m_is_ini_once = false;         ///< Ensures imgui ini is saved only once.
-        bool m_is_ini_loaded = false;       ///< 
+        bool m_is_ini_loaded = false;       ///< Indicates whether ini settings have been loaded.
     };
 
 } // namespace imguix
