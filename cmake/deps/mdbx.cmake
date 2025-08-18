@@ -60,11 +60,25 @@ function(imguix_use_or_fetch_mdbx out_target)
         endif()
         
         # --- Ensure version file exists for libmdbx (CI-friendly) ---
-        # libmdbx CMake requires either git repo metadata OR VERSION.json/VERSION.txt in source dir.
-        # In CI submodules may miss tags/metadata; create minimal VERSION.txt to unblock configure.
-        if(NOT EXISTS "${_MDBX_SRC}/VERSION.json" AND NOT EXISTS "${_MDBX_SRC}/VERSION.txt")
-            message(STATUS "libmdbx: version file not found → writing fallback VERSION.txt (0.0.0)")
-            file(WRITE "${_MDBX_SRC}/VERSION.txt" "0.0.0\n")
+        # Требуется: git-репозиторий ИЛИ файл VERSION.json в каталоге сабмодуля.
+        # Пытаемся взять тег из git; если не получилось — пишем "0.0.0".
+        if(NOT EXISTS "${_MDBX_SRC}/VERSION.json")
+          find_program(GIT_EXECUTABLE git)
+          set(_mdbx_ver "0.0.0")
+          if(GIT_EXECUTABLE)
+            execute_process(
+              COMMAND ${GIT_EXECUTABLE} -C "${_MDBX_SRC}" describe --tags --abbrev=0
+              OUTPUT_VARIABLE _tag
+              OUTPUT_STRIP_TRAILING_WHITESPACE
+              RESULT_VARIABLE _rc
+            )
+            if(_rc EQUAL 0 AND _tag)
+              string(REGEX REPLACE "^v" "" _mdbx_ver "${_tag}") # убрать префикс v
+            endif()
+          endif()
+          # Важно: этой ревизии mdbx достаточно просто строки с семвером в VERSION.json
+          file(WRITE "${_MDBX_SRC}/VERSION.json" "${_mdbx_ver}\n")
+          message(STATUS "libmdbx: wrote VERSION.json = ${_mdbx_ver}")
         endif()
 
         # Unique binary dir
