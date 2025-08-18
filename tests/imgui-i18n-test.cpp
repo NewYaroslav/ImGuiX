@@ -145,6 +145,45 @@ bool LoadFontsForLanguage(const char* lang_code, float size_px = 18.0f) {
     return true;
 }
 
+
+bool LoadFontsForLanguage2(const char* lang, float px) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.Fonts->Clear();
+    io.FontDefault = nullptr;
+
+#ifdef IMGUI_ENABLE_FREETYPE
+# if IMGUI_VERSION_NUM >= 19200
+    io.Fonts->FontLoader = ImGuiFreeType::GetFontLoader();
+    io.Fonts->FontLoaderFlags = 0;
+# else
+    io.Fonts->FontBuilderIO = ImGuiFreeType::GetBuilderForFreeType();
+    io.Fonts->FontBuilderFlags = 0;
+# endif
+#endif
+
+    const std::string path = ImGuiX::Utils::resolveExecPath("data/resources/fonts/Roboto-Medium.ttf");
+
+    ImFontGlyphRangesBuilder b;
+    b.AddRanges(io.Fonts->GetGlyphRangesDefault());
+    b.AddText(u8"–—…•“”‘’");
+    auto eq=[](const char*a,const char*b){for(;*a&&*b;++a,++b) if((unsigned char)std::tolower(*a)!=(unsigned char)std::tolower(*b)) return false; return *a==*b;};
+    if (eq(lang,"ru")||eq(lang,"uk")||eq(lang,"be")) {
+        b.AddRanges(io.Fonts->GetGlyphRangesCyrillic());
+    } else 
+    if (eq(lang,"vi")) {
+        b.AddRanges(io.Fonts->GetGlyphRangesVietnamese());
+    }
+    ImVector<ImWchar> ranges; b.BuildRanges(&ranges);
+
+    ImFontConfig cfg{}; cfg.SizePixels = 0.0f;        // не перетирать px
+    ImFont* base = io.Fonts->AddFontFromFileTTF(path.c_str(), px, &cfg, ranges.Data);
+    if (!base) return false;
+    io.FontDefault = base;
+
+    if (!ImGui::SFML::UpdateFontTexture()) return false;
+    return true;
+}
+
 class I18nController : public ImGuiX::Controller {
 public:
     I18nController(ImGuiX::WindowControl& window,
@@ -160,8 +199,10 @@ public:
 
     // --- UI demo fully using the new keys (generic settings) ---
     void drawUi() override {
-		ImGui::PushID(window().id());
+        ImGui::PushID(window().id());
+		ImGui::PushFont(nullptr, 18.0f);
         ImGui::Begin(window().id() == 0 ? "i18n main" : "i18n child");
+		
 
         // Languages to test fonts and fallback:
         // ru, uk, be, pt-BR, es, vi, en
@@ -243,6 +284,7 @@ public:
         ImGui::Text("again: %p", (const void*)m_lang_store->label("Menu.File"));
 
         ImGui::End();
+		ImGui::PopFont();
         //if (window().id() == 0) ImGui::ShowDemoWindow();
         ImGui::PopID();
     }
@@ -268,25 +310,25 @@ public:
         , m_lang_store(std::move(lang_store)) {}
 
     void onInit() override {
-		createController<I18nController>(static_cast<ImGuiX::Application&>(m_application), m_lang_store);
+        createController<I18nController>(static_cast<ImGuiX::Application&>(m_application), m_lang_store);
         create(id() == 0 ? 800 : 640, id() == 0 ? 600 : 480);
         setWindowIcon("data/resources/icons/icon.png");
-		LoadFontsForLanguage("ru", 36.0f);
+        LoadFontsForLanguage2("ru", 32.0f);
     }
+
 private:
     std::shared_ptr<i18n::LangStore> m_lang_store;
     std::string m_pending_lang;
     
     void requestLanguageChange(const std::string& lang) override {
-		setActive(true);
         if (m_pending_lang != lang && !lang.empty()) {
             m_pending_lang = lang;
-            //LoadFontsForLanguage(lang.c_str(), 36.0f);
+            LoadFontsForLanguage2(lang.c_str(), 96.0f);
             m_lang_store->set_language(lang);
         } else
         if (m_pending_lang.empty()) {
             m_pending_lang = "en";
-            //LoadFontsForLanguage("en", 36.0f);
+            LoadFontsForLanguage2("en", 96.0f);
             m_lang_store->set_language("en");
         }
     };
@@ -295,7 +337,7 @@ private:
 int main() {
     auto lang_store = std::make_shared<i18n::LangStore>();
     lang_store->set_language("en");
-	
+    
     ImGuiX::Application app;
     app.createWindow<I18nWindow>("Main Window", lang_store);
     app.run();

@@ -250,3 +250,87 @@ Format: `type(scope): short description` where the scope is optional. Keep messa
 - **ResourceRegistry** – thread-safe store for shared resources.
 - **WindowInstance** – backend-specific window implementation.
 
+## Build Architecture
+
+This project’s CMake is designed around a **three‑mode dependency policy** and **target‑only linking**, with optional SDK bundling and test apps. The goals are: easy vendorless consumption, reproducible bundled builds, and clean integration as a subproject.
+
+### 1) Three‑Mode Dependency Policy
+Each dependency supports a mode: `AUTO | SYSTEM | BUNDLED`. There is a global switch `IMGUIX_DEPS_MODE` and per‑dependency overrides (e.g. `IMGUIX_DEPS_FMT_MODE`, `IMGUIX_DEPS_MDBX_MODE`, …).
+Resolution order in `AUTO` (or when a per‑dep mode inherits the global setting):
+1. **SYSTEM/CONFIG**: `find_package(... CONFIG QUIET)`; if a suitable imported target exists, use it.
+2. **Submodule**: if sources are present (e.g. `libs/<dep>`), `add_subdirectory(...)` and reuse the provided targets.
+3. **FetchContent**: fallback to fetch the dependency and expose its targets.
+If `SYSTEM` is explicitly requested and the package cannot be found, configuration fails fast.
+
+### 2) Target‑Only Linking
+We never export raw include/library paths. Everything links via targets:
+- Examples: `fmt::fmt`, `mdbx::mdbx`, `ImGui-SFML`, `SFML::Graphics`/`SFML::Window`/`SFML::System`, `nlohmann_json::nlohmann_json`, `imgui::imgui`.
+- If a dependency’s headers/types are visible in our public interface, link it as `PUBLIC`; otherwise `PRIVATE`.
+- For nonstandard packages (e.g., libmdbx) we normalize to an alias like `mdbx::mdbx` (if upstream target names vary).
+
+### 3) Backends and Feature Flags
+- Backend options: `IMGUIX_USE_SFML_BACKEND` (default ON), `IMGUIX_USE_GLFW_BACKEND` (OFF), `IMGUIX_USE_SDL2_BACKEND` (OFF). Exactly one is expected.
+- Core ImGui and extras:
+  - `IMGUIX_IMGUI_FREETYPE` enables `imgui_freetype` integration (links FreeType and defines `IMGUI_ENABLE_FREETYPE`).
+  - `IMGUIX_IMGUI_STDLIB` controls `misc/cpp/imgui_stdlib.cpp`. Default **ON** for non‑SFML backends, forced **OFF** for SFML (ImGui‑SFML already builds it to avoid duplicate symbols).
+
+### 4) Library Form: Header‑Only vs Compiled
+- `IMGUIX_HEADER_ONLY` toggles a pure interface target vs a compiled library (`STATIC` by default; `IMGUIX_BUILD_SHARED` switches to `SHARED`).
+- In header‑only mode we avoid linking transitives; consumers bring their own backend/ImGui/FreeType via targets.
+
+### 5) Tests
+- `IMGUIX_BUILD_TESTS` builds executables in `tests/` and registers them with CTest.
+- Test executables link to the selected backend + ImGui targets and copy runtime assets via helper functions.
+
+### 6) Assets & App Icon Helpers
+- `imguix_add_assets(<target> DIRS <paths> [DEST_RUNTIME <rel>] [EXCLUDE_DIRS <names...>])` copies asset directories next to the built binary (post‑build). Use `EXCLUDE_DIRS web` to skip `assets/data/web` for native tests.
+- `imguix_copy_and_embed_app_icon(<target>)` (Windows) adds `app_icon.rc` to sources and copies `icon.png` to the runtime `data/resources/icons` folder.
+
+### 7) SDK Bundling
+- `IMGUIX_SDK_INSTALL` enables installing an SDK layout (headers, libs, CMake package exports, and optionally quickstart).
+- `IMGUIX_SDK_BUNDLE_DEPS` controls whether third‑party dependencies are also staged into the SDK (`include/`, `lib/`, and their `cmake/` packages when available).
+- Dear ImGui: only headers are installed (pruned of `.git`, `backends`, `docs`, etc.). Optionally “flatten” selected headers into the SDK include root via `IMGUIX_SDK_FLATTEN_MISC_HEADERS` (e.g., `imgui_stdlib.h`, `imgui_freetype.h`).
+- ImGui‑SFML / fmt / libmdbx / FreeType / SFML: installed via their own `install(...)` rules when available (we flip upstream install switches like `FMT_INSTALL=ON`, `MDBX_INSTALL_STATIC=ON`), otherwise we manually install target artifacts and headers.
+- Quickstart template: `IMGUIX_SDK_INSTALL_QUICKSTART` installs a ready‑to‑build sample (`quickstart/`) and optional resources (`quickstart/data/resources`).
+
+### 8) Consuming as a Subproject (Superbuild Case)
+A parent project can bring its own dependencies; our CMake will detect existing targets and reuse them without duplication:
+```cmake
+# Top-level CMake
+find_package(fmt CONFIG REQUIRED)            # or add_subdirectory(fmt)
+# For MDBX: either find_package(MDBX ...) or add_subdirectory(libmdbx) and create an alias mdbx::mdbx
+
+# Force our subproject to use system deps only:
+set(IMGUIX_DEPS_MODE SYSTEM CACHE STRING "" FORCE)
+
+add_subdirectory(external/imguix)
+target_link_libraries(my_app PRIVATE ImGuiX::imguix)
+```
+
+### 9) Exported Package
+- We export `ImGuiXTargets.cmake` and `ImGuiXConfig.cmake` so that consumers can `find_package(ImGuiX CONFIG REQUIRED)` and use `ImGuiX::imguix`.
+- When SDK is installed, the package files land under `lib/cmake/ImGuiX` within the SDK root.
+
+### 10) Typical Invocations
+Build tests + bundle SDK:
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release ^
+  -DIMGUIX_BUILD_TESTS=ON -DIMGUIX_SDK_INSTALL=ON -DIMGUIX_SDK_BUNDLE_DEPS=ON
+cmake --build build --target install --config Release
+```
+Build SDK only (no tests):
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release ^
+  -DIMGUIX_BUILD_TESTS=OFF -DIMGUIX_SDK_INSTALL=ON -DIMGUIX_SDK_BUNDLE_DEPS=ON
+cmake --build build --target install --config Release
+```
+Use system dependencies only:
+```bash
+cmake -S . -B build -DIMGUIX_DEPS_MODE=SYSTEM
+```
+Disable SFML backend and use pure Dear ImGui with std::string helpers:
+```bash
+cmake -S . -B build -DIMGUIX_USE_SFML_BACKEND=OFF -DIMGUIX_IMGUI_STDLIB=ON
+```
+
+

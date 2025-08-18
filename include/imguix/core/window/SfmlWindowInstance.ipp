@@ -261,8 +261,10 @@ namespace ImGuiX {
     bool WindowInstance::isOpen() const {
         return m_window.isOpen() && m_is_open;
     }
-    
+
     void WindowInstance::setCurrentWindow() {
-        ImGui::SFML::SetCurrentWindow(m_window);
+        if (m_window.setActive(true)) {
+            ImGui::SFML::SetCurrentWindow(m_window);
+        }
     }
 }
