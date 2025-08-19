@@ -25,7 +25,7 @@ jobs:
           update: true
           install: >-
             base-devel
-            mingw-w64-x86_64-git
+            git
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-cmake
             mingw-w64-x86_64-ninja
@@ -56,6 +56,15 @@ jobs:
         run: |
           set -e
           mkdir -p build
+          # берём Git for Windows, чтобы пути были формата D:/...
+          if [ -x "/c/Program Files/Git/bin/git.exe" ]; then
+            GITEXE="$(cygpath -m '/c/Program Files/Git/bin/git.exe')"
+          else
+            # фолбэк: msys git
+            GITEXE="$(cygpath -m "$(which git)")"
+          fi
+          echo "Using GIT_EXECUTABLE=$GITEXE"
+    
           cmake -S . -B build -G "Ninja" \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX="$PWD/dist/sdk" \
