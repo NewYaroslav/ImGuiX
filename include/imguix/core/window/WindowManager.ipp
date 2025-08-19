@@ -126,6 +126,16 @@ namespace ImGuiX {
         }
     }
 
+    void WindowManager::processFrame() {
+        handleEvents();
+        tickAll();
+        drawContentAll();
+        drawUiAll();
+        presentAll();
+        loadIniAll();
+        saveIniAll();
+    }
+
     void WindowManager::removeClosed() {
         m_windows.erase(
             std::remove_if(m_windows.begin(), m_windows.end(),
