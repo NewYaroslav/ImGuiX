@@ -29,10 +29,13 @@ jobs:
             mingw-w64-x86_64-cmake
             mingw-w64-x86_64-ninja
             mingw-w64-x86_64-pkg-config
+            
+      - name: Add Git for Windows to PATH (for subsequent steps)
+        shell: bash
+        run: echo "/c/Program Files/Git/bin" >> "$GITHUB_PATH"
 
       - name: "Sanity: which git & toplevel path"
         run: |
-          export PATH="/c/Program Files/Git/bin:$PATH"
           which git
           git --version
           git -C libs/libmdbx rev-parse --show-toplevel || true
@@ -53,11 +56,9 @@ jobs:
         env:
           CC:  x86_64-w64-mingw32-gcc
           CXX: x86_64-w64-mingw32-g++
-          PATH: "/c/Program Files/Git/bin:$PATH"
         run: |
           set -e
           mkdir -p build
-          GITEXE="$(cygpath -m '/c/Program Files/Git/bin/git.exe')"
           which git && git --version
           cmake -S . -B build -G "Ninja" \
             -DCMAKE_BUILD_TYPE=Release \
@@ -76,7 +77,6 @@ jobs:
             -DIMGUIX_SDK_INSTALL_QUICKSTART=ON \
             -DIMGUIX_SDK_FLATTEN_MISC_HEADERS=ON \
             -DCMAKE_POLICY_DEFAULT_CMP0152=NEW \
-            -DGIT_EXECUTABLE="$GITEXE" \
             -Wno-dev \
           2>&1 | tee build/configure.log
 
