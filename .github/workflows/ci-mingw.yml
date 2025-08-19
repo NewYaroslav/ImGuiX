@@ -23,24 +23,25 @@ jobs:
         with:
           msystem: MINGW64
           update: true
+          path-type: inherit
           install: >-
             base-devel
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-cmake
             mingw-w64-x86_64-ninja
             mingw-w64-x86_64-pkg-config
-            
-      - name: Add Git for Windows to PATH (for subsequent steps)
-        shell: bash
-        run: echo "/c/Program Files/Git/bin" >> "$GITHUB_PATH"
 
       - name: "Sanity: which git & toplevel path"
+        env:
+          PATH: "/c/Program Files/Git/bin:$PATH"
         run: |
           which git
           git --version
           git -C libs/libmdbx rev-parse --show-toplevel || true
     
       - name: Ensure full submodule history & tags (libmdbx)
+        env:
+          PATH: "/c/Program Files/Git/bin:$PATH"
         run: |
           set -euo pipefail
           git submodule update --init --recursive
@@ -56,6 +57,7 @@ jobs:
         env:
           CC:  x86_64-w64-mingw32-gcc
           CXX: x86_64-w64-mingw32-g++
+          PATH: "/c/Program Files/Git/bin:$PATH"
         run: |
           set -e
           mkdir -p build
