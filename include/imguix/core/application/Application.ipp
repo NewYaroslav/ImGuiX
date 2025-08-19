@@ -135,13 +135,7 @@ namespace ImGuiX {
         }
         m_event_bus.process();
         
-        m_window_manager.handleEvents();
-        m_window_manager.tickAll();
-        m_window_manager.drawContentAll();
-        m_window_manager.drawUiAll();
-        m_window_manager.presentAll();
-        m_window_manager.loadIniAll();
-        m_window_manager.saveIniAll();
+        m_window_manager.processFrame();
 
         return true;
     }

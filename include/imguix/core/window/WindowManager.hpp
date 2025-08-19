@@ -38,6 +38,24 @@ namespace ImGuiX {
         /// \brief Closes all managed windows.
         void closeAll();
 
+        /// \brief Initializes ImGui ini handling for all windows.
+        void initIniAll();
+
+        /// \brief Executes a full frame processing sequence.
+        void processFrame();
+
+        /// \brief Returns the number of managed windows.
+        /// \return Number of windows.
+        std::size_t windowCount() const;
+
+        /// \brief Checks whether all windows have been closed.
+        /// \return true if no window remains open.
+        bool allWindowsClosed() const;
+        
+        /// \brief Performs backend-specific shutdown tasks.
+        void shutdown();
+
+    private:
         /// \brief Forwards handle_events to all windows.
         void handleEvents();
 
@@ -52,9 +70,6 @@ namespace ImGuiX {
 
         /// \brief Forwards present to all windows.
         void presentAll();
-        
-        /// \brief Initializes ImGui ini handling for all windows.
-        void initIniAll();
 
         /// \brief Loads ImGui settings for all windows.
         void loadIniAll();
@@ -64,17 +79,6 @@ namespace ImGuiX {
 
         /// \brief Periodically saves ImGui settings for all windows.
         void saveIniAll();
-        
-        /// \brief Returns the number of managed windows.
-        /// \return Number of windows.
-        std::size_t windowCount() const;
-
-        /// \brief Checks whether all windows have been closed.
-        /// \return true if no window remains open.
-        bool allWindowsClosed() const;
-        
-        /// \brief Performs backend-specific shutdown tasks.
-        void shutdown();
 
     protected:
         std::vector<std::unique_ptr<WindowInstance>> m_windows;      ///< Managed windows.
@@ -88,7 +92,7 @@ namespace ImGuiX {
         /// \brief Shortcut to the application resource registry.
         /// \return Reference to the ResourceRegistry owned by the application.
         ResourceRegistry& registry();
-        
+
         void processLanguageEvents();
         WindowInstance*       findWindowById(int id) noexcept;
         const WindowInstance* findWindowById(int id) const noexcept;
