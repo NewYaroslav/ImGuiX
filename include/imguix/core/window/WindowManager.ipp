@@ -21,6 +21,13 @@ namespace ImGuiX {
             m_lang_events.push_back(event->asRef<Events::LangChangeEvent>());
         }
     }
+
+    void WindowManager::prepareFrame() {
+        // Handle lifecycle transitions before processing a frame.
+        flushPending();        // move pending windows into the active list
+        initializePending();   // run onInit on newly added windows
+        removeClosed();        // purge windows that have been closed
+    }
     
     void WindowManager::flushPending() {
         for (auto& window : m_pending_add) {
@@ -137,6 +144,7 @@ namespace ImGuiX {
     }
 
     void WindowManager::removeClosed() {
+        // Remove-erase idiom to drop null or closed windows.
         m_windows.erase(
             std::remove_if(m_windows.begin(), m_windows.end(),
                            [](const std::unique_ptr<WindowInstance>& w) {

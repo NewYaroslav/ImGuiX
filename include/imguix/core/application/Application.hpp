@@ -32,7 +32,7 @@ namespace ImGuiX {
         void run(bool async = false);
 
         /// \brief Creates a new window instance of the specified type.
-        /// \tparam WindowType Type derived from WindowInstance.
+        /// \tparam T Type derived from WindowInstance.
         /// \tparam Args Arguments forwarded to the window constructor.
         /// \return Reference to the created window instance.
         template<typename T, typename... Args>

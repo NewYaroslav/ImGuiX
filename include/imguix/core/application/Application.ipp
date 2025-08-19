@@ -105,17 +105,15 @@ namespace ImGuiX {
         });
 #   endif
 #endif
-        m_window_manager.flushPending();
-        m_window_manager.initializePending();
+        // Ensure initial windows and models are ready before entering loop
+        m_window_manager.prepareFrame();
         initializePendingModels();
     }
 
     bool Application::loopIteration() {
-        m_window_manager.flushPending();
-        m_window_manager.initializePending();
+        // Update window lifecycles before rendering the frame
+        m_window_manager.prepareFrame();
         initializePendingModels();
-
-        m_window_manager.removeClosed();
         if (allWindowsClosed()) {
             m_event_bus.process();
             for (auto& model : m_models) {
