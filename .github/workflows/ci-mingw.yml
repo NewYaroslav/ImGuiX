@@ -25,12 +25,17 @@ jobs:
           update: true
           install: >-
             base-devel
-            git
+            mingw-w64-x86_64-git
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-cmake
             mingw-w64-x86_64-ninja
             mingw-w64-x86_64-pkg-config
-
+      - name: Sanity: which git & toplevel path
+        run: |
+          which git
+          git --version
+          git -C libs/libmdbx rev-parse --show-toplevel || true
+    
       - name: Ensure full submodule history & tags (libmdbx)
         run: |
           set -euo pipefail
