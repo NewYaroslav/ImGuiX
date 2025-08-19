@@ -25,7 +25,9 @@
 
 #include "pubsub/Event.hpp"
 #include "pubsub/EventListener.hpp"
+#include "pubsub/awaiters.hpp"
 #include "pubsub/EventBus.hpp"
+#include "pubsub/cancellation.hpp"
 #include "pubsub/EventAwaiter.hpp"
 #include "pubsub/EventMediator.hpp"
 

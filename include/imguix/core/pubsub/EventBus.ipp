@@ -115,11 +115,38 @@ namespace ImGuiX::Pubsub {
         m_event_queue.push(std::move(event));
     }
 
+    inline void EventBus::registerAwaiter(const std::shared_ptr<IAwaiterEx>& aw) {
+        std::lock_guard<std::mutex> lk(m_awaiters_mutex);
+        m_awaiters.emplace_back(aw);
+    }
+
+    inline void EventBus::pollAwaitersInternal() {
+        std::vector<std::shared_ptr<IAwaiterEx>> live;
+        {
+            std::lock_guard<std::mutex> lk(m_awaiters_mutex);
+            auto& v = m_awaiters;
+            v.erase(std::remove_if(v.begin(), v.end(), [](const std::weak_ptr<IAwaiterEx>& w){
+                if (w.expired()) return true;
+                if (auto sp = w.lock()) return !sp->isActive();
+                return true;
+            }), v.end());
+            live.reserve(v.size());
+            for (auto& w : v) {
+                if (auto sp = w.lock()) live.emplace_back(std::move(sp));
+            }
+        }
+        for (auto& aw : live) aw->pollTimeout();
+    }
+
     inline void EventBus::process() {
-        std::queue<std::unique_ptr<Event>> local_queue;
-        
         std::unique_lock<std::mutex> lock(m_queue_mutex);
-        if (m_event_queue.empty()) return;
+        if (m_event_queue.empty()) {
+            lock.unlock();
+            pollAwaitersInternal();
+            return;
+        }
+
+        std::queue<std::unique_ptr<Event>> local_queue;
         std::swap(local_queue, m_event_queue);
         lock.unlock();
 
@@ -127,6 +154,8 @@ namespace ImGuiX::Pubsub {
             notify(local_queue.front().get());
             local_queue.pop();
         }
+
+        pollAwaitersInternal();
     }
 
 } // namespace ImGuiX::Pubsub

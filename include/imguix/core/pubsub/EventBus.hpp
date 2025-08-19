@@ -5,6 +5,8 @@
 /// \file EventBus.hpp
 /// \brief Contains the EventBus class for event-based communication between modules.
 
+#include "awaiters.hpp"
+
 namespace ImGuiX::Pubsub {
 
     /// \class EventBus
@@ -68,6 +70,9 @@ namespace ImGuiX::Pubsub {
         /// Should be called from the main thread to process events safely.
         void process();
 
+        /// \brief Registers an awaiter for timeout/cancellation polling.
+        void registerAwaiter(const std::shared_ptr<IAwaiterEx>& aw);
+
     private:
         std::unordered_map<std::type_index, callback_list_t> m_event_callbacks; ///< Event type -> callbacks
         std::unordered_map<std::type_index, listener_list_t> m_event_listeners; ///< Event type -> listeners
@@ -75,6 +80,11 @@ namespace ImGuiX::Pubsub {
         mutable std::mutex m_queue_mutex; ///< Mutex for thread-safe queue operations
         mutable std::mutex m_subscriptions_mutex;
         std::queue<std::unique_ptr<Event>> m_event_queue; ///< Queue for asynchronous event processing
+
+        std::vector<std::weak_ptr<IAwaiterEx>> m_awaiters; ///< Awaiters to poll
+        mutable std::mutex m_awaiters_mutex;
+
+        void pollAwaitersInternal();
     };
 
 } // namespace ImGuiX::Pubsub
