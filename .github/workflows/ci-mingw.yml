@@ -31,7 +31,7 @@ jobs:
             mingw-w64-x86_64-ninja
             mingw-w64-x86_64-pkg-config
 
-      - name: Sanity: which git & toplevel path
+      - name: "Sanity: which git & toplevel path"
         run: |
           which git
           git --version
