@@ -51,6 +51,13 @@ function(imguix_use_or_fetch_mdbx out_target)
     # ---- BUNDLED/AUTO: submodule? ----
     set(_MDBX_SRC "${PROJECT_SOURCE_DIR}/libs/libmdbx")
     if(EXISTS "${_MDBX_SRC}/CMakeLists.txt")
+        # Нормализуем путь до абсолютного Windows-стиля (D:/...) — важно для MSYS/MinGW
+        if(WIN32)
+            get_filename_component(_MDBX_SRC_REAL "${_MDBX_SRC}" REALPATH)
+        else()
+            set(_MDBX_SRC_REAL "${_MDBX_SRC}")
+        endif()
+        
         # Build options BEFORE add_subdirectory
         set(MDBX_BUILD_SHARED_LIBRARY OFF CACHE BOOL "" FORCE)
         set(MDBX_BUILD_TOOLS          OFF CACHE BOOL "" FORCE)
@@ -58,55 +65,15 @@ function(imguix_use_or_fetch_mdbx out_target)
             # чтобы install() сабпроекта поставил статическую либу (+заголовки у них тоже инсталлятся)
             set(MDBX_INSTALL_STATIC ON CACHE BOOL "" FORCE)
         endif()
+        
+        # Если в дереве случайно лежит VERSION.json — удаляем, чтобы источником был git
+        if(EXISTS "${_MDBX_SRC_REAL}/VERSION.json")
+            file(REMOVE "${_MDBX_SRC_REAL}/VERSION.json")
+            message(STATUS "libmdbx: removed stray VERSION.json (using git metadata)")
+        endif()
  
-		# ---- BUNDLED/AUTO: submodule? ----
-		set(_MDBX_SRC "${PROJECT_SOURCE_DIR}/libs/libmdbx")
-		if(EXISTS "${_MDBX_SRC}/CMakeLists.txt")
-		  # Опции ДО add_subdirectory
-		  set(MDBX_BUILD_SHARED_LIBRARY OFF CACHE BOOL "" FORCE)
-		  set(MDBX_BUILD_TOOLS          OFF CACHE BOOL "" FORCE)
-		  if(IMGUIX_SDK_BUNDLE_DEPS)
-			set(MDBX_INSTALL_STATIC ON CACHE BOOL "" FORCE)
-		  endif()
-
-		  # Источник версии: либо git, либо VERSION.json (но не оба)
-		  find_program(GIT_EXECUTABLE git)
-		  set(_is_git OFF)
-		  if(GIT_EXECUTABLE AND EXISTS "${_MDBX_SRC}/.git")
-			# В сабмодуле .git обычно файл-ссылка — этого достаточно
-			set(_is_git ON)
-		  endif()
-
-		  if(_is_git)
-			if(EXISTS "${_MDBX_SRC}/VERSION.json")
-			  message(STATUS "libmdbx: removing stray VERSION.json to prefer git metadata")
-			  file(REMOVE "${_MDBX_SRC}/VERSION.json")
-			endif()
-		  else()
-			if(NOT EXISTS "${_MDBX_SRC}/VERSION.json")
-			  message(FATAL_ERROR
-				"libmdbx: neither git repo nor VERSION.json present at ${_MDBX_SRC}.\n"
-				"Use libmdbx release tarball (with VERSION.json) or keep submodule with git tags.")
-			endif()
-		  endif()
-
-		  add_subdirectory("${_MDBX_SRC}" "${CMAKE_BINARY_DIR}/_deps/mdbx-build")
-
-		  if(TARGET mdbx-static)
-			add_library(mdbx::mdbx ALIAS mdbx-static)
-		  elseif(TARGET mdbx)
-			add_library(mdbx::mdbx ALIAS mdbx)
-		  else()
-			message(FATAL_ERROR "libmdbx added but no known target (mdbx / mdbx-static) was created")
-		  endif()
-
-		  set(${out_target} mdbx::mdbx PARENT_SCOPE)
-		  return()
-		endif()
-		# ---
-
         # Unique binary dir
-        add_subdirectory("${_MDBX_SRC}" "${CMAKE_BINARY_DIR}/_deps/mdbx-build")
+        add_subdirectory("${_MDBX_SRC_REAL}" "${CMAKE_BINARY_DIR}/_deps/mdbx-build")
 
         if(TARGET mdbx-static)
             add_library(mdbx::mdbx ALIAS mdbx-static)
