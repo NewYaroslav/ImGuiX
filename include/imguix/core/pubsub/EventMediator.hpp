@@ -103,7 +103,7 @@ namespace ImGuiX::Pubsub {
 
         /// \brief Await a single occurrence of EventType that matches predicate; auto-unsubscribe.
         template <typename EventType, typename Pred, typename Cb>
-        void awaitOnce(Pred&& pred, Cb&& cb) {
+        void awaitOnce(Pred&& pred, Cb&& cb, AwaitOptions opt = {}) {
             pruneDeadAwaiters();
 
             using AW = EventAwaiter<EventType>;
@@ -111,8 +111,10 @@ namespace ImGuiX::Pubsub {
                 *m_event_bus,
                 std::function<bool(const EventType&)>(std::forward<Pred>(pred)),
                 std::function<void(const EventType&)>(std::forward<Cb>(cb)),
-                /*singleShot=*/true
+                opt
             );
+
+            m_event_bus->registerAwaiter(std::static_pointer_cast<IAwaiterEx>(aw));
 
             std::lock_guard<std::mutex> lk(m_mutex);
             m_awaiters.emplace_back(aw);
@@ -120,25 +122,50 @@ namespace ImGuiX::Pubsub {
 
         /// \brief Await the first EventType (no predicate).
         template <typename EventType, typename Cb>
-        void awaitOnce(Cb&& cb) {
+        void awaitOnce(Cb&& cb, AwaitOptions opt = {}) {
             awaitOnce<EventType>(
                 [](const EventType&) { return true; },
-                std::forward<Cb>(cb)
+                std::forward<Cb>(cb),
+                opt
+            );
+        }
+
+        template <typename EventType, typename Pred, typename Cb>
+        void awaitOnce(Pred&& pred, Cb&& cb, std::chrono::milliseconds timeout,
+                       std::function<void()> on_timeout = {}) {
+            AwaitOptions opt{};
+            opt.timeout = timeout;
+            opt.on_timeout = std::move(on_timeout);
+            awaitOnce<EventType>(std::forward<Pred>(pred), std::forward<Cb>(cb), std::move(opt));
+        }
+
+        template <typename EventType, typename Cb>
+        void awaitOnce(Cb&& cb, std::chrono::milliseconds timeout,
+                       std::function<void()> on_timeout = {}) {
+            awaitOnce<EventType>(
+                [](const EventType&) { return true; },
+                std::forward<Cb>(cb),
+                timeout,
+                std::move(on_timeout)
             );
         }
 
         /// \brief Multi-shot awaiter; returns token (IAwaiter) to cancel manually.
         template <typename EventType, typename Pred, typename Cb>
-        std::shared_ptr<IAwaiter> awaitEach(Pred&& pred, Cb&& cb) {
+        std::shared_ptr<IAwaiter> awaitEach(Pred&& pred, Cb&& cb, AwaitOptions opt = {}) {
             pruneDeadAwaiters();
+
+            opt.single_shot = false;
 
             using AW = EventAwaiter<EventType>;
             auto aw = AW::create(
                 *m_event_bus,
                 std::function<bool(const EventType&)>(std::forward<Pred>(pred)),
                 std::function<void(const EventType&)>(std::forward<Cb>(cb)),
-                /*singleShot=*/false
+                opt
             );
+
+            m_event_bus->registerAwaiter(std::static_pointer_cast<IAwaiterEx>(aw));
 
             std::lock_guard<std::mutex> lk(m_mutex);
             m_awaiters.emplace_back(aw);
@@ -146,10 +173,32 @@ namespace ImGuiX::Pubsub {
         }
 
         template <typename EventType, typename Cb>
-        std::shared_ptr<IAwaiter> awaitEach(Cb&& cb) {
+        std::shared_ptr<IAwaiter> awaitEach(Cb&& cb, AwaitOptions opt = {}) {
             return awaitEach<EventType>(
                 [](const EventType&) { return true; },
-                std::forward<Cb>(cb)
+                std::forward<Cb>(cb),
+                std::move(opt)
+            );
+        }
+
+        template <typename EventType, typename Pred, typename Cb>
+        std::shared_ptr<IAwaiter> awaitEach(Pred&& pred, Cb&& cb,
+                                            std::chrono::milliseconds timeout,
+                                            std::function<void()> on_timeout = {}) {
+            AwaitOptions opt{};
+            opt.timeout = timeout;
+            opt.on_timeout = std::move(on_timeout);
+            return awaitEach<EventType>(std::forward<Pred>(pred), std::forward<Cb>(cb), std::move(opt));
+        }
+
+        template <typename EventType, typename Cb>
+        std::shared_ptr<IAwaiter> awaitEach(Cb&& cb, std::chrono::milliseconds timeout,
+                                            std::function<void()> on_timeout = {}) {
+            return awaitEach<EventType>(
+                [](const EventType&) { return true; },
+                std::forward<Cb>(cb),
+                timeout,
+                std::move(on_timeout)
             );
         }
 
