@@ -26,14 +26,11 @@ namespace ImGuiX {
         /// \brief Adds a new window to the manager.
         void addWindow(std::unique_ptr<WindowInstance> window);
 
-        /// \brief Moves pending windows into the active list.
-        void flushPending();
-
-        /// \brief Calls onInit() on newly added windows.
-        void initializePending();
-
-        /// \brief Removes windows that are no longer open.
-        void removeClosed();
+        /// \brief Prepares window state before each frame.
+        ///
+        /// Moves pending windows into the active list, initializes them,
+        /// and removes windows that have been closed since the last frame.
+        void prepareFrame();
 
         /// \brief Closes all managed windows.
         void closeAll();
@@ -79,6 +76,15 @@ namespace ImGuiX {
 
         /// \brief Periodically saves ImGui settings for all windows.
         void saveIniAll();
+
+        /// \brief Moves pending windows into the active list.
+        void flushPending();
+
+        /// \brief Calls onInit() on newly added windows.
+        void initializePending();
+
+        /// \brief Removes windows that are no longer open.
+        void removeClosed();
 
     protected:
         std::vector<std::unique_ptr<WindowInstance>> m_windows;      ///< Managed windows.
