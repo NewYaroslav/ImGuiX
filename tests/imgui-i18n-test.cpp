@@ -40,113 +40,7 @@ static void DrawMultilineDoc(i18n::LangStore& store, const char* key, float heig
     ImGui::EndChild();
 }
 
-
-bool LoadFontsForLanguage(const char* lang_code, float size_px = 18.0f) {
-    static float s_last_size_px = 13.0f;      // базовый дефолт ImGui
-    static bool  s_style_inited = false;
-    static ImGuiStyle s_base_style;           // эталон стиля для масштабирования
-
-    float px = (size_px > 0.0f ? size_px : s_last_size_px);
-    
-    ImGuiIO& io = ImGui::GetIO();
-    
-    std::cout << "GetFontSize " << ImGui::GetFontSize() << std::endl;
-    std::cout << "GetFont " << (void*)ImGui::GetFont() << std::endl;
-    std::cout << "io.FontDefault " << (void*)io.FontDefault << std::endl;
-    std::cout << "io.FontGlobalScale " << io.FontGlobalScale << std::endl;
-    std::cout << "io.FontGlobalScale " << io.FontGlobalScale << std::endl;
-    std::cout << "io.DisplayFramebufferScale.x " << io.DisplayFramebufferScale.x << std::endl;
-    std::cout << "io.DisplayFramebufferScale.y " << io.DisplayFramebufferScale.y << std::endl;
-    std::cout << "px " << px << std::endl;
-    
-    io.Fonts->Clear(); // reset atlas
-    io.FontDefault = nullptr;
-
-#   ifdef IMGUI_ENABLE_FREETYPE
-#       if IMGUI_VERSION_NUM >= 19200
-    // 1.92+: FreeType через FontLoader
-    io.Fonts->FontLoader      = ImGuiFreeType::GetFontLoader();
-    io.Fonts->FontLoaderFlags = 0;
-    // Подбери флаги по вкусу (можно 0):
-    //io.Fonts->FontLoaderFlags = ImGuiFreeTypeLoaderFlags_NoHinting;
-    //io.FontGlobalScale = 0.5f;
-#       else
-    // Старые версии: FreeType через FontBuilderIO
-    io.Fonts->FontBuilderIO   = ImGuiFreeType::GetBuilderForFreeType();
-    io.Fonts->FontLoaderFlags = 0;
-#       endif
-#   endif
-
-    // Resolve font file relative to exe
-    const std::string font_path = ImGuiX::Utils::resolveExecPath("data/resources/fonts/Roboto-Medium.ttf");
-
-    float font_size = size_px * 2.0f;
-    
-    ImFontConfig base_cfg;
-    base_cfg.OversampleH = 2;
-    base_cfg.OversampleV = 2;
-    base_cfg.SizePixels = size_px;
-    //base_cfg.PixelSnapH = true;
-    base_cfg.MergeMode = false;
-
-    // Base Latin (always)
-#   if IMGUI_VERSION_NUM >= 19200
-    //ImFont* base = io.Fonts->AddFontFromFileTTF(font_path.c_str(), size_px, &base_cfg);
-    ImFont* base = io.Fonts->AddFontFromFileTTF(font_path.c_str(), px, &base_cfg);
-#   else
-    const ImWchar* base_ranges = io.Fonts->GetGlyphRangesLatin(); // до 1.92 — явный Latin
-    //ImFont* base = io.Fonts->AddFontFromFileTTF(font_path.c_str(), size_px, &base_cfg, base_ranges);
-    ImFont* base = io.Fonts->AddFontFromFileTTF(font_path.c_str(), px, nullptr, base_ranges);
-#   endif
-    if (!base) return false;
-    io.FontDefault = base;
-
-    // Optional language-specific ranges (merged)
-    ImFontConfig merge_cfg;// = base_cfg;
-    //merge_cfg.OversampleH = 2;
-    //merge_cfg.OversampleV = 2;
-    //merge_cfg.SizePixels = font_size;
-    //merge_cfg.PixelSnapH = true;
-    merge_cfg.MergeMode = true;
-
-    auto ci_equal = [](const char* a, const char* b) {
-        for (; *a && *b; ++a, ++b)
-            if ((unsigned char)std::tolower(*a) != (unsigned char)std::tolower(*b)) return false;
-        return *a == *b;
-    };
-
-    if (ci_equal(lang_code, "ru") || ci_equal(lang_code, "uk") || ci_equal(lang_code, "be")) {
-        io.Fonts->AddFontFromFileTTF(font_path.c_str(), px, &merge_cfg, io.Fonts->GetGlyphRangesCyrillic());
-    } else if (ci_equal(lang_code, "vi")) {
-        io.Fonts->AddFontFromFileTTF(font_path.c_str(), px, &merge_cfg, io.Fonts->GetGlyphRangesVietnamese());
-    }
-    // en/es/pt-BR — база покрывает.
-
-#   if defined(IMGUIX_USE_SFML_BACKEND)
-    // If using ImGui-SFML, call its font-texture updater (depends on your wrapper).
-    // Example (if available): ImGui::SFML::UpdateFontTexture();
-    if (!ImGui::SFML::UpdateFontTexture()) return false;
-#   elif defined(IMGUIX_USE_GLFW_BACKEND) || defined(IMGUIX_USE_SDL2_BACKEND)
-    // OpenGL3 backend:
-    ImGui_ImplOpenGL3_DestroyFontsTexture();
-    ImGui_ImplOpenGL3_CreateFontsTexture();
-#   endif
-
-    if (!s_style_inited) {
-        s_base_style = ImGui::GetStyle();
-        s_style_inited = true;
-    }
-    ImGui::GetStyle() = s_base_style;
-    //ImGui::GetStyle().ScaleAllSizes(px / 13.0f);
-    
-    std::cout << "(px / 13.0f) " << (px / 13.0f) << std::endl;
-
-    s_last_size_px = px;
-    return true;
-}
-
-
-bool LoadFontsForLanguage2(const char* lang, float px) {
+bool LoadFontsForLanguage(const char* lang, float px) {
     ImGuiIO& io = ImGui::GetIO();
     io.Fonts->Clear();
     io.FontDefault = nullptr;
@@ -200,9 +94,9 @@ public:
     // --- UI demo fully using the new keys (generic settings) ---
     void drawUi() override {
         ImGui::PushID(window().id());
-		ImGui::PushFont(nullptr, 18.0f);
+        ImGui::PushFont(nullptr, 18.0f);
         ImGui::Begin(window().id() == 0 ? "i18n main" : "i18n child");
-		
+        
 
         // Languages to test fonts and fallback:
         // ru, uk, be, pt-BR, es, vi, en
@@ -284,7 +178,7 @@ public:
         ImGui::Text("again: %p", (const void*)m_lang_store->label("Menu.File"));
 
         ImGui::End();
-		ImGui::PopFont();
+        ImGui::PopFont();
         //if (window().id() == 0) ImGui::ShowDemoWindow();
         ImGui::PopID();
     }
@@ -313,7 +207,7 @@ public:
         createController<I18nController>(static_cast<ImGuiX::Application&>(m_application), m_lang_store);
         create(id() == 0 ? 800 : 640, id() == 0 ? 600 : 480);
         setWindowIcon("data/resources/icons/icon.png");
-        LoadFontsForLanguage2("ru", 32.0f);
+        LoadFontsForLanguage("ru", 32.0f);
     }
 
 private:
@@ -323,12 +217,10 @@ private:
     void requestLanguageChange(const std::string& lang) override {
         if (m_pending_lang != lang && !lang.empty()) {
             m_pending_lang = lang;
-            LoadFontsForLanguage2(lang.c_str(), 96.0f);
             m_lang_store->set_language(lang);
         } else
         if (m_pending_lang.empty()) {
             m_pending_lang = "en";
-            LoadFontsForLanguage2("en", 96.0f);
             m_lang_store->set_language("en");
         }
     };
