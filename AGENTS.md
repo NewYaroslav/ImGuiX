@@ -232,7 +232,8 @@ Format: `type(scope): short description` where the scope is optional. Keep messa
 
 ### Variable Naming
 
-* Prefix `m_` for all class fields (e.g., `m_event_hub`, `m_task_manager`).
+* Use `snake_case` for variables and parameters.
+* Private members must use the `m_` prefix (e.g., `m_event_hub`, `m_task_manager`). Public variables may omit the prefix.
 * Optional prefixes `p_` and `str_` when a function or method handles more than five variables or arguments of different types.
 * Boolean variables start with `is`, `has`, `use`, `enable` or `m_is_`, `m_has_`, etc., for fields.
 * Do not use prefixes `b_`, `n_`, or `f_`.
@@ -245,17 +246,17 @@ Format: `type(scope): short description` where the scope is optional. Keep messa
 
 ### File Names
 
-* Single-class files use `CamelCase` (e.g., `TradeManager.hpp`).
+* Single-class files use `PascalCase` (e.g., `TradeManager.hpp`).
 * Multi-class or utility files use `snake_case` (e.g., `trade_utils.hpp`).
 
 ### Entity Names
 
-* Names of classes, structs, and enums use `CamelCase`.
-* Method names use `snake_case`.
+* Names of classes, structs, and enums use `PascalCase`.
+* Method names use `camelCase`.
 
 ### Method Names
 
-* Methods are written in `snake_case`.
+* Methods are written in `camelCase`.
 * Getter methods may drop the `get_` prefix when returning existing references or values, exposing internal objects, or acting like a property (e.g., `size()`, `empty()`).
 * Keep the `get_` prefix when a method performs computation or when omission could mislead.
 
