@@ -6,6 +6,23 @@
 /// \brief Provides custom system-style buttons (close, minimize, maximize) for ImGui windows.
 
 #include <imgui.h>
+#include <algorithm>
+#include <cmath>
+
+/// \brief Extent multiplier for system button icons (default = 0.25f).
+#ifndef IMGUIX_SYSBTN_CROSS_EXTENT
+#define IMGUIX_SYSBTN_CROSS_EXTENT 0.25f
+#endif
+
+/// \brief Margin in pixels to keep from the button border (default = 1.0f).
+#ifndef IMGUIX_SYSBTN_MARGIN
+#define IMGUIX_SYSBTN_MARGIN 1.0f
+#endif
+
+/// \brief толщина линий, px
+#ifndef IMGUIX_SYSBTN_LINE_THICKNESS
+#define IMGUIX_SYSBTN_LINE_THICKNESS 1.0f
+#endif
 
 namespace ImGuiX::Widgets {
 
@@ -27,47 +44,46 @@ namespace ImGuiX::Widgets {
     inline bool SystemButton(const char* id, SystemButtonType type, ImVec2 size) {
         ImVec2 pos = ImGui::GetCursorScreenPos();
         ImGui::InvisibleButton(id, size);
-        ImDrawList* draw_list = ImGui::GetWindowDrawList();
+        ImDrawList* dl = ImGui::GetWindowDrawList();
 
-        const bool is_hovered = ImGui::IsItemHovered();
-        const bool is_active  = ImGui::IsItemActive();
-
-        if (is_hovered || is_active) {
-            ImVec4 bg_col = ImGui::GetStyleColorVec4(is_active ? ImGuiCol_ButtonActive : ImGuiCol_ButtonHovered);
-            draw_list->AddRectFilled(pos,
-                                     ImVec2(pos.x + size.x, pos.y + size.y),
-                                     ImGui::ColorConvertFloat4ToU32(bg_col),
-                                     2.0f);
+        if (ImGui::IsItemHovered() || ImGui::IsItemActive()) {
+            ImVec4 bg = ImGui::GetStyleColorVec4(ImGui::IsItemActive() ? ImGuiCol_ButtonActive : ImGuiCol_ButtonHovered);
+            dl->AddRectFilled(pos, ImVec2(pos.x + size.x, pos.y + size.y),
+                              ImGui::ColorConvertFloat4ToU32(bg), 2.0f);
         }
 
-        ImVec4 fg_col = ImGui::GetStyleColorVec4(ImGuiCol_Text);
-        ImU32 col_u32 = ImGui::ColorConvertFloat4ToU32(fg_col);
+        ImU32 col = ImGui::GetColorU32(ImGuiCol_Text);
+        const float thickness = IMGUIX_SYSBTN_LINE_THICKNESS;
 
-        ImVec2 center = ImVec2(pos.x + size.x * 0.5f, pos.y + size.y * 0.5f);
-        float cross_extent = size.x * 0.25f;
-        float line_thickness = 1.0f;
+        auto snap = [](float v) -> float { return std::floor(v) + 0.5f; };
+
+        // Center of button
+        ImVec2 c(snap(pos.x + size.x * 0.5f), snap(pos.y + size.y * 0.5f));
+
+        // Extent of icon
+        float min_side = std::min(size.x, size.y);
+        float e = IMGUIX_SYSBTN_CROSS_EXTENT * min_side;
+        e = std::min(e, 0.5f * min_side - IMGUIX_SYSBTN_MARGIN);
 
         if (type == SystemButtonType::Close) {
-            ImVec2 a1 = ImVec2(center.x - cross_extent, center.y - cross_extent);
-            ImVec2 b1 = ImVec2(center.x + cross_extent, center.y + cross_extent);
-            ImVec2 a2 = ImVec2(center.x - cross_extent, center.y + cross_extent);
-            ImVec2 b2 = ImVec2(center.x + cross_extent, center.y - cross_extent);
-            draw_list->AddLine(a1, b1, col_u32, line_thickness);
-            draw_list->AddLine(a2, b2, col_u32, line_thickness);
-        }
-        else if (type == SystemButtonType::Minimize) {
-            ImVec2 a = ImVec2(center.x - cross_extent, center.y);
-            ImVec2 b = ImVec2(center.x + cross_extent, center.y);
-            draw_list->AddLine(a, b, col_u32, line_thickness);
-        }
-        else if (type == SystemButtonType::Maximize) {
-            float half = cross_extent * 0.85f;
-            ImVec2 tl = ImVec2(center.x - half, center.y - half);
-            ImVec2 br = ImVec2(center.x + half, center.y + half);
-            draw_list->AddRect(tl, br, col_u32, 0.0f, 0, line_thickness);
+            ImVec2 a1(snap(c.x - e), snap(c.y - e));
+            ImVec2 b1(snap(c.x + e), snap(c.y + e));
+            ImVec2 a2(snap(c.x - e), snap(c.y + e));
+            ImVec2 b2(snap(c.x + e), snap(c.y - e));
+            dl->AddLine(a1, b1, col, thickness);
+            dl->AddLine(a2, b2, col, thickness);
+        } else if (type == SystemButtonType::Minimize) {
+            //float y = snap(pos.y + size.y - IMGUIX_SYSBTN_MARGIN - 1.0f);
+			ImVec2 a(snap(c.x - e), snap(c.y + e));
+            ImVec2 b(snap(c.x + e), snap(c.y + e));
+            dl->AddLine(a, b, col, thickness);
+        } else if (type == SystemButtonType::Maximize) {
+            ImVec2 tl(snap(c.x - e), snap(c.y - e));
+            ImVec2 br(snap(c.x + e), snap(c.y + e));
+            dl->AddRect(tl, br, col, 0.0f, 0, thickness);
         }
 
-        return ImGui::IsItemClicked();
+        return ImGui::IsItemClicked(ImGuiMouseButton_Left);
     }
 
 } // namespace ImGuiX::Widgets
