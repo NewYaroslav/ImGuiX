@@ -178,6 +178,16 @@ else()
 
     if(IMGUIX_IMGUI_FREETYPE)
         target_compile_definitions(imguix PUBLIC IMGUI_ENABLE_FREETYPE)
+		
+		# >>> ДОБАВИТЬ ЭТО <<<
+		# Нужен include-путь для imgui_freetype.h
+		set(_IMGUI_DIR_LOCAL "${IMGUI_DIR}")
+		if(NOT _IMGUI_DIR_LOCAL)
+			set(_IMGUI_DIR_LOCAL "${PROJECT_SOURCE_DIR}/libs/imgui")
+		endif()
+		target_include_directories(imguix PRIVATE "${_IMGUI_DIR_LOCAL}/misc/freetype")
+		# <<< ДОБАВИТЬ ЭТО >>>
+	
         imguix_use_or_find_freetype(FREETYPE_TARGET)
         target_link_libraries(imguix PRIVATE ${FREETYPE_TARGET})
     endif()

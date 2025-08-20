@@ -8,9 +8,34 @@
 /// Includes the main interfaces and modules for application control,
 /// window and event systems, controller-model interaction, and resource management.
 
+#if defined(IMGUIX_USE_SFML_BACKEND)
+#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
+#include <imgui-SFML.h>
+#elif defined(IMGUIX_USE_GLFW_BACKEND)
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+#include <GLFW/glfw3.h>
+#elif defined(IMGUIX_USE_SDL2_BACKEND)
+#include <imgui_impl_sdl2.h>
+#include <imgui_impl_opengl3.h>
+#include <SDL.h>
+#elif
+// Без бэкенда
+#endif
+
+#ifdef IMGUI_ENABLE_FREETYPE
+#include <imgui_freetype.h>
+#endif
+
+#include <imgui.h>
+
 // --- Event and PubSub system ---
 #include "core/pubsub.hpp"                         ///< EventBus, Event, EventMediator
 #include "core/events.hpp"                         ///< Common built-in events
+
+// --- I18N ---
+#include "core/i18n.hpp"                           ///<
 
 // --- Resource system ---
 #include "core/resource/ResourceRegistry.hpp"      ///< Global registry for shared resources

@@ -148,13 +148,13 @@ namespace ImGuiX {
         sf::RenderWindow& getRenderTarget() override;
 #       endif
 
+        /// \brief
+        /// \return
+        const ImGuiX::Utils::I18N::LangStore& langStore() const override;
+
         /// \brief Makes the window context current for rendering.
         /// Call only between frames before ImGui::NewFrame().
         virtual void setCurrentWindow();
-
-        /// \brief Requests the window to switch its UI language.
-        /// \param lang Language code to apply.
-        virtual void requestLanguageChange(const std::string& lang) {};
 
         /// \brief Computes the file path for storing ImGui ini settings.
         /// \return Absolute path to the ini file.
@@ -168,6 +168,18 @@ namespace ImGuiX {
 
         /// \brief Saves ImGui ini settings to disk.
         void saveIniNow();
+        
+        void requestLanguageChange(const std::string& lang) {
+            if (!lang.empty()) m_pending_lang = lang;
+        }
+        
+        void applyPendingLanguageChange() {
+            if (m_pending_lang.empty()) return;
+            setCurrentWindow();                        // активировать контекст окна
+            onBeforeLanguageApply(m_pending_lang);     // виртуальный хук (пересборка шрифтов и т.п.)
+            m_lang_store.set_language(m_pending_lang); // фактическая смена языка
+            m_pending_lang.clear();
+        }
 
     protected:
 #       ifdef IMGUIX_USE_SFML_BACKEND
@@ -196,6 +208,13 @@ namespace ImGuiX {
         std::string m_ini_path;             ///< Path to the window-specific ImGui ini file.
         bool m_is_ini_once = false;         ///< Ensures imgui ini is saved only once.
         bool m_is_ini_loaded = false;       ///< Indicates whether ini settings have been loaded.
+    
+        ImGuiX::Utils::I18N::LangStore m_lang_store{}; ///< 
+        std::string                    m_pending_lang; ///< 
+    
+        /// \brief Requests the window to switch its UI language.
+        /// \param lang Language code to apply.
+        virtual void onBeforeLanguageApply(const std::string& /*lang*/) {};
     };
 
 } // namespace imguix

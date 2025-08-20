@@ -71,6 +71,10 @@ namespace ImGuiX {
     }
 #   endif
 
+    const ImGuiX::Utils::I18N::LangStore& WindowInstance::langStore() const {
+        return m_lang_store;
+    }
+
     std::string WindowInstance::iniPath() const {
 #   ifdef __EMSCRIPTEN__
 #       ifdef IMGUIX_EMSCRIPTEN_IDBFS

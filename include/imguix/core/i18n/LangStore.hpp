@@ -26,44 +26,6 @@
 /// - Not thread-safe by design; guard externally if needed.
 /// - All caches are invalidated on language switch.
 
-#include <string>
-#include <string_view>
-#include <unordered_map>
-#include <vector>
-#include <fstream>
-#include <sstream>
-#include <utility>
-#include <stdexcept>
-#include <system_error>
-#include <memory>
-
-#include <fmt/core.h>
-#include <fmt/format.h>
-#include <nlohmann/json.hpp>
-#include <filesystem>
-
-#include <imguix/utils/strip_json_comments.hpp>
-#include <imguix/utils/path_utils.hpp>
-#include "PluralRules.hpp"
-
-#ifndef IMGUIX_I18N_DIR
-#   define IMGUIX_I18N_DIR "data/resources/i18n"   // default root for i18n assets
-#endif
-
-#ifndef IMGUIX_I18N_JSON_BASENAME
-#   define IMGUIX_I18N_JSON_BASENAME "strings.json"
-#endif
-
-#ifndef IMGUIX_I18N_PLURALS_FILENAME
-#   define IMGUIX_I18N_PLURALS_FILENAME "plurals.json"
-#endif
-
-// 1 = resolve IMGUIX_I18N_DIR relatively to the executable location.
-// 0 = use IMGUIX_I18N_DIR "as is".
-#ifndef IMGUIX_RESOLVE_PATHS_REL_TO_EXE
-#   define IMGUIX_RESOLVE_PATHS_REL_TO_EXE 1
-#endif
-
 namespace ImGuiX::Utils::I18N {
 
     namespace fs = std::filesystem;

@@ -103,6 +103,10 @@ namespace ImGuiX {
         virtual sf::RenderWindow& getRenderTarget() = 0;
 #       endif
 
+        /// \brief
+        /// \return
+        virtual const ImGuiX::Utils::I18N::LangStore& langStore() const = 0;
+
     };
 
 } // namespace ImGuiX

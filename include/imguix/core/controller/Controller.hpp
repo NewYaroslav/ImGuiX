@@ -46,6 +46,12 @@ namespace ImGuiX {
         WindowControl& window() {
             return m_window;
         }
+        
+        /// \brief
+        /// \return
+        const ImGuiX::Utils::I18N::LangStore& langStore() const {
+            return m_window.langStore();
+        }
 
     protected:
         WindowControl& m_window; ///< Controlled window instance.

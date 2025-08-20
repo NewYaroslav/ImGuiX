@@ -62,14 +62,14 @@ namespace ImGuiX {
 
             if (ev.apply_to_all) {
                 for (auto& window : m_windows) {
-                    window->setCurrentWindow();
                     window->requestLanguageChange(ev.lang);
+                    window->applyPendingLanguageChange();
                 }
             } else {
                 auto* window = findWindowById(ev.window_id);
                 if (window) {
-                    window->setCurrentWindow();
                     window->requestLanguageChange(ev.lang);
+                    window->applyPendingLanguageChange();
                 }
             }
         }
