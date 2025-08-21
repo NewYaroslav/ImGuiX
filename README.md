@@ -180,12 +180,21 @@ run-test-sdl2-ems.bat     :: запускает emrun на локальном с
 
 ## Fonts and Licensing
 
-This repository includes third-party font files under the following licenses:
+This repository bundles third-party fonts under their original licenses:
 
-- **FontAwesome, ForkAwesome, Fontaudio** – licensed under the [SIL Open Font License 1.1](licenses/OFL.txt)
-- **Material Icons, Roboto** – licensed under the [Apache License 2.0](licenses/LICENSE-APACHE-2.0.txt)
+- **Noto Sans (Latin/Cyrillic/Greek/Vietnamese)**, **Noto Sans CJK (SC/TC/JP/KR)**, 
+  **Noto Sans Arabic / Devanagari / Thai** — licensed under the
+  [SIL Open Font License 1.1](licenses/OFL.txt).  
+  Copyright © The Noto Project Authors.
 
-All fonts are used as-is, without modification. See individual font licenses for more details.
+- **Font Awesome Free (fonts only)**, **Fork Awesome**, **Fontaudio** — 
+  [SIL Open Font License 1.1](licenses/OFL.txt).  
+  *Note:* brand icons remain subject to trademark rights.
+
+- **Material Icons**, **Roboto** — [Apache License 2.0](licenses/LICENSE-APACHE-2.0.txt)
+  (see also `licenses/NOTICE` if provided upstream).
+
+All fonts are included unmodified. See `THIRD-PARTY-NOTICES.md` for per-family attributions.
 
 ## Лицензия
 

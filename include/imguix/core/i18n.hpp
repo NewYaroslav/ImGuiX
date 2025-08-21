@@ -17,6 +17,7 @@
 #include <string_view>
 #include <unordered_map>
 #include <vector>
+#include <deque>
 #include <fstream>
 #include <sstream>
 #include <utility>

@@ -32,8 +32,7 @@ namespace ImGuiX::Utils::I18N {
 
     class LangStore {
     public:
-        using StrMap = std::unordered_map<std::string, std::string>;
-        
+
         LangStore()
             : LangStore(default_i18n_base_dir(), "en")
         {}
@@ -117,8 +116,8 @@ namespace ImGuiX::Utils::I18N {
 
         /// \brief Get "label##id" cached string for ImGui; cache is per key & language.
         const char* label(std::string_view key) const {
-            auto it = m_label_cache.find(std::string(key));
-            if (it != m_label_cache.end()) return it->second.c_str();
+            if (auto it = m_label_cache.find(key); it != m_label_cache.end())
+                return it->second.c_str();
 
             const std::string& base = text(key);
             std::string combined;
@@ -127,7 +126,7 @@ namespace ImGuiX::Utils::I18N {
             combined += "##";
             combined.append(key.begin(), key.end());
 
-            auto [ins, /*ok*/_] = m_label_cache.emplace(std::string(key), std::move(combined));
+            auto [ins, _] = m_label_cache.emplace(intern_key(std::string(key)), std::move(combined));
             return ins->second.c_str();
         }
 
@@ -174,13 +173,39 @@ namespace ImGuiX::Utils::I18N {
         }
 
     private:
+		
+		// --- типы ключей и карты ---
+        using KeyView = std::string_view;
+    
+        struct SvHash {
+            size_t operator()(KeyView s) const noexcept { return std::hash<KeyView>{}(s); }
+        };
+
+        struct SvEq {
+            bool operator()(KeyView a, KeyView b) const noexcept { return a == b; }
+        };
+        
+        using StrMap = std::unordered_map<KeyView, std::string, SvHash, SvEq>;
+        
+        mutable std::deque<std::string> m_key_pool; ///< Пул ключей (владеем памятью, чтобы KeyView был стабилен)
+
+        // Интернирование ключа (гарантирует стабильный storage)
+        KeyView intern_key(const std::string& s) const {
+            m_key_pool.emplace_back(s);
+            return KeyView{m_key_pool.back()};
+        }
+
+        KeyView intern_key(std::string&& s) const {
+            m_key_pool.emplace_back(std::move(s));
+            return KeyView{m_key_pool.back()};
+        }
 
         static std::string default_i18n_base_dir() {
-#       if IMGUIX_RESOLVE_PATHS_REL_TO_EXE
+#           if IMGUIX_RESOLVE_PATHS_REL_TO_EXE
             return ImGuiX::Utils::resolveExecPath(IMGUIX_I18N_DIR);
-#       else
+#           else
             return std::string(IMGUIX_I18N_DIR);
-#       endif
+#           endif
         }
         // ---------- JSON loading ----------
 
@@ -211,35 +236,46 @@ namespace ImGuiX::Utils::I18N {
                     continue;
                 }
 
-                merge_object_for_lang(j, lang, out);
+                merge_object_for_lang(j, lang, out, *this);
             }
             return out;
         }
 
-        static void merge_object_for_lang(const nlohmann::json& obj,
-                                          const std::string& lang,
-                                          StrMap& out)
-        {
+        static void merge_object_for_lang(
+                const nlohmann::json& obj,
+                const std::string& lang,
+                StrMap& out,
+                const LangStore& self
+            ) {
             if (!obj.is_object()) return;
 
             for (auto it = obj.begin(); it != obj.end(); ++it) {
-                const std::string key = it.key();
+                const std::string& key_str = it.key();   // JSON даёт std::string один раз
+                KeyView k = self.intern_key(key_str);    // заинтернировали -> KeyView стабилен
                 const nlohmann::json& val = it.value();
 
+                auto get_sv = [&](const nlohmann::json& j) -> std::string {
+                    if (j.is_string()) return j.get<std::string>();
+                    if (j.is_array()) {
+                        std::string s;
+                        for (const auto& e : j) if (e.is_string()) s += e.get<std::string>();
+                        return s;
+                    }
+                    return {};
+                };
+
                 if (val.is_object()) {
-                    // Polyglot: prefer current lang, fallback "en"
                     if (auto jt = val.find(lang); jt != val.end()) {
-                        auto s = get_string_or_join_array(*jt);
-                        if (!s.empty()) { out[key] = std::move(s); continue; }
+                        auto s = get_sv(*jt);
+                        if (!s.empty()) { out.emplace(k, std::move(s)); continue; }
                     }
                     if (auto jt = val.find("en"); jt != val.end()) {
-                        auto s = get_string_or_join_array(*jt);
-                        if (!s.empty()) { out[key] = std::move(s); continue; }
+                        auto s = get_sv(*jt);
+                        if (!s.empty()) { out.emplace(k, std::move(s)); continue; }
                     }
                 } else {
-                    // Monolingual
-                    auto s = get_string_or_join_array(val);
-                    if (!s.empty()) { out[key] = std::move(s); }
+                    auto s = get_sv(val);
+                    if (!s.empty()) { out.emplace(k, std::move(s)); }
                 }
             }
         }
@@ -265,16 +301,15 @@ namespace ImGuiX::Utils::I18N {
 
         // ---------- Markdown loading (lazy) ----------
 
-        std::string load_md_cached(const std::string& lang, std::string_view key) const {
-            const std::string cache_key = lang + '\n' + std::string(key);
-            if (auto it = m_md_cache.find(cache_key); it != m_md_cache.end()) {
+        std::string load_md_cached(const std::string& lang, std::string_view doc_key) const {
+            auto& by_key = m_md_cache[lang]; // ок: создаст пустую под-таблицу при первом доступе
+            if (auto it = by_key.find(doc_key); it != by_key.end())
                 return it->second;
-            }
 
-            const fs::path p = fs::path(m_base_dir) / lang / (std::string(key) + ".md");
-            const auto s = read_file(p.string());
+            const fs::path p = fs::path(m_base_dir) / lang / (std::string(doc_key) + ".md");
+            auto s = read_file(p.string());
             if (!s.empty()) {
-                m_md_cache.emplace(cache_key, s);
+                by_key.emplace(intern_key(std::string(doc_key)), s);
             }
             return s;
         }
@@ -282,7 +317,7 @@ namespace ImGuiX::Utils::I18N {
         // ---------- Helpers ----------
 
         static const std::string* find_in(const StrMap& m, std::string_view key) {
-            auto it = m.find(std::string(key));
+            auto it = m.find(key);
             return (it == m.end()) ? nullptr : &it->second;
         }
 
@@ -321,7 +356,6 @@ namespace ImGuiX::Utils::I18N {
             }
         }
 
-    private:
         // config
         std::string m_base_dir;
         std::string m_default_lang;
@@ -333,9 +367,9 @@ namespace ImGuiX::Utils::I18N {
 
         // caches
         mutable std::unordered_map<std::string, StrMap>        m_lang_cache;   // lang -> map
-        mutable std::unordered_map<std::string, std::string>   m_md_cache;     // (lang+'\n'+key) -> content
-        mutable std::unordered_map<std::string, std::string>   m_label_cache;  // key -> "text##key"
-
+        //mutable std::unordered_map<std::string, std::string>   m_md_cache;     // (lang+'\n'+key) -> content
+        mutable std::unordered_map<KeyView, std::string, SvHash, SvEq> m_label_cache; // key -> "text##key"
+        mutable std::unordered_map<std::string, std::unordered_map<KeyView, std::string, SvHash, SvEq>> m_md_cache; // вложенная карта: lang -> (doc_key -> md
         // plural rules
         std::unique_ptr<PluralRules> m_plural_rules;
     };
