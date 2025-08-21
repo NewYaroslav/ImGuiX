@@ -45,10 +45,14 @@ namespace ImGuiX::Windows {
 
         ~ImGuiFramedWindow() override = default;
 
-        /// \brief Creates backend resources and opens the window.
+        /// \brief Create backend resources and open the window.
+        /// \return True if creation succeeds.
         bool create() override;
 
-        /// \brief Creates the window with the specified size.
+        /// \brief Create the window with the specified size.
+        /// \param w Width in pixels.
+        /// \param h Height in pixels.
+        /// \return True if creation succeeds.
         bool create(int w, int h) override;
 
         /// \brief Optional override for drawing a custom menu bar.
@@ -60,7 +64,8 @@ namespace ImGuiX::Windows {
         /// \brief Draws the ImGui interface for this window.
         void drawUi() override;
 
-        /// \brief Enables or disables clearing the background between frames.
+        /// \brief Enable or disable clearing the background between frames.
+        /// \param disable True to skip clearing the background.
         void setDisableBackground(bool disable) override;
 
     protected:
@@ -89,9 +94,20 @@ namespace ImGuiX::Windows {
     protected:
         /// \brief Draws the title bar text. Can be overridden to add icons or change alignment.
         virtual void drawTitleBarText();
+
+        /// \brief Draw control buttons in the title bar.
+        /// \param title_padding_x Horizontal title padding.
         void drawControlButtons(float title_padding_x);
+
+        /// \brief Draw macOS-styled control buttons.
+        /// \param title_padding_x Horizontal title padding.
         void drawMacStyledControlButtons(float title_padding_x);
+
+        /// \brief Draw ImGui-styled control buttons.
+        /// \param title_padding_x Horizontal title padding.
         void drawImGuiStyledControlButtons(float title_padding_x);
+
+        /// \brief Render frame manually when required by backend.
         void renderFrameManually();
     };
 
