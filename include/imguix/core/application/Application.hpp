@@ -34,6 +34,7 @@ namespace ImGuiX {
         /// \brief Creates a new window instance of the specified type.
         /// \tparam T Type derived from WindowInstance.
         /// \tparam Args Arguments forwarded to the window constructor.
+        /// \param args Constructor arguments.
         /// \return Reference to the created window instance.
         template<typename T, typename... Args>
         T& createWindow(Args&&... args);
@@ -41,6 +42,7 @@ namespace ImGuiX {
         /// \brief Creates and registers a model.
         /// \tparam T Class derived from Model.
         /// \tparam Args Arguments forwarded to the constructor.
+        /// \param args Constructor arguments.
         /// \return Reference to the created model.
         template<typename T, typename... Args>
         T& createModel(Args&&... args);
@@ -81,7 +83,7 @@ namespace ImGuiX {
         void mainLoop();
 
         /// \brief Single iteration of the main loop.
-        /// \return false if the loop should terminate.
+        /// \return True to continue the main loop.
         bool loopIteration();
 
         /// \brief Called before entering the main loop.

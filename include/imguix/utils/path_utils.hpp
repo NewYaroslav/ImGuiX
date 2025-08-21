@@ -30,7 +30,10 @@ namespace ImGuiX::Utils {
         inline constexpr bool dependent_false_v = false;
     }
 
-    /// \brief Returns full path to the current executable.
+    /// \brief Return full path to the current executable.
+    /// \tparam Dummy Dummy template parameter for SFINAE.
+    /// \return Executable path.
+    /// \throws std::runtime_error on failure.
     template<typename Dummy = void>
     std::string getExecPath() {
 #ifdef __EMSCRIPTEN__
@@ -71,7 +74,10 @@ namespace ImGuiX::Utils {
 #endif
     }
 
-    /// \brief Returns directory path of the executable.
+    /// \brief Return directory of the executable.
+    /// \tparam Dummy Dummy template parameter for SFINAE.
+    /// \return Directory path.
+    /// \throws std::runtime_error if getExecPath fails.
     template<typename Dummy = void>
     std::string getExecDir() {
 #ifdef __EMSCRIPTEN__
@@ -83,7 +89,8 @@ namespace ImGuiX::Utils {
 #endif
     }
 
-    /// \brief Resolves a relative path to absolute, based on executable location.
+    /// \brief Resolve relative path to absolute using executable directory.
+    /// \tparam Dummy Dummy template parameter for SFINAE.
     /// \param relative_path Relative path from executable directory.
     /// \return Absolute path string.
     template<typename Dummy = void>
@@ -96,7 +103,10 @@ namespace ImGuiX::Utils {
 #endif
     }
 
-    /// \brief Extracts filename from full path.
+    /// \brief Extract filename from full path.
+    /// \tparam Dummy Dummy template parameter for SFINAE.
+    /// \param full_path Full path to file.
+    /// \return Filename component.
     template<typename Dummy = void>
     std::string getFileName(const std::string& full_path) {
 #ifdef __EMSCRIPTEN__
@@ -107,7 +117,11 @@ namespace ImGuiX::Utils {
 #endif
     }
 
-    /// \brief Computes relative path from base to target.
+    /// \brief Compute relative path from base to target.
+    /// \tparam Dummy Dummy template parameter for SFINAE.
+    /// \param file_path Target file path.
+    /// \param base_path Base directory path.
+    /// \return Relative path string.
     template<typename Dummy = void>
     std::string makeRelative(const std::string& file_path, const std::string& base_path) {
 #ifdef __EMSCRIPTEN__
@@ -125,7 +139,10 @@ namespace ImGuiX::Utils {
 #endif
     }
 
-    /// \brief Recursively creates directory if it doesn't exist.
+    /// \brief Create directories recursively if missing.
+    /// \tparam Dummy Dummy template parameter for SFINAE.
+    /// \param path Directory path.
+    /// \throws std::runtime_error when creation fails.
     template<typename Dummy = void>
     void createDirectories(const std::string& path) {
 #ifdef __EMSCRIPTEN__
