@@ -142,6 +142,16 @@ namespace ImGuiX::Utils {
 #endif
     }
 
+	/// \brief
+    inline bool isAbsolutePath(const std::string& p) {
+        return fs::u8path(p).is_absolute();
+    }
+
+	/// \brief
+    inline std::string joinPaths(const std::string& a, const std::string& b) {
+        return (fs::u8path(a) / fs::u8path(b)).lexically_normal().u8string();
+    }
+
 } // namespace ImGuiX::utils
 
 #endif // _IMGUIX_UTILS_PATH_UTILS_HPP_INCLUDED

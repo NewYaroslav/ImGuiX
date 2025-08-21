@@ -1,0 +1,18 @@
+{
+    "base_dir": "data/resources/fonts",
+    "markdown_sizes": { "body": 16, "h1": 24, "h2": 20, "h3": 18 },
+    "locales": {
+        "default": {
+            "roles": {
+                "Body":   [{ "path": "NotoSans-Regular.ttf", "size_px": 16 }],
+                "H1":     [{ "path": "NotoSans-Bold.ttf",   "size_px": 24 }],
+                "H2":     [{ "path": "NotoSans-Bold.ttf",   "size_px": 20 }],
+                "H3":     [{ "path": "NotoSans-Medium.ttf", "size_px": 18 }],
+                "Icons":  [{ "path": "forkawesome-webfont.ttf", "size_px": 16, "merge": true }],
+                "Emoji":  [{ "path": "NotoEmoji-Regular.ttf",   "size_px": 16, "merge": true }]
+            },
+            "ranges": "Default+Cyrillic+Vietnamese"
+        },
+        "ru": { "inherits": "default" }
+    }
+}

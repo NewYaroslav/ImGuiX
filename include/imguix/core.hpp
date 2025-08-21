@@ -13,14 +13,14 @@
 #include <SFML/Window.hpp>
 #include <imgui-SFML.h>
 #elif defined(IMGUIX_USE_GLFW_BACKEND)
+#include <GLFW/glfw3.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
-#include <GLFW/glfw3.h>
 #elif defined(IMGUIX_USE_SDL2_BACKEND)
+#include <SDL.h>
 #include <imgui_impl_sdl2.h>
 #include <imgui_impl_opengl3.h>
-#include <SDL.h>
-#elif
+#else
 // Без бэкенда
 #endif
 
@@ -34,8 +34,9 @@
 #include "core/pubsub.hpp"                         ///< EventBus, Event, EventMediator
 #include "core/events.hpp"                         ///< Common built-in events
 
-// --- I18N ---
+// --- Locale and Fonts ---
 #include "core/i18n.hpp"                           ///<
+//#include "core/fonts/FontManager.hpp"              ///< FontManager: централизованная загрузка шрифтов (atlas ImGui + FreeType).
 
 // --- Resource system ---
 #include "core/resource/ResourceRegistry.hpp"      ///< Global registry for shared resources
