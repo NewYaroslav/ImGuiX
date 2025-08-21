@@ -15,6 +15,7 @@
 * [13. Naming & Documentation Conventions](#13-naming--documentation-conventions)
 * [14. Reference Index](#14-reference-index)
 * [15. Branching & Release Policy](#15-branching--release-policy)
+* [16. Documentation / Doxygen Style Guide](#16-documentation--doxygen-style-guide)
 
 ## 1. Mission & Scope
 
@@ -452,3 +453,56 @@ Disable SFML backend and use pure Dear ImGui with std::string helpers:
 ```bash
 cmake -S . -B build -DIMGUIX_USE_SFML_BACKEND=OFF -DIMGUIX_IMGUI_STDLIB=ON
 ```
+
+## 16. Documentation / Doxygen Style Guide
+
+### Scope
+Applies to all C++17 and newer code in this repository.
+
+### Fence & Tag Conventions
+* Use `///` for all Doxygen comments; avoid `/** ... */` blocks.
+* Use backslash tags (`\brief`, `\param`, etc.).
+* Write comments in English.
+
+### Tag Ordering
+Document entities using the following sequence:
+1. `\brief` – one short sentence (≤100 chars).
+2. `\tparam` – one per template parameter.
+3. `\param` – in function signature order.
+4. `\return` – exactly once for non-void functions.
+5. `\throws` – per exception type.
+6. `\pre` / `\post`.
+7. `\invariant`.
+8. `\complexity`.
+9. `\thread_safety`.
+10. `\note` / `\warning` (optional).
+
+All function parameters, template parameters, and non-void return values must be documented. Omit `\return` for void functions.
+
+### Additional Guidance
+* Keep wording concise, imperative, and under ~100–120 columns. Avoid leading “The”.
+* Public headers document behavior and usage but omit internal layout details.
+* Include fenced C++ examples for key public APIs when helpful.
+
+### Examples
+
+```cpp
+/// \brief Resize canvas to the target dimensions.
+/// \param w Width in pixels.
+/// \param h Height in pixels.
+/// \pre w >= 0 && h >= 0.
+/// \post New size equals (w, h).
+void resize(int w, int h);
+
+/// \brief Computes 64-bit hash of the input.
+/// \tparam T Input type supporting contiguous byte access.
+/// \param data Input value.
+/// \return 64-bit hash.
+/// \complexity O(n) over input size.
+/// \thread_safety Not thread-safe.
+template<class T>
+uint64_t hash(const T& data);
+```
+
+### Compliance
+If future style conflicts arise, this section takes precedence over legacy comments.
