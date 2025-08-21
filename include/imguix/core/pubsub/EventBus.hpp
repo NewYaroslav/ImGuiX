@@ -67,10 +67,11 @@ namespace ImGuiX::Pubsub {
         void notifyAsync(std::unique_ptr<Event> event);
 
         /// \brief Processes queued events.
-        /// Should be called from the main thread to process events safely.
+        /// \thread_safety Not thread-safe; call from main thread.
         void process();
 
         /// \brief Registers an awaiter for timeout/cancellation polling.
+        /// \param aw Awaiter to register.
         void registerAwaiter(const std::shared_ptr<IAwaiterEx>& aw);
 
     private:
