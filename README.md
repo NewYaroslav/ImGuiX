@@ -223,7 +223,19 @@ After building, open `http://localhost:8081/index.html` in your browser.
 
 ## Fonts and Licensing
 
-For font usage instructions see [FONTS-GUIDE-RU.md](docs/FONTS-GUIDE-RU.md).
+ImGuiX ships with a `FontManager` that can auto-load fonts from a JSON config or
+be configured manually. By default, fonts are read from
+`data/resources/fonts/fonts.json`. For full details see
+[FONTS-GUIDE-RU.md](docs/FONTS-GUIDE-RU.md).
+
+An example manual setup in `WindowInstance::onInit()`:
+
+```cpp
+fontsBeginManual();
+fontsAddBody({ "Roboto-Medium.ttf", 16.0f });
+fontsAddMerge(FontRole::Icons, { "forkawesome-webfont.ttf", 16.0f, true });
+fontsBuildNow();
+```
 
 This repository bundles third-party fonts under their original licenses:
 
