@@ -94,13 +94,13 @@ namespace fs = std::filesystem;
     inline void FontManager::addFontMerge(FontRole role, const FontFile &ff) {
       if (!m_manual.active) {
         m_manual.active = true;
-      } // допускаем вызов без beginManual()
+      } // allow call without beginManual()
       if (role == FontRole::Icons) {
         m_manual.merges_icons.push_back(ff);
       } else if (role == FontRole::Emoji) {
         m_manual.merges_emoji.push_back(ff);
       } else {
-        // игнорируем некорректные роли чтобы не ломать инварианты
+        // ignore invalid roles to keep invariants
         return;
       }
       markDirty();
@@ -210,7 +210,7 @@ namespace fs = std::filesystem;
           b.AddRanges(io.Fonts->GetGlyphRangesKorean());
         else if (tok == "Punct")
           b.AddText(u8"–—…•“”‘’");
-        // Latin, Greek, Thai, etc. — по мере необходимости
+        // Latin, Greek, Thai, etc. as needed
       }
     }
 
@@ -332,7 +332,7 @@ namespace fs = std::filesystem;
 
         std::string base_dir_abs;
 #       ifdef __EMSCRIPTEN__
-        base_dir_abs = m_params.base_dir; // как есть
+        base_dir_abs = m_params.base_dir; // as is
 #       else
         base_dir_abs = ImGuiX::Utils::resolveExecPath(m_params.base_dir);
 #       endif
@@ -344,7 +344,7 @@ namespace fs = std::filesystem;
 
         setupFreetypeIfNeeded(m_params);
         
-        // 1) Выбираем pack_ptr для активной локали (если не manual)
+        // 1) Select pack_ptr for active locale (if not manual)
         const LocalePack* pack_ptr = nullptr;
         if (!m_manual.active) {
             auto it = m_packs.find(m_active_locale);
@@ -356,7 +356,7 @@ namespace fs = std::filesystem;
             }
         }
         
-        // 2) Собираем флаги FreeType со всех FontFile
+        // 2) Collect FreeType flags from all FontFile
         unsigned int ft_flags = 0;
         if (!m_manual.active) {
             const LocalePack* p = pack_ptr;
@@ -375,7 +375,7 @@ namespace fs = std::filesystem;
             for (const auto& ff : m_manual.merges_unknown) ft_flags |= ff.freetype_flags;
         }
 
-        // 3) Применяем флаги на атлас ПЕРЕД AddFontFromFileTTF
+        // 3) Apply flags to atlas BEFORE AddFontFromFileTTF
 #   ifdef IMGUI_ENABLE_FREETYPE
 #       if IMGUI_VERSION_NUM >= 19200
         ImGui::GetIO().Fonts->FontLoaderFlags = ft_flags;
@@ -385,7 +385,7 @@ namespace fs = std::filesystem;
 #   endif
 
         // Build ranges
-        // 4) Собираем ranges
+        // 4) Gather ranges
         std::vector<ImWchar> ranges;
         if (!m_manual.active) {
             buildRangesFromPack(ranges, pack_ptr, m_active_locale);
@@ -393,7 +393,7 @@ namespace fs = std::filesystem;
             // Manual ranges: use default builder with extra glyphs from manual entries
             ImFontGlyphRangesBuilder b;
 
-            // 1) Приоритет: preset → явные пары → fallback по локали
+            // 1) Priority: preset → explicit pairs → locale fallback
             if (!m_manual.ranges_preset.empty()) {
                 addNamedRanges(b, io, m_manual.ranges_preset);
             } else 
@@ -409,10 +409,10 @@ namespace fs = std::filesystem;
                 addLocaleRanges(b, io, m_active_locale);
             }
 
-            // 2) Полезная пунктуация (дедупликация внутри билдера)
+            // 2) Useful punctuation (deduplicated inside builder)
             b.AddText(u8"–—…•“”‘’");
 
-            // 3) Extra glyphs из всех источников manual-конфига
+            // 3) Extra glyphs from all manual config sources
             if (m_manual.has_body) addExtraGlyphs(b, m_manual.body.extra_glyphs);
             for (const auto& kv : m_manual.headlines)      addExtraGlyphs(b, kv.second.extra_glyphs);
             for (const auto& ff : m_manual.merges_icons)   addExtraGlyphs(b, ff.extra_glyphs);
@@ -574,13 +574,13 @@ namespace fs = std::filesystem;
             }
           };
 
-          // Явные роли
+          // Explicit roles
           bool merged_icons = !m_manual.merges_icons.empty();
           bool merged_emoji = !m_manual.merges_emoji.empty();
           do_merge_vec(m_manual.merges_icons);
           do_merge_vec(m_manual.merges_emoji);
 
-          // Legacy: если использовали старый метод — включаем обе роли
+          // Legacy: if old method used, include both roles
           if (!m_manual.merges_unknown.empty()) {
             do_merge_vec(m_manual.merges_unknown);
             merged_icons = true;
@@ -651,10 +651,10 @@ namespace fs = std::filesystem;
         // Load JSON text (if exists)
         std::string cfg_path;
 #       ifdef __EMSCRIPTEN__
-        cfg_path = m_config_path; // как есть
+        cfg_path = m_config_path; // as is
 #       else
         cfg_path = ImGuiX::Utils::resolveExecPath(m_config_path);
-        // Fallback: если пусто или не найден — попробуем base_dir/fonts.json
+        // Fallback: if empty or not found, try base_dir/fonts.json
         if (readTextFile(cfg_path).empty()) {
             const auto base_abs = ImGuiX::Utils::resolveExecPath(m_params.base_dir);
             cfg_path = ImGuiX::Utils::joinPaths(base_abs, "fonts.json");
@@ -697,16 +697,16 @@ namespace fs = std::filesystem;
               if (L.contains("inherits") && L["inherits"].is_string())
                 pack.inherits = L["inherits"].get<std::string>();
 
-              // ranges: массив пар ИЛИ строка-пресет (например
+              // ranges: array of pairs OR string preset (e.g.,
               // "Default+Cyrillic+Punct")
               if (L.contains("ranges")) {
                 if (L["ranges"].is_array()) {
                   for (const auto &v : L["ranges"])
                     pack.ranges.push_back(static_cast<ImWchar>(v.get<int>()));
-                  // 0-терминатор добьём позже внутри buildRangesFromPack()
+                  // Append 0 terminator later inside buildRangesFromPack()
                 } else if (L["ranges"].is_string()) {
                   pack.ranges_preset =
-                      L["ranges"].get<std::string>(); // <-- ВАЖНО: сохраняем
+                      L["ranges"].get<std::string>(); // <-- IMPORTANT: keep
                 }
               }
 
@@ -746,8 +746,7 @@ namespace fs = std::filesystem;
               m_packs[pack.locale] = std::move(pack);
             }
 
-            // Второй проход: разворачиваем наследование после того, как ВСЕ пакеты
-            // прочитаны.
+            // Second pass: resolve inheritance after all packs are read
             {
               bool changed = true;
               int guard = 0;
@@ -762,19 +761,19 @@ namespace fs = std::filesystem;
                     continue;
                   const auto &parent = pit->second;
 
-                  // Роли: копировать недостающие (не перезаписывать имеющиеся)
+                  // Roles: copy missing ones (do not overwrite existing)
                   for (const auto &rp : parent.roles)
                     if (!child.roles.count(rp.first)) {
                       child.roles[rp.first] = rp.second;
                       changed = true;
                     }
 
-                  // Диапазоны: наследовать, если не заданы явно
+                  // Ranges: inherit if not set explicitly
                   if (child.ranges.empty() && !parent.ranges.empty()) {
                     child.ranges = parent.ranges;
                     changed = true;
                   }
-                  // Пресет: наследовать, если не задан явно
+                  // Preset: inherit if not set explicitly
                   if (child.ranges_preset.empty() &&
                       !parent.ranges_preset.empty()) {
                     child.ranges_preset = parent.ranges_preset;
