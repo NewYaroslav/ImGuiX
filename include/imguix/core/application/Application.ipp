@@ -49,28 +49,18 @@ namespace ImGuiX {
         }
 #endif
     }
-
-    template<typename T, typename... Args>
-    T& Application::createWindow(Args&&... args) {
-        static_assert(std::is_base_of<WindowInstance, T>::value,
-                      "T must derive from WindowInstance");
-
+    WindowInstance& Application::createWindowImpl(WindowFactory factory) {
         int id = m_next_window_id++;
-
-        auto window = std::make_unique<T>(id, *this,
-                                          std::forward<Args>(args)...);
-        T& ref = *window;
-
+        auto window = factory(id);
+        WindowInstance& ref = *window;
         m_window_manager.addWindow(std::move(window));
         return ref;
     }
-    
-    template<typename T, typename... Args>
-    T& Application::createModel(Args&&... args) {
-        static_assert(std::is_base_of<Model, T>::value, "T must be derived from Model");
-        auto model = std::make_unique<T>(*this, std::forward<Args>(args)...);
-        T& ref = *model;
-        m_pending_models.push_back(model.get());
+
+    Model& Application::createModelImpl(ModelFactory factory) {
+        auto model = factory();
+        Model& ref = *model;
+        m_pending_models.push_back(&ref);
         m_models.emplace_back(std::move(model));
         return ref;
     }

@@ -31,22 +31,6 @@ namespace ImGuiX {
         /// \param async If true, runs the main loop in a separate thread.
         void run(bool async = false);
 
-        /// \brief Creates a new window instance of the specified type.
-        /// \tparam T Type derived from WindowInstance.
-        /// \tparam Args Arguments forwarded to the window constructor.
-        /// \param args Constructor arguments.
-        /// \return Reference to the created window instance.
-        template<typename T, typename... Args>
-        T& createWindow(Args&&... args);
-        
-        /// \brief Creates and registers a model.
-        /// \tparam T Class derived from Model.
-        /// \tparam Args Arguments forwarded to the constructor.
-        /// \param args Constructor arguments.
-        /// \return Reference to the created model.
-        template<typename T, typename... Args>
-        T& createModel(Args&&... args);
-
         /// \brief Returns the global event bus.
         /// \return Reference to the event bus.
         Pubsub::EventBus& eventBus() override;
@@ -65,6 +49,10 @@ namespace ImGuiX {
         /// \brief Returns the application name.
         /// \return Reference to the name string.
         const std::string& name() const override;
+
+    protected:
+        WindowInstance& createWindowImpl(WindowFactory factory) override;
+        Model& createModelImpl(ModelFactory factory) override;
 
     private:
         Pubsub::EventBus m_event_bus;                 ///< Global event bus.
