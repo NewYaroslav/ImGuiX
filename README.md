@@ -17,6 +17,8 @@ An object-oriented wrapper around [Dear ImGui](https://github.com/ocornut/imgui)
 - [Fonts and Licensing](#fonts-and-licensing)
 - [License](#license)
 
+For the Russian version, see [README-RU.md](README-RU.md).
+
 ## Quick Start
 
 ```cpp
