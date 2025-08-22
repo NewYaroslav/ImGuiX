@@ -145,6 +145,12 @@ namespace ImGuiX {
         /// \brief Access to the shared resource registry.
         ResourceRegistry& registry() override;
 
+        /// \brief Access to the global options store.
+        OptionsStore::Control& options() override;
+
+        /// \brief Read-only access to the global options store.
+        const OptionsStore::View& options() const override;
+
         /// \brief Reference to the owning application.
         ApplicationControl& application() override;
 

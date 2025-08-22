@@ -2,11 +2,23 @@
 #   include <emscripten.h>
 #endif
 
+#include "../options/OptionsStore.hpp"
+
+#ifndef IMGUIX_CONFIG_DIR
+#   define IMGUIX_CONFIG_DIR "data/config"
+#endif
+
 namespace ImGuiX {
 
     Application::Application()
-        : m_event_bus(), m_registry(), 
-          m_window_manager(*static_cast<ApplicationControl*>(this)) {}
+        : m_event_bus(), m_registry(),
+          m_window_manager(*static_cast<ApplicationControl*>(this)) {
+        m_registry.registerResource<OptionsStore>([] {
+            return std::make_shared<OptionsStore>(
+                    std::string(IMGUIX_CONFIG_DIR) + "/options.json",
+                    0.5);
+        });
+    }
 
     void Application::run(bool async) {
 #       ifdef IMGUIX_USE_SFML_BACKEND
@@ -135,12 +147,15 @@ namespace ImGuiX {
         
         m_window_manager.processFrame();
 
+        m_registry.getResource<OptionsStore>().update();
+
         return true;
     }
 
     void Application::endLoop() {
         m_is_closing = true;
         m_window_manager.shutdown();
+        m_registry.getResource<OptionsStore>().saveNow();
     }
 
     void Application::mainLoop() {

@@ -9,6 +9,8 @@
 #   include <SFML/Graphics/RenderWindow.hpp>
 #endif
 
+#include "../options/OptionsStore.hpp"
+
 namespace ImGuiX {
 
     /// \brief Interface for controlling and querying a single window instance.
@@ -94,6 +96,14 @@ namespace ImGuiX {
         /// \brief Provides access to the global resource registry.
         /// \return Reference to the ResourceRegistry.
         virtual ResourceRegistry& registry() = 0;
+
+        /// \brief Provides access to the global options store.
+        /// \return Reference to the options store control interface.
+        virtual OptionsStore::Control& options() = 0;
+
+        /// \brief Provides read-only access to the global options store.
+        /// \return Reference to the options store view.
+        virtual const OptionsStore::View& options() const = 0;
         
         /// \brief Returns the owning application interface.
         /// \return Reference to ApplicationControl.
