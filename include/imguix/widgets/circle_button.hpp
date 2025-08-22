@@ -15,7 +15,7 @@ namespace ImGuiX::Widgets {
     /// \param diameter Diameter of the button in pixels.
     /// \param color Base color of the button.
     /// \return True if the button was clicked.
-	bool CircleButton(const char* id, float diameter, const ImVec4& color) {
+    bool CircleButton(const char* id, float diameter, const ImVec4& color) {
         ImVec2 size = ImVec2(diameter, diameter);
         ImVec2 pos = ImGui::GetCursorScreenPos();
         ImGui::InvisibleButton(id, size);
@@ -25,12 +25,12 @@ namespace ImGuiX::Widgets {
 
         ImVec4 final_col = color;
         if (ImGui::IsItemHovered()) final_col = ImGui::GetStyleColorVec4(ImGuiCol_ButtonHovered);
-        if (ImGui::IsItemActive())  final_col = ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive);
+        if (ImGui::IsItemActive()) final_col = ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive);
 
         draw_list->AddCircleFilled(center, diameter * 0.5f, ImGui::ColorConvertFloat4ToU32(final_col), 16);
 
         return ImGui::IsItemClicked();
-	}
+    }
 
 } // namespace ImGuiX::Widgets
 

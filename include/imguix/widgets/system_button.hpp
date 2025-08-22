@@ -74,7 +74,7 @@ namespace ImGuiX::Widgets {
             dl->AddLine(a2, b2, col, thickness);
         } else if (type == SystemButtonType::Minimize) {
             //float y = snap(pos.y + size.y - IMGUIX_SYSBTN_MARGIN - 1.0f);
-			ImVec2 a(snap(c.x - e), snap(c.y + e));
+            ImVec2 a(snap(c.x - e), snap(c.y + e));
             ImVec2 b(snap(c.x + e), snap(c.y + e));
             dl->AddLine(a, b, col, thickness);
         } else if (type == SystemButtonType::Maximize) {
