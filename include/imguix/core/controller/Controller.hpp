@@ -9,6 +9,8 @@
 
 namespace ImGuiX {
 
+    class WindowInterface;
+
     /// \brief Base class for controllers that attach to a window.
     /// \note Provides access to window-level context, including event bus and resources.
     /// \note Override `drawContent()` and `drawUi()` to render content and interface.
@@ -16,7 +18,7 @@ namespace ImGuiX {
     public:
         /// \brief Constructs a controller bound to a window.
         /// \param window Reference to associated window control.
-        explicit Controller(WindowControl& window)
+        explicit Controller(WindowInterface& window)
             : EventMediator(window.eventBus()), m_window(window) {}
             
         Controller(const Controller&) = delete;
@@ -50,11 +52,11 @@ namespace ImGuiX {
 
         /// \brief Read-only access to the global options store.
         const OptionsStore::View& options() const {
-            return static_cast<const WindowControl&>(m_window).options();
+            return static_cast<const WindowInterface&>(m_window).options();
         }
-        
+
         /// \brief Returns reference to the associated window control.
-        WindowControl& window() {
+        WindowInterface& window() {
             return m_window;
         }
         
@@ -65,7 +67,7 @@ namespace ImGuiX {
         }
 
     protected:
-        WindowControl& m_window; ///< Controlled window instance.
+        WindowInterface& m_window; ///< Controlled window instance.
     };
 
 } // namespace ImGuiX

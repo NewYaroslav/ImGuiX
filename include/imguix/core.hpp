@@ -44,7 +44,7 @@
 
 // --- Controller and model interfaces ---
 #include "core/application/ApplicationControl.hpp" ///< Interface for application access
-#include "core/window/WindowControl.hpp"           ///< Interface for window control
+#include "core/window/WindowInterface.hpp"         ///< Interface for window control
 #include "core/controller/Controller.hpp"          ///< Base interface for controllers
 #include "core/model/Model.hpp"                    ///< Base interface for models
 

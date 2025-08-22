@@ -24,6 +24,8 @@
 #    include "imgui_glsl_version.hpp"
 #endif
 
+#include "WindowInterface.hpp"
+
 #ifndef IMGUIX_CONFIG_DIR
 #    define IMGUIX_CONFIG_DIR "data/config"
 #endif
@@ -35,7 +37,7 @@ namespace ImGuiX {
     /// Combines event handling, rendering, and controller orchestration.
     /// Derive from this class to implement platform-specific windows.
     class WindowInstance :
-        public WindowControl,
+        private WindowInterface,
         public Pubsub::EventMediator {
     public:
         /// \brief Constructs the window with a unique ID and name.
@@ -82,7 +84,7 @@ namespace ImGuiX {
         template <typename ControllerType, typename... Args>
         ControllerType& createController(Args&&... args);
 
-        // --- WindowControl interface ---
+        // --- WindowInterface interface ---
 
         /// \brief Returns the unique ID of this window.
         int id() const override;

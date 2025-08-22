@@ -7,7 +7,7 @@
 
 #include "StrategicController.hpp"
 #include <imguix/core/application/Application.hpp>
-//#include <imguix/core/window/WindowControl.hpp>
+//#include <imguix/core/window/WindowInterface.hpp>
 
 namespace ImGuiX::Controllers {
 

@@ -54,7 +54,7 @@ bool LoadFonts(float px) {
 
 class I18nController : public ImGuiX::Controller {
 public:
-    I18nController(ImGuiX::WindowControl& window)
+    I18nController(ImGuiX::WindowInterface& window)
         : Controller(window) {}
 
     void drawContent() override {
