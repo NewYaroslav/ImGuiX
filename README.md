@@ -1,22 +1,22 @@
 # ImGuiX
 
-Объектно-ориентированная обёртка над [Dear ImGui](https://github.com/ocornut/imgui) для создания сложных пользовательских интерфейсов с модульными контроллерами, событийной архитектурой и принципами, вдохновлёнными MVC.
+An object-oriented wrapper around [Dear ImGui](https://github.com/ocornut/imgui) for building complex user interfaces with modular controllers, an event-driven architecture, and MVC-inspired principles.
 
-> **Примечание:** ImGuiX использует *MVC-like* архитектуру, подробнее см. раздел [Архитектура](#архитектура).
+> **Note:** ImGuiX uses an *MVC-like* architecture. See [Architecture](#architecture) for details.
 
-## Оглавление
-- [Быстрый старт](#быстрый-старт)
-- [Особенности](#особенности)
-- [Установка (SDK)](#установка-sdk)
-- [Подключение как зависимость](#подключение-как-зависимость)
-- [Быстрый старт / Примеры](#быстрый-старт--примеры)
-- [Архитектура](#архитектура)
+## Table of Contents
+- [Quick Start](#quick-start)
+- [Features](#features)
+- [SDK Installation](#sdk-installation)
+- [Using as a Dependency](#using-as-a-dependency)
+- [Quick Start / Examples](#quick-start--examples)
+- [Architecture](#architecture)
 - [Web/Emscripten](#webemscripten)
-- [Опции CMake (сводка)](#опции-cmake-сводка)
+- [CMake Options (Summary)](#cmake-options-summary)
 - [Fonts and Licensing](#fonts-and-licensing)
-- [Лицензия](#лицензия)
+- [License](#license)
 
-## Быстрый старт
+## Quick Start
 
 ```cpp
 #include <SFML/Graphics.hpp>
@@ -57,19 +57,19 @@ int main() {
 }
 ```
 
-## Особенности
+## Features
 
-- 💡 Архитектура, вдохновлённая MVC: контроллеры, модель, отображение
-- 🔔 Встроенный EventBus: для связи между компонентами
-- 📦 Готовые контроллеры: SplashScreen, StartupMenu и другие
-- 🌐 Поддержка мультиязычности через JSON-файлы
-- ⚙️ Хранение настроек (файлы или БД)
-- 📊 Виджеты: таблицы, графики, элементы ввода
-- ♻️ Поддержка вложенных контроллеров
+- 💡 MVC-inspired architecture: controllers, model, view
+- 🔔 Built-in EventBus for communication between components
+- 📦 Ready-made controllers: SplashScreen, StartupMenu and others
+- 🌐 Multilingual support through JSON files
+- ⚙️ Settings storage (files or a database)
+- 📊 Widgets: tables, charts, input elements
+- ♻️ Nested controller support
 
-## Установка (SDK)
+## SDK Installation
 
-Минимальный пример (Release, SFML-бэкенд по умолчанию), соберёт и установит SDK в `dist/sdk-sfml`:
+A minimal example (Release, SFML backend by default) builds and installs the SDK into `dist/sdk-sfml`:
 
 ```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release ^
@@ -78,67 +78,66 @@ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release ^
 cmake --build build --target install --config Release
 ```
 
-Ключевые опции:
+Key options:
 
-* `IMGUIX_SDK_INSTALL` — включает установку SDK (вместе с `install(...)` нашей библиотеки).
-* `IMGUIX_SDK_BUNDLE_DEPS` — кладёт в SDK внешние зависимости, если мы их собрали внутри (fmt, SFML, ImGui-SFML, libmdbx, nlohmann_json при вендоринге).
-* `IMGUIX_SDK_INSTALL_QUICKSTART` — добавляет в SDK папку `quickstart/` с минимальным примером и ресурсами.
-* `IMGUIX_SDK_FLATTEN_MISC_HEADERS` — дублирует `imgui_stdlib.h` и `imgui_freetype.h` в корень `include/` для удобных инклюдов.
+* `IMGUIX_SDK_INSTALL` — enables SDK installation (together with the library's `install(...)`).
+* `IMGUIX_SDK_BUNDLE_DEPS` — places external dependencies into the SDK if they are built internally (fmt, SFML, ImGui-SFML, libmdbx, nlohmann_json when vendored).
+* `IMGUIX_SDK_INSTALL_QUICKSTART` — adds a `quickstart/` folder with a minimal example and resources.
+* `IMGUIX_SDK_FLATTEN_MISC_HEADERS` — duplicates `imgui_stdlib.h` and `imgui_freetype.h` into the `include/` root for convenient includes.
 
-> Примечание. При режиме `BUNDLED` или если зависимость собрана как сабмодуль и имеет свой `install(...)`, установка их хедеров/библиотек происходит автоматически — мы это учитываем и не дублируем ручной установкой.
+> Note. In `BUNDLED` mode or if a dependency is built as a submodule and has its own `install(...)`, its headers/libraries are installed automatically—we account for that and do not duplicate installation manually.
 
-## Подключение как зависимость
+## Using as a Dependency
 
-### Вариант A: через установленный SDK
+### Option A: via installed SDK
 
 ```cmake
-# Внешний проект CMake
+# External CMake project
 cmake_minimum_required(VERSION 3.18)
 project(MyApp CXX)
 
-# Подсказываем CMake путь к SDK (где лежит lib/cmake/*)
+# Tell CMake where the SDK (with lib/cmake/*) resides
 list(PREPEND CMAKE_PREFIX_PATH "path/to/sdk-sfml")
 
-# 1) Основная библиотека
-find_package(ImGuiX CONFIG REQUIRED) # даёт цель ImGuiX::imguix
+# 1) Main library
+find_package(ImGuiX CONFIG REQUIRED) # provides target ImGuiX::imguix
 
-# 2) Бэкенд и его зависимости
+# 2) Backend and its dependencies
 find_package(SFML CONFIG REQUIRED COMPONENTS System Window Graphics)
 
-# Статическая библиотека ImGui-SFML устанавливается в SDK/lib (headers — в SDK/include).
-# Импортируем её как обычную библиотеку:
+# ImGui-SFML static library is installed to SDK/lib (headers in SDK/include).
+# Import it as a regular library:
 find_library(IMGUI_SFML_LIB NAMES ImGui-SFML PATHS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES lib REQUIRED)
 
 add_executable(myapp main.cpp)
 target_link_libraries(myapp PRIVATE ImGuiX::imguix ${IMGUI_SFML_LIB} SFML::Graphics SFML::Window SFML::System)
 ```
 
-### Вариант B: как сабмодуль
+### Option B: as a submodule
 
 ```cmake
-# У верхнего проекта есть свои зависимости (пример):
+# The top-level project has its own dependencies (example):
 find_package(fmt CONFIG REQUIRED)
-# libmdbx: либо find_package(MDBX CONFIG), либо add_subdirectory(external/libmdbx) и alias mdbx::mdbx
+# libmdbx: either find_package(MDBX CONFIG) or add_subdirectory(external/libmdbx) and alias mdbx::mdbx
 
-set(IMGUIX_DEPS_MODE SYSTEM CACHE STRING "" FORCE) # запрещаем нашему сабмодулю тянуть bundled
+set(IMGUIX_DEPS_MODE SYSTEM CACHE STRING "" FORCE) # forbid our submodule from pulling bundled deps
 add_subdirectory(external/ImGuiX)
 target_link_libraries(myapp PRIVATE ImGuiX::imguix)
 ```
 
-## Быстрый старт / Примеры
+## Quick Start / Examples
 
-В SDK можно включить `quickstart/` с минимальным примером приложения.
-Скопируй папку `quickstart` в свой проект или укажи её как исходники, собери — и стартуй.
+The SDK can include a `quickstart/` folder with a minimal application example. Copy the `quickstart` directory into your project or add it as sources, build, and you're ready to go.
 
-## Архитектура
+## Architecture
 
-ImGuiX следует адаптированному под Immediate Mode GUI подходу, напоминающему **MVC**.
+ImGuiX follows an Immediate Mode GUI approach reminiscent of **MVC**.
 
-В отличие от классического *MVC*, здесь роли *View* и *Controller* объединены: каждый контроллер отвечает и за логику, и за отрисовку виджетов в одном кадре. Модели взаимодействуют с контроллерами через событийную шину (EventBus), что обеспечивает слабую связанность и гибкую маршрутизацию событий.
+Unlike classic *MVC*, here the roles of *View* and *Controller* are combined: each controller handles both logic and widget rendering within a single frame. Models interact with controllers through an event bus (EventBus), providing loose coupling and flexible event routing.
 
 ### System Map
 
-#### Компоненты
+#### Components
 
 ```mermaid
 graph TD
@@ -162,7 +161,7 @@ graph TD
     M-->RR
 ```
 
-#### Поток событий
+#### Event Flow
 
 ```mermaid
 sequenceDiagram
@@ -177,51 +176,50 @@ sequenceDiagram
 
 ## Web/Emscripten
 
-Шаблон HTML лежит в `assets` для Web-сборки и попадает в `quickstart/` при включённом `IMGUIX_SDK_INSTALL_QUICKSTART`.
-Тестам он не нужен — для них мы исключаем `assets/data/web` при копировании ассетов.
+The HTML template for the Web build lives in `assets` and is included in `quickstart/` when `IMGUIX_SDK_INSTALL_QUICKSTART` is enabled. Tests do not need it—`assets/data/web` is excluded when copying assets for tests.
 
-Для сборки ImGuiX под WebAssembly с использованием SDL2 и OpenGL ES 2.0, используется `emcc` (из состава [Emscripten SDK](https://emscripten.org/)).
+To build ImGuiX for WebAssembly using SDL2 and OpenGL ES 2.0, use `emcc` (from the [Emscripten SDK](https://emscripten.org/)).
 
-### ⚙️ Конфигурация через `emsdk-path.txt`
+### ⚙️ Configuration via `emsdk-path.txt`
 
-Чтобы не хардкодить пути к SDK и директории сборки, используется файл `emsdk-path.txt` в корне репозитория. Скрипты `build-test-sdl2-ems.bat` и `run-test-sdl2-ems.bat` автоматически читают его.
+To avoid hardcoding paths to the SDK and build directory, an `emsdk-path.txt` file in the repository root is used. The scripts `build-test-sdl2-ems.bat` and `run-test-sdl2-ems.bat` read it automatically.
 
-**Формат файла:**
+**File format:**
 
 ```txt
 D:/tools/emsdk
 D:/repo/ImGuiX/build-test-sdl2-ems
 ```
 
-- **1-я строка**: путь к установленному Emscripten SDK
-- **2-я строка**: путь к директории сборки и запуска
+- **Line 1**: path to the installed Emscripten SDK
+- **Line 2**: path to the build and run directory
 
-### 📦 Зависимости
+### 📦 Dependencies
 
-- [emsdk](https://emscripten.org/docs/getting_started/downloads.html) (активирован через `emsdk_env.bat`)
-- [SDL2](https://emscripten.org/docs/porting/using_sdl.html) (через `-s USE_SDL=2`)
-- [FreeType](https://emscripten.org/docs/porting/using_freetype.html) (через `-s USE_FREETYPE=1`)
+- [emsdk](https://emscripten.org/docs/getting_started/downloads.html) (activated via `emsdk_env.bat`)
+- [SDL2](https://emscripten.org/docs/porting/using_sdl.html) (via `-s USE_SDL=2`)
+- [FreeType](https://emscripten.org/docs/porting/using_freetype.html) (via `-s USE_FREETYPE=1`)
 
-### 🚀 Сборка и запуск
+### 🚀 Build and Run
 
 ```bat
-build-test-sdl2-ems.bat   :: собирает пример и кладёт index.html в указанную папку
-run-test-sdl2-ems.bat     :: запускает emrun на локальном сервере
+build-test-sdl2-ems.bat   :: builds the sample and places index.html in the specified folder
+run-test-sdl2-ems.bat     :: launches emrun on a local server
 ```
 
-После сборки можно открыть `http://localhost:8081/index.html` в браузере.
+After building, open `http://localhost:8081/index.html` in your browser.
 
-## Опции CMake (сводка)
+## CMake Options (Summary)
 
-* `IMGUIX_HEADER_ONLY` — собрать только заголовки (без .cpp).
-* `IMGUIX_BUILD_SHARED` — собрать `imguix` как `SHARED`.
-* `IMGUIX_BUILD_TESTS` — собрать тесты из `tests/`.
-* Выбор бэкенда:
-  `IMGUIX_USE_SFML_BACKEND` (ON по умолчанию) / `IMGUIX_USE_GLFW_BACKEND` / `IMGUIX_USE_SDL2_BACKEND`.
-* ImGui: `IMGUIX_IMGUI_FREETYPE` (включает FreeType), `IMGUIX_IMGUI_STDLIB` (для не-SFML бэкендов включается по умолчанию).
-* JSON: `IMGUIX_VENDOR_JSON` — положить заголовки `nlohmann_json` в SDK.
-* Режимы зависимостей:
-  `IMGUIX_DEPS_MODE= AUTO|SYSTEM|BUNDLED` + пер-пакетные `IMGUIX_DEPS_*_MODE` (`fmt`, `SFML`, `ImGui`, `ImGui-SFML`, `freetype`, `json`, `mdbx`).
+* `IMGUIX_HEADER_ONLY` — build headers only (no .cpp files).
+* `IMGUIX_BUILD_SHARED` — build `imguix` as a `SHARED` library.
+* `IMGUIX_BUILD_TESTS` — build tests from `tests/`.
+* Backend selection:
+  `IMGUIX_USE_SFML_BACKEND` (ON by default) / `IMGUIX_USE_GLFW_BACKEND` / `IMGUIX_USE_SDL2_BACKEND`.
+* ImGui: `IMGUIX_IMGUI_FREETYPE` (enable FreeType), `IMGUIX_IMGUI_STDLIB` (enabled by default for non-SFML backends).
+* JSON: `IMGUIX_VENDOR_JSON` — place `nlohmann_json` headers in the SDK.
+* Dependency modes:
+  `IMGUIX_DEPS_MODE= AUTO|SYSTEM|BUNDLED` plus per-package `IMGUIX_DEPS_*_MODE` (`fmt`, `SFML`, `ImGui`, `ImGui-SFML`, `freetype`, `json`, `mdbx`).
 
 ## Fonts and Licensing
 
@@ -243,7 +241,6 @@ This repository bundles third-party fonts under their original licenses:
 
 All fonts are included unmodified. See `THIRD-PARTY-NOTICES.md` for per-family attributions.
 
-## Лицензия
+## License
 
-MIT — см. [LICENSE](./LICENSE)
-
+MIT — see [LICENSE](./LICENSE)
