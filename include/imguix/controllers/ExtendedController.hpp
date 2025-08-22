@@ -6,13 +6,10 @@
 /// \brief Extended controller that combines child and strategy controllers with access to the application context.
 
 #include "StrategicController.hpp"
-#include <imguix/core/application/Application.hpp>
-//#include <imguix/core/window/WindowInterface.hpp>
 
 namespace ImGuiX::Controllers {
 
-    /// \brief Extended controller with convenient access to the Application instance.
-    /// \note Provides utility methods such as `application()` and `createWindow()`.
+    /// \brief Extended controller with convenient access to window creation helpers.
     class ExtendedController : public StrategicController {
     public:
         using StrategicController::StrategicController;
