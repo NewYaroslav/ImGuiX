@@ -27,15 +27,14 @@ namespace ImGuiX::Fonts {
 
     /// \brief Central manager for font atlas lifecycle.
     /// \details Guarantees a single valid atlas per frame. Rebuild happens only
-    /// between frames. FontManager: централизованная загрузка шрифтов (atlas ImGui
-    /// + FreeType).
-    /// - Header-only режим: определите IMGUIX_FONTS_HEADER_ONLY до подключения
-    /// этого заголовка,
-    ///   и реализация из FontManager.ipp подтянется автоматически.
-    /// - Иначе соберите отдельный TU, подключив FontManager.ipp в .cpp.
-    /// - Если определён IMGUI_ENABLE_FREETYPE — будет использован FreeType builder.
-    /// - Конфиг по умолчанию: data/resources/fonts/fonts.json (можно
-    /// переопределить).
+    /// between frames. Handles centralized font loading (ImGui atlas + FreeType).
+    /// - Header-only mode: define IMGUIX_FONTS_HEADER_ONLY before including this
+    ///   header and the implementation from FontManager.ipp is pulled
+    ///   automatically.
+    /// - Otherwise build a separate translation unit that includes
+    ///   FontManager.ipp in a .cpp.
+    /// - If IMGUI_ENABLE_FREETYPE is defined, the FreeType builder is used.
+    /// - Default config path: data/resources/fonts/fonts.json (can be overridden).
     class FontManager : 
         private FontManagerViewCRTP<FontManager>,
         private FontManagerControlCRTP<FontManager> {
@@ -64,16 +63,16 @@ namespace ImGuiX::Fonts {
         /// \brief Set active locale. May mark atlas dirty if ranges/fonts differ.
         void setLocale(std::string locale);
 		
-		/// \brief Задать диапазоны глифов пресетом (например "Default+Cyrillic+Punct").
-		/// \details Только для manual-режима. Сбрасывает явные ranges().
-		void setRanges(std::string preset);
+                /// \brief Set glyph ranges by preset (e.g., "Default+Cyrillic+Punct").
+                /// \details Manual mode only. Clears explicit ranges().
+                void setRanges(std::string preset);
 
-		/// \brief Задать диапазоны глифов явным массивом пар [start,end]. Можно без завершающего 0.
-		/// \details Только для manual-режима. Сбрасывает preset-строку.
-		void setRanges(const std::vector<ImWchar>& pairs);
+                /// \brief Set glyph ranges with explicit [start,end] pairs. Terminator 0 optional.
+                /// \details Manual mode only. Clears preset string.
+                void setRanges(const std::vector<ImWchar>& pairs);
 
-		/// \brief Очистить ручные диапазоны (preset/explicit). Будет использована locale-политика.
-		void clearRanges();
+                /// \brief Clear manual ranges (preset or explicit). Locale policy will be used.
+                void clearRanges();
 
         /// \brief Set Markdown headline sizes (px @ 96 DPI). Body is the base text
         /// size.
@@ -143,13 +142,13 @@ namespace ImGuiX::Fonts {
         /// \brief Returns current build parameters.
         const BuildParams &params() const;
         
-        /// \brief
+        /// \brief Access view interface.
         View& view() noexcept { return *this; }
-        
-        /// \brief
+
+        /// \brief Const access to view interface.
         const View& view() const noexcept { return *this; }
-        
-        /// \brief
+
+        /// \brief Access control interface.
         Control& control() noexcept { return *this; }
 
         FontManager() = default;
@@ -166,8 +165,8 @@ namespace ImGuiX::Fonts {
             std::vector<FontFile> merges_icons;   ///< explicit Icons
             std::vector<FontFile> merges_emoji;   ///< explicit Emoji
             std::vector<FontFile> merges_unknown; ///< legacy addFontMerge(ff)
-            std::vector<ImWchar> ranges;          ///< optional manual ranges
-			std::string          ranges_preset;   ///< "Default+Cyrillic+Vietnamese+Punct"
+            std::vector<ImWchar> ranges;          ///< Optional manual ranges
+            std::string ranges_preset;            ///< "Default+Cyrillic+Vietnamese+Punct"
         };
 
         BuildParams m_params{};
