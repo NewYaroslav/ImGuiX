@@ -18,7 +18,8 @@ namespace ImGuiX {
             m_delta = m_clock.restart();
         }
 
-        /// \brief Returns last delta time value.
+        /// \brief Get last delta time value.
+        /// \return Time since last update.
         const sf::Time& delta() const {
             return m_delta;
         }

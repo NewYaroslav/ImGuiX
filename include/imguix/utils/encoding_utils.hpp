@@ -12,9 +12,9 @@
 
 namespace ImGuiX::Utils {
 
-    /// \brief Converts a UTF-8 string to an ANSI string (Windows-specific).
-    /// \param utf8 The UTF-8 encoded string.
-    /// \return The converted ANSI string.
+    /// \brief Convert UTF-8 string to ANSI string (Windows-specific).
+    /// \param utf8 UTF-8 encoded string.
+    /// \return Converted ANSI string.
     std::string Utf8ToAnsi(const std::string& utf8) noexcept {
         int n_len = MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, NULL, 0);
         if (n_len == 0) return {};
@@ -30,9 +30,9 @@ namespace ImGuiX::Utils {
         return ansi_string;
     }
 
-    /// \brief Converts an ANSI string to a UTF-8 string (Windows-specific).
-    /// \param ansi The ANSI encoded string.
-    /// \return The converted UTF-8 string.
+    /// \brief Convert ANSI string to UTF-8 string (Windows-specific).
+    /// \param ansi ANSI encoded string.
+    /// \return Converted UTF-8 string.
     std::string AnsiToUtf8(const std::string& ansi) noexcept {
         int n_len = MultiByteToWideChar(CP_ACP, 0, ansi.c_str(), -1, NULL, 0);
         if (n_len == 0) return {};
@@ -48,18 +48,18 @@ namespace ImGuiX::Utils {
         return utf8_string;
     }
 
-    /// \brief Converts a UTF-8 string to a CP866 string (DOS-specific, Windows).
-    /// \param utf8 The UTF-8 encoded string.
-    /// \return The converted CP866 string.
+    /// \brief Convert UTF-8 string to CP866 string (DOS-specific, Windows).
+    /// \param utf8 UTF-8 encoded string.
+    /// \return Converted CP866 string.
     std::string Utf8ToCp866(const std::string& utf8) noexcept {
         std::string temp = Utf8ToAnsi(utf8);
         CharToOem((LPSTR)temp.c_str(), temp.data());
         return temp;
     }
 
-    /// \brief Validates whether a string is a valid UTF-8 string.
-    /// \param message The string to validate.
-    /// \return `true` if the string is valid UTF-8, `false` otherwise.
+    /// \brief Validate UTF-8 string.
+    /// \param message String to validate.
+    /// \return `true` if string is valid UTF-8, `false` otherwise.
     bool IsValidUtf8(const char* message) {
         if (!message) return true;
         const unsigned char* bytes = reinterpret_cast<const unsigned char*>(message);
@@ -84,9 +84,9 @@ namespace ImGuiX::Utils {
         return true;
     }
 
-    /// \brief Converts a CP1251 string to UTF-8.
-    /// \param cp1251 The CP1251 encoded string.
-    /// \return The converted UTF-8 string.
+    /// \brief Convert CP1251 string to UTF-8.
+    /// \param cp1251 CP1251 encoded string.
+    /// \return Converted UTF-8 string.
     std::string Cp1251ToUtf8(const std::string& cp1251) {
         int len = MultiByteToWideChar(1251, 0, cp1251.c_str(), -1, NULL, 0);
         if (len == 0) return {};
@@ -102,9 +102,9 @@ namespace ImGuiX::Utils {
         return utf8String;
     }
 
-    /// \brief Converts a UTF-16 string to UTF-8.
-    /// \param utf16String A wide character string.
-    /// \return The converted UTF-8 string.
+    /// \brief Convert UTF-16 string to UTF-8.
+    /// \param utf16String Wide character string.
+    /// \return Converted UTF-8 string.
     std::string Utf16ToUtf8(LPWSTR utf16String) {
         int bufferSize = WideCharToMultiByte(CP_UTF8, 0, utf16String, -1, nullptr, 0, nullptr, nullptr);
         std::string utf8String(bufferSize, '\0');
@@ -112,9 +112,9 @@ namespace ImGuiX::Utils {
         return utf8String;
     }
 
-    /// \brief Converts a UTF-8 string to a UTF-16 wide string.
-    /// \param utf8 The UTF-8 encoded string.
-    /// \return The converted UTF-16 string.
+    /// \brief Convert UTF-8 string to UTF-16 wide string.
+    /// \param utf8 UTF-8 encoded string.
+    /// \return Converted UTF-16 string.
     std::wstring Utf8ToUtf16(const std::string& utf8) noexcept {
         int n_len = MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, NULL, 0);
         if (n_len == 0) return {};

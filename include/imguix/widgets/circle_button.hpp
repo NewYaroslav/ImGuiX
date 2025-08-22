@@ -7,14 +7,12 @@
 
 namespace ImGuiX::Widgets {
 
-    /// \brief Draws a simple circular button with a solid color fill.
-    ///
-    /// The button reacts to hover and active states by changing its color according to the current ImGui style.
-    ///
-    /// \param id Unique string ID for the button.
-    /// \param diameter Diameter of the button in pixels.
-    /// \param color Base color of the button.
-    /// \return True if the button was clicked.
+    /// \brief Draw simple circular button with solid fill.
+    /// \param id Unique string ID.
+    /// \param diameter Button diameter in pixels.
+    /// \param color Base color.
+    /// \return True if button was clicked.
+    /// \note Button changes color on hover or active using style.
     bool CircleButton(const char* id, float diameter, const ImVec4& color) {
         ImVec2 size = ImVec2(diameter, diameter);
         ImVec2 pos = ImGui::GetCursorScreenPos();

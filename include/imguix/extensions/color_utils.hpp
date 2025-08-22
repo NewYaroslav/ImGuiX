@@ -16,9 +16,9 @@ namespace ImGuiX::Extensions {
 
 #if defined(IMGUIX_USE_SFML_BACKEND)
 
-    /// \brief Converts an ImVec4 color to sf::Color.
-    /// \param color ImVec4 color (each component in [0.0f, 1.0f])
-    /// \return sf::Color with 8-bit RGBA values.
+    /// \brief Convert ImVec4 color to sf::Color.
+    /// \param color Color with components in [0,1].
+    /// \return 8-bit RGBA color.
     inline sf::Color ColorToSfml(const ImVec4& color) {
     #if defined(SFML_VERSION_MAJOR) && SFML_VERSION_MAJOR >= 3
         return sf::Color(

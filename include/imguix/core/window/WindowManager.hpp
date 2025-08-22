@@ -7,83 +7,82 @@
 
 namespace ImGuiX {
 
-    /// \brief Manages all windows in the application.
-    ///
-    /// Delegates lifecycle operations to each registered window instance,
-    /// and provides an interface for ticking, drawing, and shutdown control.
+    /// \brief Manage all windows in the application.
+    /// \note Delegates lifecycle operations to each registered window instance.
+    /// \note Provides interfaces for ticking, drawing, and shutdown control.
     class WindowManager : public Pubsub::EventMediator {
     public:
-        /// \brief Constructs the window manager with access to the application.
+        /// \brief Construct window manager with access to the application.
         /// \param app Reference to application control interface.
         explicit WindowManager(ApplicationControl& app);
 
-        /// \brief Destructor. Unsubscribes from all events.
+        /// \brief Destructor. Unsubscribe from all events.
         virtual ~WindowManager() = default;
 
-        /// \brief Handles events posted to the global bus.
+        /// \brief Handle events posted to the global bus.
+        /// \param event Event pointer.
         void onEvent(const Pubsub::Event* const event) override;
 
-        /// \brief Adds a new window to the manager.
+        /// \brief Add new window to the manager.
+        /// \param window Window instance.
         void addWindow(std::unique_ptr<WindowInstance> window);
 
-        /// \brief Prepares window state before each frame.
-        ///
-        /// Moves pending windows into the active list, initializes them,
-        /// and removes windows that have been closed since the last frame.
+        /// \brief Prepare window state before each frame.
+        /// \note Moves pending windows, initializes them, and removes closed windows.
         void prepareFrame();
 
-        /// \brief Closes all managed windows.
+        /// \brief Close all managed windows.
         void closeAll();
 
-        /// \brief Initializes ImGui ini handling for all windows.
+        /// \brief Initialize ImGui ini handling for all windows.
         void initIniAll();
 
-        /// \brief Executes a full frame processing sequence.
+        /// \brief Execute full frame processing sequence.
         void processFrame();
 
-        /// \brief Returns the number of managed windows.
+        /// \brief Get number of managed windows.
         /// \return Number of windows.
         std::size_t windowCount() const;
 
-        /// \brief Checks whether all windows have been closed.
-        /// \return true if no window remains open.
+        /// \brief Check whether all windows have been closed.
+        /// \return True if no window remains open.
         bool allWindowsClosed() const;
         
-        /// \brief Performs backend-specific shutdown tasks.
+        /// \brief Perform backend-specific shutdown tasks.
         void shutdown();
 
     private:
-        /// \brief Forwards handle_events to all windows.
+        /// \brief Forward handle_events to all windows.
         void handleEvents();
 
-        /// \brief Forwards tick to all windows.
+        /// \brief Forward tick to all windows.
         void tickAll();
 
-        /// \brief Forwards draw_ui to all windows.
+        /// \brief Forward draw_ui to all windows.
         void drawUiAll();
 
-        /// \brief Forwards draw_content to all windows.
+        /// \brief Forward draw_content to all windows.
         void drawContentAll();
 
-        /// \brief Forwards present to all windows.
+        /// \brief Forward present to all windows.
         void presentAll();
 
-        /// \brief Loads ImGui settings for all windows.
+        /// \brief Load ImGui settings for all windows.
         void loadIniAll();
 
-        /// \brief Saves ImGui settings for all windows immediately.
+        /// \brief Save ImGui settings for all windows immediately.
         void saveIniNowAll();
 
-        /// \brief Periodically saves ImGui settings for all windows.
+        /// \brief Periodically save ImGui settings for all windows.
         void saveIniAll();
 
-        /// \brief Moves pending windows into the active list.
+        /// \brief Move pending windows into the active list.
         void flushPending();
 
-        /// \brief Calls onInit() on newly added windows.
+        /// \brief Call onInit() on newly added windows.
         void initializePending();
 
-        /// \brief Removes windows that are no longer open.
+        /// \brief Remove windows that are no longer open.
         void removeClosed();
 
     protected:
@@ -99,8 +98,17 @@ namespace ImGuiX {
         /// \return Reference to the ResourceRegistry owned by the application.
         ResourceRegistry& registry();
 
+        /// \brief Process queued language change events.
         void processLanguageEvents();
-        WindowInstance*       findWindowById(int id) noexcept;
+
+        /// \brief Find window by identifier.
+        /// \param id Window identifier.
+        /// \return Window pointer or nullptr.
+        WindowInstance* findWindowById(int id) noexcept;
+
+        /// \brief Find window by identifier.
+        /// \param id Window identifier.
+        /// \return Window pointer or nullptr.
         const WindowInstance* findWindowById(int id) const noexcept;
     };
 

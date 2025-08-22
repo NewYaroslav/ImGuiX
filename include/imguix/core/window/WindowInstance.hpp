@@ -162,8 +162,8 @@ namespace ImGuiX {
 
         // --- Lang and Fonts ---
 
-        /// \brief
-        /// \return
+        /// \brief Get language store.
+        /// \return Language store.
         const ImGuiX::I18N::LangStore& langStore() const override;
         
         ImGuiX::Fonts::FontManager::View& fontsView() noexcept { return m_font_manager.view(); }
@@ -172,72 +172,74 @@ namespace ImGuiX {
 
         // ---
 
-        /// \brief Computes the file path for storing ImGui ini settings.
-        /// \return Absolute path to the ini file.
-        /// (для внутреннего использования)
+        /// \brief Compute file path for storing ImGui ini settings.
+        /// \return Absolute path to ini file.
+        /// \note Internal use.
         std::string iniPath() const;
 
-        /// \brief Prepares ImGui to use the window-specific ini file.
-        /// (для внутреннего использования)
+        /// \brief Prepare ImGui to use the window-specific ini file.
+        /// \note Internal use.
         void initIni();
 
-        /// \brief Loads ImGui settings from the ini file if not already loaded.
-        /// (для внутреннего использования)
+        /// \brief Load ImGui settings from the ini file if not already loaded.
+        /// \note Internal use.
         void loadIni();
 
-        /// \brief Saves ImGui ini settings to disk.
-        /// (для внутреннего использования)
+        /// \brief Save ImGui ini settings to disk.
+        /// \note Internal use.
         void saveIniNow();
         
-        /// \brief
+        /// \brief Request window to switch its UI language.
+        /// \param lang Language code.
         void requestLanguageChange(const std::string& lang);
         
-        /// \brief 
-        /// (для внутреннего использования)
+        /// \brief Apply pending language change.
+        /// \note Internal use.
         void applyPendingLanguageChange();
         
-        /// \brief 
-        /// (для внутреннего использования)
+        /// \brief Start font initialization.
+        /// \note Internal use.
         void fontsStartInit();
 
-        /// \brief
-        /// (для внутреннего использования)
+        /// \brief Build fonts atlas.
+        /// \note Internal use.
         void buildFonts();
 
     protected:
 
         // --- onInit-фаза: ручная сборка атласа ---
 
-        /// \brief
+        /// \brief Begin manual font configuration.
         void fontsBeginManual();
 
             void fontsSetLocale(std::string locale);
 
-            void fontsSetRangesPreset(std::string preset);                    // обёртка на setRanges(std::string)
+            void fontsSetRangesPreset(std::string preset);
 
-            void fontsSetRangesExplicit(const std::vector<ImWchar>& pairs);   // обёртка на setRanges(vector)
+            void fontsSetRangesExplicit(const std::vector<ImWchar>& pairs);
 
-            void fontsClearRanges();                                          // обёртка на clearRanges()
+            void fontsClearRanges();
 
-        /// \brief
-        /// \param
+        /// \brief Add body font file.
+        /// \param ff Font file.
         void fontsAddBody(const ImGuiX::Fonts::FontFile& ff);
 
-        /// \brief
-        /// \param
-        /// \param
+        /// \brief Add headline font file.
+        /// \param role Font role.
+        /// \param ff Font file.
         void fontsAddHeadline(ImGuiX::Fonts::FontRole role, const ImGuiX::Fonts::FontFile& ff);
 
-        /// \brief
-        /// \param
-        /// \param
+        /// \brief Add merge font file for role.
+        /// \param role Font role.
+        /// \param ff Font file.
         void fontsAddMerge(ImGuiX::Fonts::FontRole role, const ImGuiX::Fonts::FontFile& ff);
         
-        /// \brief
-        /// \param
+        /// \brief Add merge font file to body chain.
+        /// \param ff Font file.
         void fontsAddMerge(const ImGuiX::Fonts::FontFile& ff);
         
-        /// \brief
+        /// \brief Build fonts immediately.
+        /// \return True on success.
         bool fontsBuildNow();
 
     protected:

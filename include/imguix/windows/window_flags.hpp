@@ -25,11 +25,17 @@ namespace ImGuiX::Windows {
     };
 
     /// \brief Bitwise OR for WindowFlags.
+    /// \param a First flag.
+    /// \param b Second flag.
+    /// \return Combined flags.
     inline WindowFlags operator|(WindowFlags a, WindowFlags b) {
         return static_cast<WindowFlags>(static_cast<uint32_t>(a) | static_cast<uint32_t>(b));
     }
 
-    /// \brief Bitwise AND test for WindowFlags.
+    /// \brief Test flag presence.
+    /// \param value Flags to test.
+    /// \param flag Flag to check.
+    /// \return True if flag is set.
     inline bool hasFlag(WindowFlags value, WindowFlags flag) {
         return (static_cast<uint32_t>(value) & static_cast<uint32_t>(flag)) != 0;
     }

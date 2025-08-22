@@ -4,12 +4,8 @@
 
 /// \file pubsub.hpp
 /// \brief Entry point for the publish-subscribe system.
-/// 
-/// Includes all necessary components for event-driven communication, 
-/// allowing modules to use the entire event system with a single import.
-/// 
-/// This file encapsulates the core components of the Pub/Sub system:
-/// Event, EventListener, EventBus, and EventMediator.
+/// \note Includes all necessary components for event-driven communication.
+/// \note Encapsulates Event, EventListener, EventBus, and EventMediator.
 
 #include <unordered_map>
 #include <vector>

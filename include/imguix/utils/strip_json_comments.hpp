@@ -3,15 +3,11 @@
 #define _IMGUIX_UTILS_STRIP_JSON_COMMENTS_HPP_INCLUDED
 
 /// \file strip_json_comments.hpp
-/// \brief Removes //, /* ... */, and # line comments from JSON-like text (outside of strings).
-///
-/// Notes:
-/// - JSON standard does not allow comments; this is a convenience preprocessor.
-/// - '#' comments are treated as single-line comments only if the '#' is at line start
-///   or preceded by whitespace. This matches common "relaxed json" behavior.
-/// - Inside string literals (double quotes) nothing is stripped; escaped quotes \" are honored.
-/// - When with_whitespace == true, removed comment characters are replaced by spaces
-///   while preserving newlines (\n and \r), so line/column mapping is roughly kept.
+/// \brief Remove //, /* ... */, and # line comments from JSON-like text outside strings.
+/// \note JSON standard does not allow comments; this acts as a preprocessor.
+/// \note '#' comments apply only at line start or after whitespace.
+/// \note Inside string literals nothing is stripped; escaped quotes \" are honored.
+/// \note When with_whitespace is true, removed characters become spaces while newlines stay.
 
 #include <string>
 #include <algorithm>

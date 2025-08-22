@@ -4,9 +4,7 @@
 
 /// \file extensions.hpp
 /// \brief Unified include for all ImGuiX extensions.
-/// 
-/// This file includes all utility-style extensions for Dear ImGui such as style patches,
-/// scoped overrides, and rendering helpers.
+/// \note Includes style patches, scoped overrides, and rendering helpers.
 
 #include "extensions/force_opaque_style.hpp"
 
