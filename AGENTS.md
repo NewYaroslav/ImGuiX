@@ -276,6 +276,12 @@ Format: `type(scope): short description` where the scope is optional. Keep messa
 | `include/imguix/extensions`  | Utility helpers for ImGui                               |
 | `tests`                      | Example programs and basic tests                        |
 
+### Key Documents
+
+| Path                     | Role                                                   |
+| ------------------------ | ------------------------------------------------------ |
+| `docs/FONTS-GUIDE.md`    | FontManager usage and window `fonts*` helpers          |
+
 ### Dependency Map
 
 | Module         | Depends On                                        |
