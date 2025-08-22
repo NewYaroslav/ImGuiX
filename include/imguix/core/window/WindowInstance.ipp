@@ -3,7 +3,7 @@
 
 namespace ImGuiX {
 
-    WindowInstance::WindowInstance(int id, ApplicationControl& app, std::string name)
+    WindowInstance::WindowInstance(int id, ApplicationContext& app, std::string name)
         : EventMediator(app.eventBus()),
           m_window_id(id),
           m_window_name(std::move(name)),
@@ -71,7 +71,7 @@ namespace ImGuiX {
         return m_application.registry().getResource<OptionsStore>().view();
     }
     
-    ApplicationControl& WindowInstance::application() {
+    ApplicationContext& WindowInstance::application() {
         return m_application;
     }
     

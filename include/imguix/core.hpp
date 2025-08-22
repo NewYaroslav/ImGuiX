@@ -43,7 +43,7 @@
 #include "core/resource/ResourceRegistry.hpp"      ///< Global registry for shared resources
 
 // --- Controller and model interfaces ---
-#include "core/application/ApplicationControl.hpp" ///< Interface for application access
+#include "core/application/ApplicationContext.hpp" ///< Interface for application access
 #include "core/window/WindowInterface.hpp"         ///< Interface for window control
 #include "core/controller/Controller.hpp"          ///< Base interface for controllers
 #include "core/model/Model.hpp"                    ///< Base interface for models

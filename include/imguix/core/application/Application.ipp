@@ -12,7 +12,7 @@ namespace ImGuiX {
 
     Application::Application()
         : m_event_bus(), m_registry(),
-          m_window_manager(*static_cast<ApplicationControl*>(this)) {
+          m_window_manager(*static_cast<ApplicationContext*>(this)) {
         m_registry.registerResource<OptionsStore>([] {
             return std::make_shared<OptionsStore>(
                     std::string(IMGUIX_CONFIG_DIR) + "/options.json",

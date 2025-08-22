@@ -6,7 +6,7 @@ namespace ImGuiX::Windows {
     
     ImGuiFramedWindow::ImGuiFramedWindow(
             int id, 
-            ApplicationControl& app, 
+            ApplicationContext& app,
             std::string name,
             std::string title,
             WindowFlags flags, 

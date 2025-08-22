@@ -13,8 +13,8 @@ namespace ImGuiX {
     class WindowManager : public Pubsub::EventMediator {
     public:
         /// \brief Construct window manager with access to the application.
-        /// \param app Reference to application control interface.
-        explicit WindowManager(ApplicationControl& app);
+        /// \param app Reference to application context interface.
+        explicit WindowManager(ApplicationContext& app);
 
         /// \brief Destructor. Unsubscribe from all events.
         virtual ~WindowManager() = default;
@@ -89,7 +89,7 @@ namespace ImGuiX {
         std::vector<std::unique_ptr<WindowInstance>> m_windows;      ///< Managed windows.
         std::vector<std::unique_ptr<WindowInstance>> m_pending_add;  ///< Newly created windows waiting to be added.
         std::vector<WindowInstance*> m_pending_init;                 ///< Windows pending initialization.
-        ApplicationControl&          m_application;                  ///< Reference to the owning application.
+        ApplicationContext&          m_application;                  ///< Reference to the owning application.
         std::deque<Events::LangChangeEvent> m_lang_events;           ///< Queued language change events.
         int                          m_ini_save_frame_counter{0};    ///< Frame counter for ini saving.
         static constexpr int         m_ini_save_interval{300};       ///< Frames between ini saves.
