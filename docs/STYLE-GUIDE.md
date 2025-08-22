@@ -8,9 +8,9 @@
 
 ## Table of Contents
 1. [Naming Rules](#naming-rules)
-2. [Code Organization](#code-organization)
-3. [Formatting](#formatting)
-4. [Recommendations](#recommendations)
+2. [Formatting](#formatting)
+3. [Recommendations](#recommendations)
+4. [Rationale](#rationale)
 
 ## Naming Rules
 
@@ -121,6 +121,90 @@ private:
 
 } // namespace ImGuiX
 ```
+
+## Formatting
+
+### Indentation & Whitespace
+- Use 4 spaces; never use tabs.
+- Inside a `namespace`, indent all code by one level.
+- Soft line limit: 120 characters.
+
+### Braces
+- K&R style: opening brace remains on the same line.
+
+### Function Signatures (many parameters)
+- When a signature exceeds the line limit, break after `(` and place each parameter on its own line with double indentation (8 spaces).
+- Align the closing `) {` with a single indentation (4 spaces).
+
+### Class Declarations — Multiple Inheritance
+- Place `:` on the same line as the class name.
+- List each base class on a new line with double indentation (8 spaces), followed by a comma except for the last.
+- The opening `{` stays on the same line as the final base class.
+
+```cpp
+namespace ImGuiX {
+
+    class FontManager :
+        private FontManagerViewCRTP<FontManager>,
+        private FontManagerControlCRTP<FontManager> {
+    public:
+        // ...
+    };
+
+} // namespace ImGuiX
+```
+
+### Function Calls — Many Arguments & Ternary
+- When arguments need wrapping, break after `(` and place each argument on its own line with double indentation (8 spaces).
+- For arguments containing a ternary `?:`, break after `?` and before `:`; align both outcomes under the start of the ternary expression using the same double indentation.
+- Close with `)` aligned using a single indentation (4 spaces).
+
+**Good:**
+```cpp
+return ImGui::GetIO().Fonts->AddFontFromFileTTF(
+        resolved.c_str(), eff_px, &cfg, ranges.empty() ?
+            nullptr :
+            ranges.data()
+    );
+```
+
+**Also acceptable:**
+```cpp
+return ImGui::GetIO().Fonts->AddFontFromFileTTF(
+        resolved.c_str(),
+        eff_px,
+        &cfg,
+        ranges.empty() ?
+            nullptr :
+            ranges.data()
+    );
+```
+
+**Bad:**
+```cpp
+return ImGui::GetIO().Fonts->AddFontFromFileTTF(
+    resolved.c_str(), eff_px, &cfg, ranges.empty() ?
+        nullptr :
+        ranges.data()
+);
+```
+
+### Pointer/Reference Style
+- Attach the symbol to the type: `ImFont*`, `const Foo&`.
+
+### Doxygen
+- Use `///` comments in English with concise `@brief`, `@param`, `@return`, and `@note` tags.
+
+### Includes
+- Order: header of the current file, then library headers `<...>`, then external or project headers `"..."`.
+- Separate each group with a blank line.
+
+## Recommendations
+- Prefer early-return to reduce nesting.
+- Keep functions short and cohesive.
+- Avoid hidden global state; prefer explicit dependencies.
+- Use `enum class` for scoped enums.
+- Avoid macros in public APIs unless necessary for portability.
 
 ## Rationale
 - **ImGuiX (PascalCase)**:
