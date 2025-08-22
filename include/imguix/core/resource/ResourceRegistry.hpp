@@ -21,45 +21,41 @@
 namespace ImGuiX {
 
     /// \class ResourceRegistry
-    /// \brief Manages registration and access to shared resources in a threadsafe manner.
-    ///
-    /// The ResourceRegistry stores type-erased shared resources and allows
-    /// registration, retrieval, and cleanup. It ensures only one instance of each type
-    /// is created and supports both default and custom construction.
-    ///
-    /// Access to a resource in the middle of registration throws or returns nullopt.
+    /// \brief Manage registration and access to shared resources in a threadsafe manner.
+    /// \note Stores type-erased shared resources and ensures only one instance per type.
+    /// \note Access during registration throws or returns `nullopt`.
     class ResourceRegistry {
     public:
 
-        /// \brief Registers a resource using a custom creator function.
+        /// \brief Register a resource using a custom creator function.
         /// \tparam T Resource type.
-        /// \param creator Function that returns a shared_ptr to T.
-        /// \return true if the resource was registered, false if already exists.
+        /// \param creator Function returning `shared_ptr<T>`.
+        /// \return True if resource was registered, false if already exists.
         template <typename T>
         bool registerResource(std::function<std::shared_ptr<T>()> creator);
 
-        /// \brief Registers a resource using default constructor.
+        /// \brief Register a resource using default constructor.
         /// \tparam T Resource type.
-        /// \return true if the resource was registered, false if already exists.
+        /// \return True if resource was registered, false if already exists.
         template <typename T>
         bool registerResource();
 
-        /// \brief Retrieves a reference to a registered resource.
+        /// \brief Get reference to registered resource.
         /// \tparam T Resource type.
-        /// \return Reference to the resource.
+        /// \return Reference to resource.
         /// \throws std::runtime_error if not registered or still initializing.
         template <typename T>
         [[nodiscard]]
         T& getResource();
 
-        /// \brief Tries to get a reference to a registered resource.
+        /// \brief Try to get reference to a registered resource.
         /// \tparam T Resource type.
-        /// \return std::optional containing reference if available.
+        /// \return Optional reference if available.
         template <typename T>
         [[nodiscard]]
         std::optional<std::reference_wrapper<T>> tryGetResource();
 
-        /// \brief Clears all registered resources.
+        /// \brief Clear all registered resources.
         void clearAll();
 
     private:

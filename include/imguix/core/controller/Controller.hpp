@@ -10,9 +10,8 @@
 namespace ImGuiX {
 
     /// \brief Base class for controllers that attach to a window.
-    ///
-    /// Provides access to window-level context, including event bus and resources.
-    /// Override `drawContent()` and `drawUi()` to render content and interface.
+    /// \note Provides access to window-level context, including event bus and resources.
+    /// \note Override `drawContent()` and `drawUi()` to render content and interface.
     class Controller : public Pubsub::EventMediator {
     public:
         /// \brief Constructs a controller bound to a window.
@@ -59,8 +58,8 @@ namespace ImGuiX {
             return m_window;
         }
         
-        /// \brief
-        /// \return
+        /// \brief Get language store.
+        /// \return Language store.
         const ImGuiX::I18N::LangStore& langStore() const {
             return m_window.langStore();
         }

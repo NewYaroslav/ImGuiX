@@ -11,22 +11,19 @@
 namespace ImGuiX::Controllers {
 
     /// \brief Controller that provides convenient access to the Application instance.
-    ///
-    /// This controller offers helper methods to access the `Application` object
-    /// and create new windows within the application context.
+    /// \note Offers helper methods to access the `Application` object and create windows.
     class ApplicationController : public Controller {
     public:
         using Controller::Controller;
 
-        /// \brief Returns a reference to the owning Application instance.
-        ///
-        /// Internally casts the window's `ApplicationControl` to `Application`.
-        /// \return Reference to the `Application` object.
+        /// \brief Get owning Application instance.
+        /// \return Application reference.
+        /// \note Internally casts the window's `ApplicationControl` to `Application`.
         Application& application() {
             return static_cast<Application&>(window().application());
         }
 
-        /// \brief Creates and registers a new window instance of the specified type.
+        /// \brief Create and register a window of the specified type.
         /// \tparam WindowType Type derived from `WindowInstance`.
         /// \tparam Args Arguments forwarded to the constructor of the window.
         /// \return Reference to the created window.

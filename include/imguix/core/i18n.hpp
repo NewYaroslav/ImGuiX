@@ -3,15 +3,10 @@
 #define _IMGUIX_CORE_I18N_I18N_HPP_INCLUDED
 
 /// \file i18n.hpp
-/// \brief Central include for ImGuiX i18n (localization) components.
-///
-/// Public API:
-/// - ImGuiX::Utils::I18N::LangStore   — key/value strings, docs, plural forms, formatting
-/// - ImGuiX::Utils::I18N::PluralRules — basic pluralization helpers
-///
-/// Notes:
-/// - By default, LangStore looks for resources relative to the executable.
-/// - You can override default lookup roots via the macros below.
+/// \brief Central include for ImGuiX i18n components.
+/// \note Public API: ImGuiX::Utils::I18N::LangStore and ImGuiX::Utils::I18N::PluralRules.
+/// \note LangStore searches resources relative to the executable by default.
+/// \note Override lookup roots via the macros below.
 
 #include <string>
 #include <string_view>

@@ -26,10 +26,10 @@ namespace ImGuiX {
 
         virtual ~Model() = default;
 
-                /// \brief Optional initialization callback invoked once.
+        /// \brief Optional initialization callback invoked once.
         virtual void onInit() {}
 
-                /// \brief Called every frame by the application.
+        /// \brief Called every frame by the application.
         virtual void process() = 0;
 
         /// \brief Requests the application to close gracefully.
@@ -37,8 +37,8 @@ namespace ImGuiX {
             m_app.close();
         }
 
-        /// \brief Checks whether the application is shutting down.
-        /// \return true if the application is in the process of closing.
+        /// \brief Check whether the application is shutting down.
+        /// \return True if application is closing.
         virtual bool isClosing() const {
             return m_app.isClosing();
         }

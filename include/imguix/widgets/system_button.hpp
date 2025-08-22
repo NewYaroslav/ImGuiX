@@ -9,17 +9,17 @@
 #include <algorithm>
 #include <cmath>
 
-/// \brief Extent multiplier for system button icons (default = 0.25f).
+/// \brief Extent multiplier for system button icons (default 0.25f).
 #ifndef IMGUIX_SYSBTN_CROSS_EXTENT
 #define IMGUIX_SYSBTN_CROSS_EXTENT 0.25f
 #endif
 
-/// \brief Margin in pixels to keep from the button border (default = 1.0f).
+/// \brief Margin in pixels from button border (default 1.0f).
 #ifndef IMGUIX_SYSBTN_MARGIN
 #define IMGUIX_SYSBTN_MARGIN 1.0f
 #endif
 
-/// \brief толщина линий, px
+/// \brief Line thickness in pixels.
 #ifndef IMGUIX_SYSBTN_LINE_THICKNESS
 #define IMGUIX_SYSBTN_LINE_THICKNESS 1.0f
 #endif
@@ -33,14 +33,12 @@ namespace ImGuiX::Widgets {
         Maximize
     };
 
-    /// \brief Draws a system-style button with icon based on type (e.g., close, minimize, maximize).
-    ///
-    /// The button is visually highlighted on hover/active states using style colors.
-    ///
+    /// \brief Draw system-style button with icon based on type.
     /// \param id Unique ID string.
-    /// \param type Button type (close, minimize, maximize).
-    /// \param size Size of the button in pixels.
-    /// \return True if the button was clicked.
+    /// \param type Button type.
+    /// \param size Button size in pixels.
+    /// \return True if button was clicked.
+    /// \note Button is highlighted on hover or active using style colors.
     inline bool SystemButton(const char* id, SystemButtonType type, ImVec2 size) {
         ImVec2 pos = ImGui::GetCursorScreenPos();
         ImGui::InvisibleButton(id, size);

@@ -12,14 +12,12 @@
 namespace ImGuiX::Controllers {
 
     /// \brief Extended controller with convenient access to the Application instance.
-    ///
-    /// Provides utility methods such as `application()` and `createWindow()` 
-    /// that allow seamless interaction with the owning application.
+    /// \note Provides utility methods such as `application()` and `createWindow()`.
     class ExtendedController : public StrategicController {
     public:
         using StrategicController::StrategicController;
 
-        /// \brief Creates and registers a child controller.
+        /// \brief Create and register a child controller.
         /// \tparam ControllerType Controller type derived from Controller.
         /// \tparam Args Arguments passed to the controller constructor.
         /// \return Reference to the created controller.
@@ -34,23 +32,23 @@ namespace ImGuiX::Controllers {
             return ref;
         }
 
-        /// \brief Renders UI from all registered child controllers.
+        /// \brief Draw UI from all registered child controllers.
         void drawChildUi() {
             for (auto& c : m_children) c->drawUi();
         }
         
-        /// \brief Renders content from all registered child controllers.
+        /// \brief Draw content from all registered child controllers.
         void drawChildContent() {
             for (auto& c : m_children) c->drawContent();
         }
 
-        /// \brief Renders UI overlay (widgets, HUDs, debug).
+        /// \brief Render UI overlay (widgets, HUDs, debug).
         void drawUi() override {
             drawChildUi();
             drawStrategyUi();
         }
         
-        /// \brief Renders frame content (background, world, etc.).
+        /// \brief Render frame content (background, world, etc.).
         void drawContent() override {
             drawChildContent();
             drawStrategyContent();

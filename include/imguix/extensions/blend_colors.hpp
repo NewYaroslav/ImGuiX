@@ -9,13 +9,11 @@
 
 namespace ImGuiX::Extensions {
 
-    /// \brief Blends two colors using "source-over" alpha compositing.
-    ///
-    /// Result = foreground over background.
-    ///
-    /// \param fg Foreground color (will be blended over background).
+    /// \brief Blend two colors using source-over alpha compositing.
+    /// \param fg Foreground color.
     /// \param bg Background color.
-    /// \return Resulting ImVec4 color after blending.
+    /// \return Blended color.
+    /// \note Result equals foreground over background.
     inline ImVec4 BlendColors(const ImVec4& fg, const ImVec4& bg) {
         float a = fg.w + bg.w * (1.0f - fg.w);
         if (a <= 0.0f)

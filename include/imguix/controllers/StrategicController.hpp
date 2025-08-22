@@ -20,7 +20,7 @@ namespace ImGuiX::Controllers {
 
         virtual ~StrategicController() = default;
 
-        /// \brief Creates and registers a strategy controller under a given key.
+        /// \brief Create and register a strategy controller.
         /// \tparam Key Enum or indexable key type.
         /// \tparam ControllerType Controller type derived from Controller.
         /// \tparam Args Arguments passed to the controller constructor.
@@ -36,7 +36,9 @@ namespace ImGuiX::Controllers {
             return ref;
         }
 
-        /// \brief Selects the current active strategy by index or enum.
+        /// \brief Select active strategy by index or enum.
+        /// \tparam EnumOrIndex Enum or index type.
+        /// \param index Strategy key.
         template <typename EnumOrIndex>
         void selectStrategy(EnumOrIndex index) {
             m_strategy_key = static_cast<std::size_t>(index);
@@ -56,18 +58,14 @@ namespace ImGuiX::Controllers {
             }
         }
 
-        /// \brief Draws content using the active strategy.
-        ///
-        /// Calls \ref drawStrategyContent to forward rendering to the currently
-        /// selected strategy.
+        /// \brief Draw content using the active strategy.
+        /// \note Forwards rendering to \ref drawStrategyContent.
         void drawContent() override {
             drawStrategyContent();
         }
 
-        /// \brief Draws UI using the active strategy.
-        ///
-        /// Calls \ref drawStrategyUi to display widgets from the selected
-        /// strategy controller.
+        /// \brief Draw UI using the active strategy.
+        /// \note Forwards rendering to \ref drawStrategyUi.
         void drawUi() override {
             drawStrategyUi();
         }

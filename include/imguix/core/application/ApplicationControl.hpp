@@ -8,15 +8,8 @@
 namespace ImGuiX {
 
     /// \brief Interface for application-level control and global services.
-    ///
-    /// This interface allows window instances, controllers, and components
-    /// to interact with core application functionality without tight coupling.
-    ///
-    /// It provides access to:
-    /// - Closing application
-    /// - Application name
-    /// - Global event bus
-    /// - Shared resource registry
+    /// \note Allows components to interact with core application functionality without tight coupling.
+    /// \note Provides access to closing application, application name, event bus, and resource registry.
     class ApplicationControl {
     public:
         virtual ~ApplicationControl() = default;
@@ -24,8 +17,8 @@ namespace ImGuiX {
         /// \brief Requests the application to close gracefully.
         virtual void close() = 0;
 
-        /// \brief Checks whether the application is shutting down.
-        /// \return true if the application is in the process of closing.
+        /// \brief Check whether the application is shutting down.
+        /// \return True if application is closing.
         virtual bool isClosing() const = 0;
 
         /// \brief Returns the name of the application, if defined.

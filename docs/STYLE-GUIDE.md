@@ -187,7 +187,7 @@ return ImGui::GetIO().Fonts->AddFontFromFileTTF(
 - Attach the symbol to the type: `ImFont*`, `const Foo&`.
 
 ### Doxygen
-- Use `///` comments in English with concise `@brief`, `@param`, `@return`, and `@note` tags.
+- Use `///` comments with backslash tags (`\brief`, `\param`, `\return`, `\note`).
 
 ### Includes
 - Order: header of the current file, then library headers `<...>`, then external or project headers `"..."`.

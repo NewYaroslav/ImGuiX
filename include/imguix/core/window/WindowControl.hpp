@@ -74,15 +74,17 @@ namespace ImGuiX {
         /// \brief Toggles between maximized and restored states.
         virtual void toggleMaximizeRestore() = 0;
 
-        /// \brief Sets whether the window is active (focused).
-        /// \return True if the operation succeeded.
+        /// \brief Set whether the window is active.
+        /// \param active True to activate window.
+        /// \return True if operation succeeded.
         virtual bool setActive(bool active) = 0;
 
         /// \brief Returns true if the window is currently active (focused).
         /// \return True when active.
         virtual bool isActive() const = 0;
 
-        /// \brief Sets whether the window is visible.
+        /// \brief Set whether the window is visible.
+        /// \param visible True to show window.
         virtual void setVisible(bool visible) = 0;
 
         /// \brief Returns true if the window is currently open.
@@ -113,8 +115,8 @@ namespace ImGuiX {
         virtual sf::RenderWindow& getRenderTarget() = 0;
 #       endif
 
-        /// \brief
-        /// \return
+        /// \brief Get language store.
+        /// \return Language store.
         virtual const ImGuiX::I18N::LangStore& langStore() const = 0;
 
     };

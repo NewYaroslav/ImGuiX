@@ -30,7 +30,7 @@ namespace ImGuiX::Utils {
         inline constexpr bool dependent_false_v = false;
     }
 
-    /// \brief Return full path to the current executable.
+    /// \brief Get full path to current executable.
     /// \tparam Dummy Dummy template parameter for SFINAE.
     /// \return Executable path.
     /// \throws std::runtime_error on failure.
@@ -74,7 +74,7 @@ namespace ImGuiX::Utils {
 #endif
     }
 
-    /// \brief Return directory of the executable.
+    /// \brief Get directory of executable.
     /// \tparam Dummy Dummy template parameter for SFINAE.
     /// \return Directory path.
     /// \throws std::runtime_error if getExecPath fails.
@@ -89,10 +89,10 @@ namespace ImGuiX::Utils {
 #endif
     }
 
-    /// \brief Resolve relative path to absolute using executable directory.
+    /// \brief Resolve relative path against executable directory.
     /// \tparam Dummy Dummy template parameter for SFINAE.
-    /// \param relative_path Relative path from executable directory.
-    /// \return Absolute path string.
+    /// \param relative_path Path relative to executable directory.
+    /// \return Absolute path.
     template<typename Dummy = void>
     std::string resolveExecPath(const std::string& relative_path) {
 #ifdef __EMSCRIPTEN__
@@ -103,7 +103,7 @@ namespace ImGuiX::Utils {
 #endif
     }
 
-    /// \brief Extract filename from full path.
+    /// \brief Extract filename from path.
     /// \tparam Dummy Dummy template parameter for SFINAE.
     /// \param full_path Full path to file.
     /// \return Filename component.
@@ -117,11 +117,11 @@ namespace ImGuiX::Utils {
 #endif
     }
 
-    /// \brief Compute relative path from base to target.
+    /// \brief Compute path relative to base.
     /// \tparam Dummy Dummy template parameter for SFINAE.
     /// \param file_path Target file path.
     /// \param base_path Base directory path.
-    /// \return Relative path string.
+    /// \return Relative path.
     template<typename Dummy = void>
     std::string makeRelative(const std::string& file_path, const std::string& base_path) {
 #ifdef __EMSCRIPTEN__
@@ -159,12 +159,17 @@ namespace ImGuiX::Utils {
 #endif
     }
 
-    /// \brief
+    /// \brief Check if path is absolute.
+    /// \param p Path to check.
+    /// \return True if path is absolute.
     inline bool isAbsolutePath(const std::string& p) {
         return fs::u8path(p).is_absolute();
     }
 
-    /// \brief
+    /// \brief Join two paths.
+    /// \param a First path.
+    /// \param b Second path.
+    /// \return Joined path.
     inline std::string joinPaths(const std::string& a, const std::string& b) {
         return (fs::u8path(a) / fs::u8path(b)).lexically_normal().u8string();
     }
