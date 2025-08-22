@@ -16,6 +16,9 @@
 * [14. Reference Index](#14-reference-index)
 * [15. Branching & Release Policy](#15-branching--release-policy)
 * [16. Documentation / Doxygen Style Guide](#16-documentation--doxygen-style-guide)
+* [17. C++ Code Formatting](#17-c-code-formatting)
+* [18. C++ Naming Conventions](#18-c-naming-conventions)
+* [19. C++ Code Recommendations](#19-c-code-recommendations)
 
 ## 1. Mission & Scope
 
@@ -506,3 +509,70 @@ uint64_t hash(const T& data);
 
 ### Compliance
 If future style conflicts arise, this section takes precedence over legacy comments.
+
+## 17. C++ Code Formatting
+
+### Indentation & Whitespace
+* Use 4 spaces; never use tabs.
+* Indent all code within a `namespace` by one level.
+* Soft line limit of 120 characters.
+
+### Braces
+* K&R style – opening brace on the same line.
+
+### Function Signatures (many parameters)
+* If a function signature exceeds the line limit, break after `(`.
+* Place each parameter on its own line with double indentation (8 spaces).
+* Align the closing `) {` with a single indentation (4 spaces).
+
+### Class Declarations — Multiple Inheritance
+* Keep `:` on the line with the class name.
+* List each base class on a new line with double indentation (8 spaces) and trailing commas except the last.
+* `{` remains on the same line as the last base class.
+
+```cpp
+namespace ImGuiX {
+
+    class FontManager :
+        private FontManagerViewCRTP<FontManager>,
+        private FontManagerControlCRTP<FontManager> {
+    public:
+        // ...
+    };
+
+} // namespace ImGuiX
+```
+
+### Function Calls — Many Arguments & Ternary
+* When wrapping, break after `(` and put each argument on its own line with double indentation (8 spaces).
+* For ternary expressions inside arguments, break after `?` and before `:`; align both outcomes with the start of the ternary expression using the same double indentation.
+* Close with `)` aligned using a single indentation (4 spaces).
+
+### Pointer/Reference Style
+* Bind the symbol to the type: `ImFont*`, `const Foo&`.
+
+### Doxygen
+* Use `///` comments in English with concise `@brief`, `@param`, `@return`, and `@note` tags.
+
+### Includes
+* Order includes as: header of the current file, then standard library headers `<...>`, then external or project headers `"..."`.
+* Separate these groups with a blank line.
+
+## 18. C++ Naming Conventions
+
+* Namespaces and types: PascalCase.
+* Methods and member functions: camelCase.
+* Variables and parameters: snake_case.
+  * Private members prefixed with `m_`.
+  * Booleans start with `is`, `has`, `use`, or `enable`; private booleans use `m_is_`, `m_has_`, etc.
+* Constants: `kPascalCase` or `UPPER_CASE` (prefer `kPascalCase` for `constexpr`).
+* Events: PascalCase with the `Event` suffix.
+* Header guards follow `_PROJECT_MODULE_FILENAME_HPP_INCLUDED`.
+
+## 19. C++ Code Recommendations
+
+* Prefer early-return to reduce nesting.
+* Keep functions short and cohesive.
+* Avoid hidden global state; favor explicit dependencies.
+* Use `enum class` for scoped enums.
+* Avoid macros in public APIs unless required for portability.
