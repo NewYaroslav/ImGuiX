@@ -5,6 +5,7 @@ An object-oriented wrapper around [Dear ImGui](https://github.com/ocornut/imgui)
 > **Note:** ImGuiX uses an *MVC-like* architecture. See [Architecture](#architecture) for details.
 
 ## Table of Contents
+
 - [Quick Start](#quick-start)
 - [Features](#features)
 - [SDK Installation](#sdk-installation)
