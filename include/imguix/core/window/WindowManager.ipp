@@ -38,7 +38,10 @@ namespace ImGuiX {
 
     void WindowManager::initializePending() {
         for (auto* window : m_pending_init) {
-            if (window) window->onInit();
+			if (!window) continue;
+			window->fontsStartInit();
+            window->onInit();
+			window->buildFonts();
         }
         m_pending_init.clear();
     }
@@ -181,11 +184,7 @@ namespace ImGuiX {
         return nullptr;
     }
 
-    void WindowManager::shutdown() {
-#       ifdef IMGUIX_USE_SFML_BACKEND
-        //ImGui::SFML::Shutdown();
-#       endif
-    }
+    void WindowManager::shutdown() {}
 
 } // namespace ImGuiX
 

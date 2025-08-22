@@ -134,6 +134,10 @@ namespace ImGuiX {
 
         /// \brief Returns true if the window is open.
         bool isOpen() const override;
+        
+        /// \brief Makes the window context current for rendering.
+        /// Call only between frames before ImGui::NewFrame().
+        virtual void setCurrentWindow();
 
         /// \brief Access to the global event bus.
         Pubsub::EventBus& eventBus() override;
@@ -148,38 +152,85 @@ namespace ImGuiX {
         sf::RenderWindow& getRenderTarget() override;
 #       endif
 
+        // --- Lang and Fonts ---
+
         /// \brief
         /// \return
-        const ImGuiX::Utils::I18N::LangStore& langStore() const override;
+        const ImGuiX::I18N::LangStore& langStore() const override;
+        
+        ImGuiX::Fonts::FontManager::View& fontsView() noexcept { return m_font_manager.view(); }
+        
+        ImGuiX::Fonts::FontManager::Control& fontsControl() noexcept { return m_font_manager.control(); }
 
-        /// \brief Makes the window context current for rendering.
-        /// Call only between frames before ImGui::NewFrame().
-        virtual void setCurrentWindow();
+        // ---
 
         /// \brief Computes the file path for storing ImGui ini settings.
         /// \return Absolute path to the ini file.
+        /// (для внутреннего использования)
         std::string iniPath() const;
 
         /// \brief Prepares ImGui to use the window-specific ini file.
+        /// (для внутреннего использования)
         void initIni();
 
         /// \brief Loads ImGui settings from the ini file if not already loaded.
+        /// (для внутреннего использования)
         void loadIni();
 
         /// \brief Saves ImGui ini settings to disk.
+        /// (для внутреннего использования)
         void saveIniNow();
         
-        void requestLanguageChange(const std::string& lang) {
-            if (!lang.empty()) m_pending_lang = lang;
-        }
+        /// \brief
+        void requestLanguageChange(const std::string& lang);
         
-        void applyPendingLanguageChange() {
-            if (m_pending_lang.empty()) return;
-            setCurrentWindow();                        // активировать контекст окна
-            onBeforeLanguageApply(m_pending_lang);     // виртуальный хук (пересборка шрифтов и т.п.)
-            m_lang_store.set_language(m_pending_lang); // фактическая смена языка
-            m_pending_lang.clear();
-        }
+        /// \brief 
+        /// (для внутреннего использования)
+        void applyPendingLanguageChange();
+        
+        /// \brief 
+        /// (для внутреннего использования)
+        void fontsStartInit();
+
+        /// \brief
+        /// (для внутреннего использования)
+        void buildFonts();
+
+    protected:
+
+        // --- onInit-фаза: ручная сборка атласа ---
+
+        /// \brief
+        void fontsBeginManual();
+		
+		void fontsSetLocale(std::string locale);
+		
+		void fontsSetRangesPreset(std::string preset);                    // обёртка на setRanges(std::string)
+
+		void fontsSetRangesExplicit(const std::vector<ImWchar>& pairs);   // обёртка на setRanges(vector)
+		
+		void fontsClearRanges();                                          // обёртка на clearRanges()
+
+        /// \brief
+        /// \param
+        void fontsAddBody(const ImGuiX::Fonts::FontFile& ff);
+
+        /// \brief
+        /// \param
+        /// \param
+        void fontsAddHeadline(ImGuiX::Fonts::FontRole role, const ImGuiX::Fonts::FontFile& ff);
+
+        /// \brief
+        /// \param
+        /// \param
+        void fontsAddMerge(ImGuiX::Fonts::FontRole role, const ImGuiX::Fonts::FontFile& ff);
+        
+        /// \brief
+        /// \param
+        void fontsAddMerge(const ImGuiX::Fonts::FontFile& ff);
+        
+        /// \brief
+        bool fontsBuildNow();
 
     protected:
 #       ifdef IMGUIX_USE_SFML_BACKEND
@@ -209,9 +260,14 @@ namespace ImGuiX {
         bool m_is_ini_once = false;         ///< Ensures imgui ini is saved only once.
         bool m_is_ini_loaded = false;       ///< Indicates whether ini settings have been loaded.
     
-        ImGuiX::Utils::I18N::LangStore m_lang_store{}; ///< 
-        std::string                    m_pending_lang; ///< 
-    
+        bool m_is_fonts_manual = false;     ///< 
+        bool m_in_init_phase = false;       ///< охранник фазы
+        bool m_is_fonts_init = false;       ///< 
+        ImGuiX::Fonts::FontManager m_font_manager; ///< 
+        ImGuiX::I18N::LangStore    m_lang_store{}; ///< 
+        std::string                m_pending_lang; ///< 
+
+
         /// \brief Requests the window to switch its UI language.
         /// \param lang Language code to apply.
         virtual void onBeforeLanguageApply(const std::string& /*lang*/) {};

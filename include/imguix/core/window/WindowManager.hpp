@@ -93,7 +93,7 @@ namespace ImGuiX {
         ApplicationControl&          m_application;                  ///< Reference to the owning application.
         std::deque<Events::LangChangeEvent> m_lang_events;           ///< Queued language change events.
         int                          m_ini_save_frame_counter{0};    ///< Frame counter for ini saving.
-        static constexpr int m_ini_save_interval{300};               ///< Frames between ini saves.
+        static constexpr int         m_ini_save_interval{300};       ///< Frames between ini saves.
 
         /// \brief Shortcut to the application resource registry.
         /// \return Reference to the ResourceRegistry owned by the application.

@@ -36,7 +36,7 @@
 
 // --- Locale and Fonts ---
 #include "core/i18n.hpp"                           ///<
-//#include "core/fonts/FontManager.hpp"              ///< FontManager: централизованная загрузка шрифтов (atlas ImGui + FreeType).
+#include "core/fonts/FontManager.hpp"              ///< FontManager: централизованная загрузка шрифтов (atlas ImGui + FreeType).
 
 // --- Resource system ---
 #include "core/resource/ResourceRegistry.hpp"      ///< Global registry for shared resources

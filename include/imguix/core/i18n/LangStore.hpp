@@ -26,7 +26,7 @@
 /// - Not thread-safe by design; guard externally if needed.
 /// - All caches are invalidated on language switch.
 
-namespace ImGuiX::Utils::I18N {
+namespace ImGuiX::I18N {
 
     namespace fs = std::filesystem;
 
@@ -34,18 +34,17 @@ namespace ImGuiX::Utils::I18N {
     public:
 
         LangStore()
-            : LangStore(default_i18n_base_dir(), "en")
-        {}
+            : LangStore(default_i18n_base_dir(), "en") {
+		}
 
         /// \brief Construct i18n store.
         /// \param base_dir Root folder with per-language subfolders (e.g., "<root>/en/", "<root>/ru/").
         /// \param default_lang Default language (fallback), typically "en".
         explicit LangStore(std::string base_dir, std::string default_lang = "en")
-            : m_base_dir(std::move(base_dir))
-            , m_default_lang(std::move(default_lang))
-            , m_current_lang(m_default_lang)
-            , m_plural_rules(std::make_unique<PluralRules>()) // always present; has built-ins
-        {
+            : m_base_dir(std::move(base_dir)),
+              m_default_lang(std::move(default_lang)),
+              m_current_lang(m_default_lang),
+              m_plural_rules(std::make_unique<PluralRules>()) { // always present; has built-ins
             // Load fallback language (default) once.
             m_en_map = load_language_map(m_default_lang);
             m_current_map = &m_en_map;
@@ -388,6 +387,6 @@ namespace ImGuiX::Utils::I18N {
         }
     };
 
-} // namespace ImGuiX::Utils::I18N
+} // namespace ImGuiX::I18N
 
 #endif // _IMGUIX_UTILS_I18N_LANG_STORE_HPP_INCLUDED

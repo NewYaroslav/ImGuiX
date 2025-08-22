@@ -13,5 +13,6 @@
 #include "events/ApplicationExitEvent.hpp"
 #include "events/WindowClosedEvent.hpp"
 #include "events/LangChangeEvent.hpp"
+#include "events/LogEvent.hpp"
 
 #endif // _IMGUIX_CORE_EVENTS_EVENTS_HPP_INCLUDED

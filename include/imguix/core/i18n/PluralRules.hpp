@@ -6,7 +6,7 @@
 /// \brief Pluggable plural rules: built-in fallback (en/ru) + JSON file loader.
 /// JSON format (see docs): per-language "cardinal" array of rules with conditions.
 
-namespace ImGuiX::Utils::I18N {
+namespace ImGuiX::I18N {
 
     namespace fs = std::filesystem;
 
@@ -159,6 +159,6 @@ namespace ImGuiX::Utils::I18N {
         }
     };
 
-} // namespace ImGuiX::Utils::I18N
+} // namespace ImGuiX::I18N
 
 #endif // _IMGUIX_UTILS_I18N_PLURAL_RULES_HPP_INCLUDED

@@ -71,7 +71,7 @@ namespace ImGuiX {
     }
 #   endif
 
-    const ImGuiX::Utils::I18N::LangStore& WindowInstance::langStore() const {
+    const ImGuiX::I18N::LangStore& WindowInstance::langStore() const {
         return m_lang_store;
     }
 
@@ -135,5 +135,94 @@ namespace ImGuiX {
         ImGui::SaveIniSettingsToDisk(m_ini_path.c_str());
 #   endif
         ImGui::GetIO().WantSaveIniSettings = false;
+    }
+    
+    void WindowInstance::requestLanguageChange(const std::string& lang) {
+        if (!lang.empty()) m_pending_lang = lang;
+    }
+    
+    void WindowInstance::applyPendingLanguageChange() {
+        if (m_pending_lang.empty()) return;
+        setCurrentWindow();                        // активировать контекст окна
+        onBeforeLanguageApply(m_pending_lang);     // виртуальный хук (пересборка шрифтов и т.п.)
+        m_lang_store.set_language(m_pending_lang); // фактическая смена языка
+        m_font_manager.rebuildIfNeeded();
+        m_pending_lang.clear();
+    }
+    
+    // ---
+    
+    void WindowInstance::fontsStartInit() {
+        m_in_init_phase = true;
+    }
+
+    void WindowInstance::fontsBeginManual() {
+        assert(m_in_init_phase && !m_is_fonts_init && "fontsBeginManual() only allowed in onInit(), before initFonts()");
+        m_font_manager.beginManual();
+        m_is_fonts_manual = true;
+    }
+	
+	void WindowInstance::fontsSetLocale(std::string locale) {
+		if (locale == m_font_manager.activeLocale()) {
+			return;
+		}
+		m_font_manager.setLocale(std::move(locale));
+	}
+	
+	void WindowInstance::fontsSetRangesPreset(std::string preset) {
+		assert(m_in_init_phase && "fontsSetRangesPreset() только в onInit()");
+		m_font_manager.setRanges(std::move(preset));
+	}
+
+	void WindowInstance::fontsSetRangesExplicit(const std::vector<ImWchar>& pairs) {
+		assert(m_in_init_phase && "fontsSetRangesExplicit() только в onInit()");
+		m_font_manager.setRanges(pairs);
+	}
+
+	void WindowInstance::fontsClearRanges() {
+		assert(m_in_init_phase && "fontsClearRanges() только в onInit()");
+		m_font_manager.clearRanges();
+	}
+
+    void WindowInstance::fontsAddBody(const ImGuiX::Fonts::FontFile& ff) {
+        assert(m_in_init_phase && "Only allowed in onInit()");
+        m_font_manager.addFontBody(ff);
+    }
+
+    void WindowInstance::fontsAddHeadline(ImGuiX::Fonts::FontRole role, const ImGuiX::Fonts::FontFile& ff) {
+        assert(m_in_init_phase && "Only allowed in onInit()");
+        m_font_manager.addFontHeadline(role, ff);
+    }
+
+    void WindowInstance::fontsAddMerge(ImGuiX::Fonts::FontRole role, const ImGuiX::Fonts::FontFile& ff) {
+        assert(m_in_init_phase && "Only allowed in onInit()");
+        m_font_manager.addFontMerge(role, ff);
+    }
+
+    void WindowInstance::fontsAddMerge(const ImGuiX::Fonts::FontFile& ff) {
+        assert(m_in_init_phase && "Only allowed in onInit()");
+        m_font_manager.addFontMerge(ff);
+    }
+
+    bool WindowInstance::fontsBuildNow() {
+        assert(m_in_init_phase && "Only allowed in onInit()");
+        auto br = m_font_manager.buildNow();
+        if (br.success) m_is_fonts_init = true;
+        if (!br.success) {
+            notify(IMGUIX_LOG_EVENT(ImGuiX::Events::LogLevel::Error, "Font init failed: {}"));
+        }
+        return br.success;
+    }
+
+    void WindowInstance::buildFonts() {
+        m_in_init_phase = false;
+        if (m_is_fonts_init) return;
+        if (m_is_fonts_manual) return;
+        
+        auto br = m_font_manager.initFromJsonOrDefaults();
+        m_is_fonts_init = br.success;
+        if (!br.success) {
+            notify(IMGUIX_LOG_EVENT(ImGuiX::Events::LogLevel::Error, "Font init failed: {}"));
+        }
     }
 }

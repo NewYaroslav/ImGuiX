@@ -1,7 +1,7 @@
 #include <iostream>
 #include <imguix/core.hpp>
 
-namespace i18n = ImGuiX::Utils::I18N;
+namespace i18n = ImGuiX::I18N;
 
 // Простая отрисовка многострочного текста по ключу (с фолбэком)
 // Показываем заголовок (локализованный short-string) и содержимое .md
@@ -175,7 +175,13 @@ public:
         createController<I18nController>();
         create(id() == 0 ? 800 : 640, id() == 0 ? 600 : 480);
         setWindowIcon("data/resources/icons/icon.png");
-        LoadFonts(18.0f);
+		fontsBeginManual();
+		//fontsSetLocale("ru");
+		fontsSetRangesPreset("Default+Cyrillic+Vietnamese+Punct");
+		fontsAddBody({ "Roboto-Medium.ttf", 18.0f });
+		fontsAddMerge(ImGuiX::Fonts::FontRole::Icons, { "forkawesome-webfont.ttf", 18.0f, true });
+		fontsAddHeadline(ImGuiX::Fonts::FontRole::H1, { "Roboto-Bold.ttf", 24.0f });
+		fontsBuildNow();
     }
 
 private:

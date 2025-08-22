@@ -49,7 +49,7 @@ namespace ImGuiX {
         
         /// \brief
         /// \return
-        const ImGuiX::Utils::I18N::LangStore& langStore() const {
+        const ImGuiX::I18N::LangStore& langStore() const {
             return m_window.langStore();
         }
 

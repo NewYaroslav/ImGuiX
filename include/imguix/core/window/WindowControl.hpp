@@ -105,7 +105,7 @@ namespace ImGuiX {
 
         /// \brief
         /// \return
-        virtual const ImGuiX::Utils::I18N::LangStore& langStore() const = 0;
+        virtual const ImGuiX::I18N::LangStore& langStore() const = 0;
 
     };
 
