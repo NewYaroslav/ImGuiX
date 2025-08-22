@@ -63,7 +63,7 @@ private:
 /// \brief Controller that draws a button in ImGui and a circle using SFML.
 class DemoController : public ImGuiX::Controller {
 public:
-    DemoController(ImGuiX::WindowControl& window, ImGuiX::Application& app)
+    DemoController(ImGuiX::WindowInterface& window, ImGuiX::Application& app)
         : Controller(window), m_app(app) {
         subscribe<SecondsElapsedEvent>();
     }

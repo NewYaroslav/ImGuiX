@@ -69,7 +69,7 @@ namespace ImGuiX {
         m_window.display();
     }
     
-// --- WindowControl interface ---
+// --- WindowInterface interface ---
 
     void WindowInstance::setSize(int w, int h) {
         m_width = w;

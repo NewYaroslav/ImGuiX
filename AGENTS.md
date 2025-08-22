@@ -288,7 +288,7 @@ Format: `type(scope): short description` where the scope is optional. Keep messa
 | -------------- | ------------------------------------------------- |
 | Application    | WindowManager, EventBus, ResourceRegistry, Models |
 | WindowInstance | ApplicationControl, EventBus, Controllers         |
-| Controller     | WindowControl, EventBus, ResourceRegistry         |
+| Controller     | WindowInterface, EventBus, ResourceRegistry       |
 | Model          | ApplicationControl, EventBus, ResourceRegistry    |
 
 ### Glossary

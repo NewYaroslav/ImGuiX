@@ -1,8 +1,8 @@
 #pragma once
-#ifndef _IMGUIX_CORE_WINDOW_CONTROL_HPP_INCLUDED
-#define _IMGUIX_CORE_WINDOW_CONTROL_HPP_INCLUDED
+#ifndef _IMGUIX_CORE_WINDOW_INTERFACE_HPP_INCLUDED
+#define _IMGUIX_CORE_WINDOW_INTERFACE_HPP_INCLUDED
 
-/// \file WindowControl.hpp
+/// \file WindowInterface.hpp
 /// \brief Interface for controlling and querying a single window instance.
 
 #ifdef IMGUIX_USE_SFML_BACKEND
@@ -20,9 +20,9 @@ namespace ImGuiX {
     /// - Geometry (size, visibility, active state)
     /// - Window state (open, minimized, maximized)
     /// - Global services (event bus, resource registry)
-    class WindowControl {
+    class WindowInterface {
     public:
-        virtual ~WindowControl() = default;
+        virtual ~WindowInterface() = default;
 
         /// \brief Returns unique window ID.
         /// \return Window identifier.
@@ -123,4 +123,4 @@ namespace ImGuiX {
 
 } // namespace ImGuiX
 
-#endif // _IMGUIX_CORE_WINDOW_CONTROL_HPP_INCLUDED
+#endif // _IMGUIX_CORE_WINDOW_INTERFACE_HPP_INCLUDED

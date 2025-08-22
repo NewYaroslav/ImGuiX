@@ -29,13 +29,15 @@ namespace ImGuiX {
         static_assert(std::is_base_of<Controller, ControllerType>::value,
                       "ControllerType must derive from Controller");
 
-        auto ctrl = std::make_unique<ControllerType>(*this, std::forward<Args>(args)...);
+        auto ctrl = std::make_unique<ControllerType>(
+            static_cast<WindowInterface&>(*this),
+            std::forward<Args>(args)...);
         ControllerType& ref = *ctrl;
         m_controllers.push_back(std::move(ctrl));
         return ref;
     }
 
-// --- WindowControl interface ---
+// --- WindowInterface interface ---
 
     int WindowInstance::id() const {
         return m_window_id;
