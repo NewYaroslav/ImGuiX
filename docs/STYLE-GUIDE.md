@@ -155,20 +155,23 @@ namespace ImGuiX {
 ```
 
 ### Function Calls — Many Arguments & Ternary
-- When arguments need wrapping, break after `(` and place each argument on its own line with double indentation (8 spaces).
-- For arguments containing a ternary `?:`, break after `?` and before `:`; align both outcomes under the start of the ternary expression using the same double indentation.
-- Close with `)` aligned using a single indentation (4 spaces).
+- Break after `(` and put each argument on its own line with double indentation (8 spaces).
+- If an argument uses a ternary `?:`, break after `?` and before `:`; align both outcomes under the start of the ternary using the same double indentation.
+- Place the final `)` on its own line aligned with the call line, then `);`.
 
 **Good:**
 ```cpp
 return ImGui::GetIO().Fonts->AddFontFromFileTTF(
-        resolved.c_str(), eff_px, &cfg, ranges.empty() ?
+        resolved.c_str(),
+        eff_px,
+        &cfg,
+        ranges.empty() ?
             nullptr :
             ranges.data()
-    );
+);
 ```
 
-**Also acceptable:**
+**Bad (closing paren indented like arguments):**
 ```cpp
 return ImGui::GetIO().Fonts->AddFontFromFileTTF(
         resolved.c_str(),
@@ -178,15 +181,6 @@ return ImGui::GetIO().Fonts->AddFontFromFileTTF(
             nullptr :
             ranges.data()
     );
-```
-
-**Bad:**
-```cpp
-return ImGui::GetIO().Fonts->AddFontFromFileTTF(
-    resolved.c_str(), eff_px, &cfg, ranges.empty() ?
-        nullptr :
-        ranges.data()
-);
 ```
 
 ### Pointer/Reference Style
