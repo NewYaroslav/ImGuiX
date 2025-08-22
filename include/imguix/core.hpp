@@ -21,7 +21,7 @@
 #include <imgui_impl_sdl2.h>
 #include <imgui_impl_opengl3.h>
 #else
-// Без бэкенда
+// No backend specified
 #endif
 
 #ifdef IMGUI_ENABLE_FREETYPE
@@ -35,8 +35,8 @@
 #include "core/events.hpp"                         ///< Common built-in events
 
 // --- Locale and Fonts ---
-#include "core/i18n.hpp"                           ///<
-#include "core/fonts/FontManager.hpp"              ///< FontManager: централизованная загрузка шрифтов (atlas ImGui + FreeType).
+#include "core/i18n.hpp"                           ///< Localization utilities
+#include "core/fonts/FontManager.hpp"              ///< FontManager: centralized font loading (ImGui atlas + FreeType)
 
 // --- Resource system ---
 #include "core/resource/ResourceRegistry.hpp"      ///< Global registry for shared resources

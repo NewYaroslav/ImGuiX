@@ -31,11 +31,11 @@ namespace ImGuiX::Fonts {
 
 	/// \brief Per-locale font pack: files grouped by role + final glyph ranges.
 	struct LocalePack {
-		std::string locale; ///< e.g., "default", "en", "ru", "ja"
-		std::unordered_map<FontRole, std::vector<FontFile>> roles; ///<
-		std::vector<ImWchar> ranges;  ///< Final glyph ranges (0-terminated pairs). If empty, manager will build defaults.
-		std::string inherits;         ///< Optional inheritance tag (resolved by loader), empty if none.
-		std::string ranges_preset;    ///<
+                std::string locale; ///< e.g., "default", "en", "ru", "ja"
+                std::unordered_map<FontRole, std::vector<FontFile>> roles; ///< Font files grouped by logical role
+                std::vector<ImWchar> ranges;  ///< Final glyph ranges (0-terminated pairs). If empty, manager builds defaults.
+                std::string inherits;         ///< Optional inheritance tag (resolved by loader), empty if none.
+                std::string ranges_preset;    ///< Optional named range preset
 	};
 
 	/// \brief Parameters that affect atlas build and scaling.
