@@ -41,7 +41,7 @@ namespace ImGuiX::Fonts {
     public:
         using View    = FontManagerViewCRTP<FontManager>;
         using Control = FontManagerControlCRTP<FontManager>;
-    
+
         /// \brief Set base directory for relative font paths (affects both JSON and
         /// manual mode).
         void setBaseDir(std::string base_dir);
@@ -55,24 +55,24 @@ namespace ImGuiX::Fonts {
         /// \brief Initialize manager with build parameters. Does not build
         /// immediately.
         /// \return true if parameters accepted.
-        bool bootstrap(const BuildParams &params);
+        bool bootstrap(const BuildParams& params);
 
         /// \brief Set JSON config path. Default: "data/resources/fonts/fonts.json";.
         void setConfigPath(std::string path);
 
         /// \brief Set active locale. May mark atlas dirty if ranges/fonts differ.
         void setLocale(std::string locale);
-		
-                /// \brief Set glyph ranges by preset (e.g., "Default+Cyrillic+Punct").
-                /// \details Manual mode only. Clears explicit ranges().
-                void setRanges(std::string preset);
 
-                /// \brief Set glyph ranges with explicit [start,end] pairs. Terminator 0 optional.
-                /// \details Manual mode only. Clears preset string.
-                void setRanges(const std::vector<ImWchar>& pairs);
+        /// \brief Set glyph ranges by preset (e.g., "Default+Cyrillic+Punct").
+        /// \details Manual mode only. Clears explicit ranges().
+        void setRanges(std::string preset);
 
-                /// \brief Clear manual ranges (preset or explicit). Locale policy will be used.
-                void clearRanges();
+        /// \brief Set glyph ranges with explicit [start,end] pairs. Terminator 0 optional.
+        /// \details Manual mode only. Clears preset string.
+        void setRanges(const std::vector<ImWchar>& pairs);
+
+        /// \brief Clear manual ranges (preset or explicit). Locale policy will be used.
+        void clearRanges();
 
         /// \brief Set Markdown headline sizes (px @ 96 DPI). Body is the base text
         /// size.
@@ -80,7 +80,7 @@ namespace ImGuiX::Fonts {
 
         /// \brief Provide/override a locale pack programmatically (used without JSON
         /// or to extend it).
-        void setLocalePack(const LocalePack &pack);
+        void setLocalePack(const LocalePack& pack);
 
         /// \brief Drop all registered packs.
         void clearPacks();
@@ -95,23 +95,23 @@ namespace ImGuiX::Fonts {
         /// build time.
         /// \note This only enqueues; actual AddFont happens inside
         /// buildNow()/rebuildIfNeeded().
-        void addFontBody(const FontFile &ff);
+        void addFontBody(const FontFile& ff);
 
         /// \brief Add headline font for H1/H2/H3. If path empty, Body TTF is reused
         /// at another size.
-        void addFontHeadline(FontRole role_h, const FontFile &ff);
+        void addFontHeadline(FontRole role_h, const FontFile& ff);
 
         /// \brief Add merged font explicitly as Icons or Emoji (MANUAL mode).
         /// \note Only FontRole::Icons or FontRole::Emoji are allowed; others are
         /// ignored.
-        void addFontMerge(FontRole role, const FontFile &ff);
+        void addFontMerge(FontRole role, const FontFile& ff);
 
         /// \brief Add merged font (icons/emoji) into Body chain.
         /// \details Manual mode: merges the file into Body. Role marking:
         /// if role is not specified, both Icons and Emoji are considered available
         /// and return Body (merged chain).
         /// \warning Prefer the role-specific overload above.
-        void addFontMerge(const FontFile &ff);
+        void addFontMerge(const FontFile& ff);
 
         /// \brief Build atlas immediately from the current manual configuration.
         /// \warning Must be called on the GUI thread between frames.
@@ -134,14 +134,14 @@ namespace ImGuiX::Fonts {
         // ----------------- Accessors -----------------
 
         /// \brief Get font by role. Returns nullptr if not available.
-        ImFont *getFont(FontRole role) const;
+        ImFont* getFont(FontRole role) const;
 
         /// \brief Returns currently active locale id.
-        const std::string &activeLocale() const;
+        const std::string& activeLocale() const;
 
         /// \brief Returns current build parameters.
-        const BuildParams &params() const;
-        
+        const BuildParams& params() const;
+
         /// \brief Access view interface.
         View& view() noexcept { return *this; }
 
@@ -183,7 +183,7 @@ namespace ImGuiX::Fonts {
         float m_px_h3 = 18.0f;
 
         // Resolved fonts after last successful build
-        std::unordered_map<FontRole, ImFont *> m_fonts;
+        std::unordered_map<FontRole, ImFont*> m_fonts;
 
         // Locale packs provided by JSON or programmatically
         std::unordered_map<std::string, LocalePack> m_packs;
@@ -192,49 +192,49 @@ namespace ImGuiX::Fonts {
         PendingManual m_manual{};
 
         // Internal static helpers
-        static float scalePx(float px_96, const BuildParams &p);
+        static float scalePx(float px_96, const BuildParams& p);
 
         static void addLocaleRanges(
-            ImFontGlyphRangesBuilder &b, 
-            ImGuiIO &io,
-            const std::string &locale);
-                                  
+            ImFontGlyphRangesBuilder& b,
+            ImGuiIO& io,
+            const std::string& locale);
+
         static void addNamedRanges(
-            ImFontGlyphRangesBuilder &b, 
-            ImGuiIO &io,
-            const std::string &spec
+            ImFontGlyphRangesBuilder& b,
+            ImGuiIO& io,
+            const std::string& spec
         );
-                                 
+
         static void buildRangesFromPack(
-            std::vector<ImWchar> &out,
-            const LocalePack *pack,
-            const std::string &active_locale
+            std::vector<ImWchar>& out,
+            const LocalePack* pack,
+            const std::string& active_locale
         );
-        
-        static ImFont *addFontFile(
-            const FontFile &ff, 
-            const BuildParams &params,
-            const std::vector<ImWchar> &ranges,
-            const std::string &base_dir_abs,
-            const ImFontConfig &base_cfg
+
+        static ImFont* addFontFile(
+            const FontFile& ff,
+            const BuildParams& params,
+            const std::vector<ImWchar>& ranges,
+            const std::string& base_dir_abs,
+            const ImFontConfig& base_cfg
         );
-        
-        static void setupFreetypeIfNeeded(const BuildParams &params);
+
+        static void setupFreetypeIfNeeded(const BuildParams& params);
 
         static bool updateBackendTexture();
 
         /// \brief Read all file to string. Returns empty string on error.
-        static inline std::string readTextFile(const std::string &path);
+        static inline std::string readTextFile(const std::string& path);
 
         /// \brief Add UTF-8 extra glyphs to builder.
         static inline void addExtraGlyphs(
-            ImFontGlyphRangesBuilder &b,
-            const std::string &utf8
+            ImFontGlyphRangesBuilder& b,
+            const std::string& utf8
         );
 
         // Non-copyable
-        FontManager(const FontManager &) = delete;
-        FontManager &operator=(const FontManager &) = delete;
+        FontManager(const FontManager&) = delete;
+        FontManager& operator=(const FontManager&) = delete;
     };
 
 } // namespace ImGuiX::Fonts

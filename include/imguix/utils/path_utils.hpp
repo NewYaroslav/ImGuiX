@@ -11,16 +11,16 @@
 #include <filesystem>
 
 #if defined(_WIN32)
-#   include <Windows.h>
-#   include <codecvt>
-#   include <locale>
+#    include <Windows.h>
+#    include <codecvt>
+#    include <locale>
 #elif defined(__APPLE__)
-#   include <mach-o/dyld.h>
-#   include <limits.h>
-#   include <unistd.h>
+#    include <mach-o/dyld.h>
+#    include <limits.h>
+#    include <unistd.h>
 #else
-#   include <limits.h>
-#   include <unistd.h>
+#    include <limits.h>
+#    include <unistd.h>
 #endif
 
 namespace ImGuiX::Utils {
@@ -159,16 +159,16 @@ namespace ImGuiX::Utils {
 #endif
     }
 
-	/// \brief
+    /// \brief
     inline bool isAbsolutePath(const std::string& p) {
         return fs::u8path(p).is_absolute();
     }
 
-	/// \brief
+    /// \brief
     inline std::string joinPaths(const std::string& a, const std::string& b) {
         return (fs::u8path(a) / fs::u8path(b)).lexically_normal().u8string();
     }
 
-} // namespace ImGuiX::utils
+} // namespace ImGuiX::Utils
 
 #endif // _IMGUIX_UTILS_PATH_UTILS_HPP_INCLUDED

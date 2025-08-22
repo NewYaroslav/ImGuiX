@@ -6,26 +6,26 @@
 /// \brief Abstract base class for a window instance in ImGuiX.
 
 #ifdef IMGUIX_USE_SFML_BACKEND
-#   include "DeltaClockSfml.hpp"
-#   include <imgui-SFML.h>
-#   include <SFML/Graphics.hpp>
+#    include "DeltaClockSfml.hpp"
+#    include <imgui-SFML.h>
+#    include <SFML/Graphics.hpp>
 #endif
 #ifdef IMGUIX_USE_GLFW_BACKEND
-#   include <imgui_impl_glfw.h>
-#   include <imgui_impl_opengl3.h>
-#   include <GLFW/glfw3.h>
-#   include "imgui_glsl_version.hpp"
+#    include <imgui_impl_glfw.h>
+#    include <imgui_impl_opengl3.h>
+#    include <GLFW/glfw3.h>
+#    include "imgui_glsl_version.hpp"
 #endif
 #ifdef IMGUIX_USE_SDL2_BACKEND
-#   include <imgui_impl_sdl2.h>
-#   include <imgui_impl_opengl3.h>
-#   include <SDL.h>
-#   include <SDL_opengles2.h>
-#   include "imgui_glsl_version.hpp"
+#    include <imgui_impl_sdl2.h>
+#    include <imgui_impl_opengl3.h>
+#    include <SDL.h>
+#    include <SDL_opengles2.h>
+#    include "imgui_glsl_version.hpp"
 #endif
 
 #ifndef IMGUIX_CONFIG_DIR
-#   define IMGUIX_CONFIG_DIR "data/config"
+#    define IMGUIX_CONFIG_DIR "data/config"
 #endif
 
 namespace ImGuiX {
@@ -34,7 +34,9 @@ namespace ImGuiX {
     ///
     /// Combines event handling, rendering, and controller orchestration.
     /// Derive from this class to implement platform-specific windows.
-    class WindowInstance : public WindowControl, public Pubsub::EventMediator {
+    class WindowInstance :
+        public WindowControl,
+        public Pubsub::EventMediator {
     public:
         /// \brief Constructs the window with a unique ID and name.
         /// \param id Unique window identifier.
@@ -208,14 +210,14 @@ namespace ImGuiX {
 
         /// \brief
         void fontsBeginManual();
-		
-		void fontsSetLocale(std::string locale);
-		
-		void fontsSetRangesPreset(std::string preset);                    // обёртка на setRanges(std::string)
 
-		void fontsSetRangesExplicit(const std::vector<ImWchar>& pairs);   // обёртка на setRanges(vector)
-		
-		void fontsClearRanges();                                          // обёртка на clearRanges()
+            void fontsSetLocale(std::string locale);
+
+            void fontsSetRangesPreset(std::string preset);                    // обёртка на setRanges(std::string)
+
+            void fontsSetRangesExplicit(const std::vector<ImWchar>& pairs);   // обёртка на setRanges(vector)
+
+            void fontsClearRanges();                                          // обёртка на clearRanges()
 
         /// \brief
         /// \param
@@ -239,19 +241,19 @@ namespace ImGuiX {
         bool fontsBuildNow();
 
     protected:
-#       ifdef IMGUIX_USE_SFML_BACKEND
+#ifdef IMGUIX_USE_SFML_BACKEND
         sf::RenderWindow m_window; ///< Underlying SFML render window.
-#       elif defined(IMGUIX_USE_GLFW_BACKEND)
+#elif defined(IMGUIX_USE_GLFW_BACKEND)
         GLFWwindow* m_window = nullptr; ///< Pointer to the GLFW window.
         ImGuiContext* m_imgui_ctx = nullptr;
         const char* selectGlslForGlfw(GLFWwindow* w) noexcept;
-#       elif defined(IMGUIX_USE_SDL2_BACKEND)
-        SDL_Window* m_window = nullptr;   ///< SDL window handle.
+#elif defined(IMGUIX_USE_SDL2_BACKEND)
+        SDL_Window* m_window = nullptr; ///< SDL window handle.
         SDL_GLContext m_gl_context = nullptr; ///< Associated GL context.
-        SDL_Window*   m_window = nullptr;
+        SDL_Window* m_window = nullptr;
         ImGuiContext* m_imgui_ctx = nullptr;
         const char* selectGlslForSdl(SDL_Window* w) noexcept;
-#       endif
+#endif
         int m_window_id;                    ///< Unique window identifier.
         std::string m_window_name;          ///< Internal window name.
         int m_width = 1280;                 ///< Current window width.
@@ -279,17 +281,17 @@ namespace ImGuiX {
         virtual void onBeforeLanguageApply(const std::string& /*lang*/) {};
     };
 
-} // namespace imguix
+} // namespace ImGuiX
 
 #ifdef IMGUIX_HEADER_ONLY
-#   include "WindowInstance.ipp"
-#   ifdef IMGUIX_USE_SFML_BACKEND
-#       include "SfmlWindowInstance.ipp"
-#   elif defined(IMGUIX_USE_GLFW_BACKEND)
-#       include "GlfwWindowInstance.ipp"
-#   elif defined(IMGUIX_USE_SDL2_BACKEND)
-#       include "Sdl2WindowInstance.ipp"
-#   endif
+#    include "WindowInstance.ipp"
+#    ifdef IMGUIX_USE_SFML_BACKEND
+#        include "SfmlWindowInstance.ipp"
+#    elif defined(IMGUIX_USE_GLFW_BACKEND)
+#        include "GlfwWindowInstance.ipp"
+#    elif defined(IMGUIX_USE_SDL2_BACKEND)
+#        include "Sdl2WindowInstance.ipp"
+#    endif
 #endif
 
 #endif // _IMGUIX_CORE_WINDOW_INSTANCE_IWINDOW_INSTANCE_HPP_INCLUDED

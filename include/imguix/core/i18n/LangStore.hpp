@@ -35,7 +35,7 @@ namespace ImGuiX::I18N {
 
         LangStore()
             : LangStore(default_i18n_base_dir(), "en") {
-		}
+        }
 
         /// \brief Construct i18n store.
         /// \param base_dir Root folder with per-language subfolders (e.g., "<root>/en/", "<root>/ru/").
@@ -172,8 +172,8 @@ namespace ImGuiX::I18N {
         }
 
     private:
-		
-		// --- типы ключей и карты ---
+
+        // --- типы ключей и карты ---
         using KeyView = std::string_view;
     
         struct SvHash {
@@ -200,11 +200,11 @@ namespace ImGuiX::I18N {
         }
 
         static std::string default_i18n_base_dir() {
-#           if IMGUIX_RESOLVE_PATHS_REL_TO_EXE
+#if IMGUIX_RESOLVE_PATHS_REL_TO_EXE
             return ImGuiX::Utils::resolveExecPath(IMGUIX_I18N_DIR);
-#           else
+#else
             return std::string(IMGUIX_I18N_DIR);
-#           endif
+#endif
         }
         // ---------- JSON loading ----------
 
