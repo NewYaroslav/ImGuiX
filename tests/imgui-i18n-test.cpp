@@ -167,7 +167,7 @@ private:
 class I18nWindow : public ImGuiX::WindowInstance {
 public:
     I18nWindow(int id, 
-               ImGuiX::ApplicationControl& app, 
+               ImGuiX::ApplicationContext& app,
                std::string name)
         : WindowInstance(id, app, std::move(name)) {}
 

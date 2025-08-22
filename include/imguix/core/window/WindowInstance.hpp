@@ -42,9 +42,9 @@ namespace ImGuiX {
     public:
         /// \brief Constructs the window with a unique ID and name.
         /// \param id Unique window identifier.
-        /// \param app Reference to application control interface.
+        /// \param app Reference to application context interface.
         /// \param name Window name (title).
-        explicit WindowInstance(int id, ApplicationControl& app, std::string name);
+        explicit WindowInstance(int id, ApplicationContext& app, std::string name);
         
         WindowInstance(const WindowInstance&) = delete;
         WindowInstance& operator=(WindowInstance) = delete;
@@ -156,7 +156,7 @@ namespace ImGuiX {
         const OptionsStore::View& options() const override;
 
         /// \brief Reference to the owning application.
-        ApplicationControl& application() override;
+        ApplicationContext& application() override;
 
 #       ifdef IMGUIX_USE_SFML_BACKEND
         sf::RenderWindow& getRenderTarget() override;
@@ -266,7 +266,7 @@ namespace ImGuiX {
         bool m_is_open = false;             ///< Whether the window is currently open.
         bool m_is_visible = true;           ///< Visibility flag.
 
-        ApplicationControl& m_application;  ///< Reference to the owning application.
+        ApplicationContext& m_application;  ///< Reference to the owning application.
         std::vector<std::unique_ptr<Controller>> m_controllers; ///< Attached controllers.
         std::string m_ini_path;             ///< Path to the window-specific ImGui ini file.
         bool m_is_ini_once = false;         ///< Ensures imgui ini is saved only once.

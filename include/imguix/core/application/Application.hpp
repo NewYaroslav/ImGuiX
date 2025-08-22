@@ -13,7 +13,7 @@ namespace ImGuiX {
     /// \brief Main application class.
     ///
     /// Controls window lifecycle, global event dispatching, and the main loop.
-    class Application : public ApplicationControl {
+    class Application : public ApplicationContext {
     public:
         /// \brief Constructs the application instance.
         Application();

@@ -2,7 +2,7 @@
 
 namespace ImGuiX {
 
-    WindowManager::WindowManager(ApplicationControl& app)
+    WindowManager::WindowManager(ApplicationContext& app)
         : EventMediator(app.eventBus()), m_application(app) {
         subscribe<Events::ApplicationExitEvent>();
         subscribe<Events::LangChangeEvent>();

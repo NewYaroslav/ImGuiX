@@ -14,8 +14,8 @@ namespace ImGuiX {
     class Model : public Pubsub::EventMediator {
     public:
         /// \brief Constructs the model bound to the application.
-        /// \param app Reference to the ApplicationControl interface.
-        explicit Model(ApplicationControl& app)
+        /// \param app Reference to the ApplicationContext interface.
+        explicit Model(ApplicationContext& app)
             : EventMediator(app.eventBus()), m_app(app) {}
             
         Model(const Model&) = delete;
@@ -61,7 +61,7 @@ namespace ImGuiX {
         void notify(const Pubsub::Event&) const = delete;
 
     protected:
-        ApplicationControl& m_app; ///< Reference to the owning application.
+        ApplicationContext& m_app; ///< Reference to the owning application.
     };
 
 } // namespace ImGuiX

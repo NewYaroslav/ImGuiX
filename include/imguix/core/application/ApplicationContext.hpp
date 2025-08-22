@@ -1,18 +1,18 @@
 #pragma once
-#ifndef _IMGUIX_CORE_APPLICATION_CONTROL_HPP_INCLUDED
-#define _IMGUIX_CORE_APPLICATION_CONTROL_HPP_INCLUDED
+#ifndef _IMGUIX_CORE_APPLICATION_CONTEXT_HPP_INCLUDED
+#define _IMGUIX_CORE_APPLICATION_CONTEXT_HPP_INCLUDED
 
-/// \file ApplicationControl.hpp
-/// \brief Interface for application-level control and global services.
+/// \file ApplicationContext.hpp
+/// \brief Interface for application-level context and global services.
 
 namespace ImGuiX {
 
-    /// \brief Interface for application-level control and global services.
+    /// \brief Interface for application-level context and global services.
     /// \note Allows components to interact with core application functionality without tight coupling.
     /// \note Provides access to closing application, application name, event bus, and resource registry.
-    class ApplicationControl {
+    class ApplicationContext {
     public:
-        virtual ~ApplicationControl() = default;
+        virtual ~ApplicationContext() = default;
 
         /// \brief Requests the application to close gracefully.
         virtual void close() = 0;
@@ -36,4 +36,4 @@ namespace ImGuiX {
 
 } // namespace ImGuiX
 
-#endif // _IMGUIX_CORE_APPLICATION_CONTROL_HPP_INCLUDED
+#endif // _IMGUIX_CORE_APPLICATION_CONTEXT_HPP_INCLUDED

@@ -45,7 +45,7 @@ class DemoFramedWindow : public ImGuiX::Windows::ImGuiFramedWindow {
 public:
     using WindowFlags = ImGuiX::Windows::WindowFlags;
 
-    DemoFramedWindow(int id, ImGuiX::ApplicationControl& app, std::string name, std::string title)
+    DemoFramedWindow(int id, ImGuiX::ApplicationContext& app, std::string name, std::string title)
         : ImGuiFramedWindow(id, app, std::move(name), std::move(title),
             WindowFlags::HasMenuBar |
             WindowFlags::DefaultControlButtons) {}

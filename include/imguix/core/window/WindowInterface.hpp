@@ -108,8 +108,8 @@ namespace ImGuiX {
         virtual const OptionsStore::View& options() const = 0;
         
         /// \brief Returns the owning application interface.
-        /// \return Reference to ApplicationControl.
-        virtual ApplicationControl& application() = 0;
+        /// \return Reference to ApplicationContext.
+        virtual ApplicationContext& application() = 0;
 
 #       ifdef IMGUIX_USE_SFML_BACKEND
         virtual sf::RenderWindow& getRenderTarget() = 0;

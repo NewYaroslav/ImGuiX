@@ -18,7 +18,7 @@ namespace ImGuiX::Controllers {
 
         /// \brief Get owning Application instance.
         /// \return Application reference.
-        /// \note Internally casts the window's `ApplicationControl` to `Application`.
+        /// \note Internally casts the window's `ApplicationContext` to `Application`.
         Application& application() {
             return static_cast<Application&>(window().application());
         }

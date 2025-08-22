@@ -113,7 +113,7 @@ private:
 class DemoWindow : public ImGuiX::WindowInstance {
 public:
 
-    DemoWindow(int id, ImGuiX::ApplicationControl& app, std::string name)
+    DemoWindow(int id, ImGuiX::ApplicationContext& app, std::string name)
         : WindowInstance(id, app, std::move(name)) {
     }
 
@@ -156,7 +156,7 @@ public:
 
 class DemoWindow : public ImGuiX::WindowInstance {
 public:
-    DemoWindow(int id, ImGuiX::ApplicationControl& app, std::string name)
+    DemoWindow(int id, ImGuiX::ApplicationContext& app, std::string name)
         : WindowInstance(id, app, std::move(name)) {}
 
     void onInit() override {
@@ -194,7 +194,7 @@ public:
 
 class DemoWindow : public ImGuiX::WindowInstance {
 public:
-    DemoWindow(int id, ImGuiX::ApplicationControl& app, std::string name)
+    DemoWindow(int id, ImGuiX::ApplicationContext& app, std::string name)
         : WindowInstance(id, app, std::move(name)) {}
 
     void onInit() override {
@@ -230,7 +230,7 @@ public:
 /// \brief Simple window with ticking and rendering.
 class DummyWindow : public ImGuiX::WindowInstance {
 public:
-    DummyWindow(int id, std::string name, ImGuiX::ApplicationControl& app)
+    DummyWindow(int id, std::string name, ImGuiX::ApplicationContext& app)
         : WindowInstance(id, std::move(name), app) {}
 };
 
