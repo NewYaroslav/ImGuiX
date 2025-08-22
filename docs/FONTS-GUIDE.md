@@ -35,8 +35,9 @@ void onInit() override {
     fontsBeginManual();
 
     // Combined glyph ranges via preset:
-    // Default (Latin) + Cyrillic + Vietnamese + useful punctuation
-    fontsSetRangesPreset("Default+Cyrillic+Vietnamese+Punct");
+    // Default (Latin) + Cyrillic + Vietnamese + useful punctuation + PUA (icons)
+    // PUA is required for icon fonts like Material / (Fork) Awesome.
+    fontsSetRangesPreset("Default+Cyrillic+Vietnamese+Punct+PUA");
 
     // Base text font
     fontsAddBody({ "Roboto-Medium.ttf", 18.0f });
@@ -73,7 +74,7 @@ The window method `fontsSetLocale(std::string locale, bool rebuild_now = true)` 
   "markdown_sizes": { "body": 16, "h1": 24, "h2": 20, "h3": 18 },
   "locales": {
     "default": {
-      "ranges": "Default+Punct",
+      "ranges": "Default+Punct+PUA",
       "roles": {
         "Body":  [{ "path": "Roboto-Medium.ttf", "size_px": 16 }],
         "Icons": [{ "path": "forkawesome-webfont.ttf", "size_px": 16, "merge": true }]
@@ -110,7 +111,33 @@ Supported preset tokens (currently):
 * `Default` (Latin and basic UI symbols)
 * `Cyrillic`, `Vietnamese`
 * `Japanese`/`JapaneseFull`, `Chinese`/`ChineseFull`, `Korean` (beware: large sets)
-* `Punct` — `– — … • “ ” ‘ ’` (always added and deduplicated)
+* `Punct` — `– — … • “ ” ‘ ’` (deduplicated if added multiple times)
+* **`PUA`** (aliases: `Icons`, `PrivateUse`) — the **Private Use Area** `U+E000–U+F8FF` used by most icon fonts
+
+> **Why PUA matters:** Material Icons (e.g., `U+E8F4`) and Font Awesome/Fork Awesome (`U+Fxxx`) reside in PUA.  
+> Without `PUA` in ranges icons won’t render even if the font is merged.
+
+### Icon fonts (PUA) — usage example
+
+```cpp
+fontsBeginManual();
+fontsSetRangesPreset("Default+Cyrillic+Punct+PUA");    // include PUA
+fontsAddBody({ "NotoSans-Regular.ttf", 18.0f });
+fontsAddMerge(FontRole::Icons, { "MaterialIcons-Regular.ttf", 18.0f, true });
+fontsBuildNow();
+
+// Later
+ImGui::TextUnformatted(u8"\uE8F4"); // Material icon 'visibility' for example
+```
+
+**Glyph presence check** (diagnostics):
+
+```cpp
+ImFont* f = ImGui::GetFont();
+bool has_text  = f->FindGlyphNoFallback((ImWchar)'A');
+bool has_cyr   = f->FindGlyphNoFallback((ImWchar)0x0410); // 'А'
+bool has_icon  = f->FindGlyphNoFallback((ImWchar)0xE8F4); // Material icon
+```
 
 ---
 
@@ -147,6 +174,12 @@ Supported preset tokens (currently):
 * **Ranges:** CJK ranges inflate atlas size—keep separate locales/packs and switch on demand.
 * **`extra_glyphs`:** UTF‑8 string of extra characters (e.g. special punctuation). In C++17 `u8"…"` is `const char*` (OK).
 
+### Manual mode semantics (preset vs explicit)
+
+* `fontsSetRangesPreset(...)` and `fontsSetRangesExplicit(...)` are **mutually exclusive** — the **last call wins**.
+* To combine Latin/Cyrillic/etc. with icons, **prefer presets with `+PUA`** instead of mixing preset + explicit pairs.
+* If you must use explicit pairs, ensure they **cover all needed scripts** (not only PUA), otherwise text will turn into squares.
+
 ---
 
 ## Common pitfalls
@@ -155,6 +188,7 @@ Supported preset tokens (currently):
 * **Forgot to call `fontsBuildNow()` in manual mode** — fonts not loaded, `io.FontDefault` remains `nullptr`.
 * **Building in wrong phase** — artifacts or crash. Build atlas between frames.
 * **Expecting per-font FreeType flags** — in this version they apply to the entire atlas.
+* **Only icons show, all text is squares** — your ranges include **only PUA**. Use `"Default+...+PUA"` (preset) or add non-PUA ranges explicitly.
 
 ---
 

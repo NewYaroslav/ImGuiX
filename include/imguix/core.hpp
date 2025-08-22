@@ -37,6 +37,8 @@
 // --- Locale and Fonts ---
 #include "core/i18n.hpp"                           ///< Localization utilities
 #include "core/fonts/FontManager.hpp"              ///< FontManager: centralized font loading (ImGui atlas + FreeType)
+
+// --- Options Store ---
 #include "core/options/OptionsStore.hpp"           ///< JSON-backed options store
 
 // --- Resource system ---

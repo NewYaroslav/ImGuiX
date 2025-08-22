@@ -2,6 +2,9 @@
 #ifndef _IMGUIX_CORE_OPTIONS_STORE_VIEW_CRTP_HPP_INCLUDED
 #define _IMGUIX_CORE_OPTIONS_STORE_VIEW_CRTP_HPP_INCLUDED
 
+/// \file OptionsStoreViewCRTP.hpp
+/// \brief 
+
 #include <string>
 #include <vector>
 #include <cstdint>

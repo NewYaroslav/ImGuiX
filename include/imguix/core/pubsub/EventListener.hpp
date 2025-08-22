@@ -4,6 +4,7 @@
 
 /// \file EventListener.hpp
 /// \brief Defines the EventListener class for receiving event notifications.
+/// \ingroup Core
 
 namespace ImGuiX::Pubsub {
 

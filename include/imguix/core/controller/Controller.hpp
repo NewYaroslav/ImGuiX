@@ -5,8 +5,6 @@
 /// \file Controller.hpp
 /// \brief Base class for window-attached logic/rendering controllers.
 
-#include "../options/OptionsStore.hpp"
-
 namespace ImGuiX {
 
     class WindowInterface;

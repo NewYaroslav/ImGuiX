@@ -2,6 +2,9 @@
 #ifndef _IMGUIX_CORE_OPTIONS_STORE_HPP_INCLUDED
 #define _IMGUIX_CORE_OPTIONS_STORE_HPP_INCLUDED
 
+/// \file OptionsStore.hpp
+/// \brief 
+
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -12,6 +15,7 @@
 
 namespace ImGuiX {
 
+    /// \class OptionsStore
     /// \brief Durable JSON-backed key-value options storage.
     /// \note Thread-safe. Call update() periodically to perform debounced saves.
     class OptionsStore :
@@ -199,7 +203,7 @@ namespace ImGuiX {
 } // namespace ImGuiX
 
 #ifdef IMGUIX_HEADER_ONLY
-#include "OptionsStore.ipp"
+#   include "OptionsStore.ipp"
 #endif
 
 #endif // _IMGUIX_CORE_OPTIONS_STORE_HPP_INCLUDED

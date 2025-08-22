@@ -4,6 +4,7 @@
 
 /// \file WindowInstance.hpp
 /// \brief Abstract base class for a window instance in ImGuiX.
+/// \ingroup Core
 
 #ifdef IMGUIX_USE_SFML_BACKEND
 #    include "DeltaClockSfml.hpp"

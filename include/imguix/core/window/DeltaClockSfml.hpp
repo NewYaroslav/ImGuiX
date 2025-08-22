@@ -4,6 +4,7 @@
 
 /// \file DeltaClockSfml.hpp
 /// \brief Lightweight wrapper around sf::Clock for delta timing.
+/// \ingroup Core
 
 #include <SFML/System/Clock.hpp>
 #include <SFML/System/Time.hpp>

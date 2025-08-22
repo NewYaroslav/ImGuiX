@@ -4,6 +4,7 @@
 
 /// \file Event.hpp
 /// \brief Defines the base Event class used in the publish-subscribe pattern.
+/// \ingroup Core
 
 namespace ImGuiX::Pubsub {
 

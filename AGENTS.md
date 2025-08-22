@@ -120,6 +120,13 @@ graph LR
 | Resource registered once             | ResourceRegistry | `registerResource` returns bool   | Duplicate wastes memory or causes unexpected state |
 | Model uses `notifyAsync` only        | Model            | Compilation fails for sync notify | Thread-safety compromised                          |
 
+**FontManager semantics (manual mode)**
+
+| Contract                                   | Where        | Check/Assert                     | Violation Consequence                        |
+| ------------------------------------------ | ------------ | -------------------------------- | -------------------------------------------- |
+| Ranges preset vs explicit: last call wins  | FontManager  | Code review / unit test          | Missing glyphs when preset is overridden     |
+| PUA required for icon fonts                | FontManager  | Visual check / glyph presence    | Icons render as tofu (□) without PUA ranges  |
+
 ## 5. Concurrency & Reliability
 
 * EventBus uses mutexes for queue and subscription maps
@@ -214,6 +221,8 @@ graph LR
 | Resource retrieval throws | `registerResource` missing or still initializing | Register before access and handle `tryGetResource`                               |
 | Dangling subscriptions    | Forgetting `unsubscribeAll`                      | Ensure controllers/models inherit `EventMediator` which handles destructor unsub |
 | Blocked shutdown          | Threaded model not checking `isClosing()`        | Poll flag and join threads in destructor                                         |
+| Text shows as squares     | Ranges include only PUA (icons)                  | Use `fontsSetRangesPreset("Default+...+PUA")` or add non-PUA ranges explicitly   |
+| Icons missing             | PUA not included in ranges                       | Add `PUA` token to preset or explicit pair `0xE000–0xF8FF`                       |
 
 Quick grep patterns:
 

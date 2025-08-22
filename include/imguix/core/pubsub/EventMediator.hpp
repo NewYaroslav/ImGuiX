@@ -4,6 +4,7 @@
 
 /// \file EventMediator.hpp
 /// \brief Defines the EventMediator class for managing subscriptions and notifications through EventBus.
+/// \ingroup Core
 
 namespace ImGuiX::Pubsub {
 

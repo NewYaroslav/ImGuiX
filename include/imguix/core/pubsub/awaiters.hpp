@@ -4,6 +4,7 @@
 
 /// \file awaiters.hpp
 /// \brief Interfaces for cancelable event awaiters.
+/// \ingroup Core
 
 namespace ImGuiX::Pubsub {
 

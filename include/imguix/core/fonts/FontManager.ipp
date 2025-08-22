@@ -14,7 +14,7 @@
 #endif
 
 namespace ImGuiX::Fonts {
-namespace fs = std::filesystem;
+    namespace fs = std::filesystem;
 
     /// ----------------------------
     /// Inline trivial setters/getters
@@ -179,39 +179,34 @@ namespace fs = std::filesystem;
         }
     }
 
-    inline void FontManager::addNamedRanges(ImFontGlyphRangesBuilder &b,
-                                            ImGuiIO &io, const std::string &spec) {
-      auto split = [](const std::string &s) {
-        std::vector<std::string> out;
-        std::string cur;
-        for (char c : s) {
-          if (c == '+') {
-            if (!cur.empty())
-              out.push_back(cur), cur.clear();
-          } else
-            cur.push_back(c);
+    inline void FontManager::addNamedRanges(
+            ImFontGlyphRangesBuilder& b,
+            ImGuiIO& io, 
+            const std::string& spec
+        ) {
+        auto split = [](const std::string& s) {
+            std::vector<std::string> out; std::string cur;
+            for (char c : s) { 
+                if (c == '+') { 
+                    if (!cur.empty()) out.push_back(cur), cur.clear(); 
+                } else cur.push_back(c); 
+            }
+            if (!cur.empty()) out.push_back(cur); return out;
+        };
+        for (auto tok : split(spec)) {
+            if (tok == "Default")          b.AddRanges(io.Fonts->GetGlyphRangesDefault());
+            else if (tok == "Cyrillic")    b.AddRanges(io.Fonts->GetGlyphRangesCyrillic());
+            else if (tok == "Vietnamese")  b.AddRanges(io.Fonts->GetGlyphRangesVietnamese());
+            else if (tok == "Japanese" || tok == "JapaneseFull") b.AddRanges(io.Fonts->GetGlyphRangesJapanese());
+            else if (tok == "Chinese"  || tok == "ChineseFull")  b.AddRanges(io.Fonts->GetGlyphRangesChineseFull());
+            else if (tok == "Korean")      b.AddRanges(io.Fonts->GetGlyphRangesKorean());
+            else if (tok == "Punct")       b.AddText(u8"–—…•“”‘’");
+            else if (tok == "PUA" || tok == "Icons" || tok == "PrivateUse") {
+                static const ImWchar kPUA[] = { 0xE000, 0xF8FF, 0 };
+                b.AddRanges(kPUA);
+            }
+            // add more named ranges as needed (Latin, Greek, Thai, etc.)
         }
-        if (!cur.empty())
-          out.push_back(cur);
-        return out;
-      };
-      for (auto tok : split(spec)) {
-        if (tok == "Default")
-          b.AddRanges(io.Fonts->GetGlyphRangesDefault());
-        else if (tok == "Cyrillic")
-          b.AddRanges(io.Fonts->GetGlyphRangesCyrillic());
-        else if (tok == "Vietnamese")
-          b.AddRanges(io.Fonts->GetGlyphRangesVietnamese());
-        else if (tok == "Japanese" || tok == "JapaneseFull")
-          b.AddRanges(io.Fonts->GetGlyphRangesJapanese());
-        else if (tok == "Chinese" || tok == "ChineseFull")
-          b.AddRanges(io.Fonts->GetGlyphRangesChineseFull());
-        else if (tok == "Korean")
-          b.AddRanges(io.Fonts->GetGlyphRangesKorean());
-        else if (tok == "Punct")
-          b.AddText(u8"–—…•“”‘’");
-        // Latin, Greek, Thai, etc. as needed
-      }
     }
 
     /// \brief Build glyph ranges from LocalePack + extra glyphs from all FontFiles.

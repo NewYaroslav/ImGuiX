@@ -4,6 +4,7 @@
 
 /// \file EventBus.hpp
 /// \brief Contains the EventBus class for event-based communication between modules.
+/// \ingroup Core
 
 #include "awaiters.hpp"
 
@@ -91,7 +92,7 @@ namespace ImGuiX::Pubsub {
 } // namespace ImGuiX::Pubsub
 
 #if defined(IMGUIX_HEADER_ONLY)
-#include "EventBus.ipp"
+#   include "EventBus.ipp"
 #endif
 
 #endif // _IMGUIX_PUBSUB_EVENT_BUS_HPP_INCLUDED

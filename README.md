@@ -231,10 +231,13 @@ be configured manually. By default, fonts are read from
 `data/resources/fonts/fonts.json`. For full details see
 [FONTS-GUIDE-RU.md](docs/FONTS-GUIDE-RU.md).
 
+> **Tip (icons):** Icon fonts (Material, Font Awesome/Fork Awesome, etc.) use the **Private Use Area (PUA)** codepoints. Include PUA in glyph ranges (preset token `PUA`) so icons render alongside text.
+
 An example manual setup in `WindowInstance::onInit()`:
 
 ```cpp
 fontsBeginManual();
+fontsSetRangesPreset("Default+Punct+PUA");
 fontsAddBody({ "Roboto-Medium.ttf", 16.0f });
 fontsAddMerge(FontRole::Icons, { "forkawesome-webfont.ttf", 16.0f, true });
 fontsBuildNow();

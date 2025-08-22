@@ -30,6 +30,8 @@ namespace ImGuiX::I18N {
 
     namespace fs = std::filesystem;
 
+	/// \class LangStore.
+	/// \brief
     class LangStore {
     public:
 

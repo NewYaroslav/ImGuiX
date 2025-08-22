@@ -7,24 +7,24 @@
 
 namespace ImGuiX::Fonts {
 
-        template<class Impl>
-        struct FontManagerViewCRTP {
+    template<class Impl>
+    struct FontManagerViewCRTP {
 
-                /// \brief Get font by role; may return nullptr.
-                ImFont* getFont(FontRole r) const noexcept {
-                        return static_cast<const Impl*>(this)->getFont(r);
-                }
+        /// \brief Get font by role; may return nullptr.
+        ImFont* getFont(FontRole r) const noexcept {
+                return static_cast<const Impl*>(this)->getFont(r);
+        }
 
-                /// \brief Get currently active locale identifier.
-                const std::string& activeLocale() const noexcept {
-                        return static_cast<const Impl*>(this)->activeLocale();
-                }
+        /// \brief Get currently active locale identifier.
+        const std::string& activeLocale() const noexcept {
+                return static_cast<const Impl*>(this)->activeLocale();
+        }
 
-                /// \brief Access current build parameters.
-                const BuildParams& params() const noexcept {
-                        return static_cast<const Impl*>(this)->params();
-                }
-        };
+        /// \brief Access current build parameters.
+        const BuildParams& params() const noexcept {
+                return static_cast<const Impl*>(this)->params();
+        }
+    };
 
 } // namespace ImGuiX::Fonts
 

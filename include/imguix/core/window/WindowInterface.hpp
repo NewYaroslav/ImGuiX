@@ -4,12 +4,11 @@
 
 /// \file WindowInterface.hpp
 /// \brief Interface for controlling and querying a single window instance.
+/// \ingroup Core
 
 #ifdef IMGUIX_USE_SFML_BACKEND
 #   include <SFML/Graphics/RenderWindow.hpp>
 #endif
-
-#include "../options/OptionsStore.hpp"
 
 namespace ImGuiX {
 

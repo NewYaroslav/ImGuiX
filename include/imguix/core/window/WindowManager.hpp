@@ -4,6 +4,7 @@
 
 /// \file WindowManager.hpp
 /// \brief WindowManager controls and orchestrates all active windows.
+/// \ingroup Core
 
 namespace ImGuiX {
 

@@ -74,7 +74,7 @@ namespace ImGuiX {
 } // namespace ImGuiX
 
 #ifdef IMGUIX_HEADER_ONLY
-#include "ResourceRegistry.ipp"
+#   include "ResourceRegistry.ipp"
 #endif
 
 #endif // _IMGUIX_CORE_RESOURCE_REGISTRY_HPP_INCLUDED

@@ -241,7 +241,7 @@ namespace ImGuiX::Fonts {
 
 // Include implementation if desired
 #ifdef IMGUIX_HEADER_ONLY
-#include "FontManager.ipp"
+#   include "FontManager.ipp"
 #endif
 
 #endif // _IMGUIX_FONTS_FONT_MANAGER_HPP_INCLUDED

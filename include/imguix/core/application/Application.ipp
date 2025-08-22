@@ -2,8 +2,6 @@
 #   include <emscripten.h>
 #endif
 
-#include "../options/OptionsStore.hpp"
-
 #ifndef IMGUIX_CONFIG_DIR
 #   define IMGUIX_CONFIG_DIR "data/config"
 #endif
@@ -49,6 +47,7 @@ namespace ImGuiX {
         }
 #endif
     }
+
     WindowInstance& Application::createWindowImpl(WindowFactory factory) {
         int id = m_next_window_id++;
         auto window = factory(id);
