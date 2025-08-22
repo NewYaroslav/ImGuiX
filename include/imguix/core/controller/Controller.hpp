@@ -5,6 +5,8 @@
 /// \file Controller.hpp
 /// \brief Base class for window-attached logic/rendering controllers.
 
+#include "../options/OptionsStore.hpp"
+
 namespace ImGuiX {
 
     /// \brief Base class for controllers that attach to a window.
@@ -40,6 +42,16 @@ namespace ImGuiX {
         /// \brief Access to the global resource registry via window.
         ResourceRegistry& registry() {
             return m_window.registry();
+        }
+
+        /// \brief Access to the global options store via window.
+        OptionsStore::Control& options() {
+            return m_window.options();
+        }
+
+        /// \brief Read-only access to the global options store.
+        const OptionsStore::View& options() const {
+            return static_cast<const WindowControl&>(m_window).options();
         }
         
         /// \brief Returns reference to the associated window control.

@@ -60,6 +60,14 @@ namespace ImGuiX {
     ResourceRegistry& WindowInstance::registry() {
         return m_application.registry();
     }
+
+    OptionsStore::Control& WindowInstance::options() {
+        return m_application.registry().getResource<OptionsStore>().control();
+    }
+
+    const OptionsStore::View& WindowInstance::options() const {
+        return m_application.registry().getResource<OptionsStore>().view();
+    }
     
     ApplicationControl& WindowInstance::application() {
         return m_application;
