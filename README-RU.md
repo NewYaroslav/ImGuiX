@@ -180,7 +180,7 @@ run-test-sdl2-ems.bat     :: запускает emrun на локальном с
 
 ## Fonts and Licensing
 
-For font usage instructions see [FONTS-GUIDE-RU.md](docs/FONTS-GUIDE-RU.md).
+For font usage instructions see [FONTS-GUIDE.md](docs/FONTS-GUIDE.md) (English).
 
 This repository bundles third-party fonts under their original licenses:
 
