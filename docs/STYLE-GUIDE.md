@@ -156,7 +156,7 @@ namespace ImGuiX {
 
 ### Function Calls — Many Arguments & Ternary
 - Break after `(` and put each argument on its own line with double indentation (8 spaces).
-- If an argument uses a ternary `?:`, break after `?` and before `:`; align both outcomes under the start of the ternary using the same double indentation.
+- If an argument uses a ternary `?:`, break after `?` and before `:`; indent both outcomes by an extra +4 spaces relative to the argument line (total 12 from the call line), matching the examples below.
 - Place the final `)` on its own line aligned with the call line, then `);`.
 
 **Good:**
