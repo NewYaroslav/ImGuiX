@@ -21,14 +21,14 @@ namespace ImGuiX::Widgets {
         float angular_speed = 4.0f;      ///< radians per second added to the phase
         float sweep_ratio   = 0.80f;     ///< arc sweep as fraction of full circle (0..1], e.g. 0.8 → 288°
         ImU32 color         = 0;         ///< 0 → use style's ImGuiCol_Text color
-        float extra_top_padding = 0.0f;  ///< optional extra vertical padding on top, p
+        float extra_top_padding = 0.0f;  ///< optional extra vertical padding on top, px
     };
 
-    /// \brief Draws an animated loading spinner.
-    /// \param id Unique ID (label).
+    /// \brief Draw an animated loading spinner.
+    /// \param id Unique widget identifier.
     /// \param cfg Spinner parameters.
-    /// \return True if item was submitted (i.e., not clipped / not skipped).
-   inline bool LoadingSpinner(const char* id, const LoadingSpinnerConfig& cfg = {}) {
+    /// \return True if the item was submitted (not clipped).
+    inline bool LoadingSpinner(const char* id, const LoadingSpinnerConfig& cfg = {}) {
         // Validate / clamp
         const float radius    = std::max(0.0f, cfg.radius);
         const float thickness = std::max(1.0f, cfg.thickness);
@@ -62,6 +62,11 @@ namespace ImGuiX::Widgets {
     }
 
     /// \brief Convenience overload with basic parameters.
+    /// \param id Unique widget identifier.
+    /// \param radius Spinner radius in pixels.
+    /// \param thickness Stroke thickness in pixels.
+    /// \param color Color in ImU32 format; 0 uses style text color.
+    /// \return True if the item was submitted.
     inline bool LoadingSpinner(const char* id, float radius, float thickness, ImU32 color = 0) {
         LoadingSpinnerConfig cfg;
         cfg.radius = radius;
