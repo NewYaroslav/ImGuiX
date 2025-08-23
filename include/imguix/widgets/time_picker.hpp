@@ -164,6 +164,10 @@ namespace ImGuiX::Widgets {
     // ---------- widgets ----------------------------------------------------------
 
     /// \brief Time-of-day picker (0..86399 seconds).
+    /// \param id Unique widget identifier.
+    /// \param seconds In/out: selected time in seconds since midnight.
+    /// \param cfg Picker configuration.
+    /// \return True if value changed.
     inline bool TimePicker(const char* id, int& seconds, const TimePickerConfig& cfg = {}) {
         bool changed = false;
         std::string preview = format_hms(static_cast<uint32_t>(seconds));
@@ -195,9 +199,12 @@ namespace ImGuiX::Widgets {
     }
 
     /// \brief Signed offset picker with timezone list (sign inside value; no separate checkbox).
-    /// \param offset_sec   in/out signed seconds (range not enforced here; UI edits magnitude 0..23:59:59)
-    /// \param has_dst_out  out, true if chosen TZ observes DST (false in Custom)
-    /// \param tz_index_io  in/out, index in tz list (0 = Custom/manual)
+    /// \param id Unique widget identifier.
+    /// \param offset_sec In/out signed seconds (range not enforced; UI edits magnitude 0..23:59:59).
+    /// \param has_dst_out Output flag set when chosen TZ observes DST (false in Custom).
+    /// \param tz_index_io In/out index in timezone list (0 = Custom/manual).
+    /// \param cfg Picker configuration.
+    /// \return True if value changed.
     inline bool TimeOffsetPicker(
             const char* id,
             int64_t& offset_sec,

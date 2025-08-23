@@ -43,113 +43,130 @@ namespace ImGuiX::Fonts {
         using View    = FontManagerViewCRTP<FontManager>;
         using Control = FontManagerControlCRTP<FontManager>;
 
-        /// \brief Set base directory for relative font paths (affects both JSON and
-        /// manual mode).
+        /// \brief Set base directory for relative font paths.
+        /// \param base_dir Directory used to resolve relative font paths in JSON and manual modes.
         void setBaseDir(std::string base_dir);
 
-        /// \brief Set logical DPI (96 = 1.0 scale). Marks atlas dirty.
+        /// \brief Set logical DPI.
+        /// \param dpi Display DPI where 96 equals 1.0 scale.
         void setDpi(float dpi);
 
-        /// \brief Set global UI scale. Marks atlas dirty.
+        /// \brief Set global UI scale.
+        /// \param ui_scale Additional global scaling factor.
         void setUiScale(float ui_scale);
 
-        /// \brief Initialize manager with build parameters. Does not build
-        /// immediately.
-        /// \return true if parameters accepted.
+        /// \brief Initialize manager with build parameters.
+        /// \param params Build parameters; no immediate build is performed.
+        /// \return True if parameters are accepted.
         bool bootstrap(const BuildParams& params);
 
         /// \brief Set JSON config path. Default: IMGUIX_FONTS_CONFIG.
+        /// \param path Path to config (default "data/resources/fonts/fonts.json").
         void setConfigPath(std::string path);
 
-        /// \brief Set active locale. May mark atlas dirty if ranges/fonts differ.
+        /// \brief Set active locale.
+        /// \param locale Locale identifier; may mark atlas dirty if glyph ranges differ.
         void setLocale(std::string locale);
 
-        /// \brief Set glyph ranges by preset (e.g., "Default+Cyrillic+Punct").
+        /// \brief Set glyph ranges by preset.
         /// \details Manual mode only. Clears explicit ranges().
+        /// \param preset Named range preset, e.g. "Default+Cyrillic+Punct".
         void setRanges(std::string preset);
 
-        /// \brief Set glyph ranges with explicit [start,end] pairs. Terminator 0 optional.
+        /// \brief Set glyph ranges with explicit pairs.
         /// \details Manual mode only. Clears preset string.
+        /// \param pairs Consecutive [start,end] pairs (optional 0 terminator).
         void setRanges(const std::vector<ImWchar>& pairs);
 
-        /// \brief Clear manual ranges (preset or explicit). Locale policy will be used.
+        /// \brief Clear manual ranges and fall back to locale policy.
         void clearRanges();
 
-        /// \brief Set Markdown headline sizes (px @ 96 DPI). Body is the base text
-        /// size.
+        /// \brief Set Markdown headline sizes.
+        /// \param body_px Body text size in pixels at 96 DPI.
+        /// \param h1_px Level-1 header size in pixels at 96 DPI.
+        /// \param h2_px Level-2 header size in pixels at 96 DPI.
+        /// \param h3_px Level-3 header size in pixels at 96 DPI.
         void setMarkdownSizes(float body_px, float h1_px, float h2_px, float h3_px);
 
-        /// \brief Provide/override a locale pack programmatically (used without JSON
-        /// or to extend it).
+        /// \brief Provide or override a locale pack programmatically.
+        /// \param pack Locale pack used without JSON or to extend it.
         void setLocalePack(const LocalePack& pack);
 
-        /// \brief Drop all registered packs.
+        /// \brief Drop all registered locale packs.
         void clearPacks();
 
         // ----------------- Manual mode API (JSON-less) -----------------
 
-        /// \brief Start manual configuration (clears pending state; does not touch
-        /// current atlas).
+        /// \brief Start manual configuration without touching current atlas.
         void beginManual();
 
-        /// \brief Add Body font (base chain root). Returns false if AddFont* fails at
-        /// build time.
-        /// \note This only enqueues; actual AddFont happens inside
-        /// buildNow()/rebuildIfNeeded().
+        /// \brief Add Body font (base chain root).
+        /// \param ff Font file descriptor.
+        /// \note This only enqueues; actual addition happens during build.
         void addFontBody(const FontFile& ff);
 
-        /// \brief Add headline font for H1/H2/H3. If path empty, Body TTF is reused
-        /// at another size.
+        /// \brief Add headline font for H1/H2/H3.
+        /// \param role_h Target headline role.
+        /// \param ff Font file descriptor. If path is empty, Body font is reused.
         void addFontHeadline(FontRole role_h, const FontFile& ff);
 
-        /// \brief Add merged font explicitly as Icons or Emoji (MANUAL mode).
-        /// \note Only FontRole::Icons or FontRole::Emoji are allowed; others are
-        /// ignored.
+        /// \brief Add merged font explicitly as Icons or Emoji.
+        /// \param role Font role; only Icons or Emoji are accepted.
+        /// \param ff Font file descriptor.
+        /// \note Manual mode only.
         void addFontMerge(FontRole role, const FontFile& ff);
 
-        /// \brief Add merged font (icons/emoji) into Body chain.
-        /// \details Manual mode: merges the file into Body. Role marking:
-        /// if role is not specified, both Icons and Emoji are considered available
-        /// and return Body (merged chain).
-        /// \warning Prefer the role-specific overload above.
+        /// \brief Add merged font into Body chain without role tagging.
+        /// \param ff Font file descriptor.
+        /// \details Manual mode only; both Icons and Emoji are considered available.
+        /// \warning Prefer the role-specific overload.
         void addFontMerge(const FontFile& ff);
 
-        /// \brief Build atlas immediately from the current manual configuration.
+        /// \brief Build atlas immediately from current manual configuration.
         /// \warning Must be called on the GUI thread between frames.
+        /// \return Result summary of the build.
         BuildResult buildNow();
 
         // ----------------- Auto mode / maintenance -----------------
 
-        /// \brief Initialize from JSON or fallback to minimal defaults if JSON not
-        /// found.
+        /// \brief Initialize from JSON or minimal defaults if JSON is missing.
         /// \warning Must be called on the GUI thread between frames.
+        /// \return Result summary of the build.
         BuildResult initFromJsonOrDefaults();
 
-        /// \brief Mark atlas dirty (DPI/UI scale/locale/config changed).
+        /// \brief Mark atlas dirty after DPI/UI scale/locale/config change.
         void markDirty();
 
         /// \brief Rebuild atlas if marked dirty.
         /// \warning Must be called on the GUI thread between frames.
+        /// \return Result summary of the rebuild.
         BuildResult rebuildIfNeeded();
 
         // ----------------- Accessors -----------------
 
-        /// \brief Get font by role. Returns nullptr if not available.
+        /// \brief Get font by role.
+        /// \param role Logical font role.
+        /// \return Pointer to font or nullptr if unavailable.
         ImFont* getFont(FontRole role) const;
 
-        /// \brief Returns currently active locale id.
+        /// \brief Get currently active locale identifier.
+        /// \return Locale identifier string.
         const std::string& activeLocale() const;
 
-        /// \brief Returns current build parameters.
+        /// \brief Get current build parameters.
+        /// \return Build parameters used for last build.
         const BuildParams& params() const;
 
         /// \brief Access view interface.
+        /// \return Reference to view facade.
         View& view() noexcept { return *this; }
 
         /// \brief Const access to view interface.
+        /// \return Const reference to view facade.
         const View& view() const noexcept { return *this; }
 
         /// \brief Access control interface.
+        /// \return Reference to control facade.
         Control& control() noexcept { return *this; }
 
         FontManager() = default;
