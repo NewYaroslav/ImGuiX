@@ -111,6 +111,8 @@ namespace ImGuiX {
         virtual ApplicationContext& application() = 0;
 
 #       ifdef IMGUIX_USE_SFML_BACKEND
+        /// \brief Provides access to the underlying SFML render target.
+        /// \return Reference to the SFML render window.
         virtual sf::RenderWindow& getRenderTarget() = 0;
 #       endif
 

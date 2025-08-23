@@ -57,7 +57,10 @@ namespace ImGuiX {
 
         /// \brief Initializes the window (e.g., creates backend resources).
         virtual bool create();
-        
+
+        /// \brief Initializes the window with explicit dimensions.
+        /// \param w Width in pixels.
+        /// \param h Height in pixels.
         virtual bool create(int w, int h);
 
         /// \brief Processes input events and window messages.
@@ -78,7 +81,11 @@ namespace ImGuiX {
         /// \brief Creates and registers a controller of given type.
         /// \tparam ControllerType Controller type derived from Controller.
         /// \tparam Args Arguments passed to the controller constructor.
+        /// \param args Arguments forwarded to the controller constructor.
         /// \return Reference to the created controller.
+        /// \code
+        /// auto& ctrl = createController<MyController>(42);
+        /// \endcode
         template <typename ControllerType, typename... Args>
         ControllerType& createController(Args&&... args);
 
@@ -105,6 +112,7 @@ namespace ImGuiX {
         bool setWindowIcon(const std::string& path) override;
         
         /// \brief Enables or disables clearing the background between frames.
+        /// \param disable True to disable clearing.
         void setDisableBackground(bool disable) override {};
 
         /// \brief Requests the window to close.
@@ -157,6 +165,8 @@ namespace ImGuiX {
         ApplicationContext& application() override;
 
 #       ifdef IMGUIX_USE_SFML_BACKEND
+        /// \brief Access the underlying SFML render window.
+        /// \return SFML render target.
         sf::RenderWindow& getRenderTarget() override;
 #       endif
 
@@ -166,8 +176,12 @@ namespace ImGuiX {
         /// \return Language store.
         const ImGuiX::I18N::LangStore& langStore() const override;
         
+        /// \brief Read-only view of the font manager.
+        /// \return Font manager view.
         ImGuiX::Fonts::FontManager::View& fontsView() noexcept { return m_font_manager.view(); }
-        
+
+        /// \brief Control interface for the font manager.
+        /// \return Font manager control interface.
         ImGuiX::Fonts::FontManager::Control& fontsControl() noexcept { return m_font_manager.control(); }
 
         // ---
@@ -207,17 +221,25 @@ namespace ImGuiX {
 
     protected:
 
-        // --- onInit-фаза: ручная сборка атласа ---
+        // --- onInit phase: manual atlas assembly ---
 
         /// \brief Begin manual font configuration.
+        /// \note Call during onInit() before building fonts.
         void fontsBeginManual();
 
+            /// \brief Set locale for subsequent font operations.
+            /// \param locale Locale identifier.
             void fontsSetLocale(std::string locale);
 
+            /// \brief Select predefined character ranges.
+            /// \param preset Preset name.
             void fontsSetRangesPreset(std::string preset);
 
+            /// \brief Define explicit character ranges.
+            /// \param pairs Consecutive ImWchar pairs defining ranges.
             void fontsSetRangesExplicit(const std::vector<ImWchar>& pairs);
 
+            /// \brief Clear previously specified character ranges.
             void fontsClearRanges();
 
         /// \brief Add body font file.
@@ -270,12 +292,12 @@ namespace ImGuiX {
         bool m_is_ini_once = false;         ///< Ensures imgui ini is saved only once.
         bool m_is_ini_loaded = false;       ///< Indicates whether ini settings have been loaded.
     
-        bool m_is_fonts_manual = false;     ///< 
-        bool m_in_init_phase = false;       ///< охранник фазы
-        bool m_is_fonts_init = false;       ///< 
-        ImGuiX::Fonts::FontManager m_font_manager; ///< 
-        ImGuiX::I18N::LangStore    m_lang_store{}; ///< 
-        std::string                m_pending_lang; ///< 
+        bool m_is_fonts_manual = false;     ///< True when manual font configuration is active.
+        bool m_in_init_phase = false;       ///< Guard flag for onInit phase operations.
+        bool m_is_fonts_init = false;       ///< Indicates whether fonts have been built.
+        ImGuiX::Fonts::FontManager m_font_manager; ///< Manages ImGui font atlas.
+        ImGuiX::I18N::LangStore    m_lang_store{}; ///< Localization storage for this window.
+        std::string                m_pending_lang; ///< Language code pending to apply.
 
 
         /// \brief Requests the window to switch its UI language.
