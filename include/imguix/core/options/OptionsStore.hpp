@@ -3,7 +3,7 @@
 #define _IMGUIX_CORE_OPTIONS_STORE_HPP_INCLUDED
 
 /// \file OptionsStore.hpp
-/// \brief 
+/// \brief Persistent JSON-backed key-value options store.
 
 #include <cstdint>
 #include <memory>

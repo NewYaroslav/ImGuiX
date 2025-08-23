@@ -10,9 +10,13 @@ namespace ImGuiX::I18N {
 
     namespace fs = std::filesystem;
 
+    /// \class PluralRules
+    /// \brief Runtime-pluggable pluralization rules with JSON loading.
     class PluralRules {
     public:
-        // Load rules from JSON file. Returns true on success.
+        /// \brief Load rules from a JSON file.
+        /// \param path Path to JSON file.
+        /// \return True on success.
         bool load_from_file(const std::string& path) {
             std::error_code ec;
             if (!fs::exists(path, ec)) return false;
@@ -47,8 +51,11 @@ namespace ImGuiX::I18N {
             return !rules_.empty();
         }
 
-        // Return category for number n in language 'lang'.
-        // Built-in fallback: 'en' (one/other) and 'ru' (one/few/many/other).
+        /// \brief Determine plural category for number in given language.
+        /// \param lang Language code (e.g., "en").
+        /// \param n Numeric value.
+        /// \return Category string such as "one" or "other".
+        /// \note Built-in fallback supports English (one/other) and Russian (one/few/many/other).
         std::string category(const std::string& lang, long long n) const {
             // Try loaded rules first
             if (auto it = rules_.find(lang); it != rules_.end()) {

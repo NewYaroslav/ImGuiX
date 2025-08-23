@@ -30,11 +30,12 @@ namespace ImGuiX::I18N {
 
     namespace fs = std::filesystem;
 
-	/// \class LangStore.
-	/// \brief
+    /// \class LangStore
+    /// \brief Localized string and Markdown loader with plural support.
     class LangStore {
     public:
 
+        /// \brief Construct store with default directory and English fallback.
         LangStore()
             : LangStore(default_i18n_base_dir(), u8"en") {
         }
@@ -55,7 +56,8 @@ namespace ImGuiX::I18N {
             try_load_plural_rules_from_default_location();
         }
 
-        /// \brief Change current language; rebuild language caches.
+        /// \brief Change current language and rebuild caches.
+        /// \param lang New language code (e.g., "ru", "en").
         void set_language(std::string lang) {
             if (lang == m_current_lang) return;
             m_current_lang = std::move(lang);
@@ -78,19 +80,24 @@ namespace ImGuiX::I18N {
         }
 
         /// \brief Current language code (e.g., "ru", "en").
+        /// \return Active language code.
         const std::string& language() const noexcept { return m_current_lang; }
 
-        /// \brief Set external plural rules implementation (takes ownership).
+        /// \brief Set external plural rules implementation.
+        /// \param rules New rules instance; takes ownership.
         void set_plural_rules(std::unique_ptr<PluralRules> rules) {
             if (rules) m_plural_rules = std::move(rules);
         }
 
-        /// \brief Try to load plural rules from a JSON file (returns true on success).
+        /// \brief Load plural rules from a JSON file.
+        /// \param path Path to JSON file.
+        /// \return True on success.
         bool load_plural_rules_from_file(const std::string& path) {
             return m_plural_rules ? m_plural_rules->load_from_file(path) : false;
         }
 
         /// \brief Plain localized text for a key with fallback to default language.
+        /// \param key Lookup key.
         /// \return Reference to internal storage; invalidated on language switch or map reload.
         const std::string& text(std::string_view key) const {
             if (const auto* s = find_in(*m_current_map, key)) return *s;
@@ -98,24 +105,37 @@ namespace ImGuiX::I18N {
             return missing_string();
         }
 
-        /// \brief Formatted text with compile-time checked format string.
+        /// \brief Format using a compile-time checked string.
+        /// \tparam Args Format arguments.
+        /// \param fmt_str Format string.
+        /// \param args Format arguments.
+        /// \return Formatted string.
         template <typename... Args>
         std::string textf(fmt::format_string<Args...> fmt_str, Args&&... args) const {
             return fmt::format(fmt_str, std::forward<Args>(args)...);
         }
 
-        /// \brief Format by key (runtime template comes from JSON).
+        /// \brief Format by key where template comes from JSON.
+        /// \tparam Args Format arguments.
+        /// \param key Lookup key.
+        /// \param args Format arguments.
+        /// \return Formatted string.
         template <typename... Args>
         std::string textf_key(std::string_view key, Args&&... args) const {
             return fmt::format(text(key), std::forward<Args>(args)...);
         }
 
-        /// \brief vformat by key (when you already have fmt::format_args).
+        /// \brief vformat by key using pre-built \c fmt::format_args.
+        /// \param key Lookup key.
+        /// \param args Pre-built arguments.
+        /// \return Formatted string.
         inline std::string textvf_key(std::string_view key, fmt::format_args args) const {
             return fmt::vformat(text(key), args);
         }
 
-        /// \brief Get "label##id" cached string for ImGui; cache is per key & language.
+        /// \brief Get "label##id" cached string for ImGui.
+        /// \param key Lookup key.
+        /// \return Cached label string per key and language.
         const char* label(std::string_view key) const {
             if (auto it = m_label_cache.find(key); it != m_label_cache.end())
                 return it->second.c_str();
@@ -131,8 +151,10 @@ namespace ImGuiX::I18N {
             return ins->second.c_str();
         }
 
-        /// \brief Load markdown content for the given doc-key. Fallback to default language.
-        /// Resolves: <base>/<lang>/<key>.md -> <base>/<default>/<key>.md
+        /// \brief Load markdown content for a document key.
+        /// \param doc_key Document key.
+        /// \return Markdown content or empty string if missing.
+        /// \note Resolves: <base>/<lang>/<key>.md then <base>/<default>/<key>.md.
         std::string doc(std::string_view doc_key) const {
             if (auto s = load_md_cached(m_current_lang, doc_key); !s.empty()) return s;
             if (m_current_lang != m_default_lang) {
@@ -141,7 +163,7 @@ namespace ImGuiX::I18N {
             return {};
         }
 
-        /// \brief Clear all runtime caches (labels + markdown). Usually not needed.
+        /// \brief Clear all runtime caches (labels and markdown).
         void clear_caches() {
             m_label_cache.clear();
             m_md_cache.clear();
@@ -149,8 +171,9 @@ namespace ImGuiX::I18N {
 
         // ------------------ Pluralization API ------------------
 
-        /// \brief Category suffix for n (via PluralRules).
-        /// Returns "one", "few", "many", "other", etc., depending on the active language.
+        /// \brief Category suffix for \p n via PluralRules.
+        /// \param n Numeric value.
+        /// \return "one", "few", "many", "other", etc., depending on the active language.
         std::string plural_suffix(long long n) const {
             // PluralRules::category() already has built-ins for "en" and "ru".
             return m_plural_rules ? m_plural_rules->category(m_current_lang, n)
@@ -158,7 +181,11 @@ namespace ImGuiX::I18N {
         }
 
         /// \brief Get pluralized text for base key and number.
-        /// Tries: "<key>.<suffix>" (cur), "<key>.<suffix>" (default), "<key>" (cur), "<key>" (default).
+        /// \param base_key Base lookup key.
+        /// \param n Numeric value.
+        /// \return Matching localized string.
+        /// \note Fallback order: "<key>.<suffix>" (current), "<key>.<suffix>" (default),
+        ///       "<key>" (current), "<key>" (default).
         const std::string& text_plural(std::string_view base_key, long long n) const {
             const std::string suf = plural_suffix(n);
             if (const auto* s = find_in(*m_current_map, join_dotted(base_key, suf))) return *s;
@@ -168,6 +195,12 @@ namespace ImGuiX::I18N {
             return missing_string();
         }
 
+        /// \brief Format pluralized text for base key and number.
+        /// \tparam Args Format arguments.
+        /// \param base_key Base lookup key.
+        /// \param n Numeric value.
+        /// \param args Format arguments.
+        /// \return Formatted string.
         template <typename... Args>
         std::string textf_plural(std::string_view base_key, long long n, Args&&... args) const {
             return fmt::format(text_plural(base_key, n), std::forward<Args>(args)...);
@@ -175,7 +208,7 @@ namespace ImGuiX::I18N {
 
     private:
 
-        // --- типы ключей и карты ---
+        // --- key types and maps ---
         using KeyView = std::string_view;
     
         struct SvHash {
@@ -188,9 +221,9 @@ namespace ImGuiX::I18N {
         
         using StrMap = std::unordered_map<KeyView, std::string, SvHash, SvEq>;
         
-        mutable std::deque<std::string> m_key_pool; ///< Пул ключей (владеем памятью, чтобы KeyView был стабилен)
+        mutable std::deque<std::string> m_key_pool; ///< Key pool (owns storage so KeyView stays stable)
 
-        // Интернирование ключа (гарантирует стабильный storage)
+        // Intern a key to guarantee stable storage
         KeyView intern_key(const std::string& s) const {
             m_key_pool.emplace_back(s);
             return KeyView{m_key_pool.back()};
@@ -251,8 +284,8 @@ namespace ImGuiX::I18N {
             if (!obj.is_object()) return;
 
             for (auto it = obj.begin(); it != obj.end(); ++it) {
-                const std::string& key_str = it.key();   // JSON даёт std::string один раз
-                KeyView k = self.intern_key(key_str);    // заинтернировали -> KeyView стабилен
+                const std::string& key_str = it.key();   // JSON provides std::string only once
+                KeyView k = self.intern_key(key_str);    // intern -> KeyView stays stable
                 const nlohmann::json& val = it.value();
 
                 auto get_sv = [&](const nlohmann::json& j) -> std::string {
@@ -303,7 +336,7 @@ namespace ImGuiX::I18N {
         // ---------- Markdown loading (lazy) ----------
 
         std::string load_md_cached(const std::string& lang, std::string_view doc_key) const {
-            auto& by_key = m_md_cache[lang]; // ок: создаст пустую под-таблицу при первом доступе
+            auto& by_key = m_md_cache[lang]; // creates empty sub-table on first access
             if (auto it = by_key.find(doc_key); it != by_key.end())
                 return it->second;
 
@@ -370,19 +403,38 @@ namespace ImGuiX::I18N {
         mutable std::unordered_map<std::string, StrMap>        m_lang_cache;   // lang -> map
         //mutable std::unordered_map<std::string, std::string>   m_md_cache;     // (lang+'\n'+key) -> content
         mutable std::unordered_map<KeyView, std::string, SvHash, SvEq> m_label_cache; // key -> "text##key"
-        mutable std::unordered_map<std::string, std::unordered_map<KeyView, std::string, SvHash, SvEq>> m_md_cache; // вложенная карта: lang -> (doc_key -> md
+        mutable std::unordered_map<std::string, std::unordered_map<KeyView, std::string, SvHash, SvEq>> m_md_cache; // nested map: lang -> (doc_key -> markdown content)
         // plural rules
         std::unique_ptr<PluralRules> m_plural_rules;
     };
 
     // -------------------- Optional: tiny plural facade --------------------
+    /// \brief Convenience wrappers for pluralized lookups.
     struct Plural {
+        /// \brief Get plural category suffix for number.
+        /// \param ls Language store.
+        /// \param n Numeric value.
+        /// \return Category suffix such as "one" or "other".
         static std::string suffix(const LangStore& ls, long long n) {
             return ls.plural_suffix(n);
         }
+
+        /// \brief Get pluralized text for base key and number.
+        /// \param ls Language store.
+        /// \param base_key Base lookup key.
+        /// \param n Numeric value.
+        /// \return Localized string.
         static const std::string& text(const LangStore& ls, std::string_view base_key, long long n) {
             return ls.text_plural(base_key, n);
         }
+
+        /// \brief Format pluralized text for base key and number.
+        /// \tparam Args Format arguments.
+        /// \param ls Language store.
+        /// \param base_key Base lookup key.
+        /// \param n Numeric value.
+        /// \param args Format arguments.
+        /// \return Formatted string.
         template <typename... Args>
         static std::string textf(const LangStore& ls, std::string_view base_key, long long n, Args&&... args) {
             return ls.textf_plural(base_key, n, std::forward<Args>(args)...);
