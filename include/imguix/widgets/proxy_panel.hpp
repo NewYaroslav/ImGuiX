@@ -60,7 +60,10 @@ namespace ImGuiX::Widgets {
     };
 
     /// \brief Draw proxy settings panel.
-    /// \return true if any settings changed this frame.
+    /// \param id Unique widget identifier.
+    /// \param cfg Panel configuration.
+    /// \param st Proxy settings model to edit.
+    /// \return True if any settings changed this frame.
     inline bool ProxyPanel(const char* id, ProxyPanelConfig& cfg, ProxySettings& st) {
         bool changed = false;
 
@@ -79,7 +82,7 @@ namespace ImGuiX::Widgets {
         // --- IP ---
         bool bad_ip = false;
         if (!st.ip.empty()) {
-            // Minimal IPv4 check. For hostnames, расширь по необходимости.
+            // Minimal IPv4 check. Extend for hostnames if needed.
             static const std::regex re_ip(u8R"(^\d{1,3}(\.\d{1,3}){3}$)");
             bad_ip = !std::regex_match(st.ip, re_ip);
         }
@@ -172,7 +175,7 @@ namespace ImGuiX::Widgets {
 
         // --- Check button + status ---
         if (cfg.show_check && st.use_proxy) {
-            // Прячем кнопку, если ip невалидный
+            // Hide button if IP is invalid
             if (!bad_ip) {
                 ImGui::SameLine();
                 if (ImGui::Button(cfg.button_check)) {

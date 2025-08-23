@@ -2,7 +2,7 @@
 #ifndef _IMGUIX_WIDGETS_TEXT_CENTER_HPP_INCLUDED
 #define _IMGUIX_WIDGETS_TEXT_CENTER_HPP_INCLUDED
 
-// \file text_center.hpp
+/// \file text_center.hpp
 /// \brief Helpers to center text within the current content region (single-line, unformatted, wrapped).
 ///
 /// ImGui 1.92.* compatible: uses only public API + <cstdio> for formatting.
@@ -15,8 +15,9 @@
 
 namespace ImGuiX::Widgets {
 
-    /// \brief Center a single-line formatted text (uses ImGui::Text).
-    /// \note If text width > available width, falls back to left align.
+    /// \brief Center a single-line formatted text using ImGui::Text.
+    /// \param fmt Format string for std::vsnprintf.
+    /// \note If text width exceeds available width, falls back to left alignment.
     inline void TextCenteredFmt(const char* fmt, ...) {
         char buf[1024];
         va_list args;
@@ -34,6 +35,7 @@ namespace ImGuiX::Widgets {
     }
 
     /// \brief Center an unformatted string (no printf parsing).
+    /// \param text UTF-8 string to render.
     inline void TextUnformattedCentered(const char* text) {
         if (!text) return;
         const float avail_w = ImGui::GetContentRegionAvail().x;
@@ -45,12 +47,10 @@ namespace ImGuiX::Widgets {
         ImGui::TextUnformatted(text);
     }
 
-    /// \brief Center a wrapped text block by placing it into a centered child with given width.
+    /// \brief Center a wrapped text block by placing it into a centered child.
     /// \param text Text to render.
-    /// \param wrap_width Desired wrap width in pixels (<= avail). If <= 0, uses avail width.
-    ///
-    /// Принцип: создаём «вкладыш»-child нужной ширины и центрируем его по горизонтали,
-    /// а внутри используем обычный TextWrapped (левый край), что даёт визуально центрированный блок.
+    /// \param wrap_width Desired wrap width in pixels (<= avail). If <= 0, uses available width.
+    /// \note The function creates a child region of the target width and centers it, then uses TextWrapped inside.
     inline void TextWrappedCentered(const char* text, float wrap_width = 0.0f) {
         if (!text) return;
         const float avail_w = ImGui::GetContentRegionAvail().x;

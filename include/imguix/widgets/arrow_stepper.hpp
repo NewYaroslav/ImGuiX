@@ -4,7 +4,6 @@
 
 /// \file arrow_stepper.hpp
 /// \brief Compact numeric stepper with Up/Down arrow buttons and optional wrap.
-/// \note Comments in English, code is C++17.
 
 #include <imgui.h>
 #include <algorithm>
@@ -22,11 +21,15 @@ namespace ImGuiX::Widgets {
         const char* fmt   = u8"%02d"; ///< Small preview text to the right
         const char* input_id = u8"##val"; ///< ID for InputInt inside local PushID
         float same_line_spacing = 2.0f; ///< Spacing between items on SameLine
-        bool  disable_at_edges = true;
+        bool  disable_at_edges = true; ///< Disable buttons when value is at min/max
     };
 
     /// \brief Arrow stepper for an integer value.
-    /// \return true iff value changed.
+    /// \param id Unique widget identifier.
+    /// \param v Reference to value being edited.
+    /// \param cfg Configuration parameters.
+    /// \param last_delta Optional output: last delta applied by arrows or wheel.
+    /// \return True if value changed.
     inline bool ArrowStepper(const char* id, int& v, const ArrowStepperConfig& cfg = {}, int* last_delta = nullptr) {
         bool changed = false;
         ImGui::PushID(id);
@@ -40,7 +43,7 @@ namespace ImGuiX::Widgets {
         // clamp current value once
         v = (v < minv ? minv : (v > maxv ? maxv : v));
 
-        // --- text input (без встроенных +/-)
+        // --- text input (no built-in +/- buttons)
         ImGui::SetNextItemWidth(cfg.input_width);
         int prev = v;
         if (ImGui::InputInt(cfg.input_id, &v, 0, 0)) {
@@ -60,9 +63,9 @@ namespace ImGuiX::Widgets {
             int nv = v + step;
             if (nv > maxv) {
                 if (cfg.wrap) nv = minv;
-                else { nv = v; /* удерживаем значение */ }
+                else { nv = v; /* keep current value */ }
             }
-            if (last_delta) *last_delta = +step;   // всегда сообщаем намерение
+            if (last_delta) *last_delta = +step;   // always report intended delta
             changed |= (nv != v);
             v = nv;
         }
@@ -76,9 +79,9 @@ namespace ImGuiX::Widgets {
             int nv = v - step;
             if (nv < minv) {
                 if (cfg.wrap) nv = maxv;
-                else { nv = v; /* удерживаем значение */ }
+                else { nv = v; /* keep current value */ }
             }
-            if (last_delta) *last_delta = -step;   // всегда сообщаем намерение
+            if (last_delta) *last_delta = -step;   // always report intended delta
             changed |= (nv != v);
             v = nv;
         }
@@ -95,7 +98,7 @@ namespace ImGuiX::Widgets {
         ImGui::EndGroup();
         
         ImVec2 min = ImGui::GetItemRectMin();
-		ImVec2 max = ImGui::GetItemRectMax();
+        ImVec2 max = ImGui::GetItemRectMax();
         const ImGuiIO& io = ImGui::GetIO();
 
         // --- optional: mouse wheel over the whole group
@@ -106,7 +109,7 @@ namespace ImGuiX::Widgets {
                 int delta = (io.MouseWheel > 0.0f ? +step : -step);
                 int nv = v + delta;
 
-                if (nv > maxv) nv = cfg.wrap ? minv : v;  // по краю: держим v, но репортим delta
+                if (nv > maxv) nv = cfg.wrap ? minv : v;  // at boundary: keep v but report delta
                 if (nv < minv) nv = cfg.wrap ? maxv : v;
 
                 changed |= (nv != v);
