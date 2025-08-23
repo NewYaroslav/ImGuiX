@@ -135,43 +135,43 @@ namespace ImGuiX::Utils {
 
     template<typename Dummy = void>
     std::string Utf8ToAnsi(const std::string&) {
-        static_assert(detail::dependent_false_v<Dummy>, "Utf8ToAnsi is not supported on this platform");
+        static_assert(detail::dependent_false_v<Dummy>, u8"Utf8ToAnsi is not supported on this platform");
         return {};
     }
 
     template<typename Dummy = void>
     std::string AnsiToUtf8(const std::string&) {
-        static_assert(detail::dependent_false_v<Dummy>, "AnsiToUtf8 is not supported on this platform");
+        static_assert(detail::dependent_false_v<Dummy>, u8"AnsiToUtf8 is not supported on this platform");
         return {};
     }
 
     template<typename Dummy = void>
     std::string Utf8ToCp866(const std::string&) {
-        static_assert(detail::dependent_false_v<Dummy>, "Utf8ToCp866 is not supported on this platform");
+        static_assert(detail::dependent_false_v<Dummy>, u8"Utf8ToCp866 is not supported on this platform");
         return {};
     }
 
     template<typename Dummy = void>
     bool IsValidUtf8(const char*) {
-        static_assert(detail::dependent_false_v<Dummy>, "IsValidUtf8 is not supported on this platform");
+        static_assert(detail::dependent_false_v<Dummy>, u8"IsValidUtf8 is not supported on this platform");
         return false;
     }
 
     template<typename Dummy = void>
     std::string Cp1251ToUtf8(const std::string&) {
-        static_assert(detail::dependent_false_v<Dummy>, "Cp1251ToUtf8 is not supported on this platform");
+        static_assert(detail::dependent_false_v<Dummy>, u8"Cp1251ToUtf8 is not supported on this platform");
         return {};
     }
 
     template<typename Dummy = void>
     std::string Utf16ToUtf8(void*) {
-        static_assert(detail::dependent_false_v<Dummy>, "Utf16ToUtf8 is not supported on this platform");
+        static_assert(detail::dependent_false_v<Dummy>, u8"Utf16ToUtf8 is not supported on this platform");
         return {};
     }
 
     template<typename Dummy = void>
     std::wstring Utf8ToUtf16(const std::string&) {
-        static_assert(detail::dependent_false_v<Dummy>, "Utf8ToUtf16 is not supported on this platform");
+        static_assert(detail::dependent_false_v<Dummy>, u8"Utf8ToUtf16 is not supported on this platform");
         return {};
     }
 } // namespace ImGuiX::Utils

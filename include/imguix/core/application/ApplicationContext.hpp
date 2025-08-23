@@ -30,7 +30,7 @@ namespace ImGuiX {
         template<class WindowType, class... Args>
         WindowType& createWindow(Args&&... args) {
             static_assert(std::is_base_of_v<WindowInstance, WindowType>,
-                    "WindowType must derive from WindowInstance");
+                    u8"WindowType must derive from WindowInstance");
             auto factory = [&, this](int id) {
                 return std::make_unique<WindowType>(
                         id,
@@ -48,7 +48,7 @@ namespace ImGuiX {
         template<class ModelType, class... Args>
         ModelType& createModel(Args&&... args) {
             static_assert(std::is_base_of_v<Model, ModelType>,
-                    "ModelType must derive from Model");
+                    u8"ModelType must derive from Model");
             auto factory = [&, this]() {
                 return std::make_unique<ModelType>(
                         *this,

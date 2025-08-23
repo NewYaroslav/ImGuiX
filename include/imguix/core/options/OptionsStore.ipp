@@ -27,16 +27,16 @@ namespace ImGuiX {
 
         static json& ensureMeta(json& root) {
             if (!root.is_object()) root = json::object();
-            auto it = root.find("__meta");
+            auto it = root.find(u8"__meta");
             if (it == root.end() || !it->is_object()) {
-                root["__meta"] = json::object();
+                root[u8"__meta"] = json::object();
             }
-            return root["__meta"];
+            return root[u8"__meta"];
         }
 
         static const json* meta(const json& root) {
             if (!root.is_object()) return nullptr;
-            auto it = root.find("__meta");
+            auto it = root.find(u8"__meta");
             if (it == root.end() || !it->is_object()) return nullptr;
             return &(*it);
         }
@@ -51,7 +51,7 @@ namespace ImGuiX {
                     std::ofstream tf(
                             m_tmp_path,
                             std::ios::binary | std::ios::trunc);
-                    if (!tf.good()) throw std::runtime_error("tmp open failed");
+                    if (!tf.good()) throw std::runtime_error(u8"tmp open failed");
                     tf << m_root.dump(2);
                     tf.flush();
                 }
@@ -71,8 +71,8 @@ namespace ImGuiX {
             if (v.is_number_integer()) return v.get<long long>() != 0;
             if (v.is_string()) {
                 auto s = v.get<std::string>();
-                if (s == "true" || s == "1") return true;
-                if (s == "false" || s == "0") return false;
+                if (s == u8"true" || s == u8"1") return true;
+                if (s == u8"false" || s == u8"0") return false;
             }
             return std::nullopt;
         }
@@ -81,7 +81,7 @@ namespace ImGuiX {
         static std::optional<Int> asInt(const json& v) {
             static_assert(std::is_same<Int, int32_t>::value ||
                           std::is_same<Int, int64_t>::value,
-                          "int type");
+                          u8"int type");
             if (v.is_number_integer()) {
                 long long x = v.get<long long>();
                 if constexpr (std::is_same<Int, int32_t>::value) {
@@ -120,7 +120,7 @@ namespace ImGuiX {
         static std::optional<F> asFloat(const json& v) {
             static_assert(std::is_same<F, float>::value ||
                           std::is_same<F, double>::value,
-                          "float type");
+                          u8"float type");
             if (v.is_number()) return static_cast<F>(v.get<double>());
             if (v.is_string()) {
                 try {
@@ -135,7 +135,7 @@ namespace ImGuiX {
             if (v.is_string()) return v.get<std::string>();
             if (v.is_number_integer()) return std::to_string(v.get<long long>());
             if (v.is_number_float()) return std::to_string(v.get<double>());
-            if (v.is_boolean()) return v.get<bool>() ? "true" : "false";
+            if (v.is_boolean()) return v.get<bool>() ? u8"true" : u8"false";
             return std::nullopt;
         }
 
@@ -154,7 +154,7 @@ namespace ImGuiX {
     inline OptionsStore::OptionsStore(std::string path, double save_delay_sec)
         : m_impl(std::make_unique<Impl>()) {
         m_impl->m_path = std::move(path);
-        m_impl->m_tmp_path = m_impl->m_path + ".tmp";
+        m_impl->m_tmp_path = m_impl->m_path + u8".tmp";
         m_impl->m_save_delay = save_delay_sec;
         load();
     }
@@ -209,7 +209,7 @@ namespace ImGuiX {
         std::vector<std::string> out;
         out.reserve(m_impl->m_root.size());
         for (auto it = m_impl->m_root.begin(); it != m_impl->m_root.end(); ++it) {
-            if (it.key() == "__meta") continue;
+            if (it.key() == u8"__meta") continue;
             out.push_back(it.key());
         }
         return out;
@@ -265,7 +265,7 @@ namespace ImGuiX {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         auto it = m_impl->m_root.find(key);
         if (it == m_impl->m_root.end())
-            throw std::out_of_range("key not found: " + key);
+            throw std::out_of_range(u8"key not found: " + key);
         if (auto x = Impl::asBool(*it)) return *x;
         throw std::bad_cast();
     }
@@ -274,7 +274,7 @@ namespace ImGuiX {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         auto it = m_impl->m_root.find(key);
         if (it == m_impl->m_root.end())
-            throw std::out_of_range("key not found: " + key);
+            throw std::out_of_range(u8"key not found: " + key);
         if (auto x = Impl::asInt<int32_t>(*it)) return *x;
         throw std::bad_cast();
     }
@@ -283,7 +283,7 @@ namespace ImGuiX {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         auto it = m_impl->m_root.find(key);
         if (it == m_impl->m_root.end())
-            throw std::out_of_range("key not found: " + key);
+            throw std::out_of_range(u8"key not found: " + key);
         if (auto x = Impl::asInt<int64_t>(*it)) return *x;
         throw std::bad_cast();
     }
@@ -292,7 +292,7 @@ namespace ImGuiX {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         auto it = m_impl->m_root.find(key);
         if (it == m_impl->m_root.end())
-            throw std::out_of_range("key not found: " + key);
+            throw std::out_of_range(u8"key not found: " + key);
         if (auto x = Impl::asFloat<float>(*it)) return *x;
         throw std::bad_cast();
     }
@@ -301,7 +301,7 @@ namespace ImGuiX {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         auto it = m_impl->m_root.find(key);
         if (it == m_impl->m_root.end())
-            throw std::out_of_range("key not found: " + key);
+            throw std::out_of_range(u8"key not found: " + key);
         if (auto x = Impl::asFloat<double>(*it)) return *x;
         throw std::bad_cast();
     }
@@ -310,7 +310,7 @@ namespace ImGuiX {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         auto it = m_impl->m_root.find(key);
         if (it == m_impl->m_root.end())
-            throw std::out_of_range("key not found: " + key);
+            throw std::out_of_range(u8"key not found: " + key);
         if (auto x = Impl::asString(*it)) return *x;
         throw std::bad_cast();
     }
@@ -320,7 +320,7 @@ namespace ImGuiX {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         auto it = m_impl->m_root.find(key);
         if (it == m_impl->m_root.end())
-            throw std::out_of_range("key not found: " + key);
+            throw std::out_of_range(u8"key not found: " + key);
         if (auto x = Impl::asStrVec(*it)) return *x;
         throw std::bad_cast();
     }
@@ -398,7 +398,7 @@ namespace ImGuiX {
     inline void OptionsStore::setVersion(std::int32_t ver) noexcept {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         auto& m = Impl::ensureMeta(m_impl->m_root);
-        m["version"] = static_cast<long long>(ver);
+        m[u8"version"] = static_cast<long long>(ver);
         m_impl->touchLocked();
     }
 
@@ -406,8 +406,8 @@ namespace ImGuiX {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         auto* m = Impl::meta(m_impl->m_root);
         if (!m) return 0;
-        if (m->contains("version")) {
-            const json& v = (*m)["version"];
+        if (m->contains(u8"version")) {
+            const json& v = (*m)[u8"version"];
             if (v.is_number_integer()) {
                 long long x = v.get<long long>();
                 if (x < INT32_MIN || x > INT32_MAX) return 0;

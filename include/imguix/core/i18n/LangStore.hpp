@@ -36,13 +36,13 @@ namespace ImGuiX::I18N {
     public:
 
         LangStore()
-            : LangStore(default_i18n_base_dir(), "en") {
+            : LangStore(default_i18n_base_dir(), u8"en") {
         }
 
         /// \brief Construct i18n store.
         /// \param base_dir Root folder with per-language subfolders (e.g., "<root>/en/", "<root>/ru/").
         /// \param default_lang Default language (fallback), typically "en".
-        explicit LangStore(std::string base_dir, std::string default_lang = "en")
+        explicit LangStore(std::string base_dir, std::string default_lang = u8"en")
             : m_base_dir(std::move(base_dir)),
               m_default_lang(std::move(default_lang)),
               m_current_lang(m_default_lang),
@@ -124,7 +124,7 @@ namespace ImGuiX::I18N {
             std::string combined;
             combined.reserve(base.size() + 2 + key.size());
             combined += base;
-            combined += "##";
+            combined += u8"##";
             combined.append(key.begin(), key.end());
 
             auto [ins, _] = m_label_cache.emplace(intern_key(std::string(key)), std::move(combined));
@@ -222,7 +222,7 @@ namespace ImGuiX::I18N {
                 if (ec) break;
                 if (!de.is_regular_file()) continue;
                 const auto& p = de.path();
-                if (p.extension() != ".json") continue;
+                if (p.extension() != u8".json") continue;
 
                 const std::string raw = read_file(p.string());
                 if (raw.empty()) continue;
@@ -270,7 +270,7 @@ namespace ImGuiX::I18N {
                         auto s = get_sv(*jt);
                         if (!s.empty()) { out.emplace(k, std::move(s)); continue; }
                     }
-                    if (auto jt = val.find("en"); jt != val.end()) {
+                    if (auto jt = val.find(u8"en"); jt != val.end()) {
                         auto s = get_sv(*jt);
                         if (!s.empty()) { out.emplace(k, std::move(s)); continue; }
                     }
@@ -307,7 +307,7 @@ namespace ImGuiX::I18N {
             if (auto it = by_key.find(doc_key); it != by_key.end())
                 return it->second;
 
-            const fs::path p = fs::path(m_base_dir) / lang / (std::string(doc_key) + ".md");
+            const fs::path p = fs::path(m_base_dir) / lang / (std::string(doc_key) + u8".md");
             auto s = read_file(p.string());
             if (!s.empty()) {
                 by_key.emplace(intern_key(std::string(doc_key)), s);
@@ -323,7 +323,7 @@ namespace ImGuiX::I18N {
         }
 
         static const std::string& missing_string() {
-            static const std::string k = "##null";
+            static const std::string k = u8"##null";
             return k;
         }
 
@@ -338,15 +338,15 @@ namespace ImGuiX::I18N {
 
         static std::string default_plural_suffix(const std::string& lang, long long n) {
             // Minimal fallback; PluralRules has richer built-ins.
-            if (lang == "ru") {
+            if (lang == u8"ru") {
                 long long n10 = n % 10;
                 long long n100 = n % 100;
-                if (n10 == 1 && n100 != 11) return "one";
-                if (n10 >= 2 && n10 <= 4 && !(n100 >= 12 && n100 <= 14)) return "few";
-                if (n10 == 0 || (n10 >= 5 && n10 <= 9) || (n100 >= 11 && n100 <= 14)) return "many";
-                return "other";
+                if (n10 == 1 && n100 != 11) return u8"one";
+                if (n10 >= 2 && n10 <= 4 && !(n100 >= 12 && n100 <= 14)) return u8"few";
+                if (n10 == 0 || (n10 >= 5 && n10 <= 9) || (n100 >= 11 && n100 <= 14)) return u8"many";
+                return u8"other";
             }
-            return (n == 1) ? "one" : "other";
+            return (n == 1) ? u8"one" : u8"other";
         }
 
         void try_load_plural_rules_from_default_location() {

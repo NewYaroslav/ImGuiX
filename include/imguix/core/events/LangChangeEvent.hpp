@@ -42,7 +42,7 @@ namespace ImGuiX::Events {
         }
 
         const char* name() const override {
-            return "LangChangeEvent";
+            return u8"LangChangeEvent";
         }
     };
 

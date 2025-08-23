@@ -21,7 +21,7 @@ namespace ImGuiX::Controllers {
         template <typename ControllerType, typename... Args>
         ControllerType& createChildrenController(Args&&... args) {
             static_assert(std::is_base_of<Controller, ControllerType>::value,
-                          "ControllerType must derive from Controller");
+                          u8"ControllerType must derive from Controller");
 
             auto ctrl = std::make_unique<ControllerType>(window(), std::forward<Args>(args)...);
             ControllerType& ref = *ctrl;

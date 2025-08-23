@@ -30,14 +30,14 @@ namespace ImGuiX::Widgets {
     /// \brief UI configuration for ProxyPanel.
     struct ProxyPanelConfig {
         // Labels
-        const char* header            = "Proxy settings";
-        const char* hint_ip           = "ip";
-        const char* hint_port         = "port";
-        const char* hint_user         = "user";
-        const char* hint_pass         = "password";
-        const char* label_use_proxy   = "use proxy";
-        const char* button_check      = "check proxy";
-        const char* label_checked     = "checked";
+        const char* header            = u8"Proxy settings";
+        const char* hint_ip           = u8"ip";
+        const char* hint_port         = u8"port";
+        const char* hint_user         = u8"user";
+        const char* hint_pass         = u8"password";
+        const char* label_use_proxy   = u8"use proxy";
+        const char* button_check      = u8"check proxy";
+        const char* label_checked     = u8"checked";
 
         // Options
         bool show_type                = true;   ///< show type combo (HTTP/SOCKS)
@@ -69,8 +69,8 @@ namespace ImGuiX::Widgets {
                           ? ImVec2(ImGui::GetWindowWidth() * 0.65f, 148.0f)
                           : cfg.panel_size;
 
-        ImGui::BeginChild("##proxy_panel", size, cfg.border);
-        ImGui::Text("%s", cfg.header ? cfg.header : "Proxy");
+        ImGui::BeginChild(u8"##proxy_panel", size, cfg.border);
+        ImGui::Text(u8"%s", cfg.header ? cfg.header : u8"Proxy");
         ImGui::Separator();
 
         // Collapse inputs when proxy disabled (but still visible)
@@ -80,7 +80,7 @@ namespace ImGuiX::Widgets {
         bool bad_ip = false;
         if (!st.ip.empty()) {
             // Minimal IPv4 check. For hostnames, расширь по необходимости.
-            static const std::regex re_ip(R"(^\d{1,3}(\.\d{1,3}){3}$)");
+            static const std::regex re_ip(u8R"(^\d{1,3}(\.\d{1,3}){3}$)");
             bad_ip = !std::regex_match(st.ip, re_ip);
         }
 
@@ -91,7 +91,7 @@ namespace ImGuiX::Widgets {
             char buf[256];
             std::strncpy(buf, st.ip.c_str(), sizeof(buf));
             buf[sizeof(buf)-1] = '\0';
-            if (ImGui::InputTextWithHint("##proxy.ip", cfg.hint_ip, buf, sizeof(buf)-1,
+            if (ImGui::InputTextWithHint(u8"##proxy.ip", cfg.hint_ip, buf, sizeof(buf)-1,
                                          ImGuiInputTextFlags_AutoSelectAll)) {
                 st.ip = buf;
                 changed = true;
@@ -101,15 +101,15 @@ namespace ImGuiX::Widgets {
         if (bad_ip) ImGui::PopStyleColor();
 
         ImGui::SameLine();
-        ImGui::TextUnformatted(":");
+        ImGui::TextUnformatted(u8":");
 
         // --- Port ---
         ImGui::SameLine();
         ImGui::PushItemWidth(cfg.field_width_port);
         {
             char pbuf[32];
-            std::snprintf(pbuf, sizeof(pbuf), "%d", std::max(0, st.port));
-            if (ImGui::InputTextWithHint("##proxy.port", cfg.hint_port, pbuf, sizeof(pbuf)-1,
+            std::snprintf(pbuf, sizeof(pbuf), u8"%d", std::max(0, st.port));
+            if (ImGui::InputTextWithHint(u8"##proxy.port", cfg.hint_port, pbuf, sizeof(pbuf)-1,
                                          ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_CharsDecimal)) {
                 int v = 0;
                 if (*pbuf) v = std::clamp(std::atoi(pbuf), 0, 65535);
@@ -123,8 +123,8 @@ namespace ImGuiX::Widgets {
             ImGui::SameLine();
             ImGui::PushItemWidth(cfg.field_width_type);
             int t = static_cast<int>(st.type);
-            const char* items[] = { "HTTP", "SOCKS 4", "SOCKS 5" };
-            if (ImGui::Combo("##proxy.type", &t, items, IM_ARRAYSIZE(items))) {
+            const char* items[] = { u8"HTTP", u8"SOCKS 4", u8"SOCKS 5" };
+            if (ImGui::Combo(u8"##proxy.type", &t, items, IM_ARRAYSIZE(items))) {
                 st.type = static_cast<ProxyType>(t);
                 changed = true;
             }
@@ -137,7 +137,7 @@ namespace ImGuiX::Widgets {
             char ubuf[256];
             std::strncpy(ubuf, st.username.c_str(), sizeof(ubuf));
             ubuf[sizeof(ubuf)-1] = '\0';
-            if (ImGui::InputTextWithHint("##proxy.user", cfg.hint_user, ubuf, sizeof(ubuf)-1,
+            if (ImGui::InputTextWithHint(u8"##proxy.user", cfg.hint_user, ubuf, sizeof(ubuf)-1,
                                          ImGuiInputTextFlags_AutoSelectAll)) {
                 st.username = ubuf;
                 changed = true;
@@ -146,7 +146,7 @@ namespace ImGuiX::Widgets {
         ImGui::PopItemWidth();
 
         ImGui::SameLine();
-        ImGui::TextUnformatted(":");
+        ImGui::TextUnformatted(u8":");
 
         // --- Pass ---
         ImGui::SameLine();
@@ -155,7 +155,7 @@ namespace ImGuiX::Widgets {
             char pbuf2[256];
             std::strncpy(pbuf2, st.password.c_str(), sizeof(pbuf2));
             pbuf2[sizeof(pbuf2)-1] = '\0';
-            if (ImGui::InputTextWithHint("##proxy.pass", cfg.hint_pass, pbuf2, sizeof(pbuf2)-1,
+            if (ImGui::InputTextWithHint(u8"##proxy.pass", cfg.hint_pass, pbuf2, sizeof(pbuf2)-1,
                                          ImGuiInputTextFlags_Password)) {
                 st.password = pbuf2;
                 changed = true;

@@ -29,9 +29,9 @@ namespace ImGuiX {
         if (m_window || m_is_open) return true;
         if (SDL_Init(SDL_INIT_VIDEO) != 0) return false;
 #ifdef __EMSCRIPTEN__
-        SDL_SetHint(SDL_HINT_EMSCRIPTEN_CANVAS_SELECTOR, "#canvas");
-        SDL_SetHint(SDL_HINT_VIDEO_HIGHDPI_DISABLED, "0");
-        SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "1");
+        SDL_SetHint(SDL_HINT_EMSCRIPTEN_CANVAS_SELECTOR, u8"#canvas");
+        SDL_SetHint(SDL_HINT_VIDEO_HIGHDPI_DISABLED, u8"0");
+        SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, u8"1");
 #endif
         m_window = SDL_CreateWindow(name().c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                    width(), height(), SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
@@ -82,14 +82,14 @@ namespace ImGuiX {
 		if (SDL_GL_GetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, &profile) != 0) return IMGUIX_GLSL_VERSION;
 
 		if (profile & SDL_GL_CONTEXT_PROFILE_ES)
-			return (major >= 3) ? "#version 300 es" : "#version 100";
+			return (major >= 3) ? u8"#version 300 es" : u8"#version 100";
 
 #   	if defined(__APPLE__)
-		return "#version 150";
+		return u8"#version 150";
 #   	else
 		if (major > 3 || (major == 3 && minor >= 2) || (profile & SDL_GL_CONTEXT_PROFILE_CORE))
-			return "#version 150";
-		return "#version 130";
+			return u8"#version 150";
+		return u8"#version 130";
 #   	endif
 #	endif
 	}

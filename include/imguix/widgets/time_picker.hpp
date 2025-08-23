@@ -41,7 +41,7 @@ namespace ImGuiX::Widgets {
 
     inline std::string format_hms(uint32_t sec) {
         int h, m, s; seconds_to_hms(static_cast<int>(sec), h, m, s);
-        char buf[16]; std::snprintf(buf, sizeof(buf), "%02d:%02d:%02d", h, m, s);
+        char buf[16]; std::snprintf(buf, sizeof(buf), u8"%02d:%02d:%02d", h, m, s);
         return std::string(buf);
     }
 
@@ -50,7 +50,7 @@ namespace ImGuiX::Widgets {
         uint32_t a = static_cast<uint32_t>(pos ? off_sec : -off_sec);
         char buf[20];
         int h, m, s; seconds_to_hms(static_cast<int>(a), h, m, s);
-        std::snprintf(buf, sizeof(buf), "%c%02d:%02d:%02d", pos ? '+' : '-', h, m, s);
+        std::snprintf(buf, sizeof(buf), u8"%c%02d:%02d:%02d", pos ? '+' : '-', h, m, s);
         return std::string(buf);
     }
     
@@ -67,14 +67,14 @@ namespace ImGuiX::Widgets {
         int n = 0;
 
         // Try HH:MM:SS
-        if (std::sscanf(txt, "%d:%d:%d%n", &h, &m, &s, &n) >= 2 && n > 0) {
+        if (std::sscanf(txt, u8"%d:%d:%d%n", &h, &m, &s, &n) >= 2 && n > 0) {
             // ok
-        } else if (std::sscanf(txt, "%d:%d%n", &h, &m, &n) == 2) {
+        } else if (std::sscanf(txt, u8"%d:%d%n", &h, &m, &n) == 2) {
             s = 0;
         } else {
             // Try compact HHMM or HMM
             int packed = 0;
-            if (std::sscanf(txt, "%d%n", &packed, &n) == 1) {
+            if (std::sscanf(txt, u8"%d%n", &packed, &n) == 1) {
                 if (packed < 0) packed = -packed;
                 if (packed >= 0 && packed <= 235959) {
                     if (packed <= 959) { // HMM
@@ -106,8 +106,8 @@ namespace ImGuiX::Widgets {
     // ---------- configs & data ---------------------------------------------------
 
     struct TimePickerConfig {
-        const char* label       = "Time";
-        const char* desc        = "HH:MM:SS";
+        const char* label       = u8"Time";
+        const char* desc        = u8"HH:MM:SS";
         float       combo_width = 160.0f;
         bool        show_desc   = true;
         float       field_width = 48.0f;
@@ -122,37 +122,37 @@ namespace ImGuiX::Widgets {
 
     inline const std::vector<TimeZoneInfo>& DefaultTimeZones() {
         static const std::vector<TimeZoneInfo> tz = {
-            {"_custom",           "Custom (manual)",             0,     false},
-            {"Europe/London",     "London (UTC+0)",              0,     true },
-            {"Europe/Berlin",     "Frankfurt/Berlin (UTC+1)",    3600,  true },
-            {"Europe/Zurich",     "Zurich (UTC+1)",              3600,  true },
-            {"Europe/Moscow",     "Moscow (UTC+3)",              10800, false},
+            {u8"_custom",           u8"Custom (manual)",             0,     false},
+            {u8"Europe/London",     u8"London (UTC+0)",              0,     true },
+            {u8"Europe/Berlin",     u8"Frankfurt/Berlin (UTC+1)",    3600,  true },
+            {u8"Europe/Zurich",     u8"Zurich (UTC+1)",              3600,  true },
+            {u8"Europe/Moscow",     u8"Moscow (UTC+3)",              10800, false},
 
-            {"America/New_York",  "New York (UTC-5)",           -18000, true },
-            {"America/Chicago",   "Chicago (UTC-6)",            -21600, true },
-            {"America/Denver",    "Denver (UTC-7)",             -25200, true },
-            {"America/Los_Angeles","Los Angeles (UTC-8)",       -28800, true },
+            {u8"America/New_York",  u8"New York (UTC-5)",           -18000, true },
+            {u8"America/Chicago",   u8"Chicago (UTC-6)",            -21600, true },
+            {u8"America/Denver",    u8"Denver (UTC-7)",             -25200, true },
+            {u8"America/Los_Angeles",u8"Los Angeles (UTC-8)",       -28800, true },
 
-            {"Asia/Shanghai",     "Shanghai (UTC+8)",            28800, false},
-            {"Asia/Hong_Kong",    "Hong Kong (UTC+8)",           28800, false},
-            {"Asia/Singapore",    "Singapore (UTC+8)",           28800, false},
-            {"Asia/Tokyo",        "Tokyo (UTC+9)",               32400, false},
-            {"Asia/Seoul",        "Seoul (UTC+9)",               32400, false},
+            {u8"Asia/Shanghai",     u8"Shanghai (UTC+8)",            28800, false},
+            {u8"Asia/Hong_Kong",    u8"Hong Kong (UTC+8)",           28800, false},
+            {u8"Asia/Singapore",    u8"Singapore (UTC+8)",           28800, false},
+            {u8"Asia/Tokyo",        u8"Tokyo (UTC+9)",               32400, false},
+            {u8"Asia/Seoul",        u8"Seoul (UTC+9)",               32400, false},
 
-            {"Australia/Sydney",  "Sydney (UTC+10)",             36000, true },
+            {u8"Australia/Sydney",  u8"Sydney (UTC+10)",             36000, true },
 
-            {"America/Sao_Paulo", "Sao Paulo (UTC-3)",          -10800, true },
-            {"America/Mexico_City","Mexico City (UTC-6)",       -21600, true },
+            {u8"America/Sao_Paulo", u8"Sao Paulo (UTC-3)",          -10800, true },
+            {u8"America/Mexico_City",u8"Mexico City (UTC-6)",       -21600, true },
 
-            {"Asia/Dubai",        "Dubai (UTC+4)",               14400, false},
-            {"Asia/Jerusalem",    "Tel Aviv (UTC+2)",            7200,  true }
+            {u8"Asia/Dubai",        u8"Dubai (UTC+4)",               14400, false},
+            {u8"Asia/Jerusalem",    u8"Tel Aviv (UTC+2)",            7200,  true }
         };
         return tz;
     }
 
     struct TimeOffsetPickerConfig {
-        const char* label        = "Offset";
-        const char* desc         = "±HH:MM:SS";
+        const char* label        = u8"Offset";
+        const char* desc         = u8"±HH:MM:SS";
         float       combo_width  = 210.0f;
         bool        show_desc    = true;
         bool        show_gmt     = true;
@@ -170,19 +170,19 @@ namespace ImGuiX::Widgets {
 
         ImGui::PushID(id);
         ImGui::SetNextItemWidth(cfg.combo_width);
-        if (ImGui::BeginCombo(cfg.label ? cfg.label : "Time", preview.c_str())) {
+        if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Time", preview.c_str())) {
             if (cfg.show_desc && cfg.desc) ImGui::TextUnformatted(cfg.desc);
 
             int h, m, s; seconds_to_hms(seconds, h, m, s);
 
-            ArrowStepperConfig sc_h{0,23,1,true,cfg.field_width,"%02d h"};
-            ArrowStepperConfig sc_m{0,59,1,true,cfg.field_width,"%02d m"};
-            ArrowStepperConfig sc_s{0,59,1,true,cfg.field_width,"%02d s"};
+            ArrowStepperConfig sc_h{0,23,1,true,cfg.field_width,u8"%02d h"};
+            ArrowStepperConfig sc_m{0,59,1,true,cfg.field_width,u8"%02d m"};
+            ArrowStepperConfig sc_s{0,59,1,true,cfg.field_width,u8"%02d s"};
 
             bool any = false;
-            any |= ArrowStepper("h", h, sc_h);
-            any |= ArrowStepper("m", m, sc_m);
-            any |= ArrowStepper("s", s, sc_s);
+            any |= ArrowStepper(u8"h", h, sc_h);
+            any |= ArrowStepper(u8"m", m, sc_m);
+            any |= ArrowStepper(u8"s", s, sc_s);
 
             int prev = seconds;
             seconds = hms_to_seconds(h, m, s);
@@ -214,13 +214,13 @@ namespace ImGuiX::Widgets {
 
         ImGui::PushID(id);
         ImGui::SetNextItemWidth(cfg.combo_width);
-        if (ImGui::BeginCombo(cfg.label ? cfg.label : "Offset", preview.c_str())) {
+        if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Offset", preview.c_str())) {
             if (cfg.show_desc && cfg.desc) ImGui::TextUnformatted(cfg.desc);
 
             // Timezone combo
             if (cfg.show_tz_list && !tzlist.empty()) {
                 const char* cur = tzlist[tz_index_io].label;
-                if (ImGui::BeginCombo("Timezone", cur)) {
+                if (ImGui::BeginCombo(u8"Timezone", cur)) {
                     for (int i = 0; i < (int)tzlist.size(); ++i) {
                         bool sel = (i == tz_index_io);
                         if (ImGui::Selectable(tzlist[i].label, sel)) { tz_index_io = i; changed = true; }
@@ -245,16 +245,16 @@ namespace ImGuiX::Widgets {
             // 1) Direct string edit with sign parsing
             {
                 char buf[32];
-                std::snprintf(buf, sizeof(buf), "%s", format_signed_hms(offset_sec).c_str());
+                std::snprintf(buf, sizeof(buf), u8"%s", format_signed_hms(offset_sec).c_str());
                 ImGui::SetNextItemWidth(140.0f);
-                if (ImGui::InputText("##offset_str", buf, sizeof(buf))) {
+                if (ImGui::InputText(u8"##offset_str", buf, sizeof(buf))) {
                     int64_t v = 0;
                     if (parse_signed_hms(buf, v)) {
                         if (v != offset_sec) { offset_sec = v; changed = true; }
                     }
                 }
                 ImGui::SameLine();
-                ImGui::TextUnformatted("±HH:MM[:SS]");
+                ImGui::TextUnformatted(u8"±HH:MM[:SS]");
             }
 
             // 2) H/M/S steppers edit magnitude + allow crossing zero to change sign
@@ -268,9 +268,9 @@ namespace ImGuiX::Widgets {
                 const bool was_positive = positive;
 
                 // steppers: NO wrap here (we control borders ourselves)
-                ArrowStepperConfig sc_h{0,23,1,false,cfg.field_width,"%02d h"};
-                ArrowStepperConfig sc_m{0,59,1,false,cfg.field_width,"%02d m"};
-                ArrowStepperConfig sc_s{0,59,1,false,cfg.field_width,"%02d s"};
+                ArrowStepperConfig sc_h{0,23,1,false,cfg.field_width,u8"%02d h"};
+                ArrowStepperConfig sc_m{0,59,1,false,cfg.field_width,u8"%02d m"};
+                ArrowStepperConfig sc_s{0,59,1,false,cfg.field_width,u8"%02d s"};
 				
 				sc_h.disable_at_edges = false;
 				sc_m.disable_at_edges = false;
@@ -278,9 +278,9 @@ namespace ImGuiX::Widgets {
 
                 int dh = 0, dm = 0, ds = 0; // last deltas from arrows/wheel; 0 if edited via text
                 bool any = false;
-                any |= ArrowStepper("oh", h, sc_h, &dh);
-                any |= ArrowStepper("om", m, sc_m, &dm);
-                any |= ArrowStepper("os", s, sc_s, &ds);
+                any |= ArrowStepper(u8"oh", h, sc_h, &dh);
+                any |= ArrowStepper(u8"om", m, sc_m, &dm);
+                any |= ArrowStepper(u8"os", s, sc_s, &ds);
 
                 int new_abs = hms_to_seconds(h, m, s);
 
@@ -311,8 +311,8 @@ namespace ImGuiX::Widgets {
 
             if (cfg.show_gmt) {
                 std::string g = format_signed_hms(offset_sec);
-                ImGui::Text("GMT %s%s", g.c_str(),
-                            (!custom && has_dst_out) ? " (DST observed)" : "");
+                ImGui::Text(u8"GMT %s%s", g.c_str(),
+                            (!custom && has_dst_out) ? u8" (DST observed)" : u8"");
             }
 
             ImGui::EndCombo();

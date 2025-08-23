@@ -127,9 +127,9 @@ namespace ImGuiX {
         if (!display || !handle)
             return;
 
-        Atom wmState = XInternAtom(display, "_NET_WM_STATE", False);
-        Atom maxHorz = XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_HORZ", False);
-        Atom maxVert = XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_VERT", False);
+        Atom wmState = XInternAtom(display, u8"_NET_WM_STATE", False);
+        Atom maxHorz = XInternAtom(display, u8"_NET_WM_STATE_MAXIMIZED_HORZ", False);
+        Atom maxVert = XInternAtom(display, u8"_NET_WM_STATE_MAXIMIZED_VERT", False);
 
         XEvent xev{};
         xev.type = ClientMessage;
@@ -171,9 +171,9 @@ namespace ImGuiX {
         if (!display || !handle)
             return false;
 
-        Atom wmState = XInternAtom(display, "_NET_WM_STATE", False);
-        Atom maxHorz = XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_HORZ", False);
-        Atom maxVert = XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_VERT", False);
+        Atom wmState = XInternAtom(display, u8"_NET_WM_STATE", False);
+        Atom maxHorz = XInternAtom(display, u8"_NET_WM_STATE_MAXIMIZED_HORZ", False);
+        Atom maxVert = XInternAtom(display, u8"_NET_WM_STATE_MAXIMIZED_VERT", False);
         Atom actualType;
         int actualFormat;
         unsigned long nitems, bytesAfter;
@@ -215,9 +215,9 @@ namespace ImGuiX {
         if (!display || !handle)
             return;
 
-        Atom wmState = XInternAtom(display, "_NET_WM_STATE", False);
-        Atom maxHorz = XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_HORZ", False);
-        Atom maxVert = XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_VERT", False);
+        Atom wmState = XInternAtom(display, u8"_NET_WM_STATE", False);
+        Atom maxHorz = XInternAtom(display, u8"_NET_WM_STATE_MAXIMIZED_HORZ", False);
+        Atom maxVert = XInternAtom(display, u8"_NET_WM_STATE_MAXIMIZED_VERT", False);
 
         XEvent xev{};
         xev.type = ClientMessage;

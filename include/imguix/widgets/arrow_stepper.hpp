@@ -19,8 +19,8 @@ namespace ImGuiX::Widgets {
         int   step        = 1;      ///< Increment/decrement step
         bool  wrap        = true;   ///< If exceed bounds, wrap to the other side
         float input_width = 48.0f;  ///< Width of InputInt
-        const char* fmt   = "%02d"; ///< Small preview text to the right
-        const char* input_id = "##val"; ///< ID for InputInt inside local PushID
+        const char* fmt   = u8"%02d"; ///< Small preview text to the right
+        const char* input_id = u8"##val"; ///< ID for InputInt inside local PushID
         float same_line_spacing = 2.0f; ///< Spacing between items on SameLine
         bool  disable_at_edges = true;
     };
@@ -56,7 +56,7 @@ namespace ImGuiX::Widgets {
         // Up
         bool at_up_edge = (!cfg.wrap && v >= maxv);
         if (cfg.disable_at_edges && at_up_edge) ImGui::BeginDisabled(true);
-        if (ImGui::ArrowButton("##up", ImGuiDir_Up)) {
+        if (ImGui::ArrowButton(u8"##up", ImGuiDir_Up)) {
             int nv = v + step;
             if (nv > maxv) {
                 if (cfg.wrap) nv = minv;
@@ -72,7 +72,7 @@ namespace ImGuiX::Widgets {
         ImGui::SameLine(0.0f, cfg.same_line_spacing);
         bool at_dn_edge = (!cfg.wrap && v <= minv);
         if (cfg.disable_at_edges && at_dn_edge) ImGui::BeginDisabled(true);
-        if (ImGui::ArrowButton("##dn", ImGuiDir_Down)) {
+        if (ImGui::ArrowButton(u8"##dn", ImGuiDir_Down)) {
             int nv = v - step;
             if (nv < minv) {
                 if (cfg.wrap) nv = maxv;

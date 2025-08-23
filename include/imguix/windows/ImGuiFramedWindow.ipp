@@ -29,13 +29,13 @@ namespace ImGuiX::Windows {
     void ImGuiFramedWindow::drawTitleBarText() {
         float padding_y = (m_config.title_bar_height - ImGui::GetTextLineHeight()) * 0.5f;
         ImGui::SetCursorPosY(padding_y);
-        ImGui::Text("%s", m_title.c_str());
+        ImGui::Text(u8"%s", m_title.c_str());
     }
 
     void ImGuiFramedWindow::drawControlButtons(float title_padding_x) {
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
 
-        ImVec2 char_size = ImGui::CalcTextSize("W");
+        ImVec2 char_size = ImGui::CalcTextSize(u8"W");
         float btn_width = char_size.x * 3.0f + ImGui::GetStyle().FramePadding.x * 2.0f;
         float btn_height = char_size.y;
         float btn_padding = ImGui::GetStyle().ItemSpacing.x * 2.0f + btn_width * 3.0f + title_padding_x;
@@ -104,7 +104,7 @@ namespace ImGuiX::Windows {
         ImVec2 btn_min, btn_max;
         float center_y = (m_config.title_bar_height - btn_size.y) * 0.5f;
         ImGui::SetCursorPos(ImVec2(ImGui::GetWindowWidth() - btn_padding, center_y));
-        if (Widgets::CircleButton("##imguix_btn_minimize", btn_diameter, ImVec4(1.0f, 0.74f, 0.18f, 1.0f))) {
+        if (Widgets::CircleButton(u8"##imguix_btn_minimize", btn_diameter, ImVec4(1.0f, 0.74f, 0.18f, 1.0f))) {
             minimize();
         }
 
@@ -120,7 +120,7 @@ namespace ImGuiX::Windows {
 #       endif
         
         ImGui::SameLine();
-        if (Widgets::CircleButton("##imguix_btn_maximize", btn_diameter, ImVec4(0.15f, 0.79f, 0.25f, 1.0f))) {
+        if (Widgets::CircleButton(u8"##imguix_btn_maximize", btn_diameter, ImVec4(0.15f, 0.79f, 0.25f, 1.0f))) {
             toggleMaximizeRestore();
         }
 
@@ -136,7 +136,7 @@ namespace ImGuiX::Windows {
 #       endif
 
         ImGui::SameLine();
-        if (Widgets::CircleButton("##imguix_btn_close", btn_diameter, ImVec4(1.0f, 0.0f, 0.0f, 1.0f))) {
+        if (Widgets::CircleButton(u8"##imguix_btn_close", btn_diameter, ImVec4(1.0f, 0.0f, 0.0f, 1.0f))) {
             close();
         }
  
@@ -164,7 +164,7 @@ namespace ImGuiX::Windows {
         ImVec2 btn_min, btn_max;
         float center_y = (m_config.title_bar_height - btn_size.y) * 0.5f;
         ImGui::SetCursorPos(ImVec2(ImGui::GetWindowWidth() - btn_padding, center_y));
-        if (Widgets::SystemButton("##imguix_btn_minimize", Widgets::SystemButtonType::Minimize, btn_size)) {
+        if (Widgets::SystemButton(u8"##imguix_btn_minimize", Widgets::SystemButtonType::Minimize, btn_size)) {
             minimize();
         }
 
@@ -180,7 +180,7 @@ namespace ImGuiX::Windows {
 #       endif
         
         ImGui::SameLine();
-        if (Widgets::SystemButton("##imguix_btn_maximize", Widgets::SystemButtonType::Maximize, btn_size)) {
+        if (Widgets::SystemButton(u8"##imguix_btn_maximize", Widgets::SystemButtonType::Maximize, btn_size)) {
             toggleMaximizeRestore();
         }
 
@@ -196,7 +196,7 @@ namespace ImGuiX::Windows {
 #       endif
 
         ImGui::SameLine();
-        if (Widgets::SystemButton("##imguix_btn_close", Widgets::SystemButtonType::Close, btn_size)) {
+        if (Widgets::SystemButton(u8"##imguix_btn_close", Widgets::SystemButtonType::Close, btn_size)) {
             close();
         }
  

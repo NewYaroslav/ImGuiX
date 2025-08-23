@@ -60,20 +60,20 @@ namespace ImGuiX {
         // OpenGL ES?
         if (client == GLFW_OPENGL_ES_API) {
             int major = glfwGetWindowAttrib(w, GLFW_CONTEXT_VERSION_MAJOR);
-            return (major >= 3) ? "#version 300 es" : "#version 100";
+            return (major >= 3) ? u8"#version 300 es" : u8"#version 100";
         }
 
 #       if defined(__APPLE__)
         // macOS Core 3.2+
-        return "#version 150";
+        return u8"#version 150";
 #       else
         int major = glfwGetWindowAttrib(w, GLFW_CONTEXT_VERSION_MAJOR);
         int minor = glfwGetWindowAttrib(w, GLFW_CONTEXT_VERSION_MINOR);
         int profile = glfwGetWindowAttrib(w, GLFW_OPENGL_PROFILE);
 
         if (major > 3 || (major == 3 && minor >= 2) || profile == GLFW_OPENGL_CORE_PROFILE)
-            return "#version 150";
-        return "#version 130";
+            return u8"#version 150";
+        return u8"#version 130";
 #       endif
 #   endif
     }

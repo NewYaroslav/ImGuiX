@@ -42,7 +42,7 @@ namespace ImGuiX::Fonts {
     struct BuildParams {
         float dpi = 96.0f;     ///< Logical DPI (96 = 1.0 scale)
         float ui_scale = 1.0f; ///< Global UI scaling factor
-        std::string base_dir = "data/resources/fonts"; ///< Base directory for relative paths
+        std::string base_dir = u8"data/resources/fonts"; ///< Base directory for relative paths
         bool use_freetype = true;   ///< Use ImGui FreeType builder if available
     };
 
