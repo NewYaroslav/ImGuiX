@@ -39,27 +39,28 @@ namespace ImGuiX::Widgets {
         const char* icon_hide     = u8"\ue8f5";  ///< «глаз перечёркнутый»
         ImVec2      button_size   = ImVec2(0,0); ///< (0,0) — авто (по высоте текущего фрейма)
         float       same_line_w   = 0.0f;        ///< Отступ перед кнопкой (SameLine(offset))
-        const char* tooltip_show  = u8"Show password";
-        const char* tooltip_hide  = u8"Hide password";
-        const char* text_label    = u8"Show";      ///< Текст для чекбокса, если use_icon == false
+        const char* tooltip_show  = u8"Show password"; ///<
+        const char* tooltip_hide  = u8"Hide password"; ///<
+        const char* text_label    = u8"Show";    ///< Текст для чекбокса, если use_icon == false
         
         ImFont*     icon_font     = nullptr;     ///< шрифт с иконками (если null — текущий)
-        float       icon_baseline = IMGUIX_MATERIAL_ICONS_BASELINE_18PX;        ///< сдвиг по Y в пикселях (подгонка базлайна)
+        float       icon_baseline = IMGUIX_MATERIAL_ICONS_BASELINE; ///< сдвиг по Y в пикселях (подгонка базлайна)
         float       icon_rounding = -1.0f;       ///< скругление фона кнопки
     };
 	
+	/// \brief Параметры переключателя "показать пароль".
 	struct VKButtonConfig {
-		bool        enabled_host      = false;     ///< show VK button near host
-		bool        enabled_email     = false;     ///< show VK button near email
-		bool        enabled_password  = false;     ///< show VK button near password
+		bool        enabled_host      = false;      ///< show VK button near host
+		bool        enabled_email     = false;      ///< show VK button near email
+		bool        enabled_password  = false;      ///< show VK button near password
 
-		bool        use_icon          = true;      ///< icon or text
-		const char* icon_text         = u8"\uE312";///< default Material PUA 'keyboard' (alt: u8"\uE23E")
-		const char* text              = u8"[KB]";    ///< text label if use_icon==false
+		bool        use_icon          = true;       ///< icon or text
+		const char* icon_text         = u8"\uE312"; ///< default Material PUA 'keyboard' (alt: u8"\uE23E")
+		const char* text              = u8"[KB]";   ///< text label if use_icon==false
                 ImFont*     icon_font         = nullptr;   ///< icon font (merged or dedicated)
                 ImVec2      button_size       = ImVec2(0,0);
                 float       same_line_w       = 0.0f;      ///< SameLine(offset) before button
-                float       icon_baseline     = IMGUIX_MATERIAL_ICONS_BASELINE_16PX;      ///< Y offset to fit baseline
+                float       icon_baseline     = IMGUIX_MATERIAL_ICONS_BASELINE; ///< Y offset to fit baseline
                 float       icon_rounding     = -1.0f;     ///< bg rounding, -1 => default
 		const char* tooltip_toggle_on = u8"Show keyboard";
 		const char* tooltip_toggle_off= u8"Hide keyboard";

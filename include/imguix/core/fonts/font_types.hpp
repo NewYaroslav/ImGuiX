@@ -26,10 +26,11 @@ namespace ImGuiX::Fonts {
     struct FontFile {
         std::string path;            ///< Absolute or relative to BuildParams::base_dir
         float size_px = 16.0f;       ///< Base size at 96 DPI
+		float baseline_offset_px  = 0.0f; ///< +down, -up. Applied to ImFontConfig::GlyphOffset.y
         bool merge = false;          ///< Merge glyphs into previous font (icons/emoji)
         unsigned freetype_flags = 0; ///< ImGui FreeType builder flags (0 = default)
         std::string extra_glyphs;    ///< Optional extra glyphs UTF-8 string with extra symbols
-    };
+	};
 
     /// \brief Per-locale font pack: files grouped by role + final glyph ranges.
     struct LocalePack {

@@ -223,6 +223,7 @@ graph LR
 | Blocked shutdown          | Threaded model not checking `isClosing()`        | Poll flag and join threads in destructor                                         |
 | Text shows as squares     | Ranges include only PUA (icons)                  | Use `fontsSetRangesPreset("Default+...+PUA")` or add non-PUA ranges explicitly   |
 | Icons missing             | PUA not included in ranges                       | Add `PUA` token to preset or explicit pair `0xE000–0xF8FF`                       |
+| PopStyleColor / PopID mismatch   | PushStyleColor/PushID/PushVar вызваны несимметрично | Всегда использовать флаговый паттерн: `bool pushed = false; if(cond){ ImGui::PushStyleColor(...); pushed=true; } ... if(pushed) ImGui::PopStyleColor();` |
 
 Quick grep patterns:
 

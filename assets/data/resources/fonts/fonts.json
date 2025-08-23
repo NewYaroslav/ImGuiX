@@ -8,8 +8,7 @@
                 "H1":     [{ "path": "NotoSans-Bold.ttf",   "size_px": 24 }],
                 "H2":     [{ "path": "NotoSans-Bold.ttf",   "size_px": 20 }],
                 "H3":     [{ "path": "NotoSans-Medium.ttf", "size_px": 18 }],
-                "Icons":  [{ "path": "forkawesome-webfont.ttf", "size_px": 16, "merge": true }],
-                "Emoji":  [{ "path": "NotoEmoji-Regular.ttf",   "size_px": 16, "merge": true }]
+                "Icons":  [{ "path": "MaterialIcons-Regular.ttf", "size_px": 16, "merge": true, "baseline_offset": 4 }]
             },
             "ranges": "Default+Cyrillic+Vietnamese"
         },

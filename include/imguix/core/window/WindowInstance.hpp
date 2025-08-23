@@ -227,20 +227,20 @@ namespace ImGuiX {
         /// \note Call during onInit() before building fonts.
         void fontsBeginManual();
 
-            /// \brief Set locale for subsequent font operations.
-            /// \param locale Locale identifier.
-            void fontsSetLocale(std::string locale);
+        /// \brief Set locale for subsequent font operations.
+        /// \param locale Locale identifier.
+        void fontsSetLocale(std::string locale);
 
-            /// \brief Select predefined character ranges.
-            /// \param preset Preset name.
-            void fontsSetRangesPreset(std::string preset);
+        /// \brief Select predefined character ranges.
+        /// \param preset Preset name.
+        void fontsSetRangesPreset(std::string preset);
 
-            /// \brief Define explicit character ranges.
-            /// \param pairs Consecutive ImWchar pairs defining ranges.
-            void fontsSetRangesExplicit(const std::vector<ImWchar>& pairs);
+        /// \brief Define explicit character ranges.
+        /// \param pairs Consecutive ImWchar pairs defining ranges.
+        void fontsSetRangesExplicit(const std::vector<ImWchar>& pairs);
 
-            /// \brief Clear previously specified character ranges.
-            void fontsClearRanges();
+        /// \brief Clear previously specified character ranges.
+        void fontsClearRanges();
 
         /// \brief Add body font file.
         /// \param ff Font file.

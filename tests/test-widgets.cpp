@@ -12,7 +12,7 @@
 #include <imguix/widgets/proxy_panel.hpp>
 
 #include <imguix/widgets/text_center.hpp>
-
+#include <imguix/widgets/list_editor.hpp>
 
 namespace i18n = ImGuiX::I18N;
 
@@ -85,6 +85,9 @@ private:
         ImGuiX::Widgets::TimePickerConfig       tp_cfg{};
         ImGuiX::Widgets::TimeOffsetPickerConfig to_cfg{};
         ImGuiX::Widgets::DatePickerConfig       dp_cfg{};
+		
+		std::vector<std::string> names {"Alice", "Bob"};
+		std::vector<int> numbers {1, 2, 3};
 
         AuthDemoState() {
             auth_cfg.header                 = "Login";
@@ -321,6 +324,11 @@ private:
             "This is a long message that demonstrates how wrapped text can be visually centered "
             "by placing it inside a centered child region.", 420.0f
         );
+		
+		// ---
+		ImGui::SeparatorText("List editor");
+        ImGuiX::Widgets::ListEditor("names", m_auth.names);
+        ImGuiX::Widgets::ListEditor("numbers", m_auth.numbers);
     }
 
     void postLanguageChange(const std::string& lang, bool apply_to_all = true) {
@@ -342,7 +350,7 @@ public:
         fontsBeginManual();
         fontsSetRangesPreset("Default+Cyrillic+Vietnamese+Punct+PUA");
         fontsAddBody({ "NotoSans-Regular.ttf", 18.0f });
-        fontsAddMerge(ImGuiX::Fonts::FontRole::Icons, { "MaterialIcons-Regular.ttf", 18.0f, true });
+        fontsAddMerge(ImGuiX::Fonts::FontRole::Icons, { "MaterialIcons-Regular.ttf", 18.0f, 4.0f, true});
         fontsAddHeadline(ImGuiX::Fonts::FontRole::H1, { "NotoSans-Bold.ttf", 24.0f });
         fontsBuildNow();
     }
