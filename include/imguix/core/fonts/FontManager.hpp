@@ -173,8 +173,8 @@ namespace ImGuiX::Fonts {
         bool m_auto_init = true;
         bool m_dirty = true;
 
-        std::string m_config_path = "data/resources/fonts/fonts.json";
-        std::string m_active_locale = "default";
+        std::string m_config_path = u8"data/resources/fonts/fonts.json";
+        std::string m_active_locale = u8"default";
 
         // Markdown sizes (px @ 96 DPI)
         float m_px_body = 16.0f;

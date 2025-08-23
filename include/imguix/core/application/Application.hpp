@@ -63,7 +63,7 @@ namespace ImGuiX {
         std::atomic<bool> m_is_ini_once{false};        ///< Ensures imgui ini is saved only once.
 
         std::atomic<int> m_next_window_id{0};          ///< Incremental ID for new windows.
-        std::string m_app_name = "ImGuiX Application"; ///< Application name string.
+        std::string m_app_name = u8"ImGuiX Application"; ///< Application name string.
         std::vector<std::unique_ptr<Model>> m_models;  ///< Owned model objects.
         std::vector<Model*> m_pending_models;          ///< Models waiting for initialization.
 

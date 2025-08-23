@@ -15,8 +15,8 @@ namespace ImGuiX::Widgets {
 
     /// \brief Configuration for HoursSelector.
     struct HoursSelectorConfig {
-        const char* label        = "Hours";     ///< Combo label (left of preview)
-        const char* empty_hint   = "none";      ///< Preview text when no hours selected
+        const char* label        = u8"Hours";     ///< Combo label (left of preview)
+        const char* empty_hint   = u8"none";      ///< Preview text when no hours selected
         ImVec2      child_size   = ImVec2(260, 110); ///< Scrolling area size inside combo
         ImVec2      cell_size    = ImVec2(18, 18);   ///< Clickable cell size for each hour
         int         rows         = 3;           ///< Grid rows (rows*cols should cover 24)
@@ -43,12 +43,12 @@ namespace ImGuiX::Widgets {
 
         // Build compact preview string that fits into cfg.combo_width
         auto build_preview = [&](float max_w)->std::string {
-            if (selected_hours.empty()) return std::string(cfg.empty_hint ? cfg.empty_hint : "none");
+            if (selected_hours.empty()) return std::string(cfg.empty_hint ? cfg.empty_hint : u8"none");
             std::string acc;
             acc.reserve(64);
             for (size_t i = 0; i < selected_hours.size(); ++i) {
                 char tmp[8];
-                std::snprintf(tmp, sizeof(tmp), "%s%d", (i ? "," : ""), selected_hours[i]);
+                std::snprintf(tmp, sizeof(tmp), u8"%s%d", (i ? u8"," : u8""), selected_hours[i]);
                 std::string candidate = acc;
                 candidate += tmp;
                 float w = ImGui::CalcTextSize(candidate.c_str()).x;
@@ -56,10 +56,10 @@ namespace ImGuiX::Widgets {
                     acc.swap(candidate);
                 } else {
                     // Add ellipsis if anything was added before; otherwise show first with ellipsis
-                    if (!acc.empty()) acc += "...";
+                    if (!acc.empty()) acc += u8"...";
                     else {
                         // Show first number and ellipsis anyway
-                        std::snprintf(tmp, sizeof(tmp), "%d...", selected_hours[i]);
+                        std::snprintf(tmp, sizeof(tmp), u8"%d...", selected_hours[i]);
                         acc = tmp;
                     }
                     break;
@@ -79,8 +79,8 @@ namespace ImGuiX::Widgets {
 
         ImGui::PushID(id);
         ImGui::SetNextItemWidth(cfg.combo_width);
-        if (ImGui::BeginCombo(cfg.label ? cfg.label : "Hours", preview.c_str())) {
-            ImGui::BeginChild("##hours_grid", cfg.child_size, true);
+        if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Hours", preview.c_str())) {
+            ImGui::BeginChild(u8"##hours_grid", cfg.child_size, true);
 
             // Grid layout
             const int rows = std::max(1, cfg.rows);
@@ -91,12 +91,12 @@ namespace ImGuiX::Widgets {
             const int total = std::max(rows * cols, 24);
 
             // Small toolbar (optional): Select All / Clear
-            if (ImGui::SmallButton("All")) {
+            if (ImGui::SmallButton(u8"All")) {
                 for (int i = 0; i < 24; ++i) mark[i] = true;
                 changed = true;
             }
             ImGui::SameLine();
-            if (ImGui::SmallButton("None")) {
+            if (ImGui::SmallButton(u8"None")) {
                 for (int i = 0; i < 24; ++i) mark[i] = false;
                 changed = true;
             }
@@ -113,7 +113,7 @@ namespace ImGuiX::Widgets {
                     }
                     ImGui::PushID(idx);
                     char label_txt[4];
-                    std::snprintf(label_txt, sizeof(label_txt), "%d", idx);
+                    std::snprintf(label_txt, sizeof(label_txt), u8"%d", idx);
 
                     bool selected = mark[idx];
                     if (selected && cfg.use_header_color_for_selected) {

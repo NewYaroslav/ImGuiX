@@ -13,9 +13,9 @@ namespace ImGuiX::Widgets {
 
     /// \brief Configuration for DomainSelector.
     struct DomainSelectorConfig {
-        std::string header      = "Domain";
-        std::string hint_domain = "domain";
-        std::string custom_text = "Custom";
+        std::string header      = u8"Domain";
+        std::string hint_domain = u8"domain";
+        std::string custom_text = u8"Custom";
         std::string default_domain;
         std::string help_text;
         bool        show_help   = false;
@@ -33,8 +33,8 @@ namespace ImGuiX::Widgets {
         bool updated = false;
         ImGui::PushID(id);
 
-        ImGui::BeginChild("##DomainSelector", ImVec2(ImGui::GetWindowWidth() * 0.65f, 100.0f), true);
-        ImGui::Text("%s", cfg.header.c_str());
+        ImGui::BeginChild(u8"##DomainSelector", ImVec2(ImGui::GetWindowWidth() * 0.65f, 100.0f), true);
+        ImGui::Text(u8"%s", cfg.header.c_str());
         ImGui::Separator();
 
         bool use_input = cfg.domains.empty();
@@ -51,7 +51,7 @@ namespace ImGuiX::Widgets {
             items.push_back(cfg.custom_text.c_str());
             if (combo_index < 0) { combo_index = static_cast<int>(items.size()) - 1; use_input = true; }
 
-            if (ImGui::Combo("##domain.combo", &combo_index, items.data(), static_cast<int>(items.size()))) {
+            if (ImGui::Combo(u8"##domain.combo", &combo_index, items.data(), static_cast<int>(items.size()))) {
                 if (combo_index == static_cast<int>(cfg.domains.size())) {
                     host = cfg.default_domain;
                     use_input = true;
@@ -62,14 +62,14 @@ namespace ImGuiX::Widgets {
                 updated = true;
             }
 
-            if (cfg.show_help) { ImGui::SameLine(); ImGui::TextDisabled("(?)"); if (ImGui::IsItemHovered()) ImGui::SetTooltip("%s", cfg.help_text.c_str()); }
+            if (cfg.show_help) { ImGui::SameLine(); ImGui::TextDisabled(u8"(?)"); if (ImGui::IsItemHovered()) ImGui::SetTooltip(u8"%s", cfg.help_text.c_str()); }
         }
 
         if (use_input) {
             char buf[512];
             std::strncpy(buf, host.c_str(), sizeof(buf));
             buf[sizeof(buf)-1] = '\0';
-            if (ImGui::InputTextWithHint("##domain.input", cfg.hint_domain.c_str(), buf, sizeof(buf)-1)) {
+            if (ImGui::InputTextWithHint(u8"##domain.input", cfg.hint_domain.c_str(), buf, sizeof(buf)-1)) {
                 host = buf;
                 updated = true;
             }
@@ -77,7 +77,7 @@ namespace ImGuiX::Widgets {
 
         if (cfg.domains.empty() && cfg.show_help) {
             ImGui::SameLine();
-            ImGui::TextDisabled("(?)"); if (ImGui::IsItemHovered()) ImGui::SetTooltip("%s", cfg.help_text.c_str());
+            ImGui::TextDisabled(u8"(?)"); if (ImGui::IsItemHovered()) ImGui::SetTooltip(u8"%s", cfg.help_text.c_str());
         }
 
         ImGui::EndChild();

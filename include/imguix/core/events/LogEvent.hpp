@@ -27,19 +27,19 @@ namespace ImGuiX::Events {
     inline const char *levelToCStr(LogLevel level) noexcept {
       switch (level) {
       case LogLevel::Trace:
-        return "TRACE";
+        return u8"TRACE";
       case LogLevel::Debug:
-        return "DEBUG";
+        return u8"DEBUG";
       case LogLevel::Info:
-        return "INFO";
+        return u8"INFO";
       case LogLevel::Warn:
-        return "WARN";
+        return u8"WARN";
       case LogLevel::Error:
-        return "ERROR";
+        return u8"ERROR";
       case LogLevel::Fatal:
-        return "FATAL";
+        return u8"FATAL";
       }
-      return "UNKNOWN";
+      return u8"UNKNOWN";
     }
 
     /// \brief Event containing log message and source metadata.
@@ -58,7 +58,7 @@ namespace ImGuiX::Events {
 
       std::type_index type() const override { return typeid(LogEvent); }
 
-      const char *name() const override { return "LogEvent"; }
+      const char *name() const override { return u8"LogEvent"; }
     };
 
 } // namespace ImGuiX::Events

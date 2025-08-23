@@ -17,7 +17,7 @@ namespace ImGuiX::Events {
         }
 
         const char* name() const override {
-            return "ApplicationExitEvent";
+            return u8"ApplicationExitEvent";
         }
     };
 

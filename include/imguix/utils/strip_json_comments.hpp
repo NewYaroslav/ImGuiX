@@ -70,7 +70,7 @@ namespace ImGuiX::Utils {
             const char next = (i + 1 < n) ? json_string[i + 1] : '\0';
 
             // Handle string boundaries only outside comments
-            if (comment == Comment::None && c == '"') {
+            if (comment == Comment::None && c == 'u8"') {
                 if (!detail::is_escaped_quote(json_string, i)) {
                     in_string = !in_string;
                 }
@@ -159,7 +159,7 @@ namespace ImGuiX::Utils {
             }
 
             if (comment == Comment::Block) {
-                // End of block comment "*/"
+                // End of block comment "*/u8"
                 if (c == '*' && next == '/') {
                     const std::size_t comment_end_inclusive = i + 1; // include '/'
                     if (with_whitespace) {

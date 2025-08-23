@@ -21,7 +21,7 @@ namespace ImGuiX::Windows {
         if (!ImGui::GetCurrentContext())
             ImGui::CreateContext();
         ImGui_ImplSDL2_InitForOpenGL(m_window, m_gl_context);
-        ImGui_ImplOpenGL3_Init("#version 100");
+        ImGui_ImplOpenGL3_Init(u8"#version 100");
         m_is_open = true;
         return true;
     }
@@ -47,7 +47,7 @@ namespace ImGuiX::Windows {
         ImGui::SetNextWindowPos(ImVec2(0, 0));
         ImGui::SetNextWindowSize(ImVec2((float)w, (float)h));
 
-        ImVec2 char_size = ImGui::CalcTextSize("W");
+        ImVec2 char_size = ImGui::CalcTextSize(u8"W");
         ImVec2 padding = ImGui::GetStyle().WindowPadding;
         float title_padding_x = padding.x + char_size.x * 2.0f;
 
@@ -68,14 +68,14 @@ namespace ImGuiX::Windows {
         }
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-        ImGui::Begin("##imguix_framed_window", nullptr, flags);
+        ImGui::Begin(u8"##imguix_framed_window", nullptr, flags);
         ImGui::PopStyleVar();
 
         if (hasFlag(m_flags, WindowFlags::DisableBackground) || m_disable_background) {
             ImGui::PopStyleColor(2);
         }
 
-        ImGui::BeginChild("##imguix_title_bar", ImVec2(0, m_config.title_bar_height), false,
+        ImGui::BeginChild(u8"##imguix_title_bar", ImVec2(0, m_config.title_bar_height), false,
                           ImGuiWindowFlags_NoScrollbar |
                           ImGuiWindowFlags_NoDecoration);
 
@@ -102,7 +102,7 @@ namespace ImGuiX::Windows {
 
         if (hasFlag(m_flags, WindowFlags::HasMenuBar)) {
             ImGui::SetCursorPosY(m_config.title_bar_height);
-            ImGui::BeginChild("##imguix_menu_bar", ImVec2(0, 0), false,
+            ImGui::BeginChild(u8"##imguix_menu_bar", ImVec2(0, 0), false,
                               ImGuiWindowFlags_MenuBar |
                               ImGuiWindowFlags_NoScrollbar |
                               ImGuiWindowFlags_NoDecoration |

@@ -31,7 +31,7 @@ namespace ImGuiX::Pubsub {
                          public IAwaiterEx,
                          public std::enable_shared_from_this<EventAwaiter<EventType>> {
         static_assert(std::is_base_of<Event, EventType>::value,
-                      "EventType must derive from ImGuiX::Pubsub::Event");
+                      u8"EventType must derive from ImGuiX::Pubsub::Event");
     public:
         using Predicate = std::function<bool(const EventType&)>;
         using Callback  = std::function<void(const EventType&)>;

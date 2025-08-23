@@ -3,7 +3,7 @@
 #endif
 
 #ifndef IMGUIX_CONFIG_DIR
-#   define IMGUIX_CONFIG_DIR "data/config"
+#   define IMGUIX_CONFIG_DIR u8"data/config"
 #endif
 
 namespace ImGuiX {
@@ -13,7 +13,7 @@ namespace ImGuiX {
           m_window_manager(*static_cast<ApplicationContext*>(this)) {
         m_registry.registerResource<OptionsStore>([] {
             return std::make_shared<OptionsStore>(
-                    std::string(IMGUIX_CONFIG_DIR) + "/options.json",
+                    std::string(IMGUIX_CONFIG_DIR) + u8"/options.json",
                     0.5);
         });
     }
@@ -21,7 +21,7 @@ namespace ImGuiX {
     void Application::run(bool async) {
 #       ifdef IMGUIX_USE_SFML_BACKEND
         if (!registry().registerResource<DeltaClockSfml>()) {
-            throw std::runtime_error("Failed to register DeltaClockSfml resource");
+            throw std::runtime_error(u8"Failed to register DeltaClockSfml resource");
         }
 #       endif
 

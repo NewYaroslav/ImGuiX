@@ -151,29 +151,29 @@ namespace ImGuiX::Fonts {
 
         // Latin-based locales already covered by Default()
         // Add Cyrillic
-        if (locale == "ru" || 
-            locale == "uk" ||
-            locale == "bg" || 
-            locale == "kk" ||
-            locale == "sr") {
+        if (locale == u8"ru" || 
+            locale == u8"uk" ||
+            locale == u8"bg" || 
+            locale == u8"kk" ||
+            locale == u8"sr") {
             b.AddRanges(io.Fonts->GetGlyphRangesCyrillic());
         }
 
         // Vietnamese
-        if (locale == "vi") b.AddRanges(io.Fonts->GetGlyphRangesVietnamese());
+        if (locale == u8"vi") b.AddRanges(io.Fonts->GetGlyphRangesVietnamese());
 
         // CJK (careful: large)
-        if (locale == "ja")
+        if (locale == u8"ja")
             b.AddRanges(io.Fonts->GetGlyphRangesJapanese());
-        else if (locale == "zh" || locale == "zh-CN" || locale == "zh-TW")
+        else if (locale == u8"zh" || locale == u8"zh-CN" || locale == u8"zh-TW")
             b.AddRanges(io.Fonts->GetGlyphRangesChineseFull());
-        else if (locale == "ko")
+        else if (locale == u8"ko")
             b.AddRanges(io.Fonts->GetGlyphRangesKorean());
 
         // RTL (Arabic/Hebrew) – ImGui does not provide built-ins for all subsets;
         // user usually supplies proper ranges via JSON LocalePack::ranges or custom
         // font files.
-        if (locale == "ar" || locale == "fa" || locale == "he") {
+        if (locale == u8"ar" || locale == u8"fa" || locale == u8"he") {
             // Leave to JSON-provided ranges; if absent, fallback stays Latin-only.
             // You may add custom ranges here if you ship appropriate fonts.
         }
@@ -194,14 +194,14 @@ namespace ImGuiX::Fonts {
             if (!cur.empty()) out.push_back(cur); return out;
         };
         for (auto tok : split(spec)) {
-            if (tok == "Default")          b.AddRanges(io.Fonts->GetGlyphRangesDefault());
-            else if (tok == "Cyrillic")    b.AddRanges(io.Fonts->GetGlyphRangesCyrillic());
-            else if (tok == "Vietnamese")  b.AddRanges(io.Fonts->GetGlyphRangesVietnamese());
-            else if (tok == "Japanese" || tok == "JapaneseFull") b.AddRanges(io.Fonts->GetGlyphRangesJapanese());
-            else if (tok == "Chinese"  || tok == "ChineseFull")  b.AddRanges(io.Fonts->GetGlyphRangesChineseFull());
-            else if (tok == "Korean")      b.AddRanges(io.Fonts->GetGlyphRangesKorean());
-            else if (tok == "Punct")       b.AddText(u8"–—…•“”‘’");
-            else if (tok == "PUA" || tok == "Icons" || tok == "PrivateUse") {
+            if (tok == u8"Default")          b.AddRanges(io.Fonts->GetGlyphRangesDefault());
+            else if (tok == u8"Cyrillic")    b.AddRanges(io.Fonts->GetGlyphRangesCyrillic());
+            else if (tok == u8"Vietnamese")  b.AddRanges(io.Fonts->GetGlyphRangesVietnamese());
+            else if (tok == u8"Japanese" || tok == u8"JapaneseFull") b.AddRanges(io.Fonts->GetGlyphRangesJapanese());
+            else if (tok == u8"Chinese"  || tok == u8"ChineseFull")  b.AddRanges(io.Fonts->GetGlyphRangesChineseFull());
+            else if (tok == u8"Korean")      b.AddRanges(io.Fonts->GetGlyphRangesKorean());
+            else if (tok == u8"Punct")       b.AddText(u8"–—…•“”‘’");
+            else if (tok == u8"PUA" || tok == u8"Icons" || tok == u8"PrivateUse") {
                 static const ImWchar kPUA[] = { 0xE000, 0xF8FF, 0 };
                 b.AddRanges(kPUA);
             }
@@ -344,7 +344,7 @@ namespace ImGuiX::Fonts {
         if (!m_manual.active) {
             auto it = m_packs.find(m_active_locale);
             if (it == m_packs.end()) {
-                auto it2 = m_packs.find("default");
+                auto it2 = m_packs.find(u8"default");
                 if (it2 != m_packs.end()) pack_ptr = &it2->second;
             } else {
                 pack_ptr = &it->second;
@@ -442,7 +442,7 @@ namespace ImGuiX::Fonts {
                     vec[i].merge;
                 ImFont *f = addFontFile(vec[i], m_params, ranges, base_dir_abs, local);
                 if (!f) {
-                    br.message = "Failed to load font: " + vec[i].path;
+                    br.message = u8"Failed to load font: " + vec[i].path;
                 }
                 last = f;
             }
@@ -453,7 +453,7 @@ namespace ImGuiX::Fonts {
         auto add_single = [&](FontRole role, const FontFile &ff) -> ImFont * {
             ImFont *f = addFontFile(ff, m_params, ranges, base_dir_abs, cfg);
             if (f) m_fonts[role] = f;
-            else br.message = "Failed to load font: " + ff.path;
+            else br.message = u8"Failed to load font: " + ff.path;
             return f;
         };
 
@@ -534,12 +534,12 @@ namespace ImGuiX::Fonts {
         // If still no Body, try a minimal fallback (Roboto + Icons) using base_dir
         if (!body) {
           FontFile fb{};
-          fb.path = "Roboto-Medium.ttf";
+          fb.path = u8"Roboto-Medium.ttf";
           fb.size_px = m_px_body;
           body = add_single(FontRole::Body, fb);
 
           FontFile ic{};
-          ic.path = "forkawesome-webfont.ttf";
+          ic.path = u8"forkawesome-webfont.ttf";
           ic.size_px = m_px_body;
           ic.merge = true;
           addFontFile(ic, m_params, ranges, base_dir_abs, cfg);
@@ -605,14 +605,14 @@ namespace ImGuiX::Fonts {
           ensure_headline(FontRole::H2, m_px_h2);
           ensure_headline(FontRole::H3, m_px_h3);
         } else {
-          br.message = "Manual mode: Body font not provided";
+          br.message = u8"Manual mode: Body font not provided";
         }
       }
 
         // Update backend texture (SFML or stub true)
         if (!updateBackendTexture()) {
             br.success = false;
-            br.message = "Backend font texture update failed";
+            br.message = u8"Backend font texture update failed";
             return br;
         }
 
@@ -652,7 +652,7 @@ namespace ImGuiX::Fonts {
         // Fallback: if empty or not found, try base_dir/fonts.json
         if (readTextFile(cfg_path).empty()) {
             const auto base_abs = ImGuiX::Utils::resolveExecPath(m_params.base_dir);
-            cfg_path = ImGuiX::Utils::joinPaths(base_abs, "fonts.json");
+            cfg_path = ImGuiX::Utils::joinPaths(base_abs, u8"fonts.json");
         }
 #       endif
 
@@ -664,78 +664,78 @@ namespace ImGuiX::Fonts {
           j = json::parse(json_text);
 
           // base_dir (optional)
-          if (j.contains("base_dir") && j["base_dir"].is_string())
-            m_params.base_dir = j["base_dir"].get<std::string>();
+          if (j.contains(u8"base_dir") && j[u8"base_dir"].is_string())
+            m_params.base_dir = j[u8"base_dir"].get<std::string>();
 
           // markdown_sizes (optional)
-          if (j.contains("markdown_sizes") && j["markdown_sizes"].is_object()) {
-            const auto &ms = j["markdown_sizes"];
-            if (ms.contains("body"))
-              m_px_body = ms["body"].get<float>();
-            if (ms.contains("h1"))
-              m_px_h1 = ms["h1"].get<float>();
-            if (ms.contains("h2"))
-              m_px_h2 = ms["h2"].get<float>();
-            if (ms.contains("h3"))
-              m_px_h3 = ms["h3"].get<float>();
+          if (j.contains(u8"markdown_sizes") && j[u8"markdown_sizes"].is_object()) {
+            const auto &ms = j[u8"markdown_sizes"];
+            if (ms.contains(u8"body"))
+              m_px_body = ms[u8"body"].get<float>();
+            if (ms.contains(u8"h1"))
+              m_px_h1 = ms[u8"h1"].get<float>();
+            if (ms.contains(u8"h2"))
+              m_px_h2 = ms[u8"h2"].get<float>();
+            if (ms.contains(u8"h3"))
+              m_px_h3 = ms[u8"h3"].get<float>();
           }
 
           // locales (packs)
-          if (j.contains("locales") && j["locales"].is_object()) {
-            for (auto it = j["locales"].begin(); it != j["locales"].end(); ++it) {
+          if (j.contains(u8"locales") && j[u8"locales"].is_object()) {
+            for (auto it = j[u8"locales"].begin(); it != j[u8"locales"].end(); ++it) {
               const std::string loc = it.key();
               const json &L = it.value();
 
               LocalePack pack{};
               pack.locale = loc;
 
-              if (L.contains("inherits") && L["inherits"].is_string())
-                pack.inherits = L["inherits"].get<std::string>();
+              if (L.contains(u8"inherits") && L[u8"inherits"].is_string())
+                pack.inherits = L[u8"inherits"].get<std::string>();
 
               // ranges: array of pairs OR string preset (e.g.,
               // "Default+Cyrillic+Punct")
-              if (L.contains("ranges")) {
-                if (L["ranges"].is_array()) {
-                  for (const auto &v : L["ranges"])
+              if (L.contains(u8"ranges")) {
+                if (L[u8"ranges"].is_array()) {
+                  for (const auto &v : L[u8"ranges"])
                     pack.ranges.push_back(static_cast<ImWchar>(v.get<int>()));
                   // Append 0 terminator later inside buildRangesFromPack()
-                } else if (L["ranges"].is_string()) {
+                } else if (L[u8"ranges"].is_string()) {
                   pack.ranges_preset =
-                      L["ranges"].get<std::string>(); // <-- IMPORTANT: keep
+                      L[u8"ranges"].get<std::string>(); // <-- IMPORTANT: keep
                 }
               }
 
               // roles...
-              if (L.contains("roles") && L["roles"].is_object()) {
-                const auto &R = L["roles"];
+              if (L.contains(u8"roles") && L[u8"roles"].is_object()) {
+                const auto &R = L[u8"roles"];
                 auto parse_files = [&](const char *key, FontRole role) {
                   if (R.contains(key) && R[key].is_array()) {
                     for (const auto &item : R[key]) {
                       FontFile ff{};
-                      if (item.contains("path"))
-                        ff.path = item["path"].get<std::string>();
-                      if (item.contains("size_px"))
-                        ff.size_px = item["size_px"].get<float>();
-                      if (item.contains("merge"))
-                        ff.merge = item["merge"].get<bool>();
-                      if (item.contains("freetype_flags"))
-                        ff.freetype_flags = item["freetype_flags"].get<unsigned>();
-                      if (item.contains("extra_glyphs"))
-                        ff.extra_glyphs = item["extra_glyphs"].get<std::string>();
+                      if (item.contains(u8"path"))
+                        ff.path = item[u8"path"].get<std::string>();
+                      if (item.contains(u8"size_px"))
+                        ff.size_px = item[u8"size_px"].get<float>();
+                      if (item.contains(u8"merge"))
+                        ff.merge = item[u8"merge"].get<bool>();
+                      if (item.contains(u8"freetype_flags"))
+                        ff.freetype_flags = item[u8"freetype_flags"].get<unsigned>();
+                      if (item.contains(u8"extra_glyphs"))
+                        ff.extra_glyphs = item[u8"extra_glyphs"].get<std::string>();
                       pack.roles[role].push_back(std::move(ff));
                     }
                   }
                 };
-                parse_files("Body", FontRole::Body);
-                parse_files("H1", FontRole::H1);
-                parse_files("H2", FontRole::H2);
-                parse_files("H3", FontRole::H3);
-                parse_files("Monospace", FontRole::Monospace);
-                parse_files("Bold", FontRole::Bold);
-                parse_files("Italic", FontRole::Italic);
-                parse_files("BoldItalic", FontRole::BoldItalic);
-                parse_files("Icons", FontRole::Icons);
-                parse_files("Emoji", FontRole::Emoji);
+                parse_files(u8"Body", FontRole::Body);
+                parse_files(u8"H1", FontRole::H1);
+                parse_files(u8"H2", FontRole::H2);
+                parse_files(u8"H3", FontRole::H3);
+                parse_files(u8"Monospace", FontRole::Monospace);
+                parse_files(u8"Bold", FontRole::Bold);
+                parse_files(u8"Italic", FontRole::Italic);
+                parse_files(u8"BoldItalic", FontRole::BoldItalic);
+                parse_files(u8"Icons", FontRole::Icons);
+                parse_files(u8"Emoji", FontRole::Emoji);
               }
 
               m_packs[pack.locale] = std::move(pack);
@@ -781,7 +781,7 @@ namespace ImGuiX::Fonts {
 
         } catch (const std::exception &e) {
           br.success = false;
-          br.message = std::string("JSON parse error: ") + e.what();
+          br.message = std::string(u8"JSON parse error: ") + e.what();
           // Fallback to defaults below
         }
       }
@@ -789,8 +789,8 @@ namespace ImGuiX::Fonts {
         // Choose active locale, or fallback to "default"
         if (!m_packs.empty()) {
             if (!m_packs.count(m_active_locale)) {
-                if (m_packs.count("default"))
-                m_active_locale = "default";
+                if (m_packs.count(u8"default"))
+                m_active_locale = u8"default";
             }
         }
 

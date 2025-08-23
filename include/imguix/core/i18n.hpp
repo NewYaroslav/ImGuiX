@@ -29,15 +29,15 @@
 #include <imguix/utils/path_utils.hpp>
 
 #ifndef IMGUIX_I18N_DIR
-#   define IMGUIX_I18N_DIR "data/resources/i18n"   // default root for i18n assets
+#   define IMGUIX_I18N_DIR u8"data/resources/i18n"   // default root for i18n assets
 #endif
 
 #ifndef IMGUIX_I18N_JSON_BASENAME
-#   define IMGUIX_I18N_JSON_BASENAME "strings.json"
+#   define IMGUIX_I18N_JSON_BASENAME u8"strings.json"
 #endif
 
 #ifndef IMGUIX_I18N_PLURALS_FILENAME
-#   define IMGUIX_I18N_PLURALS_FILENAME "plurals.json"
+#   define IMGUIX_I18N_PLURALS_FILENAME u8"plurals.json"
 #endif
 
 // 1 = resolve IMGUIX_I18N_DIR relatively to the executable location.

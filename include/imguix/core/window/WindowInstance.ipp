@@ -27,7 +27,7 @@ namespace ImGuiX {
     template <typename ControllerType, typename... Args>
     ControllerType& WindowInstance::createController(Args&&... args) {
         static_assert(std::is_base_of<Controller, ControllerType>::value,
-                      "ControllerType must derive from Controller");
+                      u8"ControllerType must derive from Controller");
 
         auto ctrl = std::make_unique<ControllerType>(
             static_cast<WindowInterface&>(*this),
@@ -88,13 +88,13 @@ namespace ImGuiX {
     std::string WindowInstance::iniPath() const {
 #   ifdef __EMSCRIPTEN__
 #       ifdef IMGUIX_EMSCRIPTEN_IDBFS
-        return "/imguix_fs/imgui-" + std::to_string(m_window_id) + ".ini";
+        return u8"/imguix_fs/imgui-" + std::to_string(m_window_id) + u8".ini";
 #       else
         return {};
 #       endif
 #   else
         return ImGuiX::Utils::resolveExecPath(
-            std::string(IMGUIX_CONFIG_DIR) + "/imgui-" + std::to_string(m_window_id) + ".ini");
+            std::string(IMGUIX_CONFIG_DIR) + u8"/imgui-" + std::to_string(m_window_id) + u8".ini");
 #   endif
     }
 
@@ -167,7 +167,7 @@ namespace ImGuiX {
     }
 
     void WindowInstance::fontsBeginManual() {
-        assert(m_in_init_phase && !m_is_fonts_init && "fontsBeginManual() only allowed in onInit(), before initFonts()");
+        assert(m_in_init_phase && !m_is_fonts_init && u8"fontsBeginManual() only allowed in onInit(), before initFonts()");
         m_font_manager.beginManual();
         m_is_fonts_manual = true;
     }
@@ -180,46 +180,46 @@ namespace ImGuiX {
 	}
 	
 	void WindowInstance::fontsSetRangesPreset(std::string preset) {
-		assert(m_in_init_phase && "fontsSetRangesPreset() только в onInit()");
+		assert(m_in_init_phase && u8"fontsSetRangesPreset() только в onInit()");
 		m_font_manager.setRanges(std::move(preset));
 	}
 
 	void WindowInstance::fontsSetRangesExplicit(const std::vector<ImWchar>& pairs) {
-		assert(m_in_init_phase && "fontsSetRangesExplicit() только в onInit()");
+		assert(m_in_init_phase && u8"fontsSetRangesExplicit() только в onInit()");
 		m_font_manager.setRanges(pairs);
 	}
 
 	void WindowInstance::fontsClearRanges() {
-		assert(m_in_init_phase && "fontsClearRanges() только в onInit()");
+		assert(m_in_init_phase && u8"fontsClearRanges() только в onInit()");
 		m_font_manager.clearRanges();
 	}
 
     void WindowInstance::fontsAddBody(const ImGuiX::Fonts::FontFile& ff) {
-        assert(m_in_init_phase && "Only allowed in onInit()");
+        assert(m_in_init_phase && u8"Only allowed in onInit()");
         m_font_manager.addFontBody(ff);
     }
 
     void WindowInstance::fontsAddHeadline(ImGuiX::Fonts::FontRole role, const ImGuiX::Fonts::FontFile& ff) {
-        assert(m_in_init_phase && "Only allowed in onInit()");
+        assert(m_in_init_phase && u8"Only allowed in onInit()");
         m_font_manager.addFontHeadline(role, ff);
     }
 
     void WindowInstance::fontsAddMerge(ImGuiX::Fonts::FontRole role, const ImGuiX::Fonts::FontFile& ff) {
-        assert(m_in_init_phase && "Only allowed in onInit()");
+        assert(m_in_init_phase && u8"Only allowed in onInit()");
         m_font_manager.addFontMerge(role, ff);
     }
 
     void WindowInstance::fontsAddMerge(const ImGuiX::Fonts::FontFile& ff) {
-        assert(m_in_init_phase && "Only allowed in onInit()");
+        assert(m_in_init_phase && u8"Only allowed in onInit()");
         m_font_manager.addFontMerge(ff);
     }
 
     bool WindowInstance::fontsBuildNow() {
-        assert(m_in_init_phase && "Only allowed in onInit()");
+        assert(m_in_init_phase && u8"Only allowed in onInit()");
         auto br = m_font_manager.buildNow();
         if (br.success) m_is_fonts_init = true;
         if (!br.success) {
-            notify(IMGUIX_LOG_EVENT(ImGuiX::Events::LogLevel::Error, "Font init failed: {}"));
+            notify(IMGUIX_LOG_EVENT(ImGuiX::Events::LogLevel::Error, u8"Font init failed: {}"));
         }
         return br.success;
     }
@@ -232,7 +232,7 @@ namespace ImGuiX {
         auto br = m_font_manager.initFromJsonOrDefaults();
         m_is_fonts_init = br.success;
         if (!br.success) {
-            notify(IMGUIX_LOG_EVENT(ImGuiX::Events::LogLevel::Error, "Font init failed: {}"));
+            notify(IMGUIX_LOG_EVENT(ImGuiX::Events::LogLevel::Error, u8"Font init failed: {}"));
         }
     }
 }

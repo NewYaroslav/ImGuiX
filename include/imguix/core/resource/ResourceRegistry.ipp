@@ -50,7 +50,7 @@ namespace ImGuiX {
         std::shared_lock<std::shared_mutex> progress_lock(m_progress_mutex);
         #endif
         if (m_in_progress.find(type) != m_in_progress.end()) {
-            throw std::runtime_error("Resource is being initialized");
+            throw std::runtime_error(u8"Resource is being initialized");
         }
         progress_lock.unlock();
         
@@ -61,7 +61,7 @@ namespace ImGuiX {
         #endif
         auto it = m_resources.find(type);
         if (it == m_resources.end()) {
-            throw std::runtime_error("Resource not registered");
+            throw std::runtime_error(u8"Resource not registered");
         }
 
         return *static_cast<T*>(it->second.get());

@@ -21,7 +21,7 @@ namespace ImGuiX::Events {
         }
 
         const char* name() const override {
-            return "WindowClosedEvent";
+            return u8"WindowClosedEvent";
         }
     };
 

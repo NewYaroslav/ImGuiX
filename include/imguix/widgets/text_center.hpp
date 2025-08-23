@@ -60,10 +60,10 @@ namespace ImGuiX::Widgets {
         const float x  = x0 + (avail_w - block_w) * 0.5f;
         ImGui::SetCursorPosX(x);
 
-        ImGui::BeginChild("##TextWrappedCentered", ImVec2(block_w, 0.0f),
+        ImGui::BeginChild(u8"##TextWrappedCentered", ImVec2(block_w, 0.0f),
                           false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBackground);
         ImGui::PushTextWrapPos(0.0f);
-        ImGui::TextWrapped("%s", text);
+        ImGui::TextWrapped(u8"%s", text);
         ImGui::PopTextWrapPos();
         ImGui::EndChild();
     }

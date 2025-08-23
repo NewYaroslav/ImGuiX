@@ -37,7 +37,7 @@ namespace ImGuiX::Utils {
     template<typename Dummy = void>
     std::string getExecPath() {
 #ifdef __EMSCRIPTEN__
-        static_assert(detail::dependent_false_v<Dummy>, "getExecPath is not supported on Emscripten");
+        static_assert(detail::dependent_false_v<Dummy>, u8"getExecPath is not supported on Emscripten");
         return {};
 #elif defined(_WIN32)
         std::vector<wchar_t> buffer(MAX_PATH);
@@ -50,7 +50,7 @@ namespace ImGuiX::Utils {
         }
 
         if (size == 0)
-            throw std::runtime_error("Failed to get executable path.");
+            throw std::runtime_error(u8"Failed to get executable path.");
 
         std::wstring exe_path(buffer.begin(), buffer.begin() + size);
         std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
@@ -61,14 +61,14 @@ namespace ImGuiX::Utils {
         if (_NSGetExecutablePath(buffer.data(), &size) != 0) {
             buffer.resize(size);
             if (_NSGetExecutablePath(buffer.data(), &size) != 0)
-                throw std::runtime_error("Failed to get executable path.");
+                throw std::runtime_error(u8"Failed to get executable path.");
         }
         return std::string(buffer.data());
 #else
         char result[PATH_MAX];
-        ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
+        ssize_t count = readlink(u8"/proc/self/exe", result, PATH_MAX);
         if (count == -1)
-            throw std::runtime_error("Failed to get executable path.");
+            throw std::runtime_error(u8"Failed to get executable path.");
 
         return std::string(result, count);
 #endif
@@ -81,7 +81,7 @@ namespace ImGuiX::Utils {
     template<typename Dummy = void>
     std::string getExecDir() {
 #ifdef __EMSCRIPTEN__
-        static_assert(detail::dependent_false_v<Dummy>, "getExecDir is not supported on Emscripten");
+        static_assert(detail::dependent_false_v<Dummy>, u8"getExecDir is not supported on Emscripten");
         return {};
 #else
         fs::path path = fs::u8path(getExecPath());
@@ -96,7 +96,7 @@ namespace ImGuiX::Utils {
     template<typename Dummy = void>
     std::string resolveExecPath(const std::string& relative_path) {
 #ifdef __EMSCRIPTEN__
-        static_assert(detail::dependent_false_v<Dummy>, "resolveExecPath is not supported on Emscripten");
+        static_assert(detail::dependent_false_v<Dummy>, u8"resolveExecPath is not supported on Emscripten");
         return relative_path;
 #else
         return (fs::u8path(getExecDir()) / fs::u8path(relative_path)).u8string();
@@ -110,7 +110,7 @@ namespace ImGuiX::Utils {
     template<typename Dummy = void>
     std::string getFileName(const std::string& full_path) {
 #ifdef __EMSCRIPTEN__
-        static_assert(detail::dependent_false_v<Dummy>, "getFileName is not supported on Emscripten");
+        static_assert(detail::dependent_false_v<Dummy>, u8"getFileName is not supported on Emscripten");
         return full_path;
 #else
         return fs::u8path(full_path).filename().u8string();
@@ -125,7 +125,7 @@ namespace ImGuiX::Utils {
     template<typename Dummy = void>
     std::string makeRelative(const std::string& file_path, const std::string& base_path) {
 #ifdef __EMSCRIPTEN__
-        static_assert(detail::dependent_false_v<Dummy>, "makeRelative is not supported on Emscripten");
+        static_assert(detail::dependent_false_v<Dummy>, u8"makeRelative is not supported on Emscripten");
         return file_path;
 #else
         if (base_path.empty()) return file_path;
@@ -146,14 +146,14 @@ namespace ImGuiX::Utils {
     template<typename Dummy = void>
     void createDirectories(const std::string& path) {
 #ifdef __EMSCRIPTEN__
-        static_assert(detail::dependent_false_v<Dummy>, "createDirectories is not supported on Emscripten");
+        static_assert(detail::dependent_false_v<Dummy>, u8"createDirectories is not supported on Emscripten");
         (void)path;
 #else
         fs::path dir = fs::u8path(path);
         if (!fs::exists(dir)) {
             std::error_code ec;
             if (!fs::create_directories(dir, ec)) {
-                throw std::runtime_error("Failed to create directories: " + dir.u8string());
+                throw std::runtime_error(u8"Failed to create directories: " + dir.u8string());
             }
         }
 #endif
