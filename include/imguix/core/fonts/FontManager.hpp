@@ -22,6 +22,7 @@
 #include "FontManagerViewCRTP.hpp"
 #include "FontManagerControlCRTP.hpp"
 #include <imguix/utils/path_utils.hpp>
+#include <imguix/config/fonts.hpp>
 
 namespace ImGuiX::Fonts {
 
@@ -57,7 +58,7 @@ namespace ImGuiX::Fonts {
         /// \return true if parameters accepted.
         bool bootstrap(const BuildParams& params);
 
-        /// \brief Set JSON config path. Default: "data/resources/fonts/fonts.json";.
+        /// \brief Set JSON config path. Default: IMGUIX_FONTS_CONFIG.
         void setConfigPath(std::string path);
 
         /// \brief Set active locale. May mark atlas dirty if ranges/fonts differ.
@@ -173,7 +174,7 @@ namespace ImGuiX::Fonts {
         bool m_auto_init = true;
         bool m_dirty = true;
 
-        std::string m_config_path = u8"data/resources/fonts/fonts.json";
+        std::string m_config_path = IMGUIX_FONTS_CONFIG;
         std::string m_active_locale = u8"default";
 
         // Markdown sizes (px @ 96 DPI)

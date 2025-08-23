@@ -1,0 +1,9 @@
+#pragma once
+#ifndef _IMGUIX_CONFIG_PATHS_HPP_INCLUDED
+#define _IMGUIX_CONFIG_PATHS_HPP_INCLUDED
+
+#ifndef IMGUIX_CONFIG_DIR
+#   define IMGUIX_CONFIG_DIR u8"data/config"
+#endif
+
+#endif // _IMGUIX_CONFIG_PATHS_HPP_INCLUDED

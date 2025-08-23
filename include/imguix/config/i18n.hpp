@@ -1,0 +1,21 @@
+#pragma once
+#ifndef _IMGUIX_CONFIG_I18N_HPP_INCLUDED
+#define _IMGUIX_CONFIG_I18N_HPP_INCLUDED
+
+#ifndef IMGUIX_I18N_DIR
+#   define IMGUIX_I18N_DIR u8"data/resources/i18n"
+#endif
+
+#ifndef IMGUIX_I18N_JSON_BASENAME
+#   define IMGUIX_I18N_JSON_BASENAME u8"strings.json"
+#endif
+
+#ifndef IMGUIX_I18N_PLURALS_FILENAME
+#   define IMGUIX_I18N_PLURALS_FILENAME u8"plurals.json"
+#endif
+
+#ifndef IMGUIX_RESOLVE_PATHS_REL_TO_EXE
+#   define IMGUIX_RESOLVE_PATHS_REL_TO_EXE 1
+#endif
+
+#endif // _IMGUIX_CONFIG_I18N_HPP_INCLUDED
