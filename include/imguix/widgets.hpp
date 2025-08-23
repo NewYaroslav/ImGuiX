@@ -7,5 +7,6 @@
 
 #include "widgets/circle_button.hpp"
 #include "widgets/system_button.hpp"
+#include "widgets/markers.hpp"
 
 #endif // IMGUIX_WIDGETS_HPP_INCLUDED
