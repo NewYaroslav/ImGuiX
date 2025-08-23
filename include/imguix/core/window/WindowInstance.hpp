@@ -26,10 +26,7 @@
 #endif
 
 #include "WindowInterface.hpp"
-
-#ifndef IMGUIX_CONFIG_DIR
-#    define IMGUIX_CONFIG_DIR u8"data/config"
-#endif
+#include <imguix/config/paths.hpp>
 
 namespace ImGuiX {
 

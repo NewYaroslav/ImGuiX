@@ -2,6 +2,8 @@
 #ifndef _IMGUIX_UTILS_I18N_LANG_STORE_HPP_INCLUDED
 #define _IMGUIX_UTILS_I18N_LANG_STORE_HPP_INCLUDED
 
+#include <imguix/config/i18n.hpp>
+
 /// \file LangStore.hpp
 /// \brief Localized strings and markdown loader with JSON (monolingual + polyglot) support,
 ///        using pluggable plural rules (PluralRules).
