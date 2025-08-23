@@ -18,11 +18,14 @@ namespace ImGuiX::Widgets {
 
     /// \brief Bitmask result for AuthPanel events.
     enum class AuthPanelResult : unsigned {
-        None            = 0u,
-        EmailChanged    = 1u << 0,
-        PasswordChanged = 1u << 1,
-        HostChanged     = 1u << 2,
-        ConnectClicked  = 1u << 3
+        None             = 0u,
+        EmailChanged     = 1u << 0,
+        PasswordChanged  = 1u << 1,
+        HostChanged      = 1u << 2,
+        TokenChanged     = 1u << 3,
+        ApiKeyChanged    = 1u << 4,
+        ApiSecretChanged = 1u << 5,
+        ConnectClicked   = 1u << 6
     };
 
     inline AuthPanelResult operator|(AuthPanelResult a, AuthPanelResult b) {
@@ -44,31 +47,34 @@ namespace ImGuiX::Widgets {
         const char* text_label    = u8"Show";    ///< Текст для чекбокса, если use_icon == false
         
         ImFont*     icon_font     = nullptr;     ///< шрифт с иконками (если null — текущий)
-        float       icon_baseline = IMGUIX_MATERIAL_ICONS_BASELINE; ///< сдвиг по Y в пикселях (подгонка базлайна)
+        float       icon_baseline = 0.0f;        ///< сдвиг по Y в пикселях (подгонка базлайна)
         float       icon_rounding = -1.0f;       ///< скругление фона кнопки
     };
-	
-	/// \brief Параметры переключателя "показать пароль".
-	struct VKButtonConfig {
-		bool        enabled_host      = false;      ///< show VK button near host
-		bool        enabled_email     = false;      ///< show VK button near email
-		bool        enabled_password  = false;      ///< show VK button near password
+    
+    /// \brief Параметры переключателя "показать пароль".
+    struct VKButtonConfig {
+        bool        enabled_host      = false;      ///< show VK button near host
+        bool        enabled_email     = false;      ///< show VK button near email
+        bool        enabled_password  = false;      ///< show VK button near password
+        bool        enabled_token     = false;      ///< show VK near token
+        bool        enabled_api_key   = false;      ///< show VK near API key (public)
+        bool        enabled_api_secret= false;      ///< show VK near API secret
 
-		bool        use_icon          = true;       ///< icon or text
-		const char* icon_text         = u8"\uE312"; ///< default Material PUA 'keyboard' (alt: u8"\uE23E")
-		const char* text              = u8"[KB]";   ///< text label if use_icon==false
-                ImFont*     icon_font         = nullptr;   ///< icon font (merged or dedicated)
-                ImVec2      button_size       = ImVec2(0,0);
-                float       same_line_w       = 0.0f;      ///< SameLine(offset) before button
-                float       icon_baseline     = IMGUIX_MATERIAL_ICONS_BASELINE; ///< Y offset to fit baseline
-                float       icon_rounding     = -1.0f;     ///< bg rounding, -1 => default
-		const char* tooltip_toggle_on = u8"Show keyboard";
-		const char* tooltip_toggle_off= u8"Hide keyboard";
+        bool        use_icon          = true;       ///< icon or text
+        const char* icon_text         = u8"\uE312"; ///< default Material PUA 'keyboard' (alt: u8"\uE23E")
+        const char* text              = u8"[KB]";   ///< text label if use_icon==false
+        ImFont*     icon_font         = nullptr;   ///< icon font (merged or dedicated)
+        ImVec2      button_size       = ImVec2(0,0);
+        float       same_line_w       = 0.0f;      ///< SameLine(offset) before button
+        float       icon_baseline     = 0.0f;      ///< Y offset to fit baseline
+        float       icon_rounding     = -1.0f;     ///< bg rounding, -1 => default
+        const char* tooltip_toggle_on = u8"Show keyboard";
+        const char* tooltip_toggle_off= u8"Hide keyboard";
 
-		// VK render mode
-		bool        vk_as_overlay     = true;      ///< true: floating overlay window; false: embed under form
-		ImVec2      overlay_size      = ImVec2(0,0); ///< 0,0 => auto
-	};
+        // VK render mode
+        bool        vk_as_overlay     = true;      ///< true: floating overlay window; false: embed under form
+        ImVec2      overlay_size      = ImVec2(0,0); ///< 0,0 => auto
+    };
 
     /// \brief Configuration for AuthPanel.
     struct AuthPanelConfig {
@@ -79,6 +85,14 @@ namespace ImGuiX::Widgets {
         std::string hint_host       = u8"host";
         std::string connected_label = u8"connected";
         std::string connect_label   = u8"connect";
+        
+        // Tokens / API keys
+        bool        show_token      = false;
+        bool        show_api_keys   = false;        ///< public + secret
+        std::string hint_token      = u8"token";
+        std::string hint_api_key    = u8"api key (public)";
+        std::string hint_api_secret = u8"api secret";
+        bool        mask_api_secret = true;         ///< show secret as password
 
         // Options
         bool show_host              = false;
@@ -89,9 +103,9 @@ namespace ImGuiX::Widgets {
         
         // Password toggle
         PasswordToggleConfig password_toggle{};
-		
-		ImGuiX::Widgets::VirtualKeyboardConfig vk_cfg{};
-		VKButtonConfig vk{};
+        
+        ImGuiX::Widgets::VirtualKeyboardConfig vk_cfg{};
+        VKButtonConfig vk{};
 
         // Connection state visuals
         bool init                   = false;
@@ -117,70 +131,78 @@ namespace ImGuiX::Widgets {
     /// \param password Reference to password string.
     /// \param host Optional pointer to host string (used only if cfg.show_host is true).
     /// \param email_valid_out Optional output: whether email matches regex (if validate_email).
+    /// \param token Optional pointer to token (used only if cfg.show_token is true).
+    /// \param api_key Optional pointer to API public key (used only if cfg.show_api_keys is true).
+    /// \param api_secret Optional pointer to API secret key (used only if cfg.show_api_keys is true).
     /// \return Bitmask of events happened this frame.
     inline AuthPanelResult AuthPanel(const char* id,
                                      AuthPanelConfig& cfg,
                                      std::string& email,
                                      std::string& password,
                                      std::string* host = nullptr,
-                                     bool* email_valid_out = nullptr) {
-		AuthPanelResult res = AuthPanelResult::None;
+                                     bool* email_valid_out = nullptr,
+                                     std::string* token = nullptr,
+                                     std::string* api_key = nullptr, std::string* api_secret = nullptr) {
+        AuthPanelResult res = AuthPanelResult::None;
         ImGui::PushID(id);
         
         const ImGuiID key_show_pwd = ImGui::GetID(u8"show_password");
         ImGuiStorage* st = ImGui::GetStateStorage();
 
-		//--
-		enum class VKTarget : int { None=0, Host=1, Email=2, Password=3 };
+        //--
+        enum class VKTarget : int { None=0, Host=1, Email=2, Password=3, Token=4, ApiKey=5, ApiSecret=6 };
 
-		const ImGuiID key_vk_visible = ImGui::GetID(u8"vk_visible");
-		const ImGuiID key_vk_target  = ImGui::GetID(u8"vk_target");
+        const ImGuiID key_vk_visible = ImGui::GetID(u8"vk_visible");
+        const ImGuiID key_vk_target  = ImGui::GetID(u8"vk_target");
 
-		auto get_vk_visible = [&](){ return st->GetInt(key_vk_visible, 0) != 0; };
-		auto set_vk_visible = [&](bool v){ st->SetInt(key_vk_visible, v ? 1 : 0); };
-		auto get_vk_target  = [&](){ return (VKTarget)st->GetInt(key_vk_target, (int)VKTarget::None); };
-		auto set_vk_target  = [&](VKTarget t){ st->SetInt(key_vk_target, (int)t); };
+        auto get_vk_visible = [&](){ return st->GetInt(key_vk_visible, 0) != 0; };
+        auto set_vk_visible = [&](bool v){ st->SetInt(key_vk_visible, v ? 1 : 0); };
+        auto get_vk_target  = [&](){ return (VKTarget)st->GetInt(key_vk_target, (int)VKTarget::None); };
+        auto set_vk_target  = [&](VKTarget t){ st->SetInt(key_vk_target, (int)t); };
 
-		// helper: toggle for a field
-		auto toggle_vk_for = [&](VKTarget t){
-			bool vis = get_vk_visible();
-			VKTarget cur = get_vk_target();
-			if (vis && cur == t) { set_vk_visible(false); set_vk_target(VKTarget::None); }
-			else { set_vk_target(t); set_vk_visible(true); }
-		};
+        // helper: toggle for a field
+        auto toggle_vk_for = [&](VKTarget t){
+            bool vis = get_vk_visible();
+            VKTarget cur = get_vk_target();
+            if (vis && cur == t) { set_vk_visible(false); set_vk_target(VKTarget::None); }
+            else { set_vk_target(t); set_vk_visible(true); }
+        };
 
-		// helper: draw small KB button (icon or text)
-		auto draw_kb_button = [&](const char* idlabel)->bool {
-			if (cfg.vk.same_line_w != 0.0f) ImGui::SameLine(cfg.vk.same_line_w);
-			else ImGui::SameLine();
+        // helper: draw small KB button (icon or text)
+        auto draw_kb_button = [&](const char* idlabel)->bool {
+            if (cfg.vk.same_line_w != 0.0f) ImGui::SameLine(cfg.vk.same_line_w);
+            else ImGui::SameLine();
 
-			bool pressed = false;
-			if (cfg.vk.use_icon) {
-				ImGuiX::Widgets::IconButtonConfig ib{};
-				ib.font        = cfg.vk.icon_font;
-				ib.text_offset = ImVec2(0, cfg.vk.icon_baseline);
-				ib.rounding    = cfg.vk.icon_rounding;
-				pressed = ImGuiX::Widgets::IconButtonCentered(idlabel, 
-							cfg.vk.icon_text ? cfg.vk.icon_text : u8"\uE312", ib);
-			} else {
-				pressed = ImGui::Button(idlabel, cfg.vk.button_size);
-			}
-			// tooltip reflects next state
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip(u8"%s", get_vk_visible() ? 
-					(cfg.vk.tooltip_toggle_off?cfg.vk.tooltip_toggle_off:u8"Hide keyboard"):
-					(cfg.vk.tooltip_toggle_on? cfg.vk.tooltip_toggle_on :u8"Show keyboard"));
-			return pressed;
-		};
+            bool pressed = false;
+            if (cfg.vk.use_icon) {
+                ImGuiX::Widgets::IconButtonConfig ib{};
+                ib.font        = cfg.vk.icon_font;
+                ib.text_offset = ImVec2(0, cfg.vk.icon_baseline);
+                ib.rounding    = cfg.vk.icon_rounding;
+                pressed = ImGuiX::Widgets::IconButtonCentered(idlabel, 
+                            cfg.vk.icon_text ? cfg.vk.icon_text : u8"\uE312", ib);
+            } else {
+                pressed = ImGui::Button(idlabel, cfg.vk.button_size);
+            }
+            // tooltip reflects next state
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip(u8"%s", get_vk_visible() ? 
+                    (cfg.vk.tooltip_toggle_off?cfg.vk.tooltip_toggle_off:u8"Hide keyboard"):
+                    (cfg.vk.tooltip_toggle_on? cfg.vk.tooltip_toggle_on :u8"Show keyboard"));
+            return pressed;
+        };
 
-		// ТЕКУЩАЯ ЦЕЛЬ ДЛЯ ВК + указатель на текст
-		VKTarget vk_target = get_vk_target();
-		std::string* vk_text_ptr = nullptr;
-		if (vk_target == VKTarget::Email) vk_text_ptr = &email;
-		else if (vk_target == VKTarget::Password) vk_text_ptr = &password;
-		else if (vk_target == VKTarget::Host && host) vk_text_ptr = host;
-		
-		//---
+        // ТЕКУЩАЯ ЦЕЛЬ ДЛЯ ВК + указатель на текст
+        VKTarget vk_target = get_vk_target();
+        std::string* vk_text_ptr = nullptr;
+        if (vk_target == VKTarget::Email) vk_text_ptr = &email;
+        else if (vk_target == VKTarget::Password) vk_text_ptr = &password;
+        else if (vk_target == VKTarget::Host && host) vk_text_ptr = host;
+        else if (vk_target == VKTarget::Token && token) vk_text_ptr = token;
+        else if (vk_target == VKTarget::ApiKey && api_key) vk_text_ptr = api_key;
+        else if (vk_target == VKTarget::ApiSecret && api_secret) vk_text_ptr = api_secret;
+        
+        //---
 
         auto get_show = [&]() -> bool {
             return st->GetInt(key_show_pwd, 0) != 0;
@@ -201,7 +223,13 @@ namespace ImGuiX::Widgets {
         if(cfg.show_connection_state) {
             height += ImGui::GetFrameHeightWithSpacing();
         }
+        if(cfg.show_token) {
+            height += ImGui::GetFrameHeightWithSpacing();
+        }
+        if(cfg.show_api_keys) { height += 2.0f * ImGui::GetFrameHeightWithSpacing(); }
+
         height += ImGui::GetFrameHeightWithSpacing(); // кнопка Connect
+    
         ImGui::BeginChild(u8"##AuthPanel", ImVec2(ImGui::GetWindowWidth() * 0.65f, height), true);
 
         ImGui::Text(u8"%s", cfg.header.c_str());
@@ -215,12 +243,56 @@ namespace ImGuiX::Widgets {
             if (ImGui::InputTextWithHint(u8"##host", cfg.hint_host.c_str(), buf, sizeof(buf)-1)) {
                 if (host) { *host = buf; res |= AuthPanelResult::HostChanged; }
             }
-			
-			if (cfg.vk.enabled_host) {
-				if (draw_kb_button(u8"##vk_host")) {
-					toggle_vk_for(VKTarget::Host);
-				}
-			}
+            
+            if (cfg.vk.enabled_host) {
+                if (draw_kb_button(u8"##vk_host")) {
+                    toggle_vk_for(VKTarget::Host);
+                }
+            }
+        }
+        
+        // Token (optional)
+        if (cfg.show_token) {
+            char buf[512];
+            std::strncpy(buf, (token ? token->c_str() : u8""), sizeof(buf));
+            buf[sizeof(buf)-1] = '\0';
+            if (ImGui::InputTextWithHint(u8"##token", cfg.hint_token.c_str(), buf, sizeof(buf)-1)) {
+                if (token) { *token = buf; res |= AuthPanelResult::TokenChanged; }
+            }
+            if (cfg.vk.enabled_token) {
+                if (draw_kb_button(u8"##vk_token")) {
+                    toggle_vk_for(VKTarget::Token);
+                }
+            }
+        }
+
+        // API keys (optional)
+        if (cfg.show_api_keys) {
+            // public
+            {
+                char buf[512];
+                std::strncpy(buf, (api_key ? api_key->c_str() : u8""), sizeof(buf));
+                buf[sizeof(buf)-1] = '\0';
+                if (ImGui::InputTextWithHint(u8"##api_key", cfg.hint_api_key.c_str(), buf, sizeof(buf)-1)) {
+                    if (api_key) { *api_key = buf; res |= AuthPanelResult::ApiKeyChanged; }
+                }
+                if (cfg.vk.enabled_api_key) {
+                    if (draw_kb_button(u8"##vk_api_key")) { toggle_vk_for(VKTarget::ApiKey); }
+                }
+            }
+            // secret (masked if enabled)
+            {
+                char buf[512];
+                std::strncpy(buf, (api_secret ? api_secret->c_str() : u8""), sizeof(buf));
+                buf[sizeof(buf)-1] = '\0';
+                const int sec_flags = cfg.mask_api_secret ? ImGuiInputTextFlags_Password : 0;
+                if (ImGui::InputTextWithHint(u8"##api_secret", cfg.hint_api_secret.c_str(), buf, sizeof(buf)-1, sec_flags)) {
+                    if (api_secret) { *api_secret = buf; res |= AuthPanelResult::ApiSecretChanged; }
+                }
+                if (cfg.vk.enabled_api_secret) {
+                    if (draw_kb_button(u8"##vk_api_secret")) { toggle_vk_for(VKTarget::ApiSecret); }
+                }
+            }
         }
 
         // Email
@@ -231,11 +303,11 @@ namespace ImGuiX::Widgets {
                 email_valid = std::regex_match(email, re);
             } catch (...) { /* ignore invalid regex */ }
         }
-		
-		bool pushed_invalid_color = false;
+        
+        bool pushed_invalid_color = false;
         if (cfg.validate_email && !email_valid) {
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.5f, 0.5f, 1.0f));
-			pushed_invalid_color = true;
+            pushed_invalid_color = true;
         }
 
         {
@@ -253,11 +325,11 @@ namespace ImGuiX::Widgets {
                     } catch (...) { email_valid = true; }
                 }
             }
-			if (cfg.vk.enabled_email) {
-				if (draw_kb_button(u8"##vk_email")) {
-					toggle_vk_for(VKTarget::Email);
-				}
-			}
+            if (cfg.vk.enabled_email) {
+                if (draw_kb_button(u8"##vk_email")) {
+                    toggle_vk_for(VKTarget::Email);
+                }
+            }
         }
 
         if (pushed_invalid_color) ImGui::PopStyleColor();
@@ -282,30 +354,30 @@ namespace ImGuiX::Widgets {
                 password = buf;
                 res |= AuthPanelResult::PasswordChanged;
             }
-			if (cfg.vk.enabled_password) {
-				if (draw_kb_button(u8"##vk_password")) {
-					toggle_vk_for(VKTarget::Password);
-				}
-			}
+            if (cfg.vk.enabled_password) {
+                if (draw_kb_button(u8"##vk_password")) {
+                    toggle_vk_for(VKTarget::Password);
+                }
+            }
         }
         if (cfg.password_toggle.enabled) {
             ImGui::SameLine();
 
             if (cfg.password_toggle.use_icon) {
                 // Подберём размер: квадрат по высоте текущего фрейма
-				/*
+                /*
                 ImVec2 sz = cfg.password_toggle.button_size;
                 if (sz.x <= 0.0f || sz.y <= 0.0f) {
                     float h = ImGui::GetFrameHeight();
                     sz = ImVec2(h, h);
                 }
-				*/
-				
-				ImGuiX::Widgets::IconButtonConfig eye{};
-				eye.font        = cfg.password_toggle.icon_font;
-				eye.text_offset = ImVec2(0, cfg.password_toggle.icon_baseline);
-				eye.rounding    = cfg.password_toggle.icon_rounding;
-			
+                */
+                
+                ImGuiX::Widgets::IconButtonConfig eye{};
+                eye.font        = cfg.password_toggle.icon_font;
+                eye.text_offset = ImVec2(0, cfg.password_toggle.icon_baseline);
+                eye.rounding    = cfg.password_toggle.icon_rounding;
+            
                 const char* icon = show_password ? 
                     (cfg.password_toggle.icon_hide ? cfg.password_toggle.icon_hide : u8"X") : 
                     (cfg.password_toggle.icon_show ? cfg.password_toggle.icon_show : u8"V");
@@ -347,97 +419,101 @@ namespace ImGuiX::Widgets {
         }
 
         ImGui::EndChild();
-		
-		if (get_vk_visible() && vk_text_ptr) {
-			// Скопируем cfg.vk_cfg и обернём on_submit, чтобы закрыть клаву
-			ImGuiX::Widgets::VirtualKeyboardConfig vkcfg = cfg.vk_cfg;
+        
+        if (get_vk_visible() && vk_text_ptr) {
+            // Скопируем cfg.vk_cfg и обернём on_submit, чтобы закрыть клаву
+            ImGuiX::Widgets::VirtualKeyboardConfig vkcfg = cfg.vk_cfg;
 
-			// Compose on_submit
-			auto user_submit = vkcfg.on_submit; // may be empty
-			vkcfg.on_submit = [&, user_submit](const std::string& s){
-				if (user_submit) user_submit(s);
-				// close VK on submit
-				set_vk_visible(false);
-				set_vk_target(VKTarget::None);
-				// вернуть фокус на поле (не строго, но помогает UX)
-				switch (vk_target) {
-					case VKTarget::Email:    ImGui::SetKeyboardFocusHere(-1); break;
-					case VKTarget::Password: ImGui::SetKeyboardFocusHere(-1); break;
-					case VKTarget::Host:     ImGui::SetKeyboardFocusHere(-1); break;
-					default: break;
-				}
-			};
+            // Compose on_submit
+            auto user_submit = vkcfg.on_submit; // may be empty
+            vkcfg.on_submit = [&, user_submit](const std::string& s){
+                if (user_submit) user_submit(s);
+                // close VK on submit
+                set_vk_visible(false);
+                set_vk_target(VKTarget::None);
+                // вернуть фокус на поле (не строго, но помогает UX)
+                switch (vk_target) {
+                    case VKTarget::Email:    ImGui::SetKeyboardFocusHere(-1); break;
+                    case VKTarget::Password: ImGui::SetKeyboardFocusHere(-1); break;
+                    case VKTarget::Host:     ImGui::SetKeyboardFocusHere(-1); break;
+                    case VKTarget::Token:    ImGui::SetKeyboardFocusHere(-1); break;
+                    case VKTarget::ApiKey:   ImGui::SetKeyboardFocusHere(-1); break;
+                    case VKTarget::ApiSecret:ImGui::SetKeyboardFocusHere(-1); break;
+                    default: break;
+                }
+            };
 
-			// Если эмбед — просто под формой
-			if (!cfg.vk.vk_as_overlay) {
-				std::string& ref = *vk_text_ptr;
-				ImGui::Dummy(ImVec2(0.0f, ImGui::GetStyle().ItemSpacing.y));
-				ImGui::Separator();
-				ImGui::TextUnformatted(u8"Virtual keyboard:");
-				ImGuiX::Widgets::VirtualKeyboard(u8"##vk_embed", ref, vkcfg);
-			} else {
-				// ОВЕРЛЕЙ: поверх всех окон. Рендерим как отдельное окно ближе к концу кадра.
-				const ImGuiID key_vk_was_visible = ImGui::GetID(u8"vk_was_visible");
-				bool vk_visible_now  = get_vk_visible();
-				bool vk_visible_prev = (st->GetInt(key_vk_was_visible, 0) != 0);
-				bool vk_just_opened  = vk_visible_now && !vk_visible_prev;
+            // Если эмбед — просто под формой
+            if (!cfg.vk.vk_as_overlay) {
+                std::string& ref = *vk_text_ptr;
+                ImGui::Dummy(ImVec2(0.0f, ImGui::GetStyle().ItemSpacing.y));
+                ImGui::Separator();
+                ImGui::TextUnformatted(u8"Virtual keyboard:");
+                ImGuiX::Widgets::VirtualKeyboard(u8"##vk_embed", ref, vkcfg);
+            } else {
+                // ОВЕРЛЕЙ: поверх всех окон. Рендерим как отдельное окно ближе к концу кадра.
+                const ImGuiID key_vk_was_visible = ImGui::GetID(u8"vk_was_visible");
+                bool vk_visible_now  = get_vk_visible();
+                bool vk_visible_prev = (st->GetInt(key_vk_was_visible, 0) != 0);
+                bool vk_just_opened  = vk_visible_now && !vk_visible_prev;
 
-				// If just opened, request focus once
-				if (vk_just_opened) {
-					ImGui::SetNextWindowFocus();
-				}
-				
-				const ImGuiViewport* vp = ImGui::GetMainViewport();
-				ImVec2 center = vp->GetCenter();
-				if (cfg.vk.overlay_size.x > 0.0f && cfg.vk.overlay_size.y > 0.0f) {
-					ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-					ImGui::SetNextWindowSize(cfg.vk.overlay_size, ImGuiCond_Appearing);
-				} else {
-					ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-				}
-				
-				bool should_close_on_blur = false; // computed inside, then acted after End()
-				
-				ImGui::SetNextWindowBgAlpha(0.98f);
-				ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 6.0f);
-				if (ImGui::Begin(u8"##vk_overlay_window",
-								 nullptr,
-								 ImGuiWindowFlags_NoTitleBar |
-								 ImGuiWindowFlags_NoResize |
-								 ImGuiWindowFlags_NoCollapse |
-								 ImGuiWindowFlags_NoSavedSettings |
-								 //ImGuiWindowFlags_NoDocking |
-								 ImGuiWindowFlags_AlwaysAutoResize))
-				{
-					// Render VK as usual
-					std::string& ref = *vk_text_ptr;
-					bool mod = ImGuiX::Widgets::VirtualKeyboard(u8"##vk_overlay", ref, vkcfg);
-					
-					// Close on ESC
-					if (ImGui::IsKeyPressed(ImGuiKey_Escape, false)) {
-						should_close_on_blur = true;
-					}
-					
-					// Close when focus leaves the overlay (but not on the very first frame)
-					const bool focused_now = ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows);
-					const bool appearing   = ImGui::IsWindowAppearing();
-					if (!focused_now && !appearing) {
-						should_close_on_blur = true;
-					}
-				}
-				ImGui::End();
-				ImGui::PopStyleVar();
-				
-				// Apply close if needed
-				if (should_close_on_blur) {
-					set_vk_visible(false);
-					set_vk_target(VKTarget::None);
-				}
-				
-				// Update "was visible" flag for next frame
-				st->SetInt(key_vk_was_visible, get_vk_visible() ? 1 : 0);
-			}
-		}
+                // If just opened, request focus once
+                if (vk_just_opened) {
+                    ImGui::SetNextWindowFocus();
+                }
+                
+                const ImGuiViewport* vp = ImGui::GetMainViewport();
+                ImVec2 center = vp->GetCenter();
+                if (cfg.vk.overlay_size.x > 0.0f && cfg.vk.overlay_size.y > 0.0f) {
+                    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+                    ImGui::SetNextWindowSize(cfg.vk.overlay_size, ImGuiCond_Appearing);
+                } else {
+                    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+                }
+                
+                bool should_close_on_blur = false; // computed inside, then acted after End()
+                
+                ImGui::SetNextWindowBgAlpha(0.98f);
+                ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 6.0f);
+                if (ImGui::Begin(
+                    u8"##vk_overlay_window",
+                    nullptr,
+                    ImGuiWindowFlags_NoTitleBar |
+                    ImGuiWindowFlags_NoResize |
+                    ImGuiWindowFlags_NoCollapse |
+                    ImGuiWindowFlags_NoSavedSettings |
+                    //ImGuiWindowFlags_NoDocking |
+                    ImGuiWindowFlags_AlwaysAutoResize)
+                ) {
+                    // Render VK as usual
+                    std::string& ref = *vk_text_ptr;
+                    bool mod = ImGuiX::Widgets::VirtualKeyboard(u8"##vk_overlay", ref, vkcfg);
+                    
+                    // Close on ESC
+                    if (ImGui::IsKeyPressed(ImGuiKey_Escape, false)) {
+                        should_close_on_blur = true;
+                    }
+                    
+                    // Close when focus leaves the overlay (but not on the very first frame)
+                    const bool focused_now = ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows);
+                    const bool appearing   = ImGui::IsWindowAppearing();
+                    if (!focused_now && !appearing) {
+                        should_close_on_blur = true;
+                    }
+                }
+                ImGui::End();
+                ImGui::PopStyleVar();
+                
+                // Apply close if needed
+                if (should_close_on_blur) {
+                    set_vk_visible(false);
+                    set_vk_target(VKTarget::None);
+                }
+                
+                // Update "was visible" flag for next frame
+                st->SetInt(key_vk_was_visible, get_vk_visible() ? 1 : 0);
+            }
+        }
 
         if (email_valid_out) *email_valid_out = email_valid;
 
