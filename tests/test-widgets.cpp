@@ -49,11 +49,6 @@ private:
     int                                  m_notif_count{2};
 
     struct AuthDemoState {
-        // Model values
-        std::string email   = "guest@example.com";
-        std::string pass    = "";
-        std::string host    = "demo.local";
-
         // UI toggles for on-screen keyboards
         ImGuiX::Widgets::VirtualKeyboardConfig kcfg;
     
@@ -63,6 +58,8 @@ private:
 
         // Configs (static UI config, can be tweaked at runtime)
         ImGuiX::Widgets::AuthPanelConfig      auth_cfg{};
+        ImGuiX::Widgets::AuthData             auth_data;
+
         ImGuiX::Widgets::DomainSelectorConfig dom_cfg{};
         
         ImGuiX::Widgets::LoadingSpinnerConfig sp_cfg{};
@@ -85,9 +82,9 @@ private:
         ImGuiX::Widgets::TimePickerConfig       tp_cfg{};
         ImGuiX::Widgets::TimeOffsetPickerConfig to_cfg{};
         ImGuiX::Widgets::DatePickerConfig       dp_cfg{};
-		
-		std::vector<std::string> names {"Alice", "Bob"};
-		std::vector<int> numbers {1, 2, 3};
+        
+        std::vector<std::string> names {"Alice", "Bob"};
+        std::vector<int> numbers {1, 2, 3};
 
         AuthDemoState() {
             auth_cfg.header                 = "Login";
@@ -117,7 +114,7 @@ private:
             auth_cfg.vk_cfg.capture_hw_enter = true;      // физический Enter, пока фокус на VK
             auth_cfg.vk_cfg.shift_enter_newline = true;   // Shift+Enter => перенос строки
             auth_cfg.vk_cfg.border = false;
-		    auth_cfg.vk_cfg.on_submit = [](const std::string& text){
+            auth_cfg.vk_cfg.on_submit = [](const std::string& text){
                 // your submit logic (дополнительно к автозакрытию внутри обёртки)
             };
 
@@ -127,6 +124,10 @@ private:
                 // Toggle connected flag as a demo effect.
                 auth_cfg.connected = !auth_cfg.connected;
             };
+            
+            auth_data.email    = "guest@example.com";
+            auth_data.password = "";
+            auth_data.host     = "demo.local";
             
             // keyboards
             kcfg.size = ImVec2(0, 0);       // авто-высота
@@ -144,13 +145,13 @@ private:
             kcfg.show_top_preview = false;
 
             // Domain presets
-            dom_cfg.header        = "Server";
-            dom_cfg.hint_domain   = "domain";
-            dom_cfg.custom_text   = "Custom";
-            dom_cfg.default_domain= host; // when switching to "Custom", keep current
-            dom_cfg.show_help     = true;
-            dom_cfg.help_text     = "Choose predefined server or type custom host.";
-            dom_cfg.domains       = { "demo.local", "test.example.com" };
+            dom_cfg.header         = "Server";
+            dom_cfg.hint_domain    = "domain";
+            dom_cfg.custom_text    = "Custom";
+            dom_cfg.default_domain = auth_data.host; // when switching to "Custom", keep current
+            dom_cfg.show_help      = true;
+            dom_cfg.help_text      = "Choose predefined server or type custom host.";
+            dom_cfg.domains        = { "demo.local", "test.example.com" };
             
             //sp_cfg.radius = 28.0f;
             //sp_cfg.angular_speed = 5.0f; // быстрее вращение
@@ -202,14 +203,10 @@ private:
         ImGui::SeparatorText("Auth demo");
 
         // Panel (email+password+host+connect)
-        bool email_ok = true;
         ImGuiX::Widgets::AuthPanelResult r = ImGuiX::Widgets::AuthPanel(
             "auth.panel",
             m_auth.auth_cfg,
-            m_auth.email,
-            m_auth.pass,
-            &m_auth.host,
-            &email_ok
+            m_auth.auth_data
         );
 
         // Show a compact status line
@@ -217,7 +214,7 @@ private:
         ImGui::SameLine();
         ImGui::Text("%s | email: %s",
             m_auth.auth_cfg.connected ? "connected" : "disconnected",
-            email_ok ? "ok" : "invalid");
+            m_auth.auth_data.email_valid ? "ok" : "invalid");
 
         // --- On-screen keyboard toggles
         ImGui::Separator();
@@ -226,13 +223,13 @@ private:
         ImGui::Checkbox("Password", &m_auth.kbd_pass); ImGui::SameLine();
         ImGui::Checkbox("Host", &m_auth.kbd_host);
 
-        if (m_auth.kbd_email)  ImGuiX::Widgets::VirtualKeyboard("kbd.email",  m_auth.email, m_auth.kcfg);
-        if (m_auth.kbd_pass)   ImGuiX::Widgets::VirtualKeyboard("kbd.pass",   m_auth.pass,  m_auth.kcfg);
-        if (m_auth.kbd_host)   ImGuiX::Widgets::VirtualKeyboard("kbd.host",   m_auth.host,  m_auth.kcfg);
+        if (m_auth.kbd_email)  ImGuiX::Widgets::VirtualKeyboard("kbd.email",  m_auth.auth_data.email, m_auth.kcfg);
+        if (m_auth.kbd_pass)   ImGuiX::Widgets::VirtualKeyboard("kbd.pass",   m_auth.auth_data.password,  m_auth.kcfg);
+        if (m_auth.kbd_host)   ImGuiX::Widgets::VirtualKeyboard("kbd.host",   m_auth.auth_data.host,  m_auth.kcfg);
 
         // Domain selector (presets + custom)
         ImGui::Separator();
-        if (ImGuiX::Widgets::DomainSelector("auth.domain", m_auth.dom_cfg, m_auth.host)) {
+        if (ImGuiX::Widgets::DomainSelector("auth.domain", m_auth.dom_cfg, m_auth.auth_data.host)) {
             // optional: react on host change
         }
 
@@ -314,7 +311,7 @@ private:
         ImGui::SeparatorText("Centered text demo");
 
         // Однострочный (форматируемый)
-        ImGuiX::Widgets::TextCenteredFmt("Welcome, %s!", m_auth.email.empty() ? "guest" : m_auth.email.c_str());
+        ImGuiX::Widgets::TextCenteredFmt("Welcome, %s!", m_auth.auth_data.email.empty() ? "guest" : m_auth.auth_data.email.c_str());
 
         // Не форматируемый
         ImGuiX::Widgets::TextUnformattedCentered("This line is centered.");
@@ -324,9 +321,9 @@ private:
             "This is a long message that demonstrates how wrapped text can be visually centered "
             "by placing it inside a centered child region.", 420.0f
         );
-		
-		// ---
-		ImGui::SeparatorText("List editor");
+        
+        // ---
+        ImGui::SeparatorText("List editor");
         ImGuiX::Widgets::ListEditor("names", m_auth.names);
         ImGuiX::Widgets::ListEditor("numbers", m_auth.numbers);
     }

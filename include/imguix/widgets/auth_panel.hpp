@@ -123,26 +123,29 @@ namespace ImGuiX::Widgets {
         // Email regex (basic)
         const char* email_regex = u8R"(.+@.+\.\w+)";
     };
+    
+    /// \brief All auth-related fields passed in/out by reference.
+    struct AuthData {
+        std::string email;       ///< in/out
+        std::string password;    ///< in/out
+        std::string host;        ///< in/out, used if cfg.show_host
+        std::string token;       ///< in/out, used if cfg.show_token
+        std::string api_key;     ///< in/out, used if cfg.show_api_keys
+        std::string api_secret;  ///< in/out, used if cfg.show_api_keys
+
+        bool email_valid = true; ///< out (set by widget if cfg.validate_email)
+    };
 
     /// \brief Renders login form. Optionally includes host input.
     /// \param id Unique widget ID.
     /// \param cfg Panel configuration.
-    /// \param email Reference to email string.
-    /// \param password Reference to password string.
-    /// \param host Optional pointer to host string (used only if cfg.show_host is true).
-    /// \param email_valid_out Optional output: whether email matches regex (if validate_email).
-    /// \param token Optional pointer to token (used only if cfg.show_token is true).
-    /// \param api_key Optional pointer to API public key (used only if cfg.show_api_keys is true).
-    /// \param api_secret Optional pointer to API secret key (used only if cfg.show_api_keys is true).
+    /// \param data
     /// \return Bitmask of events happened this frame.
-    inline AuthPanelResult AuthPanel(const char* id,
-                                     AuthPanelConfig& cfg,
-                                     std::string& email,
-                                     std::string& password,
-                                     std::string* host = nullptr,
-                                     bool* email_valid_out = nullptr,
-                                     std::string* token = nullptr,
-                                     std::string* api_key = nullptr, std::string* api_secret = nullptr) {
+    inline AuthPanelResult AuthPanel(
+            const char* id,
+            AuthPanelConfig& cfg,
+            AuthData& data
+        ) {
         AuthPanelResult res = AuthPanelResult::None;
         ImGui::PushID(id);
         
@@ -195,12 +198,12 @@ namespace ImGuiX::Widgets {
         // ТЕКУЩАЯ ЦЕЛЬ ДЛЯ ВК + указатель на текст
         VKTarget vk_target = get_vk_target();
         std::string* vk_text_ptr = nullptr;
-        if (vk_target == VKTarget::Email) vk_text_ptr = &email;
-        else if (vk_target == VKTarget::Password) vk_text_ptr = &password;
-        else if (vk_target == VKTarget::Host && host) vk_text_ptr = host;
-        else if (vk_target == VKTarget::Token && token) vk_text_ptr = token;
-        else if (vk_target == VKTarget::ApiKey && api_key) vk_text_ptr = api_key;
-        else if (vk_target == VKTarget::ApiSecret && api_secret) vk_text_ptr = api_secret;
+        if (vk_target == VKTarget::Email) vk_text_ptr = &data.email;
+        else if (vk_target == VKTarget::Password) vk_text_ptr = &data.password;
+        else if (vk_target == VKTarget::Host) vk_text_ptr = &data.host;
+        else if (vk_target == VKTarget::Token) vk_text_ptr = &data.token;
+        else if (vk_target == VKTarget::ApiKey) vk_text_ptr = &data.api_key;
+        else if (vk_target == VKTarget::ApiSecret) vk_text_ptr = &data.api_secret;
         
         //---
 
@@ -238,10 +241,11 @@ namespace ImGuiX::Widgets {
         // Host
         if (cfg.show_host) {
             char buf[512];
-            std::strncpy(buf, (host ? host->c_str() : u8""), sizeof(buf));
+            std::strncpy(buf, data.host.c_str(), sizeof(buf));
             buf[sizeof(buf)-1] = '\0';
             if (ImGui::InputTextWithHint(u8"##host", cfg.hint_host.c_str(), buf, sizeof(buf)-1)) {
-                if (host) { *host = buf; res |= AuthPanelResult::HostChanged; }
+                data.host = buf;
+                res |= AuthPanelResult::HostChanged;
             }
             
             if (cfg.vk.enabled_host) {
@@ -254,10 +258,11 @@ namespace ImGuiX::Widgets {
         // Token (optional)
         if (cfg.show_token) {
             char buf[512];
-            std::strncpy(buf, (token ? token->c_str() : u8""), sizeof(buf));
+            std::strncpy(buf, data.token.c_str(), sizeof(buf));
             buf[sizeof(buf)-1] = '\0';
             if (ImGui::InputTextWithHint(u8"##token", cfg.hint_token.c_str(), buf, sizeof(buf)-1)) {
-                if (token) { *token = buf; res |= AuthPanelResult::TokenChanged; }
+                data.token = buf;
+                res |= AuthPanelResult::TokenChanged;
             }
             if (cfg.vk.enabled_token) {
                 if (draw_kb_button(u8"##vk_token")) {
@@ -271,10 +276,11 @@ namespace ImGuiX::Widgets {
             // public
             {
                 char buf[512];
-                std::strncpy(buf, (api_key ? api_key->c_str() : u8""), sizeof(buf));
+                std::strncpy(buf, data.api_key.c_str(), sizeof(buf));
                 buf[sizeof(buf)-1] = '\0';
                 if (ImGui::InputTextWithHint(u8"##api_key", cfg.hint_api_key.c_str(), buf, sizeof(buf)-1)) {
-                    if (api_key) { *api_key = buf; res |= AuthPanelResult::ApiKeyChanged; }
+                    data.api_key = buf;
+                    res |= AuthPanelResult::ApiKeyChanged;
                 }
                 if (cfg.vk.enabled_api_key) {
                     if (draw_kb_button(u8"##vk_api_key")) { toggle_vk_for(VKTarget::ApiKey); }
@@ -283,11 +289,12 @@ namespace ImGuiX::Widgets {
             // secret (masked if enabled)
             {
                 char buf[512];
-                std::strncpy(buf, (api_secret ? api_secret->c_str() : u8""), sizeof(buf));
+                std::strncpy(buf, data.api_secret.c_str(), sizeof(buf));
                 buf[sizeof(buf)-1] = '\0';
                 const int sec_flags = cfg.mask_api_secret ? ImGuiInputTextFlags_Password : 0;
                 if (ImGui::InputTextWithHint(u8"##api_secret", cfg.hint_api_secret.c_str(), buf, sizeof(buf)-1, sec_flags)) {
-                    if (api_secret) { *api_secret = buf; res |= AuthPanelResult::ApiSecretChanged; }
+                    data.api_secret = buf;
+                    res |= AuthPanelResult::ApiSecretChanged;
                 }
                 if (cfg.vk.enabled_api_secret) {
                     if (draw_kb_button(u8"##vk_api_secret")) { toggle_vk_for(VKTarget::ApiSecret); }
@@ -296,33 +303,33 @@ namespace ImGuiX::Widgets {
         }
 
         // Email
-        bool email_valid = true;
+        data.email_valid = true;
         if (cfg.validate_email) {
             try {
                 std::regex re(cfg.email_regex);
-                email_valid = std::regex_match(email, re);
+                data.email_valid = std::regex_match(data.email, re);
             } catch (...) { /* ignore invalid regex */ }
         }
         
         bool pushed_invalid_color = false;
-        if (cfg.validate_email && !email_valid) {
+        if (cfg.validate_email && !data.email_valid) {
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.5f, 0.5f, 1.0f));
             pushed_invalid_color = true;
         }
 
         {
             char buf[512];
-            std::strncpy(buf, email.c_str(), sizeof(buf));
+            std::strncpy(buf, data.email.c_str(), sizeof(buf));
             buf[sizeof(buf)-1] = '\0';
             if (ImGui::InputTextWithHint(u8"##email", cfg.hint_email.c_str(), buf, sizeof(buf)-1)) {
-                email = buf;
+                data.email = buf;
                 res |= AuthPanelResult::EmailChanged;
                 // revalidate quickly
                 if (cfg.validate_email) {
                     try {
                         std::regex re(cfg.email_regex);
-                        email_valid = std::regex_match(email, re);
-                    } catch (...) { email_valid = true; }
+                        data.email_valid = std::regex_match(data.email, re);
+                    } catch (...) { data.email_valid = true; }
                 }
             }
             if (cfg.vk.enabled_email) {
@@ -348,10 +355,10 @@ namespace ImGuiX::Widgets {
         int flags = show_password ? 0 : ImGuiInputTextFlags_Password;
         {
             char buf[512];
-            std::strncpy(buf, password.c_str(), sizeof(buf));
+            std::strncpy(buf, data.password.c_str(), sizeof(buf));
             buf[sizeof(buf)-1] = '\0';
             if (ImGui::InputTextWithHint(u8"##password", cfg.hint_password.c_str(), buf, sizeof(buf)-1, flags)) {
-                password = buf;
+                data.password = buf;
                 res |= AuthPanelResult::PasswordChanged;
             }
             if (cfg.vk.enabled_password) {
@@ -514,8 +521,6 @@ namespace ImGuiX::Widgets {
                 st->SetInt(key_vk_was_visible, get_vk_visible() ? 1 : 0);
             }
         }
-
-        if (email_valid_out) *email_valid_out = email_valid;
 
         ImGui::PopID();
         return res;
