@@ -6,6 +6,7 @@
 
 #include <imguix/widgets/hours_selector.hpp>
 #include <imguix/widgets/time_picker.hpp>
+#include <imguix/widgets/date_picker.hpp>
 
 #include <imguix/widgets/loading_spinner.hpp>
 #include <imguix/widgets/proxy_panel.hpp>
@@ -79,9 +80,11 @@ private:
         int64_t  tz_offset_sec   = 2 * 3600;                // +02:00:00
         bool     has_dst_out = false;
         int      tz_index_io = 0;
+        int64_t  date_ts       = 0;                          // 1970-01-01
 
         ImGuiX::Widgets::TimePickerConfig       tp_cfg{};
         ImGuiX::Widgets::TimeOffsetPickerConfig to_cfg{};
+        ImGuiX::Widgets::DatePickerConfig       dp_cfg{};
 
         AuthDemoState() {
             auth_cfg.header                 = "Login";
@@ -300,7 +303,10 @@ private:
         if (t_changed || tz_changed) {
             // TODO: пересчитать расписание, применить к логике и т.п.
         }
-        
+
+        ImGui::SeparatorText("Date picker");
+        ImGuiX::Widgets::DatePicker("auth.date", m_auth.date_ts, m_auth.dp_cfg);
+
         // ---
         ImGui::SeparatorText("Centered text demo");
 
