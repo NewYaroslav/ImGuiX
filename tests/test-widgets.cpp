@@ -102,12 +102,9 @@ private:
             auth_cfg.init                   = true;   // connection state is meaningful after init
             auth_cfg.connected              = false;  // pretend we are disconnected
             
-            auth_cfg.vk.enabled_host     = true;
-            auth_cfg.vk.enabled_email    = true;
-            auth_cfg.vk.enabled_password = true;
-            auth_cfg.vk.use_icon         = true;
-            auth_cfg.vk.icon_text        = u8"\uE312"; // или u8"\uE23E"
-            auth_cfg.vk.vk_as_overlay    = true;
+            auth_cfg.vk_host     = true;
+            auth_cfg.vk_email    = true;
+            auth_cfg.vk_password = true;
 
             // Поведение Enter: отправить и закрыть
             auth_cfg.vk_cfg.submit_on_enter  = true;
@@ -220,8 +217,8 @@ private:
             auth_cfg.show_api_keys          = true;
             auth_cfg.hint_api_key           = u8"api key (public)";
             auth_cfg.hint_api_secret        = u8"api secret";
-            auth_cfg.vk.enabled_api_key     = true;
-            auth_cfg.vk.enabled_api_secret  = true;
+            auth_cfg.vk_api_key             = true;
+            auth_cfg.vk_api_secret          = true;
             ImGuiX::Widgets::AuthPanelResult r = ImGuiX::Widgets::AuthPanel(
                 "AuthApiKeys",
                 auth_cfg,

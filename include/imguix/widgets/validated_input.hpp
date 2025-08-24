@@ -63,33 +63,83 @@ namespace ImGuiX::Widgets {
         using ImGuiX::Extensions::RegexMatchSafe;
         using ImGuiX::Extensions::ScopedInvalid;
 
+        ImGui::PushID(label);
+        ImGuiStorage* st = ImGui::GetStateStorage();
+        
+        const ImGuiID key_touched   = ImGui::GetID("##validated_touched");
+        const ImGuiID key_prev_hash = ImGui::GetID("##validated_prev32");
+        
+        // simple FNV-1a 32-bit
+        auto hash32 = [](const std::string& s)->uint32_t {
+            uint32_t h = 2166136261u;
+            for (unsigned char c : s) { h ^= c; h *= 16777619u; }
+            return h;
+        };
+
         auto match = [&](const std::string& s){ return !validate || RegexMatchSafe(s, pattern); };
 
+        // hash BEFORE drawing the input (to detect external changes)
+        const uint32_t prev_hash = static_cast<uint32_t>(st->GetInt(key_prev_hash, -1));
+        const uint32_t cur_hash_before = hash32(value);
+        const bool first_frame_for_id = (prev_hash == static_cast<uint32_t>(-1));
+        const bool external_changed = (!first_frame_for_id && prev_hash != cur_hash_before);
+    
+        // choose when to tint
         bool pre_tint = false;
         switch (policy) {
             case InputValidatePolicy::OnDraw:           pre_tint = true; break;
             case InputValidatePolicy::OnChange:         pre_tint = false; break;
             case InputValidatePolicy::OnChangeNonEmpty: pre_tint = !value.empty(); break;
             case InputValidatePolicy::OnTouch: {
-                ImGuiStorage* st = ImGui::GetStateStorage();
-                ImGuiID id = ImGui::GetID("##validated_touched");
-                pre_tint = st->GetBool(id, false);
+                pre_tint = st->GetBool(key_touched, false) || external_changed;
             } break;
         }
 
         bool valid_now = match(value);
         ScopedInvalid tint(pre_tint && !valid_now, error_color);
 
-        bool changed = ImGui::InputTextWithHint(label, hint, &value, flags, callback, user_data);
+        bool changed = ImGui::InputTextWithHint(
+            "##input_text", hint, &value, flags, callback, user_data
+        );
+        
+        tint.end();
 
+        // recompute validity and touched flag
         if (changed) {
             valid_now = match(value);
             if (policy == InputValidatePolicy::OnTouch) {
-                ImGui::GetStateStorage()->SetBool(ImGui::GetID("##validated_touched"), true);
+                st->SetBool(key_touched, true);
+            }
+        } else 
+        if (external_changed) {
+            valid_now = !validate || RegexMatchSafe(value, pattern);
+            if (policy == InputValidatePolicy::OnTouch) {
+                st->SetBool(key_touched, true);
             }
         }
 
         out_valid = valid_now;
+        
+        // store hash AFTER draw (captures user edits)
+        const uint32_t cur_hash_after = hash32(value);
+        st->SetInt(key_prev_hash, static_cast<int>(cur_hash_after));
+        
+        // --- trailing label (print only visible part of `label` before "##")
+        {
+            // find end of visible label (stop at "##" if present)
+            const char* label_end = label;
+            while (*label_end != '\0' && !(label_end[0] == '#' && label_end[1] == '#'))
+                ++label_end;
+
+            const bool has_visible = (label_end > label); // non-empty prefix
+            if (has_visible) {
+                // keep standard inner spacing between item and label (like core widgets)
+                ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
+                ImGui::TextUnformatted(label, label_end);
+            }
+        }
+        
+        ImGui::PopID();
         return changed;
     }
     
