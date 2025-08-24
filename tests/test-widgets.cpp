@@ -229,6 +229,22 @@ private:
             );
         }
         
+        ImGuiX::Widgets::KeyboardToggleConfig kb_cfg;
+        kb_cfg.icon_text = u8"\uE312";
+        kb_cfg.tooltip_toggle_on  = u8"Show keyboard";
+        kb_cfg.tooltip_toggle_off = u8"Hide keyboard";
+        
+        bool email_valid = false;
+        (void)ImGuiX::Widgets::InputTextWithVKValidated(
+            u8"email##DemoInputTextValidated",
+            u8"email",
+            m_auth.auth_data.email,
+            true,
+            ImGuiX::Widgets::InputValidatePolicy::OnTouch,
+            u8R"(.+@.+\.\w+)",
+            email_valid,
+            kb_cfg);
+        
         bool api_key_valid = false;
         (void)ImGuiX::Widgets::InputTextValidated(
             u8"api key##DemoInputTextValidated",
@@ -238,7 +254,7 @@ private:
             ImGuiX::Widgets::InputValidatePolicy::OnTouch,
             u8R"(^[A-Za-z0-9.\-:]+$)",
             api_key_valid);
-        
+
         ImGuiX::Widgets::PasswordToggleConfig toggle_cfg;
         (void)ImGuiX::Widgets::InputPasswordWithToggle(
             u8"api key##DemoInputPasswordWithToggle",
@@ -249,6 +265,18 @@ private:
             u8R"(^[A-Za-z0-9.\-:]+$)",
             api_key_valid,
             toggle_cfg);
+            
+        (void)InputPasswordWithToggleVK(
+            u8"api key##DemoInputPasswordWithToggleVK",
+            u8"api key (public)",
+            m_auth.auth_data.api_key,
+            true,
+            ImGuiX::Widgets::InputValidatePolicy::OnTouch,
+            u8R"(^[A-Za-z0-9.\-:]+$)",
+            api_key_valid,
+            toggle_cfg,
+            kb_cfg);
+
 
         // Show a compact status line
         ImGui::TextUnformatted("Status:");
