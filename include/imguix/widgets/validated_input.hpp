@@ -35,18 +35,18 @@ namespace ImGuiX::Widgets {
     /// \param user_data  Optional user data for callback.
     /// \return True if the value changed this frame.
     inline bool InputTextValidated(
-        const char* label,
-        const char* hint,
-        std::string& value,
-        bool validate,
-        InputValidatePolicy policy,
-        const std::string& pattern,
-        bool& out_valid,
-        ImVec4 error_color = ImVec4(0.9f,0.5f,0.5f,1.0f),
-        ImGuiInputTextFlags flags = 0,
-        ImGuiInputTextCallback callback = nullptr,
-        void* user_data = nullptr
-    ) {
+            const char* label,
+            const char* hint,
+            std::string& value,
+            bool validate,
+            InputValidatePolicy policy,
+            const std::string& pattern,
+            bool& out_valid,
+            ImVec4 error_color = ImVec4(0.9f,0.5f,0.5f,1.0f),
+            ImGuiInputTextFlags flags = 0,
+            ImGuiInputTextCallback callback = nullptr,
+            void* user_data = nullptr
+        ) {
         using ImGuiX::Extensions::RegexMatchSafe;
         using ImGuiX::Extensions::ScopedInvalid;
 

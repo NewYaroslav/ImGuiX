@@ -14,7 +14,9 @@
 #include <imguix/config/fonts.hpp>
 #include "icon_button.hpp"
 #include "validated_input.hpp"
+#include "validated_password_input.hpp"
 #include "virtual_keyboard_overlay.hpp"
+
 
 namespace ImGuiX::Widgets {
 
@@ -36,6 +38,7 @@ namespace ImGuiX::Widgets {
     
     inline AuthPanelResult& operator|=(AuthPanelResult& a, AuthPanelResult b) { a = a | b; return a; }
 
+/*
     /// \brief Параметры переключателя "показать пароль".
     struct PasswordToggleConfig {
         bool        enabled       = true;        ///< Включить переключатель
@@ -52,6 +55,7 @@ namespace ImGuiX::Widgets {
         float       icon_baseline = 0.0f;        ///< сдвиг по Y в пикселях (подгонка базлайна)
         float       icon_rounding = -1.0f;       ///< скругление фона кнопки
     };
+    */
     
     /// \brief Параметры переключателя "показать пароль".
     struct VKButtonConfig {
@@ -112,7 +116,7 @@ namespace ImGuiX::Widgets {
         bool validate_api_secret   = false;
 
         // Password toggle
-        PasswordToggleConfig password_toggle{};
+        PasswordToggleConfig toggle_cfg{};
         
         ImGuiX::Widgets::VirtualKeyboardConfig vk_cfg{};
         VKButtonConfig vk{};
@@ -171,7 +175,6 @@ namespace ImGuiX::Widgets {
         AuthPanelResult res = AuthPanelResult::None;
         ImGui::PushID(id);
         
-        const ImGuiID key_show_pwd = ImGui::GetID(u8"show_password");
         ImGuiStorage* st = ImGui::GetStateStorage();
 
         //--
@@ -229,18 +232,10 @@ namespace ImGuiX::Widgets {
         
         //---
 
-        auto get_show = [&]() -> bool {
-            return st->GetInt(key_show_pwd, 0) != 0;
-        };
-        auto set_show = [&](bool v) {
-            st->SetInt(key_show_pwd, v ? 1 : 0);
-        };
-
         float height = 0.0f;
         height += ImGui::GetTextLineHeightWithSpacing();
-        if(cfg.password_toggle.enabled) {
-            height = std::max(height, ImGui::GetFrameHeightWithSpacing()); // кнопка/чекбокс сбоку
-        }
+        height = std::max(height, ImGui::GetFrameHeightWithSpacing());
+
         if(cfg.show_host) {
             height += ImGui::GetFrameHeightWithSpacing();
         }
@@ -281,9 +276,9 @@ namespace ImGuiX::Widgets {
         
         // Token
         if (cfg.show_token) {
-            if (InputTextValidated(u8"##token", cfg.hint_token.c_str(),
+            if (InputPasswordWithToggle(u8"##token", cfg.hint_token.c_str(),
                     data.token, cfg.validate_token, InputValidatePolicy::OnTouch,
-                    cfg.token_regex, data.token_valid, cfg.error_color)) {
+                    cfg.token_regex, data.token_valid, cfg.toggle_cfg, cfg.error_color)) {
                 res |= AuthPanelResult::TokenChanged;
             }
             if (cfg.vk.enabled_token && draw_kb_button(u8"##vk_token")) {
@@ -294,18 +289,18 @@ namespace ImGuiX::Widgets {
         // API keys
         if (cfg.show_api_keys) {
             // public
-            if (InputTextValidated(u8"##api_key", cfg.hint_api_key.c_str(),
+            if (InputPasswordWithToggle(u8"##api_key", cfg.hint_api_key.c_str(),
                     data.api_key, cfg.validate_api_key, InputValidatePolicy::OnTouch,
-                    cfg.api_key_regex, data.api_key_valid, cfg.error_color)) {
+                    cfg.api_key_regex, data.api_key_valid, cfg.toggle_cfg, cfg.error_color)) {
                 res |= AuthPanelResult::ApiKeyChanged;
             }
             if (cfg.vk.enabled_api_key && draw_kb_button(u8"##vk_api_key")) {
                 toggle_vk_for(VKTarget::ApiKey);
             }
             // secret (masked if enabled)
-            if (InputTextValidated(u8"##api_secret", cfg.hint_api_secret.c_str(),
+            if (InputPasswordWithToggle(u8"##api_secret", cfg.hint_api_secret.c_str(),
                     data.api_secret, cfg.validate_api_secret, InputValidatePolicy::OnTouch,
-                    cfg.api_secret_regex, data.api_secret_valid, cfg.error_color)) {
+                    cfg.api_secret_regex, data.api_secret_valid, cfg.toggle_cfg, cfg.error_color)) {
                 res |= AuthPanelResult::ApiSecretChanged;
             }
             if (cfg.vk.enabled_api_secret && draw_kb_button(u8"##vk_api_secret")) {
@@ -335,41 +330,13 @@ namespace ImGuiX::Widgets {
 
         // Password
         if (cfg.show_password) {
-            bool show_password = get_show();
-            int flags = show_password ? 0 : ImGuiInputTextFlags_Password;
-            
-            if (InputTextValidated(u8"##password", cfg.hint_password.c_str(),
+            if (InputPasswordWithToggle(u8"##password", cfg.hint_password.c_str(),
                     data.password, cfg.validate_password, InputValidatePolicy::OnTouch,
-                    cfg.password_regex, data.password_valid, cfg.error_color, flags)) {
+                    cfg.password_regex, data.password_valid, cfg.toggle_cfg, cfg.error_color)) {
                 res |= AuthPanelResult::PasswordChanged;
             }
             if (cfg.vk.enabled_password && draw_kb_button(u8"##vk_password")) {
                 toggle_vk_for(VKTarget::Password);
-            }
-            if (cfg.password_toggle.enabled) {
-                ImGui::SameLine();
-                if (cfg.password_toggle.use_icon) {
-                    ImGuiX::Widgets::IconButtonConfig eye{};
-                    eye.font        = cfg.password_toggle.icon_font;
-                    eye.text_offset = ImVec2(0, cfg.password_toggle.icon_baseline);
-                    eye.rounding    = cfg.password_toggle.icon_rounding;
-                
-                    const char* icon = show_password ? 
-                        (cfg.password_toggle.icon_hide ? cfg.password_toggle.icon_hide : u8"X") : 
-                        (cfg.password_toggle.icon_show ? cfg.password_toggle.icon_show : u8"V");
-                    if (IconButtonCentered(u8"##pwd_eye", icon, eye)) {
-                        show_password = !show_password;
-                        set_show(show_password);
-                    }
-                    if (ImGui::IsItemHovered()) {
-                        ImGui::SetTooltip(u8"%s", show_password ? (cfg.password_toggle.tooltip_hide ? cfg.password_toggle.tooltip_hide : u8"Hide")
-                                                              : (cfg.password_toggle.tooltip_show ? cfg.password_toggle.tooltip_show : u8"Show"));
-                    }
-                } else {
-                    if (ImGui::Checkbox(cfg.password_toggle.text_label, &show_password)) {
-                        set_show(show_password);
-                    }
-                }
             }
         }
 
@@ -429,12 +396,12 @@ namespace ImGuiX::Widgets {
                 (void)ImGuiX::Widgets::VirtualKeyboard(u8"##vk_embed", ref, vkcfg);
             } else {
                 // overlay: окно и автозакрытие
-				bool vis = true; // уже знаем, что get_vk_visible() == true
-				std::string& ref = *vk_text_ptr;
-				(void)ImGuiX::Widgets::VirtualKeyboardOverlay(
-					u8"##vk_overlay_window", ref, vkcfg, &vis, cfg.vk.overlay_size
-				);
-				if (!vis) { set_vk_visible(false); set_vk_target(VKTarget::None); }
+                bool vis = true; // уже знаем, что get_vk_visible() == true
+                std::string& ref = *vk_text_ptr;
+                (void)ImGuiX::Widgets::VirtualKeyboardOverlay(
+                    u8"##vk_overlay_window", ref, vkcfg, &vis, cfg.vk.overlay_size
+                );
+                if (!vis) { set_vk_visible(false); set_vk_target(VKTarget::None); }
             }
         }
 

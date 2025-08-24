@@ -1,6 +1,8 @@
 #include <iostream>
 #include <imguix/core.hpp>
 #include <imguix/widgets/auth_panel.hpp>
+#include <imguix/widgets/validated_input.hpp>
+#include <imguix/widgets/validated_password_input.hpp>
 #include <imguix/widgets/domain_selector.hpp>
 #include <imguix/widgets/virtual_keyboard.hpp>
 
@@ -95,8 +97,6 @@ private:
             auth_cfg.connect_label          = "connect";
             auth_cfg.show_host              = true;
             auth_cfg.show_connection_state  = true;
-            auth_cfg.password_toggle.enabled  = true;
-            auth_cfg.password_toggle.use_icon = true;
 
             auth_cfg.validate_email         = true;
             auth_cfg.init                   = true;   // connection state is meaningful after init
@@ -220,13 +220,35 @@ private:
             auth_cfg.show_api_keys          = true;
             auth_cfg.hint_api_key           = u8"api key (public)";
             auth_cfg.hint_api_secret        = u8"api secret";
-			auth_cfg.vk.enabled_api_secret  = true;
+            auth_cfg.vk.enabled_api_key     = true;
+            auth_cfg.vk.enabled_api_secret  = true;
             ImGuiX::Widgets::AuthPanelResult r = ImGuiX::Widgets::AuthPanel(
                 "AuthApiKeys",
                 auth_cfg,
                 m_auth.auth_data
             );
         }
+        
+        bool api_key_valid = false;
+        (void)ImGuiX::Widgets::InputTextValidated(
+            u8"api key##DemoInputTextValidated",
+            u8"api key (public)",
+            m_auth.auth_data.api_key,
+            true,
+            ImGuiX::Widgets::InputValidatePolicy::OnTouch,
+            u8R"(^[A-Za-z0-9.\-:]+$)",
+            api_key_valid);
+        
+        ImGuiX::Widgets::PasswordToggleConfig toggle_cfg;
+        (void)ImGuiX::Widgets::InputPasswordWithToggle(
+            u8"api key##DemoInputPasswordWithToggle",
+            u8"api key (public)",
+            m_auth.auth_data.api_key,
+            true,
+            ImGuiX::Widgets::InputValidatePolicy::OnTouch,
+            u8R"(^[A-Za-z0-9.\-:]+$)",
+            api_key_valid,
+            toggle_cfg);
 
         // Show a compact status line
         ImGui::TextUnformatted("Status:");
