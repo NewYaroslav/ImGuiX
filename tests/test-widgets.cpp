@@ -1,6 +1,7 @@
 #include <iostream>
 #include <imguix/core.hpp>
 #include <imguix/widgets/auth_panel.hpp>
+#include <imguix/widgets/auth_js_panel.hpp>
 #include <imguix/widgets/validated_input.hpp>
 #include <imguix/widgets/validated_password_input.hpp>
 #include <imguix/widgets/domain_selector.hpp>
@@ -61,6 +62,7 @@ private:
         // Configs (static UI config, can be tweaked at runtime)
         ImGuiX::Widgets::AuthPanelConfig      auth_cfg{};
         ImGuiX::Widgets::AuthData             auth_data;
+		ImGuiX::Widgets::AuthJsSettings       js_st{};
 
         ImGuiX::Widgets::DomainSelectorConfig dom_cfg{};
         
@@ -295,7 +297,7 @@ private:
         if (m_auth.kbd_pass)   ImGuiX::Widgets::VirtualKeyboard("kbd.pass",   m_auth.auth_data.password,  m_auth.kcfg);
         if (m_auth.kbd_host)   ImGuiX::Widgets::VirtualKeyboard("kbd.host",   m_auth.auth_data.host,  m_auth.kcfg);
 
-        // Domain selector (presets + custom)
+		// Domain selector (presets + custom)
         ImGui::Separator();
         if (ImGuiX::Widgets::DomainSelector("auth.domain", m_auth.dom_cfg, m_auth.auth_data.host)) {
             // optional: react on host change
@@ -307,6 +309,11 @@ private:
             // e.g., log, start async connect, etc.
             // Here we already toggled connected in on_connect callback.
         }
+		
+		{
+			ImGuiX::Widgets::AuthJsPanelConfig cfg;
+			(void)ImGuiX::Widgets::AuthJsPanel("##DemoAuthJsPanel", cfg,  m_auth.js_st);
+		}
         
         // Hours section
         ImGui::SeparatorText("Hours");

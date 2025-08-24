@@ -4,10 +4,9 @@
 
 /// \file auth_js_panel.hpp
 /// \brief Browser auth config panel: user-agent, accept-language, and DNT flag.
+/// Uses InputTextWithVKValidated (validation + on-screen keyboard trigger).
 
-#include <imgui.h>
-#include <string>
-#include <cstring>
+#include "validated_input.hpp" // InputTextWithVKValidated, KeyboardToggleConfig, InputValidatePolicy
 
 namespace ImGuiX::Widgets {
 
@@ -20,12 +19,38 @@ namespace ImGuiX::Widgets {
 
     /// \brief UI configuration for AuthJsPanel.
     struct AuthJsPanelConfig {
-        std::string header              = u8"JS Config";
-        std::string hint_user_agent     = u8"user agent";
-        std::string hint_accept_language= u8"accept language";
-        std::string label_dnt           = u8"Do Not Track";
-        ImVec2      panel_size          = ImVec2(0, 0); ///< 0 → auto width/height
-        bool        border              = true;
+        // Labels / hints
+        std::string header               = u8"JS Config";
+        std::string hint_user_agent      = u8"User agent";
+        std::string hint_accept_language = u8"Accept language";
+        std::string label_dnt            = u8"Do Not Track";
+
+        // Panel
+        ImVec2      panel_size           = ImVec2(0, 0); ///< (0,0) → auto width/height
+        bool        border               = true;
+
+        // Validation
+        bool        validate_user_agent      = true;
+        bool        validate_accept_language = true;
+        ImGuiX::Widgets::InputValidatePolicy policy = ImGuiX::Widgets::InputValidatePolicy::OnTouch;
+        ImVec4      error_color           = ImVec4(0.9f, 0.5f, 0.5f, 1.0f);
+
+        // Pragmatic regexes (ECMAScript for std::regex)
+        // UA: printable ASCII (space through ~), at least 1 char
+        const char* user_agent_regex      = u8R"(^[ -~]+$)";
+        // Accept-Language: allow tokens, subtags, q-factors; permissive char class
+        const char* accept_language_regex = u8R"(^(?:[A-Za-z0-9,*_\-.;=,\s])+)$)";
+
+        // VK trigger + keyboard configs
+        ImGuiX::Widgets::KeyboardToggleConfig  kb_cfg{};
+        ImGuiX::Widgets::VirtualKeyboardConfig vk_cfg{};
+
+        // Enable VK per field
+        bool vk_user_agent      = true;
+        bool vk_accept_language = true;
+
+        // Extra input flags applied to both fields (e.g., AutoSelectAll)
+        ImGuiInputTextFlags input_flags = ImGuiInputTextFlags_AutoSelectAll;
     };
 
     /// \brief Draw browser auth settings panel.
@@ -36,38 +61,81 @@ namespace ImGuiX::Widgets {
     inline bool AuthJsPanel(const char* id, AuthJsPanelConfig& cfg, AuthJsSettings& st) {
         bool changed = false;
         ImGui::PushID(id);
+
+        // Auto size similar to other panels
         const ImVec2 size = (cfg.panel_size.x <= 0.f || cfg.panel_size.y <= 0.f)
-                            ? ImVec2(ImGui::GetWindowWidth() * 0.65f, 128.0f)
+                            ? ImVec2(ImGui::GetWindowWidth() * 0.65f, ImGui::GetFrameHeightWithSpacing() * 5.0f)
                             : cfg.panel_size;
 
         ImGui::BeginChild(u8"##auth_js_panel", size, cfg.border);
-        ImGui::Text(u8"%s", cfg.header.c_str());
+        ImGui::TextUnformatted(cfg.header.c_str());
         ImGui::Separator();
 
-        char buf[512];
-
-        std::strncpy(buf, st.user_agent.c_str(), sizeof(buf));
-        buf[sizeof(buf) - 1] = '\0';
-        if (ImGui::InputTextWithHint(u8"##authjs.user_agent",
-                                     cfg.hint_user_agent.c_str(),
-                                     buf,
-                                     sizeof(buf) - 1,
-                                     ImGuiInputTextFlags_AutoSelectAll)) {
-            st.user_agent = buf;
-            changed = true;
+        // User-Agent
+        {
+            bool ok = true;
+            if (cfg.vk_user_agent) {
+                if (InputTextWithVKValidated(u8"##authjs.user_agent",
+                        cfg.hint_user_agent.c_str(),
+                        st.user_agent,
+                        cfg.validate_user_agent,
+                        cfg.policy,
+                        cfg.user_agent_regex,
+                        ok,
+                        cfg.error_color,
+                        cfg.input_flags,
+                        /*callback*/nullptr, /*user_data*/nullptr,
+                        cfg.kb_cfg, cfg.vk_cfg)) {
+                    changed = true;
+                }
+            } else {
+                if (InputTextValidated(u8"##authjs.user_agent",
+                        cfg.hint_user_agent.c_str(),
+                        st.user_agent,
+                        cfg.validate_user_agent,
+                        cfg.policy,
+                        cfg.user_agent_regex,
+                        ok,
+                        cfg.error_color,
+                        cfg.input_flags)) {
+                    changed = true;
+                }
+            }
         }
 
-        std::strncpy(buf, st.accept_language.c_str(), sizeof(buf));
-        buf[sizeof(buf) - 1] = '\0';
-        if (ImGui::InputTextWithHint(u8"##authjs.accept_lang",
-                                     cfg.hint_accept_language.c_str(),
-                                     buf,
-                                     sizeof(buf) - 1,
-                                     ImGuiInputTextFlags_AutoSelectAll)) {
-            st.accept_language = buf;
-            changed = true;
+        // Accept-Language
+        {
+            bool ok = true;
+            if (cfg.vk_accept_language) {
+                if (InputTextWithVKValidated(u8"##authjs.accept_lang",
+                        cfg.hint_accept_language.c_str(),
+                        st.accept_language,
+                        cfg.validate_accept_language,
+                        cfg.policy,
+                        cfg.accept_language_regex,
+                        ok,
+                        cfg.error_color,
+                        cfg.input_flags,
+                        /*callback*/nullptr, /*user_data*/nullptr,
+                        cfg.kb_cfg, cfg.vk_cfg)) {
+                    changed = true;
+                }
+            } else {
+                if (InputTextValidated(u8"##authjs.accept_lang",
+                        cfg.hint_accept_language.c_str(),
+                        st.accept_language,
+                        cfg.validate_accept_language,
+                        cfg.policy,
+                        cfg.accept_language_regex,
+                        ok,
+                        cfg.error_color,
+                        cfg.input_flags)) {
+                    changed = true;
+                }
+            }
         }
 
+        // DNT
         if (ImGui::Checkbox(cfg.label_dnt.c_str(), &st.dnt)) {
             changed = true;
         }
@@ -80,3 +148,4 @@ namespace ImGuiX::Widgets {
 } // namespace ImGuiX::Widgets
 
 #endif // _IMGUIX_WIDGETS_AUTH_JS_PANEL_HPP_INCLUDED
+

@@ -96,12 +96,12 @@ namespace ImGuiX::Widgets {
         std::function<void()> on_connect;
 
         // Regexes (basic)
-        const char* email_regex      = u8R"(.+@.+\.\w+)";
-        const char* password_regex   = u8R"(.{6,})";              ///< example: min 6 chars
-        const char* host_regex       = u8R"(^[A-Za-z0-9.\-:]+$)"; ///< host:port / domain
-        const char* token_regex      = u8R"(^\S+$)";              ///< non-empty, no spaces
-        const char* api_key_regex    = u8R"(^\S+$)";
-        const char* api_secret_regex = u8R"(^\S+$)";
+        const char* email_regex      = u8R"(.+@.+\.\w+)";                    ///< 
+        const char* password_regex   = u8R"(^\S+$)";                         ///< 
+        const char* host_regex       = u8R"(^[A-Za-z0-9.\-:]+$)";            ///< host:port / domain
+        const char* token_regex      = u8R"(^(?:[A-Za-z0-9._\-]{16,256})$)"; ///< 
+        const char* api_key_regex    = u8R"(^(?:[A-Za-z0-9._\-]{16,256})$)"; ///< 
+        const char* api_secret_regex = u8R"(^(?:[A-Za-z0-9._\-]{16,256})$)"; ///< 
 
         ImVec4      error_color      = ImVec4(0.9f, 0.5f, 0.5f, 1.0f);
     };
