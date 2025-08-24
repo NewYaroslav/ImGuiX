@@ -178,16 +178,23 @@ else()
 
     if(IMGUIX_IMGUI_FREETYPE)
         target_compile_definitions(imguix PUBLIC IMGUI_ENABLE_FREETYPE)
-		
-		# >>> ДОБАВИТЬ ЭТО <<<
-		# Нужен include-путь для imgui_freetype.h
-		set(_IMGUI_DIR_LOCAL "${IMGUI_DIR}")
-		if(NOT _IMGUI_DIR_LOCAL)
-			set(_IMGUI_DIR_LOCAL "${PROJECT_SOURCE_DIR}/libs/imgui")
-		endif()
-		target_include_directories(imguix PRIVATE "${_IMGUI_DIR_LOCAL}/misc/freetype")
-		# <<< ДОБАВИТЬ ЭТО >>>
-	
+
+        # Нужен include-путь для imgui_freetype.h
+        set(_IMGUI_DIR_LOCAL "${IMGUI_DIR}")
+        if(NOT _IMGUI_DIR_LOCAL)
+            set(_IMGUI_DIR_LOCAL "${PROJECT_SOURCE_DIR}/libs/imgui")
+        endif()
+        target_include_directories(imguix PRIVATE "${_IMGUI_DIR_LOCAL}/misc/freetype")
+        
+        # Путь к корню Dear ImGui (как ты делаешь для freetype)
+        set(_IMGUI_DIR_LOCAL "${IMGUI_DIR}")
+        if(NOT _IMGUI_DIR_LOCAL)
+            set(_IMGUI_DIR_LOCAL "${PROJECT_SOURCE_DIR}/libs/imgui")
+        endif()
+
+        # Нужен include-путь для imgui_stdlib.h (misc/cpp)
+        target_include_directories(imguix PRIVATE "${_IMGUI_DIR_LOCAL}/misc/cpp")
+
         imguix_use_or_find_freetype(FREETYPE_TARGET)
         target_link_libraries(imguix PRIVATE ${FREETYPE_TARGET})
     endif()
@@ -229,6 +236,10 @@ if(IMGUIX_BUILD_TESTS)
 
         target_include_directories(${TEST_NAME} PRIVATE
             "${CMAKE_CURRENT_LIST_DIR}/include"
+        )
+        # Дать доступ к imgui_stdlib.h
+        target_include_directories(${TEST_NAME} PRIVATE 
+            "${_IMGUI_DIR}/misc/cpp"
         )
 
         if(IMGUIX_IMGUI_FREETYPE)

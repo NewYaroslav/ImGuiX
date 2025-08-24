@@ -204,10 +204,29 @@ private:
 
         // Panel (email+password+host+connect)
         ImGuiX::Widgets::AuthPanelResult r = ImGuiX::Widgets::AuthPanel(
-            "auth.panel",
+            "AuthEmail",
             m_auth.auth_cfg,
             m_auth.auth_data
         );
+        
+        // Panel (api_key+api_secret)
+        {
+            ImGuiX::Widgets::AuthPanelConfig auth_cfg;
+            auth_cfg.header                 = u8"Authorization (api key)";
+            auth_cfg.show_host              = false;
+            auth_cfg.show_email             = false;
+            auth_cfg.show_password          = false;
+            auth_cfg.show_connect_button    = false;
+            auth_cfg.show_api_keys          = true;
+            auth_cfg.hint_api_key           = u8"api key (public)";
+            auth_cfg.hint_api_secret        = u8"api secret";
+			auth_cfg.vk.enabled_api_secret  = true;
+            ImGuiX::Widgets::AuthPanelResult r = ImGuiX::Widgets::AuthPanel(
+                "AuthApiKeys",
+                auth_cfg,
+                m_auth.auth_data
+            );
+        }
 
         // Show a compact status line
         ImGui::TextUnformatted("Status:");
@@ -215,6 +234,8 @@ private:
         ImGui::Text("%s | email: %s",
             m_auth.auth_cfg.connected ? "connected" : "disconnected",
             m_auth.auth_data.email_valid ? "ok" : "invalid");
+        ImGui::Text("api key (public): %s", m_auth.auth_data.api_key.c_str());
+        ImGui::Text("api secret:       %s", m_auth.auth_data.api_secret.c_str());
 
         // --- On-screen keyboard toggles
         ImGui::Separator();

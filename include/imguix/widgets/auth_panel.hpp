@@ -10,9 +10,11 @@
 #include <functional>
 #include <regex>
 #include <cstring>
+#include <algorithm>
 #include <imguix/config/fonts.hpp>
 #include "icon_button.hpp"
-#include "virtual_keyboard.hpp"
+#include "validated_input.hpp"
+#include "virtual_keyboard_overlay.hpp"
 
 namespace ImGuiX::Widgets {
 
@@ -87,20 +89,28 @@ namespace ImGuiX::Widgets {
         std::string connect_label   = u8"connect";
         
         // Tokens / API keys
-        bool        show_token      = false;
-        bool        show_api_keys   = false;        ///< public + secret
         std::string hint_token      = u8"token";
         std::string hint_api_key    = u8"api key (public)";
         std::string hint_api_secret = u8"api secret";
-        bool        mask_api_secret = true;         ///< show secret as password
 
         // Options
-        bool show_host              = false;
-        bool show_connect_button    = true;
-        bool show_connection_state  = true;
-        bool show_password_toggle   = true;  ///< show "Show password" checkbox
-        bool validate_email         = true;  ///< apply simple regex validation
+        bool show_host             = false;
+        bool show_email            = true;
+        bool show_password         = true;
+        bool show_token            = false;
+        bool show_api_keys         = false; ///< public + secret
+        bool mask_api_secret       = true;  ///< show secret as password
+        bool show_connect_button   = true;
+        bool show_connection_state = true;
+        bool show_password_toggle  = true;  ///< show "Show password" checkbox
         
+        bool validate_email        = true;  ///< apply simple regex validation
+        bool validate_password     = false;
+        bool validate_host         = false;
+        bool validate_token        = false;
+        bool validate_api_key      = false;
+        bool validate_api_secret   = false;
+
         // Password toggle
         PasswordToggleConfig password_toggle{};
         
@@ -121,7 +131,14 @@ namespace ImGuiX::Widgets {
         std::function<void()> on_connect;
 
         // Email regex (basic)
-        const char* email_regex = u8R"(.+@.+\.\w+)";
+        const char* email_regex      = u8R"(.+@.+\.\w+)";
+        const char* password_regex   = u8R"(.{6,})";              ///< пример: минимум 6 символов
+        const char* host_regex       = u8R"(^[A-Za-z0-9.\-:]+$)"; ///< проверка хост:порт/домен
+        const char* token_regex      = u8R"(^\S+$)";              ///< пример: без пробелов, не пусто
+        const char* api_key_regex    = u8R"(^\S+$)";
+        const char* api_secret_regex = u8R"(^\S+$)";
+        
+        ImVec4      error_color      = ImVec4(0.9f, 0.5f, 0.5f, 1.0f);
     };
     
     /// \brief All auth-related fields passed in/out by reference.
@@ -133,13 +150,18 @@ namespace ImGuiX::Widgets {
         std::string api_key;     ///< in/out, used if cfg.show_api_keys
         std::string api_secret;  ///< in/out, used if cfg.show_api_keys
 
-        bool email_valid = true; ///< out (set by widget if cfg.validate_email)
+        bool email_valid     = true;  ///< out (set by widget if cfg.validate_email)
+        bool password_valid  = true;  ///< out
+        bool host_valid      = true;  ///< out
+        bool token_valid     = true;  ///< out
+        bool api_key_valid   = true;  ///< out
+        bool api_secret_valid= true;  ///< out
     };
 
     /// \brief Renders login form. Optionally includes host input.
     /// \param id Unique widget ID.
     /// \param cfg Panel configuration.
-    /// \param data
+    /// \param data All input/output fields (email/password/host/token/api keys) and validity flags (set inside).
     /// \return Bitmask of events happened this frame.
     inline AuthPanelResult AuthPanel(
             const char* id,
@@ -215,21 +237,28 @@ namespace ImGuiX::Widgets {
         };
 
         float height = 0.0f;
-        height += ImGui::GetTextLineHeightWithSpacing();     // заголовок
-        height += 2.0f * ImGui::GetFrameHeightWithSpacing(); // password
+        height += ImGui::GetTextLineHeightWithSpacing();
         if(cfg.password_toggle.enabled) {
             height = std::max(height, ImGui::GetFrameHeightWithSpacing()); // кнопка/чекбокс сбоку
         }
         if(cfg.show_host) {
             height += ImGui::GetFrameHeightWithSpacing();
         }
-        if(cfg.show_connection_state) {
+        if(cfg.show_email) {
+            height += ImGui::GetFrameHeightWithSpacing();
+        }
+        if(cfg.show_password) {
+            height += ImGui::GetFrameHeightWithSpacing();
+        }
+        if(cfg.show_connect_button) {
             height += ImGui::GetFrameHeightWithSpacing();
         }
         if(cfg.show_token) {
             height += ImGui::GetFrameHeightWithSpacing();
         }
-        if(cfg.show_api_keys) { height += 2.0f * ImGui::GetFrameHeightWithSpacing(); }
+        if(cfg.show_api_keys) { 
+            height += 2.0f * ImGui::GetFrameHeightWithSpacing(); 
+        }
 
         height += ImGui::GetFrameHeightWithSpacing(); // кнопка Connect
     
@@ -240,165 +269,106 @@ namespace ImGuiX::Widgets {
 
         // Host
         if (cfg.show_host) {
-            char buf[512];
-            std::strncpy(buf, data.host.c_str(), sizeof(buf));
-            buf[sizeof(buf)-1] = '\0';
-            if (ImGui::InputTextWithHint(u8"##host", cfg.hint_host.c_str(), buf, sizeof(buf)-1)) {
-                data.host = buf;
+            if (InputTextValidated(u8"##host", cfg.hint_host.c_str(), 
+                data.host, cfg.validate_host, InputValidatePolicy::OnTouch,
+                cfg.host_regex, data.host_valid, cfg.error_color)) {
                 res |= AuthPanelResult::HostChanged;
             }
-            
-            if (cfg.vk.enabled_host) {
-                if (draw_kb_button(u8"##vk_host")) {
-                    toggle_vk_for(VKTarget::Host);
-                }
+            if (cfg.vk.enabled_host && draw_kb_button(u8"##vk_host")) {
+                toggle_vk_for(VKTarget::Host);
             }
         }
         
-        // Token (optional)
+        // Token
         if (cfg.show_token) {
-            char buf[512];
-            std::strncpy(buf, data.token.c_str(), sizeof(buf));
-            buf[sizeof(buf)-1] = '\0';
-            if (ImGui::InputTextWithHint(u8"##token", cfg.hint_token.c_str(), buf, sizeof(buf)-1)) {
-                data.token = buf;
+            if (InputTextValidated(u8"##token", cfg.hint_token.c_str(),
+                    data.token, cfg.validate_token, InputValidatePolicy::OnTouch,
+                    cfg.token_regex, data.token_valid, cfg.error_color)) {
                 res |= AuthPanelResult::TokenChanged;
             }
-            if (cfg.vk.enabled_token) {
-                if (draw_kb_button(u8"##vk_token")) {
-                    toggle_vk_for(VKTarget::Token);
-                }
+            if (cfg.vk.enabled_token && draw_kb_button(u8"##vk_token")) {
+                toggle_vk_for(VKTarget::Token);
             }
         }
-
-        // API keys (optional)
+        
+        // API keys
         if (cfg.show_api_keys) {
             // public
-            {
-                char buf[512];
-                std::strncpy(buf, data.api_key.c_str(), sizeof(buf));
-                buf[sizeof(buf)-1] = '\0';
-                if (ImGui::InputTextWithHint(u8"##api_key", cfg.hint_api_key.c_str(), buf, sizeof(buf)-1)) {
-                    data.api_key = buf;
-                    res |= AuthPanelResult::ApiKeyChanged;
-                }
-                if (cfg.vk.enabled_api_key) {
-                    if (draw_kb_button(u8"##vk_api_key")) { toggle_vk_for(VKTarget::ApiKey); }
-                }
+            if (InputTextValidated(u8"##api_key", cfg.hint_api_key.c_str(),
+                    data.api_key, cfg.validate_api_key, InputValidatePolicy::OnTouch,
+                    cfg.api_key_regex, data.api_key_valid, cfg.error_color)) {
+                res |= AuthPanelResult::ApiKeyChanged;
+            }
+            if (cfg.vk.enabled_api_key && draw_kb_button(u8"##vk_api_key")) {
+                toggle_vk_for(VKTarget::ApiKey);
             }
             // secret (masked if enabled)
-            {
-                char buf[512];
-                std::strncpy(buf, data.api_secret.c_str(), sizeof(buf));
-                buf[sizeof(buf)-1] = '\0';
-                const int sec_flags = cfg.mask_api_secret ? ImGuiInputTextFlags_Password : 0;
-                if (ImGui::InputTextWithHint(u8"##api_secret", cfg.hint_api_secret.c_str(), buf, sizeof(buf)-1, sec_flags)) {
-                    data.api_secret = buf;
-                    res |= AuthPanelResult::ApiSecretChanged;
-                }
-                if (cfg.vk.enabled_api_secret) {
-                    if (draw_kb_button(u8"##vk_api_secret")) { toggle_vk_for(VKTarget::ApiSecret); }
-                }
+            if (InputTextValidated(u8"##api_secret", cfg.hint_api_secret.c_str(),
+                    data.api_secret, cfg.validate_api_secret, InputValidatePolicy::OnTouch,
+                    cfg.api_secret_regex, data.api_secret_valid, cfg.error_color)) {
+                res |= AuthPanelResult::ApiSecretChanged;
+            }
+            if (cfg.vk.enabled_api_secret && draw_kb_button(u8"##vk_api_secret")) {
+                toggle_vk_for(VKTarget::ApiSecret);
             }
         }
 
         // Email
-        data.email_valid = true;
-        if (cfg.validate_email) {
-            try {
-                std::regex re(cfg.email_regex);
-                data.email_valid = std::regex_match(data.email, re);
-            } catch (...) { /* ignore invalid regex */ }
-        }
-        
-        bool pushed_invalid_color = false;
-        if (cfg.validate_email && !data.email_valid) {
-            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.5f, 0.5f, 1.0f));
-            pushed_invalid_color = true;
-        }
-
-        {
-            char buf[512];
-            std::strncpy(buf, data.email.c_str(), sizeof(buf));
-            buf[sizeof(buf)-1] = '\0';
-            if (ImGui::InputTextWithHint(u8"##email", cfg.hint_email.c_str(), buf, sizeof(buf)-1)) {
-                data.email = buf;
+        if (cfg.show_email) {
+            if (InputTextValidated(u8"##email", cfg.hint_email.c_str(),
+                    data.email, cfg.validate_email, InputValidatePolicy::OnTouch,
+                    cfg.email_regex, data.email_valid, cfg.error_color)) {
                 res |= AuthPanelResult::EmailChanged;
-                // revalidate quickly
-                if (cfg.validate_email) {
-                    try {
-                        std::regex re(cfg.email_regex);
-                        data.email_valid = std::regex_match(data.email, re);
-                    } catch (...) { data.email_valid = true; }
-                }
             }
-            if (cfg.vk.enabled_email) {
-                if (draw_kb_button(u8"##vk_email")) {
-                    toggle_vk_for(VKTarget::Email);
-                }
+            if (cfg.vk.enabled_email && draw_kb_button(u8"##vk_email")) {
+                toggle_vk_for(VKTarget::Email);
             }
-        }
-
-        if (pushed_invalid_color) ImGui::PopStyleColor();
-
-        // Optional email state pill
-        if (cfg.use_email_state) {
-            ImGui::SameLine();
-            ImGui::PushStyleColor(ImGuiCol_CheckMark, cfg.email_state_color);
-            ImGui::RadioButton(cfg.email_state_label.empty() ? u8"state" : cfg.email_state_label.c_str(),
-                               cfg.email_state);
-            ImGui::PopStyleColor();
+            // Optional email state pill
+            if (cfg.use_email_state) {
+                ImGui::SameLine();
+                ImGui::PushStyleColor(ImGuiCol_CheckMark, cfg.email_state_color);
+                ImGui::RadioButton(cfg.email_state_label.empty() ? u8"state" : cfg.email_state_label.c_str(),
+                                   cfg.email_state);
+                ImGui::PopStyleColor();
+            }
         }
 
         // Password
-        bool show_password = get_show();
-        int flags = show_password ? 0 : ImGuiInputTextFlags_Password;
-        {
-            char buf[512];
-            std::strncpy(buf, data.password.c_str(), sizeof(buf));
-            buf[sizeof(buf)-1] = '\0';
-            if (ImGui::InputTextWithHint(u8"##password", cfg.hint_password.c_str(), buf, sizeof(buf)-1, flags)) {
-                data.password = buf;
+        if (cfg.show_password) {
+            bool show_password = get_show();
+            int flags = show_password ? 0 : ImGuiInputTextFlags_Password;
+            
+            if (InputTextValidated(u8"##password", cfg.hint_password.c_str(),
+                    data.password, cfg.validate_password, InputValidatePolicy::OnTouch,
+                    cfg.password_regex, data.password_valid, cfg.error_color, flags)) {
                 res |= AuthPanelResult::PasswordChanged;
             }
-            if (cfg.vk.enabled_password) {
-                if (draw_kb_button(u8"##vk_password")) {
-                    toggle_vk_for(VKTarget::Password);
-                }
+            if (cfg.vk.enabled_password && draw_kb_button(u8"##vk_password")) {
+                toggle_vk_for(VKTarget::Password);
             }
-        }
-        if (cfg.password_toggle.enabled) {
-            ImGui::SameLine();
-
-            if (cfg.password_toggle.use_icon) {
-                // Подберём размер: квадрат по высоте текущего фрейма
-                /*
-                ImVec2 sz = cfg.password_toggle.button_size;
-                if (sz.x <= 0.0f || sz.y <= 0.0f) {
-                    float h = ImGui::GetFrameHeight();
-                    sz = ImVec2(h, h);
-                }
-                */
+            if (cfg.password_toggle.enabled) {
+                ImGui::SameLine();
+                if (cfg.password_toggle.use_icon) {
+                    ImGuiX::Widgets::IconButtonConfig eye{};
+                    eye.font        = cfg.password_toggle.icon_font;
+                    eye.text_offset = ImVec2(0, cfg.password_toggle.icon_baseline);
+                    eye.rounding    = cfg.password_toggle.icon_rounding;
                 
-                ImGuiX::Widgets::IconButtonConfig eye{};
-                eye.font        = cfg.password_toggle.icon_font;
-                eye.text_offset = ImVec2(0, cfg.password_toggle.icon_baseline);
-                eye.rounding    = cfg.password_toggle.icon_rounding;
-            
-                const char* icon = show_password ? 
-                    (cfg.password_toggle.icon_hide ? cfg.password_toggle.icon_hide : u8"X") : 
-                    (cfg.password_toggle.icon_show ? cfg.password_toggle.icon_show : u8"V");
-                if (IconButtonCentered(u8"##pwd_eye", icon, eye)) {
-                    show_password = !show_password;
-                    set_show(show_password);
-                }
-                if (ImGui::IsItemHovered()) {
-                    ImGui::SetTooltip(u8"%s", show_password ? (cfg.password_toggle.tooltip_hide ? cfg.password_toggle.tooltip_hide : u8"Hide")
-                                                          : (cfg.password_toggle.tooltip_show ? cfg.password_toggle.tooltip_show : u8"Show"));
-                }
-            } else {
-                if (ImGui::Checkbox(cfg.password_toggle.text_label, &show_password)) {
-                    set_show(show_password);
+                    const char* icon = show_password ? 
+                        (cfg.password_toggle.icon_hide ? cfg.password_toggle.icon_hide : u8"X") : 
+                        (cfg.password_toggle.icon_show ? cfg.password_toggle.icon_show : u8"V");
+                    if (IconButtonCentered(u8"##pwd_eye", icon, eye)) {
+                        show_password = !show_password;
+                        set_show(show_password);
+                    }
+                    if (ImGui::IsItemHovered()) {
+                        ImGui::SetTooltip(u8"%s", show_password ? (cfg.password_toggle.tooltip_hide ? cfg.password_toggle.tooltip_hide : u8"Hide")
+                                                              : (cfg.password_toggle.tooltip_show ? cfg.password_toggle.tooltip_show : u8"Show"));
+                    }
+                } else {
+                    if (ImGui::Checkbox(cfg.password_toggle.text_label, &show_password)) {
+                        set_show(show_password);
+                    }
                 }
             }
         }
@@ -456,69 +426,15 @@ namespace ImGuiX::Widgets {
                 ImGui::Dummy(ImVec2(0.0f, ImGui::GetStyle().ItemSpacing.y));
                 ImGui::Separator();
                 ImGui::TextUnformatted(u8"Virtual keyboard:");
-                ImGuiX::Widgets::VirtualKeyboard(u8"##vk_embed", ref, vkcfg);
+                (void)ImGuiX::Widgets::VirtualKeyboard(u8"##vk_embed", ref, vkcfg);
             } else {
-                // ОВЕРЛЕЙ: поверх всех окон. Рендерим как отдельное окно ближе к концу кадра.
-                const ImGuiID key_vk_was_visible = ImGui::GetID(u8"vk_was_visible");
-                bool vk_visible_now  = get_vk_visible();
-                bool vk_visible_prev = (st->GetInt(key_vk_was_visible, 0) != 0);
-                bool vk_just_opened  = vk_visible_now && !vk_visible_prev;
-
-                // If just opened, request focus once
-                if (vk_just_opened) {
-                    ImGui::SetNextWindowFocus();
-                }
-                
-                const ImGuiViewport* vp = ImGui::GetMainViewport();
-                ImVec2 center = vp->GetCenter();
-                if (cfg.vk.overlay_size.x > 0.0f && cfg.vk.overlay_size.y > 0.0f) {
-                    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-                    ImGui::SetNextWindowSize(cfg.vk.overlay_size, ImGuiCond_Appearing);
-                } else {
-                    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-                }
-                
-                bool should_close_on_blur = false; // computed inside, then acted after End()
-                
-                ImGui::SetNextWindowBgAlpha(0.98f);
-                ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 6.0f);
-                if (ImGui::Begin(
-                    u8"##vk_overlay_window",
-                    nullptr,
-                    ImGuiWindowFlags_NoTitleBar |
-                    ImGuiWindowFlags_NoResize |
-                    ImGuiWindowFlags_NoCollapse |
-                    ImGuiWindowFlags_NoSavedSettings |
-                    //ImGuiWindowFlags_NoDocking |
-                    ImGuiWindowFlags_AlwaysAutoResize)
-                ) {
-                    // Render VK as usual
-                    std::string& ref = *vk_text_ptr;
-                    bool mod = ImGuiX::Widgets::VirtualKeyboard(u8"##vk_overlay", ref, vkcfg);
-                    
-                    // Close on ESC
-                    if (ImGui::IsKeyPressed(ImGuiKey_Escape, false)) {
-                        should_close_on_blur = true;
-                    }
-                    
-                    // Close when focus leaves the overlay (but not on the very first frame)
-                    const bool focused_now = ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows);
-                    const bool appearing   = ImGui::IsWindowAppearing();
-                    if (!focused_now && !appearing) {
-                        should_close_on_blur = true;
-                    }
-                }
-                ImGui::End();
-                ImGui::PopStyleVar();
-                
-                // Apply close if needed
-                if (should_close_on_blur) {
-                    set_vk_visible(false);
-                    set_vk_target(VKTarget::None);
-                }
-                
-                // Update "was visible" flag for next frame
-                st->SetInt(key_vk_was_visible, get_vk_visible() ? 1 : 0);
+                // overlay: окно и автозакрытие
+				bool vis = true; // уже знаем, что get_vk_visible() == true
+				std::string& ref = *vk_text_ptr;
+				(void)ImGuiX::Widgets::VirtualKeyboardOverlay(
+					u8"##vk_overlay_window", ref, vkcfg, &vis, cfg.vk.overlay_size
+				);
+				if (!vis) { set_vk_visible(false); set_vk_target(VKTarget::None); }
             }
         }
 
