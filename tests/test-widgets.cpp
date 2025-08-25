@@ -373,6 +373,14 @@ private:
 
         // ---
         ImGui::SeparatorText("Time pickers");
+        
+        static int h = 14, m = 30, s = 0;
+        ImGuiX::Widgets::TimePickerConfig tc;
+        tc.label = u8"Time (H/M/S)";
+        if (ImGuiX::Widgets::TimePicker("time_hms", h, m, s, tc)) {
+            // значения обновлены: h/m/s
+        }
+        
         bool t_changed  = ImGuiX::Widgets::TimePicker("auth.time", m_auth.time_of_day_sec, m_auth.tp_cfg);
         ImGui::SameLine();
         bool tz_changed = ImGuiX::Widgets::TimeOffsetPicker(
@@ -389,31 +397,33 @@ private:
 
         ImGui::SeparatorText("Date picker");
         
-        static int64_t y = 2025;
-        static int m = 8, d = 25;
-        
-        ImGuiX::Widgets::DatePickerConfig dc;
-        dc.label = u8"Date";
-        dc.month_label = ImGuiX::Widgets::MonthLabelMode::ShortName;
-        dc.show_weekday = true;
-        dc.min_year = 1950;
-        dc.max_year = 2100;
-        if (ImGuiX::Widgets::DatePicker("date1", y, m, d, dc)) {
-            // changed -> use (y,m,d)
+        {
+            static int64_t y = 2025;
+            static int m = 8, d = 25;
+            ImGuiX::Widgets::DatePickerConfig dc;
+            dc.label = u8"Date";
+            dc.month_label = ImGuiX::Widgets::MonthLabelMode::ShortName;
+            dc.show_weekday = true;
+            dc.min_year = 1950;
+            dc.max_year = 2100;
+            if (ImGuiX::Widgets::DatePicker("date1", y, m, d, dc)) {
+                // changed -> use (y,m,d)
+            }
         }
-		
-		static int64_t ts = 0;//ImGuiX::Utils::ymdhms_to_timestamp(2025, 8, 25, 14, 30, 0);
+        
+        {
+            static int64_t ts = 0;//ImGuiX::Utils::ymdhms_to_timestamp(2025, 8, 25, 14, 30, 0);
+            ImGuiX::Widgets::DatePickerConfig dc_ts;
+            dc_ts.label = u8"Report date";
+            dc_ts.show_weekday = true;
+            dc_ts.preserve_time_of_day = false; // snap to 00:00:00
+            dc_ts.min_year = 1970;
+            dc_ts.max_year = 2100;
 
-		ImGuiX::Widgets::DatePickerConfig dc_ts;
-		dc_ts.label = u8"Report date";
-        dc_ts.show_weekday = true;
-		dc_ts.preserve_time_of_day = false; // snap to 00:00:00
-		dc_ts.min_year = 2000;
-		dc_ts.max_year = 2100;
-
-		if (ImGuiX::Widgets::DatePicker("date_ts", ts, dc_ts)) {
-			// ts updated (UTC-based), time set to 00:00:00 due to preserve_time_of_day=false
-		}
+            if (ImGuiX::Widgets::DatePicker("date_ts", ts, dc_ts)) {
+                // ts updated (UTC-based), time set to 00:00:00 due to preserve_time_of_day=false
+            }
+        }
         
         //ImGuiX::Widgets::DatePicker("auth.date", m_auth.date_ts, m_auth.dp_cfg);
 
