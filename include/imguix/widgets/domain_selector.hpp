@@ -6,6 +6,7 @@
 /// \brief Domain chooser widget (combo with "Custom" fallback or validated input with VK).
 
 #include "validated_input.hpp" // InputTextWithVKValidated, KeyboardToggleConfig, InputValidatePolicy
+#include "markers.hpp" // HelpMarker
 
 namespace ImGuiX::Widgets {
 
@@ -139,9 +140,7 @@ namespace ImGuiX::Widgets {
 
         if (cfg.domains.empty() && cfg.show_help) {
             ImGui::SameLine();
-            ImGui::TextDisabled(u8"(?)");
-            if (ImGui::IsItemHovered())
-                ImGui::SetTooltip(u8"%s", cfg.help_text.c_str());
+			ImGuiX::Widgets::HelpMarker(cfg.help_text.c_str());
         }
 
         ImGui::EndChild();

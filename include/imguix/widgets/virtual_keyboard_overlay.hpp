@@ -51,7 +51,8 @@ namespace ImGuiX::Widgets {
             if (user_submit) user_submit(s);
             should_close = true;
         };
-		cfg.submit_on_enter  = true;
+        cfg.submit_on_enter  = true;
+        cfg.border           = false;
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 6.0f);
         if (ImGui::Begin(id, nullptr,

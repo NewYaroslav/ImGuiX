@@ -3,14 +3,15 @@
 #define _IMGUIX_WIDGETS_DATE_PICKER_HPP_INCLUDED
 
 /// \file date_picker.hpp
-/// \brief Simple UTC date/time picker without local-time dependencies.
+/// \brief UTC date/time picker with optional steppers, quick actions, seconds toggle and bounds.
 
+#include <imgui.h>
 #include <algorithm>
 #include <cstdint>
 #include <cstdio>
 #include <string>
-
-#include <imgui.h>
+#include <chrono>
+#include <limits>
 
 namespace ImGuiX::Widgets {
 
@@ -83,88 +84,181 @@ namespace ImGuiX::Widgets {
             return d;
         }
 
+        inline void clamp_ymdhms(int64_t& y, int& m, int& d, int& hh, int& mm, int& ss,
+                                 int min_year, int max_year) {
+            y = std::max<int64_t>(min_year, std::min<int64_t>(max_year, y));
+            m = std::clamp(m, 1, 12);
+            d = std::clamp(d, 1, num_days_in_month(y, m));
+            hh = std::clamp(hh, 0, 23);
+            mm = std::clamp(mm, 0, 59);
+            ss = std::clamp(ss, 0, 59);
+        }
+
     } // namespace detail
 
     struct DatePickerConfig {
-        const char* label       = u8"Date";
-        const char* desc_date   = u8"DD/MM/YYYY";
-        const char* desc_time   = u8"HH:MM:SS";
-        float       combo_width = 180.0f;
-        bool        show_desc   = true;
-        float       field_width = 48.0f;
+        const char* label         = u8"Date";
+        float       combo_width   = 200.0f;
+        float       field_width   = 48.0f;
+        bool        show_desc     = true;        ///< show row captions (DD/MM/YYYY and HH:MM[:SS])
+        const char* desc_date     = u8"DD/MM/YYYY";
+        const char* desc_time     = u8"HH:MM:SS";
+
+        // UX options
+        bool        show_seconds  = true;        ///< show seconds row/field
+        bool        show_steppers = true;        ///< show -/+ buttons near date row
+        bool        show_quick    = true;        ///< show Today/Now buttons
+
+        // Bounds & clamping (optional)
+        bool        clamp_to_years = true;       ///< clamp Y/M/D/.. into [min_year..max_year]
+        int         min_year       = 1970;
+        int         max_year       = 2099;
+
+        // Preview format (seconds omitted automatically if show_seconds=false)
+        const char* preview_fmt_with_sec = u8"%02d/%02d/%04lld %02d:%02d:%02d";
+        const char* preview_fmt_no_sec   = u8"%02d/%02d/%04lld %02d:%02d";
     };
 
-    inline std::string format_ymdhms(detail::ts_t ts) {
-        int64_t y; int m, d, h, min, s;
-        detail::timestamp_to_ymdhms(ts, y, m, d, h, min, s);
+    inline std::string format_preview(detail::ts_t ts, const DatePickerConfig& cfg) {
+        int64_t y; int m, d, hh, mm, ss;
+        detail::timestamp_to_ymdhms(ts, y, m, d, hh, mm, ss);
         char buf[32];
-        std::snprintf(buf, sizeof(buf), u8"%02d/%02d/%04lld %02d:%02d:%02d",
-                      d, m, static_cast<long long>(y), h, min, s);
+        if (cfg.show_seconds) {
+            std::snprintf(buf, sizeof(buf), cfg.preview_fmt_with_sec, d, m, (long long)y, hh, mm, ss);
+        } else {
+            std::snprintf(buf, sizeof(buf), cfg.preview_fmt_no_sec,   d, m, (long long)y, hh, mm);
+        }
         return std::string(buf);
     }
 
-    inline bool DatePicker(
-            const char* id,
-            detail::ts_t& ts,
-            const DatePickerConfig& cfg = {}) {
+    inline bool DatePicker(const char* id, detail::ts_t& ts, const DatePickerConfig& cfg = {}) {
         bool changed = false;
-        std::string preview = format_ymdhms(ts);
+        std::string preview = format_preview(ts, cfg);
 
         ImGui::PushID(id);
         ImGui::SetNextItemWidth(cfg.combo_width);
         if (ImGui::BeginCombo(cfg.label ? cfg.label : id, preview.c_str())) {
-            if (cfg.show_desc && cfg.desc_date) ImGui::TextUnformatted(cfg.desc_date);
 
             int64_t year; int month; int day; int hour; int minute; int second;
-            detail::timestamp_to_ymdhms(ts, year, month, day, hour, minute, second);
+            ImGuiX::Widgets::detail::timestamp_to_ymdhms(ts, year, month, day, hour, minute, second);
 
-            int day_idx0 = day - 1;
-            int month_idx = month - 1;
-            int year_i = static_cast<int>(year);
+            // --- Date row
+            if (cfg.show_desc && cfg.desc_date) ImGui::TextUnformatted(cfg.desc_date);
 
-            const char* number_items[] = {
-                "1","2","3","4","5","6","7","8","9","10",
-                "11","12","13","14","15","16","17","18","19","20",
-                "21","22","23","24","25","26","27","28","29","30",
-                "31"
-            };
+            // steppers for date (optional)
+            if (cfg.show_steppers) {
+                ImGui::PushButtonRepeat(true);
+                // Day
+                ImGui::SetNextItemWidth(cfg.field_width);
+                if (ImGui::SmallButton(u8"-##d")) { day = std::max(1, day - 1); changed = true; }
+                ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x * 0.5f);
+                ImGui::SetNextItemWidth(cfg.field_width);
+                if (ImGui::InputInt(u8"##day", &day, 0, 0)) { changed = true; }
+                ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x * 0.5f);
+                if (ImGui::SmallButton(u8"+##d")) { day = std::min(detail::num_days_in_month(year, month), day + 1); changed = true; }
 
-            ImGui::SetNextItemWidth(cfg.field_width);
-            int max_days = detail::num_days_in_month(year_i, month);
-            if (ImGui::Combo("##day", &day_idx0, number_items, max_days)) {
-                day = day_idx0 + 1;
-                changed = true;
+                // Month
+                ImGui::SameLine();
+                if (ImGui::SmallButton(u8"-##m")) { month = std::max(1, month - 1); day = std::min(day, detail::num_days_in_month(year, month)); changed = true; }
+                ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x * 0.5f);
+                ImGui::SetNextItemWidth(cfg.field_width);
+                if (ImGui::InputInt(u8"##month", &month, 0, 0)) { changed = true; }
+                ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x * 0.5f);
+                if (ImGui::SmallButton(u8"+##m")) { month = std::min(12, month + 1); day = std::min(day, detail::num_days_in_month(year, month)); changed = true; }
+
+                // Year
+                ImGui::SameLine();
+                if (ImGui::SmallButton(u8"-##y")) { year -= 1; changed = true; }
+                ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x * 0.5f);
+                ImGui::SetNextItemWidth(cfg.field_width * 2.0f);
+                int year_i = static_cast<int>(year);
+                if (ImGui::InputInt(u8"##year", &year_i, 0, 0)) { changed = true; }
+                year = year_i;
+                ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x * 0.5f);
+                if (ImGui::SmallButton(u8"+##y")) { year += 1; changed = true; }
+
+                ImGui::PopButtonRepeat();
+            } else {
+                // simple inputs without steppers
+                ImGui::SetNextItemWidth(cfg.field_width);
+                if (ImGui::InputInt(u8"##day", &day, 1, 5)) changed = true;
+                ImGui::SameLine();
+                ImGui::SetNextItemWidth(cfg.field_width);
+                if (ImGui::InputInt(u8"##month", &month, 1, 3)) changed = true;
+                ImGui::SameLine();
+                ImGui::SetNextItemWidth(cfg.field_width * 2.0f);
+                if (ImGui::InputInt(u8"##year", (int*)&year, 1, 10)) changed = true;
             }
-            ImGui::SameLine();
-            ImGui::SetNextItemWidth(cfg.field_width);
-            if (ImGui::Combo("##month", &month_idx, number_items, 12)) {
-                month = month_idx + 1;
-                day = std::min(day, detail::num_days_in_month(year_i, month));
-                changed = true;
-            }
-            ImGui::SameLine();
-            ImGui::SetNextItemWidth(cfg.field_width * 2);
-            if (ImGui::InputInt("##year", &year_i)) {
-                if (year_i < 1970) year_i = 1970;
-                day = std::min(day, detail::num_days_in_month(year_i, month));
-                changed = true;
+
+            // Clamp date after edits
+            if (cfg.clamp_to_years) detail::clamp_ymdhms(year, month, day, hour, minute, second, cfg.min_year, cfg.max_year);
+            else {
+                month = std::clamp(month, 1, 12);
+                day   = std::clamp(day,   1, detail::num_days_in_month(year, month));
             }
 
+            // --- Time row
             if (cfg.show_desc && cfg.desc_time) ImGui::TextUnformatted(cfg.desc_time);
-            int time_vals[3] = {hour, minute, second};
-            ImGui::SetNextItemWidth(cfg.field_width * 3 + ImGui::GetStyle().ItemSpacing.x * 2);
-            if (ImGui::InputInt3("##time", time_vals)) {
-                changed = true;
-            }
-            hour = std::clamp(time_vals[0], 0, 23);
-            minute = std::clamp(time_vals[1], 0, 59);
-            second = std::clamp(time_vals[2], 0, 59);
 
-            detail::ts_t new_ts = detail::ymdhms_to_timestamp(year_i, month, day, hour, minute, second);
-            if (new_ts != ts) {
-                ts = new_ts;
-                changed = true;
+            int time_vals[3] = {hour, minute, second};
+            if (!cfg.show_seconds) time_vals[2] = 0;
+
+            ImGui::SetNextItemWidth(cfg.field_width * (cfg.show_seconds ? 3.0f : 2.0f)
+                                    + ImGui::GetStyle().ItemSpacing.x * (cfg.show_seconds ? 2.0f : 1.0f));
+            if (cfg.show_seconds) {
+                bool ch = false;
+                ImGui::SetNextItemWidth(cfg.field_width);
+                ch |= ImGui::InputInt(u8"##hh", &time_vals[0], 1, 5);
+                ImGui::SameLine();
+                ImGui::SetNextItemWidth(cfg.field_width);
+                ch |= ImGui::InputInt(u8"##mm", &time_vals[1], 1, 5);
+                ImGui::SameLine();
+                ImGui::SetNextItemWidth(cfg.field_width);
+                ch |= ImGui::InputInt(u8"##ss", &time_vals[2], 1, 5);
+                if (ch) changed = true;
+            } else {
+                // два поля (часы и минуты)
+                bool ch = false;
+                ImGui::SetNextItemWidth(cfg.field_width);
+                ch |= ImGui::InputInt(u8"##hh", &time_vals[0], 1, 5);
+                ImGui::SameLine();
+                ImGui::SetNextItemWidth(cfg.field_width);
+                ch |= ImGui::InputInt(u8"##mm", &time_vals[1], 1, 5);
+                if (ch) changed = true;
             }
+
+            hour   = std::clamp(time_vals[0], 0, 23);
+            minute = std::clamp(time_vals[1], 0, 59);
+            second = cfg.show_seconds ? std::clamp(time_vals[2], 0, 59) : 0;
+
+            // --- Quick actions
+            if (cfg.show_quick) {
+                if (ImGui::SmallButton(u8"Today")) {
+                    // midnight UTC today
+                    using namespace std::chrono;
+                    auto now  = system_clock::now();
+                    auto s    = duration_cast<seconds>(now.time_since_epoch()).count();
+                    int64_t Y; int M, D, H, MIN, S;
+                    ImGuiX::Widgets::detail::timestamp_to_ymdhms((detail::ts_t)s, Y, M, D, H, MIN, S);
+                    hour = minute = second = 0;
+                    year = Y; month = M; day = D;
+                    changed = true;
+                }
+                ImGui::SameLine();
+                if (ImGui::SmallButton(u8"Now")) {
+                    using namespace std::chrono;
+                    auto now  = system_clock::now();
+                    auto s    = duration_cast<seconds>(now.time_since_epoch()).count();
+                    int64_t Y; int M, D, H, MIN, S;
+                    ImGuiX::Widgets::detail::timestamp_to_ymdhms((detail::ts_t)s, Y, M, D, H, MIN, S);
+                    year = Y; month = M; day = D; hour = H; minute = MIN; second = cfg.show_seconds ? S : 0;
+                    changed = true;
+                }
+            }
+
+            // Rebuild timestamp
+            detail::ts_t new_ts = detail::ymdhms_to_timestamp(year, month, day, hour, minute, second);
+            if (new_ts != ts) { ts = new_ts; changed = true; }
 
             ImGui::EndCombo();
         }

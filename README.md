@@ -233,15 +233,21 @@ be configured manually. By default, fonts are read from
 
 > **Tip (icons):** Icon fonts (Material, Font Awesome/Fork Awesome, etc.) use the **Private Use Area (PUA)** codepoints. Include PUA in glyph ranges (preset token `PUA`) so icons render alongside text.
 
+### Example setup
+
 An example manual setup in `WindowInstance::onInit()`:
 
 ```cpp
 fontsBeginManual();
-fontsSetRangesPreset("Default+Punct+PUA");
+fontsSetRangesPreset("Default+Punct+PUA+LatinExtA"); // include LatinExtA for œ/Œ, æ/Æ, etc.
 fontsAddBody({ "Roboto-Medium.ttf", 16.0f });
 fontsAddMerge(FontRole::Icons, { "forkawesome-webfont.ttf", 16.0f, true });
 fontsBuildNow();
 ```
+
+> **Tip:** For Western European languages (French, Polish, Czech, etc.) it is recommended to add `+LatinExtA`
+> since characters like `œ/Œ` are located in the Latin Extended-A block.
+> You may also include `+Latin1Sup`, `+LatinExtB`, or `+LatinExtAdditional` if your target locale requires them.
 
 This repository bundles third-party fonts under their original licenses:
 

@@ -14,6 +14,7 @@
 #include <imguix/widgets/loading_spinner.hpp>
 #include <imguix/widgets/proxy_panel.hpp>
 
+#include <imguix/widgets/input_vertical_stepper.hpp>
 #include <imguix/widgets/text_center.hpp>
 #include <imguix/widgets/list_editor.hpp>
 
@@ -62,7 +63,7 @@ private:
         // Configs (static UI config, can be tweaked at runtime)
         ImGuiX::Widgets::AuthPanelConfig      auth_cfg{};
         ImGuiX::Widgets::AuthData             auth_data;
-		ImGuiX::Widgets::AuthJsSettings       js_st{};
+        ImGuiX::Widgets::AuthJsSettings       js_st{};
 
         ImGuiX::Widgets::DomainSelectorConfig dom_cfg{};
         
@@ -297,7 +298,7 @@ private:
         if (m_auth.kbd_pass)   ImGuiX::Widgets::VirtualKeyboard("kbd.pass",   m_auth.auth_data.password,  m_auth.kcfg);
         if (m_auth.kbd_host)   ImGuiX::Widgets::VirtualKeyboard("kbd.host",   m_auth.auth_data.host,  m_auth.kcfg);
 
-		// Domain selector (presets + custom)
+        // Domain selector (presets + custom)
         ImGui::Separator();
         if (ImGuiX::Widgets::DomainSelector("auth.domain", m_auth.dom_cfg, m_auth.auth_data.host)) {
             // optional: react on host change
@@ -309,11 +310,17 @@ private:
             // e.g., log, start async connect, etc.
             // Here we already toggled connected in on_connect callback.
         }
-		
-		{
-			ImGuiX::Widgets::AuthJsPanelConfig cfg;
-			(void)ImGuiX::Widgets::AuthJsPanel("##DemoAuthJsPanel", cfg,  m_auth.js_st);
-		}
+        
+        {
+            ImGuiX::Widgets::AuthJsPanelConfig cfg;
+            (void)ImGuiX::Widgets::AuthJsPanel("##DemoAuthJsPanel", cfg,  m_auth.js_st);
+        }
+        
+        //
+        ImGui::TextUnformatted("Input:");
+        static int step = 0;
+        (void)ImGuiX::Widgets::InputIntVerticalStepper("Input int##DemoInputIntVerticalStepper", &step, 1, 5);
+        
         
         // Hours section
         ImGui::SeparatorText("Hours");
@@ -420,7 +427,7 @@ public:
         create(id() == 0 ? 800 : 640, id() == 0 ? 600 : 480);
         setWindowIcon("data/resources/icons/icon.png");
         fontsBeginManual();
-        fontsSetRangesPreset("Default+Cyrillic+Vietnamese+Punct+PUA");
+        fontsSetRangesPreset("Default+Cyrillic+Vietnamese+Punct+PUA+LatinExtA");
         fontsAddBody({ "NotoSans-Regular.ttf", 18.0f });
         fontsAddMerge(ImGuiX::Fonts::FontRole::Icons, { "MaterialIcons-Regular.ttf", 18.0f, 4.0f, true});
         fontsAddHeadline(ImGuiX::Fonts::FontRole::H1, { "NotoSans-Bold.ttf", 24.0f });

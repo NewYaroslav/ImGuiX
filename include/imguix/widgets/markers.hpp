@@ -5,9 +5,8 @@
 /// \file markers.hpp
 /// \brief Assorted marker widgets for colored labels and tooltips.
 
-#include <string>
-
 #include <imgui.h>
+#include <string>
 
 namespace ImGuiX::Widgets {
 
@@ -15,9 +14,11 @@ namespace ImGuiX::Widgets {
     /// \param label Text displayed on screen.
     /// \param desc Tooltip text shown when hovered.
     /// \param color Text color.
-    inline void ColoredMarker(const char* label,
-                               const char* desc,
-                               const ImVec4& color) {
+    inline void ColoredMarker(
+            const char* label,
+            const char* desc,
+            const ImVec4& color
+        ) {
         ImGui::PushStyleColor(ImGuiCol_Text, color);
         ImGui::TextUnformatted(label);
         ImGui::PopStyleColor();

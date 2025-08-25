@@ -204,6 +204,20 @@ namespace ImGuiX::Fonts {
             else if (tok == u8"PUA" || tok == u8"Icons" || tok == u8"PrivateUse") {
                 static const ImWchar kPUA[] = { 0xE000, 0xF8FF, 0 };
                 b.AddRanges(kPUA);
+            } else if (tok == u8"LatinExtA") {      // U+0100..U+017F   (œ/Œ здесь)
+                static const ImWchar kLatinExtA[] = { 0x0100, 0x017F, 0 };
+                b.AddRanges(kLatinExtA);
+            }
+            else if (tok == u8"LatinExtB") {        // U+0180..U+024F   (реже нужно)
+                static const ImWchar kLatinExtB[] = { 0x0180, 0x024F, 0 };
+                b.AddRanges(kLatinExtB);
+            } else if (tok == u8"Latin1Sup") {      // U+0080..U+00FF (многие акценты здесь)
+                static const ImWchar kLatin1[] = { 0x0080, 0x00FF, 0 };
+                b.AddRanges(kLatin1);
+            }
+            else if (tok == u8"LatinExtAdditional") { // U+1E00..U+1EFF (редко, но встречается)
+                static const ImWchar kLatinExtAdd[] = { 0x1E00, 0x1EFF, 0 };
+                b.AddRanges(kLatinExtAdd);
             }
             // add more named ranges as needed (Latin, Greek, Thai, etc.)
         }
@@ -269,8 +283,8 @@ namespace ImGuiX::Fonts {
         ) {
         ImFontConfig cfg = base_cfg;
         cfg.MergeMode = cfg.MergeMode || ff.merge;
-		cfg.GlyphOffset.y += ff.baseline_offset_px;
-		
+        cfg.GlyphOffset.y += ff.baseline_offset_px;
+        
         const float px = (ff.size_px > 0.0f ? ff.size_px : 16.0f);
         const float eff_px = scalePx(px, params);
 
@@ -659,130 +673,130 @@ namespace ImGuiX::Fonts {
 
       const std::string json_text = readTextFile(cfg_path);
 
-		if (!json_text.empty()) {
-			json j;
-			try {
-				j = json::parse(json_text);
+        if (!json_text.empty()) {
+            json j;
+            try {
+                j = json::parse(json_text);
 
-				// base_dir (optional)
-				if (j.contains(u8"base_dir") && j[u8"base_dir"].is_string())
-				m_params.base_dir = j[u8"base_dir"].get<std::string>();
+                // base_dir (optional)
+                if (j.contains(u8"base_dir") && j[u8"base_dir"].is_string())
+                m_params.base_dir = j[u8"base_dir"].get<std::string>();
 
-				// markdown_sizes (optional)
-				if (j.contains(u8"markdown_sizes") && j[u8"markdown_sizes"].is_object()) {
-					const auto &ms = j[u8"markdown_sizes"];
-					if (ms.contains(u8"body")) m_px_body = ms[u8"body"].get<float>();
-					if (ms.contains(u8"h1")) m_px_h1 = ms[u8"h1"].get<float>();
-					if (ms.contains(u8"h2")) m_px_h2 = ms[u8"h2"].get<float>();
-					if (ms.contains(u8"h3")) m_px_h3 = ms[u8"h3"].get<float>();
-				}
+                // markdown_sizes (optional)
+                if (j.contains(u8"markdown_sizes") && j[u8"markdown_sizes"].is_object()) {
+                    const auto &ms = j[u8"markdown_sizes"];
+                    if (ms.contains(u8"body")) m_px_body = ms[u8"body"].get<float>();
+                    if (ms.contains(u8"h1")) m_px_h1 = ms[u8"h1"].get<float>();
+                    if (ms.contains(u8"h2")) m_px_h2 = ms[u8"h2"].get<float>();
+                    if (ms.contains(u8"h3")) m_px_h3 = ms[u8"h3"].get<float>();
+                }
 
-				// locales (packs)
-				if (j.contains(u8"locales") && j[u8"locales"].is_object()) {
-					for (auto it = j[u8"locales"].begin(); it != j[u8"locales"].end(); ++it) {
-						const std::string loc = it.key();
-						const json &L = it.value();
+                // locales (packs)
+                if (j.contains(u8"locales") && j[u8"locales"].is_object()) {
+                    for (auto it = j[u8"locales"].begin(); it != j[u8"locales"].end(); ++it) {
+                        const std::string loc = it.key();
+                        const json &L = it.value();
 
-						LocalePack pack{};
-						pack.locale = loc;
+                        LocalePack pack{};
+                        pack.locale = loc;
 
-						if (L.contains(u8"inherits") && L[u8"inherits"].is_string())
-						pack.inherits = L[u8"inherits"].get<std::string>();
+                        if (L.contains(u8"inherits") && L[u8"inherits"].is_string())
+                        pack.inherits = L[u8"inherits"].get<std::string>();
 
-						// ranges: array of pairs OR string preset (e.g.,
-						// "Default+Cyrillic+Punct")
-						if (L.contains(u8"ranges")) {
-							if (L[u8"ranges"].is_array()) {
-								for (const auto &v : L[u8"ranges"])
-									pack.ranges.push_back(static_cast<ImWchar>(v.get<int>()));
-								// Append 0 terminator later inside buildRangesFromPack()
-							} else if (L[u8"ranges"].is_string()) {
-								pack.ranges_preset =
-								L[u8"ranges"].get<std::string>(); // <-- IMPORTANT: keep
-							}
-						}
+                        // ranges: array of pairs OR string preset (e.g.,
+                        // "Default+Cyrillic+Punct")
+                        if (L.contains(u8"ranges")) {
+                            if (L[u8"ranges"].is_array()) {
+                                for (const auto &v : L[u8"ranges"])
+                                    pack.ranges.push_back(static_cast<ImWchar>(v.get<int>()));
+                                // Append 0 terminator later inside buildRangesFromPack()
+                            } else if (L[u8"ranges"].is_string()) {
+                                pack.ranges_preset =
+                                L[u8"ranges"].get<std::string>(); // <-- IMPORTANT: keep
+                            }
+                        }
 
-						// roles...
-						if (L.contains(u8"roles") && L[u8"roles"].is_object()) {
-							const auto &R = L[u8"roles"];
-							auto parse_files = [&](const char *key, FontRole role) {
-								if (R.contains(key) && R[key].is_array()) {
-								for (const auto &item : R[key]) {
-										FontFile ff{};
-										if (item.contains(u8"path"))
-											ff.path = item[u8"path"].get<std::string>();
-										if (item.contains(u8"size_px"))
-											ff.size_px = item[u8"size_px"].get<float>();
-										if (item.contains(u8"merge"))
-											ff.merge = item[u8"merge"].get<bool>();
-										if (item.contains(u8"freetype_flags"))
-											ff.freetype_flags = item[u8"freetype_flags"].get<unsigned>();
-										if (item.contains(u8"extra_glyphs"))
-											ff.extra_glyphs = item[u8"extra_glyphs"].get<std::string>();
-										if (item.contains(u8"baseline_offset"))
-											ff.baseline_offset = item[u8"baseline_offset"].get<float>();
-										pack.roles[role].push_back(std::move(ff));
-									}
-								}
-							};
-							parse_files(u8"Body", FontRole::Body);
-							parse_files(u8"H1", FontRole::H1);
-							parse_files(u8"H2", FontRole::H2);
-							parse_files(u8"H3", FontRole::H3);
-							parse_files(u8"Monospace", FontRole::Monospace);
-							parse_files(u8"Bold", FontRole::Bold);
-							parse_files(u8"Italic", FontRole::Italic);
-							parse_files(u8"BoldItalic", FontRole::BoldItalic);
-							parse_files(u8"Icons", FontRole::Icons);
-							parse_files(u8"Emoji", FontRole::Emoji);
-						}
+                        // roles...
+                        if (L.contains(u8"roles") && L[u8"roles"].is_object()) {
+                            const auto &R = L[u8"roles"];
+                            auto parse_files = [&](const char *key, FontRole role) {
+                                if (R.contains(key) && R[key].is_array()) {
+                                for (const auto &item : R[key]) {
+                                        FontFile ff{};
+                                        if (item.contains(u8"path"))
+                                            ff.path = item[u8"path"].get<std::string>();
+                                        if (item.contains(u8"size_px"))
+                                            ff.size_px = item[u8"size_px"].get<float>();
+                                        if (item.contains(u8"merge"))
+                                            ff.merge = item[u8"merge"].get<bool>();
+                                        if (item.contains(u8"freetype_flags"))
+                                            ff.freetype_flags = item[u8"freetype_flags"].get<unsigned>();
+                                        if (item.contains(u8"extra_glyphs"))
+                                            ff.extra_glyphs = item[u8"extra_glyphs"].get<std::string>();
+                                        if (item.contains(u8"baseline_offset"))
+                                            ff.baseline_offset = item[u8"baseline_offset"].get<float>();
+                                        pack.roles[role].push_back(std::move(ff));
+                                    }
+                                }
+                            };
+                            parse_files(u8"Body", FontRole::Body);
+                            parse_files(u8"H1", FontRole::H1);
+                            parse_files(u8"H2", FontRole::H2);
+                            parse_files(u8"H3", FontRole::H3);
+                            parse_files(u8"Monospace", FontRole::Monospace);
+                            parse_files(u8"Bold", FontRole::Bold);
+                            parse_files(u8"Italic", FontRole::Italic);
+                            parse_files(u8"BoldItalic", FontRole::BoldItalic);
+                            parse_files(u8"Icons", FontRole::Icons);
+                            parse_files(u8"Emoji", FontRole::Emoji);
+                        }
 
-						m_packs[pack.locale] = std::move(pack);
-					}
+                        m_packs[pack.locale] = std::move(pack);
+                    }
 
-					// Second pass: resolve inheritance after all packs are read
-					{
-						bool changed = true;
-						int guard = 0;
-						while (changed && guard++ < 16) {
-							changed = false;
-							for (auto &kv : m_packs) {
-								auto &child = kv.second;
-								if (child.inherits.empty())
-									continue;
-								auto pit = m_packs.find(child.inherits);
-								if (pit == m_packs.end())
-									continue;
-								const auto &parent = pit->second;
+                    // Second pass: resolve inheritance after all packs are read
+                    {
+                        bool changed = true;
+                        int guard = 0;
+                        while (changed && guard++ < 16) {
+                            changed = false;
+                            for (auto &kv : m_packs) {
+                                auto &child = kv.second;
+                                if (child.inherits.empty())
+                                    continue;
+                                auto pit = m_packs.find(child.inherits);
+                                if (pit == m_packs.end())
+                                    continue;
+                                const auto &parent = pit->second;
 
-								// Roles: copy missing ones (do not overwrite existing)
-								for (const auto &rp : parent.roles)
-								if (!child.roles.count(rp.first)) {
-									child.roles[rp.first] = rp.second;
-									changed = true;
-								}
+                                // Roles: copy missing ones (do not overwrite existing)
+                                for (const auto &rp : parent.roles)
+                                if (!child.roles.count(rp.first)) {
+                                    child.roles[rp.first] = rp.second;
+                                    changed = true;
+                                }
 
-								// Ranges: inherit if not set explicitly
-								if (child.ranges.empty() && !parent.ranges.empty()) {
-									child.ranges = parent.ranges;
-									changed = true;
-								}
-								// Preset: inherit if not set explicitly
-								if (child.ranges_preset.empty() &&
-									!parent.ranges_preset.empty()) {
-									child.ranges_preset = parent.ranges_preset;
-									changed = true;
-								}
-							}
-						}
-					}
-				}
+                                // Ranges: inherit if not set explicitly
+                                if (child.ranges.empty() && !parent.ranges.empty()) {
+                                    child.ranges = parent.ranges;
+                                    changed = true;
+                                }
+                                // Preset: inherit if not set explicitly
+                                if (child.ranges_preset.empty() &&
+                                    !parent.ranges_preset.empty()) {
+                                    child.ranges_preset = parent.ranges_preset;
+                                    changed = true;
+                                }
+                            }
+                        }
+                    }
+                }
 
-			} catch (const std::exception &e) {
-				br.success = false;
-				br.message = std::string(u8"JSON parse error: ") + e.what();
-				// Fallback to defaults below
-			}
+            } catch (const std::exception &e) {
+                br.success = false;
+                br.message = std::string(u8"JSON parse error: ") + e.what();
+                // Fallback to defaults below
+            }
       }
 
         // Choose active locale, or fallback to "default"

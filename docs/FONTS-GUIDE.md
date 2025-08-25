@@ -108,11 +108,18 @@ void onInit() override {
 
 Supported preset tokens (currently):
 
-* `Default` (Latin and basic UI symbols)
-* `Cyrillic`, `Vietnamese`
-* `Japanese`/`JapaneseFull`, `Chinese`/`ChineseFull`, `Korean` (beware: large sets)
+* `Default` — Latin and basic UI symbols (ImGui built-in)
+* `Cyrillic`
+* `Vietnamese`
+* `Japanese` / `JapaneseFull`
+* `Chinese` / `ChineseFull`
+* `Korean` (beware: large sets)
 * `Punct` — `– — … • “ ” ‘ ’` (deduplicated if added multiple times)
 * **`PUA`** (aliases: `Icons`, `PrivateUse`) — the **Private Use Area** `U+E000–U+F8FF` used by most icon fonts
+* `Latin1Sup` — `U+0080–U+00FF` (Latin-1 Supplement, contains e.g. `é`, `æ`, `ø`)
+* `LatinExtA` — `U+0100–U+017F` (Latin Extended-A, e.g. `œ`, `Œ`, Polish and Czech diacritics)
+* `LatinExtB` — `U+0180–U+024F` (Latin Extended-B, additional Balkan and African Latin letters)
+* `LatinExtAdditional` — `U+1E00–U+1EFF` (Extended Additional set, rare but useful diacritics)
 
 > **Why PUA matters:** Material Icons (e.g., `U+E8F4`) and Font Awesome/Fork Awesome (`U+Fxxx`) reside in PUA.  
 > Without `PUA` in ranges icons won’t render even if the font is merged.
