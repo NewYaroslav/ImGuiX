@@ -12,37 +12,17 @@ namespace ImGuiX::Extensions {
     /// \brief Set ImGui style to fully opaque.
     /// \note Applies `style.Alpha = 1.0f` and sets all style colors' alpha to 1.0f.
     /// \note Useful when using DWM transparency or to prevent unwanted background blending.
-    inline void ForceOpaqueStyle() {
-        ImGuiStyle& style = ImGui::GetStyle();
-        style.Alpha = 1.0f;
-        for (int i = 0; i < ImGuiCol_COUNT; ++i) {
-            style.Colors[i].w = 1.0f;
-        }
-    }
+    inline void ForceOpaqueStyle();
 
     /// \brief RAII-style scope to enforce fully opaque ImGui style.
     /// \note Restores all style colors and alpha after scope ends.
     class ScopedOpaqueStyle {
     public:
         /// \brief Save current style and apply fully opaque style.
-        ScopedOpaqueStyle() {
-            ImGuiStyle& style = ImGui::GetStyle();
-            m_old_alpha = style.Alpha;
-            for (int i = 0; i < ImGuiCol_COUNT; ++i) {
-                m_old_colors[i] = style.Colors[i];
-                style.Colors[i].w = 1.0f;
-            }
-            style.Alpha = 1.0f;
-        }
+        ScopedOpaqueStyle();
 
         /// \brief Restore previous style on destruction.
-        ~ScopedOpaqueStyle() {
-            ImGuiStyle& style = ImGui::GetStyle();
-            style.Alpha = m_old_alpha;
-            for (int i = 0; i < ImGuiCol_COUNT; ++i) {
-                style.Colors[i] = m_old_colors[i];
-            }
-        }
+        ~ScopedOpaqueStyle();
 
     private:
         ImVec4 m_old_colors[ImGuiCol_COUNT];
@@ -50,5 +30,9 @@ namespace ImGuiX::Extensions {
     };
 
 } // namespace ImGuiX::Extensions
+
+#ifdef IMGUIX_HEADER_ONLY
+#   include "force_opaque_style.ipp"
+#endif
 
 #endif // _IMGUIX_EXTENSIONS_FORCE_OPAQUE_STYLE_HPP_INCLUDED
