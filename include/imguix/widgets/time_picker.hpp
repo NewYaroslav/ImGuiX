@@ -12,96 +12,10 @@
 #include <cstdio>
 #include <string>
 #include <vector>
-
 #include "arrow_stepper.hpp"
+#include <imguix/utils/time_utils.hpp>  // ImGuiX::Utils::format_hms, etc.
 
 namespace ImGuiX::Widgets {
-
-    // ---------- helpers ----------------------------------------------------------
-
-    inline int clamp_time_sec(int sec) {
-        if (sec < 0) return 0;
-        if (sec > 86399) return 86399;
-        return sec;
-    }
-
-    inline void seconds_to_hms(int sec, int& h, int& m, int& s) {
-        sec = clamp_time_sec(sec);
-        h = sec / 3600;
-        m = (sec % 3600) / 60;
-        s = sec % 60;
-    }
-
-    inline int hms_to_seconds(int h, int m, int s) {
-        h = std::clamp(h, 0, 23);
-        m = std::clamp(m, 0, 59);
-        s = std::clamp(s, 0, 59);
-        return (h * 3600 + m * 60 + s);
-    }
-
-    inline std::string format_hms(uint32_t sec) {
-        int h, m, s; seconds_to_hms(static_cast<int>(sec), h, m, s);
-        char buf[16]; std::snprintf(buf, sizeof(buf), u8"%02d:%02d:%02d", h, m, s);
-        return std::string(buf);
-    }
-
-    inline std::string format_signed_hms(int64_t off_sec) {
-        bool pos = off_sec >= 0;
-        uint32_t a = static_cast<uint32_t>(pos ? off_sec : -off_sec);
-        char buf[20];
-        int h, m, s; seconds_to_hms(static_cast<int>(a), h, m, s);
-        std::snprintf(buf, sizeof(buf), u8"%c%02d:%02d:%02d", pos ? '+' : '-', h, m, s);
-        return std::string(buf);
-    }
-    
-    // Parse strings like "+03:00", "-05:30:15", "3:00", "0300", with optional sign.
-    inline bool parse_signed_hms(const char* txt, int64_t& out_sec) {
-        if (!txt) return false;
-        // Trim spaces
-        while (*txt == ' ' || *txt == '\t') ++txt;
-        int sign = +1;
-        if (*txt == '+') { sign = +1; ++txt; }
-        else if (*txt == '-') { sign = -1; ++txt; }
-
-        int h = 0, m = 0, s = 0;
-        int n = 0;
-
-        // Try HH:MM:SS
-        if (std::sscanf(txt, u8"%d:%d:%d%n", &h, &m, &s, &n) >= 2 && n > 0) {
-            // ok
-        } else if (std::sscanf(txt, u8"%d:%d%n", &h, &m, &n) == 2) {
-            s = 0;
-        } else {
-            // Try compact HHMM or HMM
-            int packed = 0;
-            if (std::sscanf(txt, u8"%d%n", &packed, &n) == 1) {
-                if (packed < 0) packed = -packed;
-                if (packed >= 0 && packed <= 235959) {
-                    if (packed <= 959) { // HMM
-                        h = packed / 100;
-                        m = packed % 100;
-                        s = 0;
-                    } else if (packed <= 2359) { // HHMM
-                        h = packed / 100;
-                        m = packed % 100;
-                        s = 0;
-                    } else { // HHMMSS
-                        h = packed / 10000;
-                        m = (packed / 100) % 100;
-                        s = packed % 100;
-                    }
-                } else {
-                    return false;
-                }
-            } else {
-                return false;
-            }
-        }
-
-        if (h < 0 || h > 23 || m < 0 || m > 59 || s < 0 || s > 59) return false;
-        out_sec = static_cast<int64_t>(sign) * static_cast<int64_t>(hms_to_seconds(h, m, s));
-        return true;
-    }
 
     // ---------- configs & data ---------------------------------------------------
 
@@ -170,14 +84,15 @@ namespace ImGuiX::Widgets {
     /// \return True if value changed.
     inline bool TimePicker(const char* id, int& seconds, const TimePickerConfig& cfg = {}) {
         bool changed = false;
-        std::string preview = format_hms(static_cast<uint32_t>(seconds));
+        std::string preview = ImGuiX::Utils::format_hms(seconds);
 
         ImGui::PushID(id);
         ImGui::SetNextItemWidth(cfg.combo_width);
         if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Time", preview.c_str())) {
             if (cfg.show_desc && cfg.desc) ImGui::TextUnformatted(cfg.desc);
 
-            int h, m, s; seconds_to_hms(seconds, h, m, s);
+            int h, m, s; 
+			ImGuiX::Utils::seconds_to_hms(seconds, h, m, s);
 
             ArrowStepperConfig sc_h{0,23,1,true,cfg.field_width,u8"%02d h"};
             ArrowStepperConfig sc_m{0,59,1,true,cfg.field_width,u8"%02d m"};
@@ -189,7 +104,7 @@ namespace ImGuiX::Widgets {
             any |= ArrowStepper(u8"s", s, sc_s);
 
             int prev = seconds;
-            seconds = hms_to_seconds(h, m, s);
+            seconds = ImGuiX::Utils::hms_to_seconds(h, m, s);
             changed |= (seconds != prev) || any;
 
             ImGui::EndCombo();
@@ -217,7 +132,7 @@ namespace ImGuiX::Widgets {
             tz_index_io = 0;
 
         bool changed = false;
-        std::string preview = format_signed_hms(offset_sec);
+        std::string preview = ImGuiX::Utils::format_signed_hms(offset_sec);
 
         ImGui::PushID(id);
         ImGui::SetNextItemWidth(cfg.combo_width);
@@ -252,11 +167,11 @@ namespace ImGuiX::Widgets {
             // 1) Direct string edit with sign parsing
             {
                 char buf[32];
-                std::snprintf(buf, sizeof(buf), u8"%s", format_signed_hms(offset_sec).c_str());
+                std::snprintf(buf, sizeof(buf), u8"%s", ImGuiX::Utils::format_signed_hms(offset_sec).c_str());
                 ImGui::SetNextItemWidth(140.0f);
                 if (ImGui::InputText(u8"##offset_str", buf, sizeof(buf))) {
                     int64_t v = 0;
-                    if (parse_signed_hms(buf, v)) {
+                    if (ImGuiX::Utils::parse_signed_hms(buf, v)) {
                         if (v != offset_sec) { offset_sec = v; changed = true; }
                     }
                 }
@@ -268,10 +183,11 @@ namespace ImGuiX::Widgets {
             {
                 bool positive = offset_sec >= 0;
                 uint32_t abs_u = static_cast<uint32_t>(positive ? offset_sec : -offset_sec);
-                int h, m, s; seconds_to_hms(static_cast<int>(abs_u), h, m, s);
+                int h, m, s; 
+				ImGuiX::Utils::seconds_to_hms(static_cast<int>(abs_u), h, m, s);
 
                 // remember old magnitude to detect "at zero" state
-                const int old_abs = hms_to_seconds(h, m, s);
+                const int old_abs = ImGuiX::Utils::hms_to_seconds(h, m, s);
                 const bool was_positive = positive;
 
                 // steppers: NO wrap here (we control borders ourselves)
@@ -289,7 +205,7 @@ namespace ImGuiX::Widgets {
                 any |= ArrowStepper(u8"om", m, sc_m, &dm);
                 any |= ArrowStepper(u8"os", s, sc_s, &ds);
 
-                int new_abs = hms_to_seconds(h, m, s);
+                int new_abs = ImGuiX::Utils::hms_to_seconds(h, m, s);
 
                 // Crossing zero logic:
                 // if we were exactly 00:00:00 and user pressed DOWN on any field -> go to -00:00:01
@@ -317,7 +233,7 @@ namespace ImGuiX::Widgets {
             if (!custom) ImGui::EndDisabled();
 
             if (cfg.show_gmt) {
-                std::string g = format_signed_hms(offset_sec);
+                std::string g = ImGuiX::Utils::format_signed_hms(offset_sec);
                 ImGui::Text(u8"GMT %s%s", g.c_str(),
                             (!custom && has_dst_out) ? u8" (DST observed)" : u8"");
             }

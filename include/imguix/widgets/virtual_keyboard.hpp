@@ -17,6 +17,7 @@
 #include <cctype>
 #include <cstring>
 #include <algorithm>
+#include <regex>
 #include "icon_button.hpp"
 
 namespace ImGuiX::Widgets {
@@ -92,7 +93,7 @@ namespace ImGuiX::Widgets {
         // Размещение селектора локали
         bool    locale_bottom_right  = true;   ///< true: внизу справа; false: сверху (как раньше)
         bool    show_locale_combo    = true;   ///< show Combo to choose locale
-        float   locale_width         = 56.0f;  ///< ширина превью "en"/"ru" (компактно)
+        float   locale_width         = 64.0f;  ///< ширина превью "en"/"ru" (компактно)
         
         float   left_ratio           = 0.60f;  /// < Доли ширины панелей при заданной ширине (size.x>0)
     };
@@ -424,7 +425,6 @@ namespace ImGuiX::Widgets {
             else st->SetInt(key_vk_locale, i);
         };
 
-
         auto get_shift = [&](){
             if (state) return state->shift;
             return st->GetInt(key_vk_shift_state, 0) != 0;
@@ -484,7 +484,7 @@ namespace ImGuiX::Widgets {
         float child_w = inner_w + 2.0f * pad_x + (cfg.border ? 2.0f * child_b : 0.0f);
         float child_h = inner_h + 2.0f * pad_y + (cfg.border ? 2.0f * child_b : 0.0f);
         child_h += cfg.height_bias_px;
-        child_h += 2.0f * pad_y;
+        //child_h += 2.0f * pad_y;
 
         ImGui::BeginChild(u8"##VirtualKeyboard", ImVec2(child_w, child_h), cfg.border, ImGuiWindowFlags_NoScrollbar);
         const float base_x = ImGui::GetCursorPosX();
@@ -708,7 +708,7 @@ namespace ImGuiX::Widgets {
             const float line_start_x = ImGui::GetCursorPosX();
 
             if (cfg.show_bottom) {
-                const ImVec2 wide(key_size.x * 1.5f, key_size.y);
+                const ImVec2 wide(key_size.x * 1.6f, key_size.y);
                 const ImVec2 space_size(key_size.x * 4,   key_size.y);
                 if (ButtonOrIcon(u8"Shift", wide)) press(u8"Shift");
                 ImGui::SameLine();
@@ -730,7 +730,8 @@ namespace ImGuiX::Widgets {
                 if (has_accents) {
                     float offset = right_anchor_offset;                    // смещение от начала строки
                     if (offset < 0.0f) offset = 0.0f;                      // на всякий случай
-                    ImGui::SameLine(offset, style.ItemSpacing.x);          // позиционируем "по X от начала"
+                    //ImGui::SameLine(offset, style.ItemSpacing.x);          // позиционируем "по X от начала"
+                    ImGui::SameLine(offset, 0.0f);
                     const char* label = (get_pane() == VKSpecialPane::Symbols) ? u8"Accents" : u8"Symbols";
                     const float btn_w = 64.0f;
                     if (ButtonOrIcon(label, ImVec2(btn_w, 0))) {
@@ -739,19 +740,37 @@ namespace ImGuiX::Widgets {
                             VKSpecialPane::Symbols);
                     }
                 }
-                
-                float offset = right_anchor_offset;                    // смещение от начала строки
-                if (offset < 0.0f) offset = 0.0f;                      // на всякий случай
-                ImGui::SameLine(offset, style.ItemSpacing.x);          // позиционируем "по X от начала"
+				//float offset = right_anchor_offset < 0.0f ? 0.0f : right_anchor_offset;
+                //ImGui::SameLine(offset, style.ItemSpacing.x);
             }
 
             // комбо локали справа
-            if (cfg.show_locale_combo && cfg.locale_bottom_right && !cfg.locales.empty()) {
+            if (cfg.show_locale_combo && 
+			    cfg.locale_bottom_right && 
+				!cfg.locales.empty()) {
                 // прижать вправо
-                float w = std::max(44.0f, cfg.locale_width);
+				const float line_x0 = line_start_x;
+                float w = std::max(64.0f, cfg.locale_width);
                 float x = ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - w;
-                ImGui::SameLine();
-                ImGui::SetCursorPosX(x);
+                //ImGui::SameLine();
+				
+				// если есть правая панель — выравниваем по её правому краю
+				float target_x;
+				if (cfg.show_special) {
+					// base_x — X-старт контента главного Child в начале рендера
+					target_x = base_x + right_anchor_offset + right_w_outer - w;
+					// переведём в координату строки: SameLine сбивает относительный X,
+					// поэтому ставим курсор жёстко от line_x0.
+					ImGui::SameLine(0.0f, 0.0f);
+					ImGui::SetCursorPosX(target_x);
+				} else {
+					// fallback: правый край всего child-контента
+					target_x = line_x0 + ImGui::GetContentRegionAvail().x - w;
+					ImGui::SameLine(0.0f, 0.0f);
+					ImGui::SetCursorPosX(target_x);
+				}
+
+                //ImGui::SetCursorPosX(x);
                 ImGui::SetNextItemWidth(w);
                 const char* cur = cfg.locales[locale_index];
                 if (ImGui::BeginCombo(u8"##vk_locale_br", cur, ImGuiComboFlags_HeightSmall)) {
@@ -767,10 +786,12 @@ namespace ImGuiX::Widgets {
                 }
             }
         } else 
-        if (cfg.show_locale_combo && !cfg.locale_bottom_right && !cfg.locales.empty()) {
+        if (cfg.show_locale_combo && 
+	        !cfg.locale_bottom_right && 
+			!cfg.locales.empty()) {
             // старое размещение сверху (компактно)
             ImGui::SetCursorPosY(ImGui::GetCursorPosY() - (cfg.spacing + key_size.y)); // поднять к верху
-            ImGui::SetNextItemWidth(std::max(44.0f, cfg.locale_width));
+            ImGui::SetNextItemWidth(std::max(64.0f, cfg.locale_width));
             const char* cur = cfg.locales[locale_index];
             if (ImGui::BeginCombo(u8"##vk_locale_top", cur, ImGuiComboFlags_HeightSmall)) {
                 for (int i = 0; i < (int)cfg.locales.size(); ++i) {

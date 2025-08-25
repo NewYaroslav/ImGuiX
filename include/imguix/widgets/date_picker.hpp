@@ -1,271 +1,248 @@
 #pragma once
 #ifndef _IMGUIX_WIDGETS_DATE_PICKER_HPP_INCLUDED
 #define _IMGUIX_WIDGETS_DATE_PICKER_HPP_INCLUDED
-
 /// \file date_picker.hpp
-/// \brief UTC date/time picker with optional steppers, quick actions, seconds toggle and bounds.
+/// \brief Date picker (YYYY-MM-DD) with ArrowStepper controls and direct input.
+/// \note Requires arrow_stepper.hpp and time_utils.hpp (Hinnant civil date).
+/// \note Header-only, C++17.
 
 #include <imgui.h>
 #include <algorithm>
 #include <cstdint>
 #include <cstdio>
 #include <string>
-#include <chrono>
-#include <limits>
+#include "arrow_stepper.hpp"
+#include <imguix/utils/time_utils.hpp> // days_from_civil, civil_from_days, num_days_in_month, clamp_ymdhms, month_short_name
 
 namespace ImGuiX::Widgets {
 
-    namespace detail {
+    /// \brief Month label mode for UI hints (steppers remain numeric).
+    enum class MonthLabelMode : int { Numeric = 0, ShortName = 1 };
 
-        using ts_t = int64_t;
-
-        constexpr bool is_leap_year_date(int64_t y) noexcept {
-            return (y % 4 == 0 && y % 100 != 0) || (y % 400 == 0);
-        }
-
-        // Howard Hinnant's civil <-> days algorithms
-        constexpr int64_t days_from_civil(int64_t y, unsigned m, unsigned d) noexcept {
-            y -= m <= 2;
-            const int64_t era = (y >= 0 ? y : y - 399) / 400;
-            const unsigned yoe = static_cast<unsigned>(y - era * 400);        // [0, 399]
-            const unsigned doy = (153 * (m + (m > 2 ? -3 : 9)) + 2) / 5 + d - 1; // [0, 365]
-            const unsigned doe = yoe * 365 + yoe / 4 - yoe / 100 + yoe / 400 + doy; // [0, 146096]
-            return era * 146097 + static_cast<int64_t>(doe) - 719468;
-        }
-
-        constexpr void civil_from_days(int64_t z, int64_t& y, unsigned& m, unsigned& d) noexcept {
-            z += 719468;
-            const int64_t era = (z >= 0 ? z : z - 146096) / 146097;
-            const unsigned doe = static_cast<unsigned>(z - era * 146097);
-            const unsigned yoe = (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365;
-            y = static_cast<int64_t>(yoe) + era * 400;
-            const unsigned doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
-            const unsigned mp = (5 * doy + 2) / 153;
-            d = doy - (153 * mp + 2) / 5 + 1;
-            m = mp + (mp < 10 ? 3 : -9);
-            y += (m <= 2);
-        }
-
-        inline void timestamp_to_ymdhms(
-                ts_t ts,
-                int64_t& year,
-                int& month,
-                int& day,
-                int& hour,
-                int& minute,
-                int& second) {
-            int64_t days = ts / 86400;
-            int64_t rem = ts % 86400;
-            if (rem < 0) { rem += 86400; --days; }
-            unsigned m, d;
-            civil_from_days(days, year, m, d);
-            month = static_cast<int>(m);
-            day = static_cast<int>(d);
-            hour = static_cast<int>(rem / 3600); rem %= 3600;
-            minute = static_cast<int>(rem / 60);
-            second = static_cast<int>(rem % 60);
-        }
-
-        inline ts_t ymdhms_to_timestamp(
-                int64_t year,
-                int month,
-                int day,
-                int hour,
-                int minute,
-                int second) {
-            int64_t days = days_from_civil(year, static_cast<unsigned>(month), static_cast<unsigned>(day));
-            return days * 86400 + static_cast<int64_t>(hour) * 3600 + minute * 60 + second;
-        }
-
-        inline int num_days_in_month(int64_t year, int month) {
-            static const int k_days[12] = {31,28,31,30,31,30,31,31,30,31,30,31};
-            int d = k_days[month - 1];
-            if (month == 2 && is_leap_year_date(year)) ++d;
-            return d;
-        }
-
-        inline void clamp_ymdhms(int64_t& y, int& m, int& d, int& hh, int& mm, int& ss,
-                                 int min_year, int max_year) {
-            y = std::max<int64_t>(min_year, std::min<int64_t>(max_year, y));
-            m = std::clamp(m, 1, 12);
-            d = std::clamp(d, 1, num_days_in_month(y, m));
-            hh = std::clamp(hh, 0, 23);
-            mm = std::clamp(mm, 0, 59);
-            ss = std::clamp(ss, 0, 59);
-        }
-
-    } // namespace detail
-
+    /// \brief Config for DatePicker.
     struct DatePickerConfig {
-        const char* label         = u8"Date";
-        float       combo_width   = 200.0f;
-        float       field_width   = 48.0f;
-        bool        show_desc     = true;        ///< show row captions (DD/MM/YYYY and HH:MM[:SS])
-        const char* desc_date     = u8"DD/MM/YYYY";
-        const char* desc_time     = u8"HH:MM:SS";
-
-        // UX options
-        bool        show_seconds  = true;        ///< show seconds row/field
-        bool        show_steppers = true;        ///< show -/+ buttons near date row
-        bool        show_quick    = true;        ///< show Today/Now buttons
-
-        // Bounds & clamping (optional)
-        bool        clamp_to_years = true;       ///< clamp Y/M/D/.. into [min_year..max_year]
-        int         min_year       = 1970;
-        int         max_year       = 2099;
-
-        // Preview format (seconds omitted automatically if show_seconds=false)
-        const char* preview_fmt_with_sec = u8"%02d/%02d/%04lld %02d:%02d:%02d";
-        const char* preview_fmt_no_sec   = u8"%02d/%02d/%04lld %02d:%02d";
+        const char*     label           = u8"Date";
+        const char*     desc            = u8"YYYY-MM-DD";
+        float           combo_width     = 200.0f;
+        bool            show_desc       = true;
+        float           field_width     = 64.0f;     ///< width per ArrowStepper field
+        int             min_year        = 1970;      ///< inclusive
+        int             max_year        = 2099;      ///< inclusive
+        MonthLabelMode  month_label     = MonthLabelMode::Numeric;
+        bool            show_weekday    = false;     ///< show weekday hint
+        bool            preserve_time_of_day = true;///< keep hh:mm:ss from original ts
+        // Optional hard TS bounds (disabled if min_ts > max_ts).
+        int64_t         min_ts          = 0;
+        int64_t         max_ts          = std::numeric_limits<int64_t>::max();
     };
 
-    inline std::string format_preview(detail::ts_t ts, const DatePickerConfig& cfg) {
-        int64_t y; int m, d, hh, mm, ss;
-        detail::timestamp_to_ymdhms(ts, y, m, d, hh, mm, ss);
-        char buf[32];
-        if (cfg.show_seconds) {
-            std::snprintf(buf, sizeof(buf), cfg.preview_fmt_with_sec, d, m, (long long)y, hh, mm, ss);
-        } else {
-            std::snprintf(buf, sizeof(buf), cfg.preview_fmt_no_sec,   d, m, (long long)y, hh, mm);
-        }
-        return std::string(buf);
-    }
+    // --- widget -----------------------------------------------------------------
 
-    inline bool DatePicker(const char* id, detail::ts_t& ts, const DatePickerConfig& cfg = {}) {
+    /// \brief Date picker (YYYY-MM-DD) using ArrowStepper; allows direct text input.
+    /// \param id  Unique widget identifier.
+    /// \param year In/out civil year.
+    /// \param month In/out 1..12.
+    /// \param day In/out 1..31 (clamped to month length).
+    /// \param cfg  Picker configuration.
+    /// \return true if any component changed.
+    inline bool DatePicker(
+            const char* id,
+            int64_t& year,
+            int&     month,
+            int&     day,
+            const DatePickerConfig& cfg = {}
+        ) {
+        // Clamp initial Y/M/D into configured bounds
+        ImGuiX::Utils::clamp_ymd(year, month, day, cfg.min_year, cfg.max_year);
+
         bool changed = false;
-        std::string preview = format_preview(ts, cfg);
+        const std::string preview = cfg.show_weekday
+            ? ImGuiX::Utils::format_with_weekday(year, month, day)
+            : ImGuiX::Utils::format_ymd(year, month, day);
 
         ImGui::PushID(id);
         ImGui::SetNextItemWidth(cfg.combo_width);
-        if (ImGui::BeginCombo(cfg.label ? cfg.label : id, preview.c_str())) {
+        if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Date", preview.c_str())) {
+            if (cfg.show_desc && cfg.desc) ImGui::TextUnformatted(cfg.desc);
 
-            int64_t year; int month; int day; int hour; int minute; int second;
-            ImGuiX::Widgets::detail::timestamp_to_ymdhms(ts, year, month, day, hour, minute, second);
-
-            // --- Date row
-            if (cfg.show_desc && cfg.desc_date) ImGui::TextUnformatted(cfg.desc_date);
-
-            // steppers for date (optional)
-            if (cfg.show_steppers) {
-                ImGui::PushButtonRepeat(true);
-                // Day
-                ImGui::SetNextItemWidth(cfg.field_width);
-                if (ImGui::SmallButton(u8"-##d")) { day = std::max(1, day - 1); changed = true; }
-                ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x * 0.5f);
-                ImGui::SetNextItemWidth(cfg.field_width);
-                if (ImGui::InputInt(u8"##day", &day, 0, 0)) { changed = true; }
-                ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x * 0.5f);
-                if (ImGui::SmallButton(u8"+##d")) { day = std::min(detail::num_days_in_month(year, month), day + 1); changed = true; }
-
-                // Month
-                ImGui::SameLine();
-                if (ImGui::SmallButton(u8"-##m")) { month = std::max(1, month - 1); day = std::min(day, detail::num_days_in_month(year, month)); changed = true; }
-                ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x * 0.5f);
-                ImGui::SetNextItemWidth(cfg.field_width);
-                if (ImGui::InputInt(u8"##month", &month, 0, 0)) { changed = true; }
-                ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x * 0.5f);
-                if (ImGui::SmallButton(u8"+##m")) { month = std::min(12, month + 1); day = std::min(day, detail::num_days_in_month(year, month)); changed = true; }
-
-                // Year
-                ImGui::SameLine();
-                if (ImGui::SmallButton(u8"-##y")) { year -= 1; changed = true; }
-                ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x * 0.5f);
-                ImGui::SetNextItemWidth(cfg.field_width * 2.0f);
-                int year_i = static_cast<int>(year);
-                if (ImGui::InputInt(u8"##year", &year_i, 0, 0)) { changed = true; }
-                year = year_i;
-                ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x * 0.5f);
-                if (ImGui::SmallButton(u8"+##y")) { year += 1; changed = true; }
-
-                ImGui::PopButtonRepeat();
-            } else {
-                // simple inputs without steppers
-                ImGui::SetNextItemWidth(cfg.field_width);
-                if (ImGui::InputInt(u8"##day", &day, 1, 5)) changed = true;
-                ImGui::SameLine();
-                ImGui::SetNextItemWidth(cfg.field_width);
-                if (ImGui::InputInt(u8"##month", &month, 1, 3)) changed = true;
-                ImGui::SameLine();
-                ImGui::SetNextItemWidth(cfg.field_width * 2.0f);
-                if (ImGui::InputInt(u8"##year", (int*)&year, 1, 10)) changed = true;
-            }
-
-            // Clamp date after edits
-            if (cfg.clamp_to_years) detail::clamp_ymdhms(year, month, day, hour, minute, second, cfg.min_year, cfg.max_year);
-            else {
-                month = std::clamp(month, 1, 12);
-                day   = std::clamp(day,   1, detail::num_days_in_month(year, month));
-            }
-
-            // --- Time row
-            if (cfg.show_desc && cfg.desc_time) ImGui::TextUnformatted(cfg.desc_time);
-
-            int time_vals[3] = {hour, minute, second};
-            if (!cfg.show_seconds) time_vals[2] = 0;
-
-            ImGui::SetNextItemWidth(cfg.field_width * (cfg.show_seconds ? 3.0f : 2.0f)
-                                    + ImGui::GetStyle().ItemSpacing.x * (cfg.show_seconds ? 2.0f : 1.0f));
-            if (cfg.show_seconds) {
-                bool ch = false;
-                ImGui::SetNextItemWidth(cfg.field_width);
-                ch |= ImGui::InputInt(u8"##hh", &time_vals[0], 1, 5);
-                ImGui::SameLine();
-                ImGui::SetNextItemWidth(cfg.field_width);
-                ch |= ImGui::InputInt(u8"##mm", &time_vals[1], 1, 5);
-                ImGui::SameLine();
-                ImGui::SetNextItemWidth(cfg.field_width);
-                ch |= ImGui::InputInt(u8"##ss", &time_vals[2], 1, 5);
-                if (ch) changed = true;
-            } else {
-                // два поля (часы и минуты)
-                bool ch = false;
-                ImGui::SetNextItemWidth(cfg.field_width);
-                ch |= ImGui::InputInt(u8"##hh", &time_vals[0], 1, 5);
-                ImGui::SameLine();
-                ImGui::SetNextItemWidth(cfg.field_width);
-                ch |= ImGui::InputInt(u8"##mm", &time_vals[1], 1, 5);
-                if (ch) changed = true;
-            }
-
-            hour   = std::clamp(time_vals[0], 0, 23);
-            minute = std::clamp(time_vals[1], 0, 59);
-            second = cfg.show_seconds ? std::clamp(time_vals[2], 0, 59) : 0;
-
-            // --- Quick actions
-            if (cfg.show_quick) {
-                if (ImGui::SmallButton(u8"Today")) {
-                    // midnight UTC today
-                    using namespace std::chrono;
-                    auto now  = system_clock::now();
-                    auto s    = duration_cast<seconds>(now.time_since_epoch()).count();
-                    int64_t Y; int M, D, H, MIN, S;
-                    ImGuiX::Widgets::detail::timestamp_to_ymdhms((detail::ts_t)s, Y, M, D, H, MIN, S);
-                    hour = minute = second = 0;
-                    year = Y; month = M; day = D;
-                    changed = true;
+            // --- direct string edit ------------------------------------------------
+            {
+                char buf[32];
+                std::snprintf(buf, sizeof(buf), "%s", ImGuiX::Utils::format_ymd(year, month, day).c_str());
+                ImGui::SetNextItemWidth(160.0f);
+                if (ImGui::InputText(u8"##date_str", buf, sizeof(buf))) {
+                    int64_t y = year; int m = month; int d = day;
+                    if (ImGuiX::Utils::parse_ymd(buf, y, m, d)) {
+                        // Clamp to bounds and month length
+                        ImGuiX::Utils::clamp_ymd(y, m, d, cfg.min_year, cfg.max_year);
+                        const int mdays = ImGuiX::Utils::num_days_in_month(y, m);
+                        if (d > mdays) d = mdays;
+                        if (y != year || m != month || d != day) {
+                            year = y; month = m; day = d; changed = true;
+                        }
+                    }
                 }
                 ImGui::SameLine();
-                if (ImGui::SmallButton(u8"Now")) {
-                    using namespace std::chrono;
-                    auto now  = system_clock::now();
-                    auto s    = duration_cast<seconds>(now.time_since_epoch()).count();
-                    int64_t Y; int M, D, H, MIN, S;
-                    ImGuiX::Widgets::detail::timestamp_to_ymdhms((detail::ts_t)s, Y, M, D, H, MIN, S);
-                    year = Y; month = M; day = D; hour = H; minute = MIN; second = cfg.show_seconds ? S : 0;
-                    changed = true;
-                }
+                ImGui::TextUnformatted(u8"YYYY-MM-DD");
             }
 
-            // Rebuild timestamp
-            detail::ts_t new_ts = detail::ymdhms_to_timestamp(year, month, day, hour, minute, second);
-            if (new_ts != ts) { ts = new_ts; changed = true; }
+            // --- steppers (Y/M/D) -------------------------------------------------
+            {
+                // Year: no wrap; Month/Day: no wrap; clamp day after Y/M change.
+                ArrowStepperConfig scY{cfg.min_year, cfg.max_year, 1, false, cfg.field_width, u8"%04d y"};
+                ArrowStepperConfig scM{1, 12, 1, false, cfg.field_width,  u8"%02d m"};
+                // Day upper bound depends on (year,month) -> set after Y/M edits.
+                int mdays = ImGuiX::Utils::num_days_in_month(year, month);
+                ArrowStepperConfig scD{1, mdays, 1, false, cfg.field_width, u8"%02d d"};
+
+                int dy=0, dm=0, dd=0; // deltas from arrows/wheel
+                bool any = false;
+
+                any |= ArrowStepper(u8"Y", *reinterpret_cast<int*>(&year), scY, &dy);
+                any |= ArrowStepper(u8"M", month, scM, &dm);
+
+                // Month short label hint (optional)
+                if (cfg.month_label == MonthLabelMode::ShortName) {
+                    ImGui::SameLine();
+                    ImGui::TextDisabled("%s", ImGuiX::Utils::month_short_name(month));
+                }
+
+                // After potential Y/M change, recompute days-in-month and clamp 'day'
+                const int new_mdays = ImGuiX::Utils::num_days_in_month(year, month);
+                if (day > new_mdays) { day = new_mdays; any = true; }
+
+                // Rebuild scD upper bound when Y/M changed
+                if (dm != 0 || dy != 0) {
+                    scD.min_value = 1;
+                    scD.max_value = new_mdays;
+                }
+
+                any |= ArrowStepper(u8"D", day, scD, &dd);
+
+                // Normalize in-range just in case
+                if (day < 1) { day = 1; any = true; }
+                if (day > new_mdays) { day = new_mdays; any = true; }
+
+                changed |= any;
+            }
+
+            // --- extra hint line ---------------------------------------------------
+            if (cfg.show_weekday) {
+                const std::string hint = ImGuiX::Utils::format_with_weekday(year, month, day);
+                ImGui::TextDisabled("%s", hint.c_str());
+            }
 
             ImGui::EndCombo();
         }
         ImGui::PopID();
         return changed;
     }
+    
+    inline bool DatePicker(const char* id,
+                           int64_t& ts,
+                           const DatePickerConfig& cfg = {}) {
+        // 1) Decompose ts -> Y/M/D/h/m/s
+        int64_t y = 1970;
+        int m = 1, d = 1, hh = 0, mm = 0, ss = 0;
+        ImGuiX::Utils::timestamp_to_ymdhms(ts, y, m, d, hh, mm, ss);
+
+        // 2) Clamp Y/M/D to config year bounds (time part unaffected here)
+        ImGuiX::Utils::clamp_ymd(y, m, d, cfg.min_year, cfg.max_year);
+
+        // Preview string (date or "WD date")
+        const std::string preview = cfg.show_weekday
+            ? ImGuiX::Utils::format_with_weekday(y, m, d)
+            : ImGuiX::Utils::format_ymd(y, m, d);
+
+        bool changed = false;
+
+        ImGui::PushID(id);
+        ImGui::SetNextItemWidth(cfg.combo_width);
+        if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Date", preview.c_str())) {
+            if (cfg.show_desc && cfg.desc)
+                ImGui::TextUnformatted(cfg.desc);
+
+            // --- direct string edit --------------------------------------------------
+            {
+                char buf[32];
+                std::snprintf(buf, sizeof(buf), "%s", ImGuiX::Utils::format_ymd(y, m, d).c_str());
+                ImGui::SetNextItemWidth(160.0f);
+                if (ImGui::InputText(u8"##date_str", buf, sizeof(buf))) {
+                    int64_t ny = y; int nm = m; int nd = d;
+                    if (ImGuiX::Utils::parse_ymd(buf, ny, nm, nd)) {
+                        ImGuiX::Utils::clamp_ymd(ny, nm, nd, cfg.min_year, cfg.max_year);
+                        const int md = ImGuiX::Utils::num_days_in_month(ny, nm);
+                        if (nd > md) nd = md;
+                        if (ny != y || nm != m || nd != d) {
+                            y = ny; m = nm; d = nd; changed = true;
+                        }
+                    }
+                }
+                ImGui::SameLine();
+                ImGui::TextUnformatted(u8"YYYY-MM-DD");
+            }
+
+            // --- steppers Y/M/D ------------------------------------------------------
+            {
+                ArrowStepperConfig scY{cfg.min_year, cfg.max_year, 1, false, cfg.field_width, u8"%04d y"};
+                ArrowStepperConfig scM{1, 12, 1, false, cfg.field_width,  u8"%02d m"};
+
+                int y_i = static_cast<int>(y);
+                int dy=0, dm=0, dd=0;
+                bool any = false;
+
+                any |= ArrowStepper(u8"Y", y_i, scY, &dy);
+                if (y_i != static_cast<int>(y)) { y = y_i; any = true; }
+
+                any |= ArrowStepper(u8"M", m, scM, &dm);
+
+                if (cfg.month_label == MonthLabelMode::ShortName) {
+                    ImGui::SameLine();
+                    ImGui::TextDisabled("%s", ImGuiX::Utils::month_short_name(m));
+                }
+
+                // Day depends on (y,m)
+                int mdays = ImGuiX::Utils::num_days_in_month(y, m);
+                if (d > mdays) { d = mdays; any = true; }
+                ArrowStepperConfig scD{1, mdays, 1, false, cfg.field_width, u8"%02d d"};
+                any |= ArrowStepper(u8"D", d, scD, &dd);
+
+                if (d < 1) { d = 1; any = true; }
+                if (d > mdays) { d = mdays; any = true; }
+
+                changed |= any;
+            }
+
+            // --- weekday hint ---------------------------------------------------------
+            if (cfg.show_weekday) {
+                ImGui::TextDisabled("%s", ImGuiX::Utils::format_with_weekday(y, m, d).c_str());
+            }
+
+            ImGui::EndCombo();
+        }
+        ImGui::PopID();
+
+        if (changed) {
+            // 3) Recompose timestamp (preserve hh:mm:ss or snap to midnight)
+            const int nh = cfg.preserve_time_of_day ? hh : 0;
+            const int nm = cfg.preserve_time_of_day ? mm : 0;
+            const int ns = cfg.preserve_time_of_day ? ss : 0;
+            int64_t nts = ImGuiX::Utils::ymdhms_to_timestamp(y, m, d, nh, nm, ns);
+
+            // 4) Optional clamp to TS bounds
+            if (cfg.min_ts <= cfg.max_ts) {
+                if (nts < cfg.min_ts) nts = cfg.min_ts;
+                if (nts > cfg.max_ts) nts = cfg.max_ts;
+            }
+
+            // 5) Write back
+            ts = nts;
+        }
+
+        return changed;
+    }
 
 } // namespace ImGuiX::Widgets
 
 #endif // _IMGUIX_WIDGETS_DATE_PICKER_HPP_INCLUDED
+

@@ -36,6 +36,8 @@ namespace ImGuiX::Widgets {
 
     /// \brief Configuration for AuthPanel.
     struct AuthPanelConfig {
+        ImVec2 panel_size = ImVec2(0.0f, 0.0f); ///< x<=0: fill available width; y<=0: auto-computed
+        bool   inputs_fill_width = true;        ///< make input fields fill panel width
         // Labels
         std::string header          = u8"Authorization";
         std::string hint_email      = u8"email";
@@ -148,11 +150,19 @@ namespace ImGuiX::Widgets {
         if (cfg.show_api_keys)  height += 2.0f * ImGui::GetFrameHeightWithSpacing();
         if (cfg.show_connect_button) height += ImGui::GetFrameHeightWithSpacing();
         height += ImGui::GetFrameHeightWithSpacing();
+        
+        ImVec2 size = cfg.panel_size;
+        //if (size.x <= 0.0f) size.x = ImGui::GetContentRegionAvail().x; // занять доступную ширину
+        if (size.x <= 0.0f) size.x = ImGui::CalcItemWidth();
+        if (size.y <= 0.0f) size.y = height;
+        // ImGui::GetWindowWidth() * 0.65f
 
-        ImGui::BeginChild(u8"##AuthPanel", ImVec2(ImGui::GetWindowWidth() * 0.65f, height), true);
+        ImGui::BeginChild(u8"##AuthPanel", size, true);
 
         ImGui::TextUnformatted(cfg.header.c_str());
         ImGui::Separator();
+        
+        if (cfg.inputs_fill_width) ImGui::PushItemWidth(-FLT_MIN);
 
         // Host
         if (cfg.show_host) {
@@ -318,6 +328,8 @@ namespace ImGuiX::Widgets {
                 res |= AuthPanelResult::ConnectClicked;
             }
         }
+
+        if (cfg.inputs_fill_width) ImGui::PopItemWidth();
 
         ImGui::EndChild();
         ImGui::PopID();
