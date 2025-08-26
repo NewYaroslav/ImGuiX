@@ -176,4 +176,8 @@ namespace ImGuiX::Utils {
 
 } // namespace ImGuiX::Utils
 
+#ifdef IMGUIX_HEADER_ONLY
+#   include "path_utils.ipp"
+#endif
+
 #endif // _IMGUIX_UTILS_PATH_UTILS_HPP_INCLUDED
