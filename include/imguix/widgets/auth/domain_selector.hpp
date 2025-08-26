@@ -5,8 +5,8 @@
 /// \file domain_selector.hpp
 /// \brief Domain chooser widget (combo with "Custom" fallback or validated input with VK).
 
-#include "validated_input.hpp" // InputTextWithVKValidated, KeyboardToggleConfig, InputValidatePolicy
-#include "markers.hpp" // HelpMarker
+#include <imguix/widgets/input/validated_input.hpp> // InputTextWithVKValidated, KeyboardToggleConfig, InputValidatePolicy
+#include <imguix/widgets/misc/markers.hpp> // HelpMarker
 
 namespace ImGuiX::Widgets {
 

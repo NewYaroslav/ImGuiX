@@ -2,28 +2,28 @@
 #include <imguix/core.hpp>
 
 // === Core UI: Ввод, валидация, списки, текст ===
-#include <imguix/widgets/validated_input.hpp>
-#include <imguix/widgets/validated_password_input.hpp>
-#include <imguix/widgets/input_vertical_stepper.hpp>
-#include <imguix/widgets/text_center.hpp>
-#include <imguix/widgets/list_editor.hpp>
+#include <imguix/widgets/input/validated_input.hpp>
+#include <imguix/widgets/input/validated_password_input.hpp>
+#include <imguix/widgets/input/input_vertical_stepper.hpp>
+#include <imguix/widgets/misc/text_center.hpp>
+#include <imguix/widgets/input/list_editor.hpp>
 
 // === Авторизация и связанные панели ===
-#include <imguix/widgets/auth_panel.hpp>
-#include <imguix/widgets/auth_js_panel.hpp>
-#include <imguix/widgets/domain_selector.hpp>
-#include <imguix/widgets/virtual_keyboard.hpp>
+#include <imguix/widgets/auth/auth_panel.hpp>
+#include <imguix/widgets/auth/auth_js_panel.hpp>
+#include <imguix/widgets/auth/domain_selector.hpp>
+#include <imguix/widgets/input/virtual_keyboard.hpp>
 
 // === Время, дата, часы ===
-#include <imguix/widgets/time_picker.hpp>
-#include <imguix/widgets/date_picker.hpp>
-#include <imguix/widgets/hours_selector.hpp>
-#include <imguix/widgets/days_selector.hpp>
+#include <imguix/widgets/time/time_picker.hpp>
+#include <imguix/widgets/time/date_picker.hpp>
+#include <imguix/widgets/time/hours_selector.hpp>
+#include <imguix/widgets/time/days_selector.hpp>
 
 // === Дополнительно: прокси, спиннер, маркеры ===
-#include <imguix/widgets/proxy_panel.hpp>
-#include <imguix/widgets/loading_spinner.hpp>
-#include <imguix/widgets/markers.hpp>
+#include <imguix/widgets/auth/proxy_panel.hpp>
+#include <imguix/widgets/misc/loading_spinner.hpp>
+#include <imguix/widgets/misc/markers.hpp>
 
 namespace i18n = ImGuiX::I18N;
 

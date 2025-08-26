@@ -18,7 +18,7 @@
 #include <cstring>
 #include <algorithm>
 #include <regex>
-#include "icon_button.hpp"
+#include <imguix/widgets/controls/icon_button.hpp>
 
 namespace ImGuiX::Widgets {
 

@@ -5,9 +5,9 @@
 /// \file widgets.hpp
 /// \brief Aggregated include for all ImGuiX widget extensions.
 
-#include "widgets/circle_button.hpp"
-#include "widgets/system_button.hpp"
-#include "widgets/toggle_button.hpp"
-#include "widgets/markers.hpp"
+#include <imguix/widgets/controls/circle_button.hpp>
+#include <imguix/widgets/controls/system_button.hpp>
+#include <imguix/widgets/controls/toggle_button.hpp>
+#include <imguix/widgets/misc/markers.hpp>
 
 #endif // IMGUIX_WIDGETS_HPP_INCLUDED
