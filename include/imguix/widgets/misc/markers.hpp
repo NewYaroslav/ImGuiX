@@ -9,6 +9,9 @@
 #include <string>
 #include <cstddef>
 
+#include <imguix/config/icons.hpp>
+#include <imguix/config/colors.hpp>
+
 namespace ImGuiX::Widgets {
     
     enum class MarkerMode : int {
@@ -73,7 +76,7 @@ namespace ImGuiX::Widgets {
     inline void HelpMarker(
             const char* desc, 
             MarkerMode mode = MarkerMode::TooltipOnly, 
-            const char* icon_utf8 = u8"\uE887"
+            const char* icon_utf8 = IMGUIX_ICON_HELP
         ) {
         ImGui::TextDisabled(icon_utf8);
         if (mode == MarkerMode::InlineText) {
@@ -89,8 +92,8 @@ namespace ImGuiX::Widgets {
     inline void WarningMarker(
             const char* desc,
             MarkerMode mode = MarkerMode::TooltipOnly, 
-            const ImVec4& color = ImVec4(1.0f, 1.0f, 0.0f, 1.0f),
-            const char* icon_utf8 = u8"\uE002"
+            const ImVec4& color = IMGUIX_COLOR_WARNING,
+            const char* icon_utf8 = IMGUIX_ICON_WARNING
         ) {
         IconMarker(icon_utf8, color, desc, mode);
     }
@@ -100,8 +103,8 @@ namespace ImGuiX::Widgets {
     inline void InfoMarker(
             const char* desc,
             MarkerMode mode = MarkerMode::TooltipOnly,
-            const ImVec4& color = ImVec4(0.10f, 0.45f, 0.95f, 1.0f),
-            const char* icon_utf8 = u8"\uE88E"
+            const ImVec4& color = IMGUIX_COLOR_INFO,
+            const char* icon_utf8 = IMGUIX_ICON_INFO
         ) {
         IconMarker(icon_utf8, color, desc, mode);
     }
@@ -111,8 +114,8 @@ namespace ImGuiX::Widgets {
     inline void SuccessMarker(
             const char* desc,
             MarkerMode mode = MarkerMode::TooltipOnly,
-            const ImVec4& color = ImVec4(0.0f, 0.60f, 0.0f, 1.0f),
-            const char* icon_utf8 = u8"\uE88E"
+            const ImVec4& color = IMGUIX_COLOR_SUCCESS,
+            const char* icon_utf8 = IMGUIX_ICON_SUCCESS
         ) {
         IconMarker(icon_utf8, color, desc, mode);
     }

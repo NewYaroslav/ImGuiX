@@ -18,7 +18,9 @@
 #include <cstring>
 #include <algorithm>
 #include <regex>
+
 #include <imguix/widgets/controls/icon_button.hpp>
+#include <imguix/config/icons.hpp>
 
 namespace ImGuiX::Widgets {
 
@@ -67,8 +69,8 @@ namespace ImGuiX::Widgets {
             {u8"Enter",   u8"Enter"},
             {u8"Symbols", u8"Symbols"},
             {u8"Accents", u8"Accents"},
-            {u8"Copy",    u8"\uE14D"},
-            {u8"Paste",   u8"\uE14F"}
+            {u8"Copy",    IMGUIX_ICON_COPY},
+            {u8"Paste",   IMGUIX_ICON_PASTE}
         };
         
         std::unordered_map<std::string, const char*> tooltips{
@@ -648,8 +650,8 @@ namespace ImGuiX::Widgets {
         ImVec2 wide_size (wide_w,                        key_size.y);
         ImVec2 space_size(wide_w * cfg.space_width_multiplier, key_size.y);
 
-        const char* ICON_COPY  = u8"\uE14D"; // content_copy
-        const char* ICON_PASTE = u8"\uE2C8"; // content_paste
+        const char* ICON_COPY  = IMGUIX_ICON_COPY;   // content_copy
+        const char* ICON_PASTE = IMGUIX_ICON_PASTE;  // content_paste
         ImVec2 clip_size(frame_h, frame_h);
 
         const float btn_h    = cfg.show_bottom ? key_size.y : 0.0f;

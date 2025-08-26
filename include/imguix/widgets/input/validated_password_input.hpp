@@ -7,9 +7,12 @@
 
 #include <imgui.h>
 #include <string>
+#include <algorithm>
+
+#include <imguix/config/icons.hpp>
+#include <imguix/config/colors.hpp>
 #include "validated_input.hpp" // InputTextValidated, InputValidatePolicy, KeyboardToggleConf
 #include <imguix/widgets/controls/icon_button.hpp>     // IconButtonCentered
-#include <algorithm>
 
 namespace ImGuiX::Widgets {
 
@@ -20,8 +23,8 @@ namespace ImGuiX::Widgets {
     /// Rounding is applied through style var override if \ref icon_rounding >= 0.
     struct PasswordToggleConfig {
         bool        use_icon      = true;        ///< true: icon button; false: checkbox + optional text label.
-        const char* icon_show     = u8"\ue8f4";  ///< Glyph for "show" (depends on your icon font).
-        const char* icon_hide     = u8"\ue8f5";  ///< Glyph for "hide".
+        const char* icon_show     = IMGUIX_ICON_EYE_SHOW;  ///< Glyph for "show" (depends on your icon font).
+        const char* icon_hide     = IMGUIX_ICON_EYE_HIDE;  ///< Glyph for "hide".
         ImVec2      button_size   = ImVec2(0,0); ///< (0,0) => square by current frame height.
         float       same_line_w   = 0.0f;        ///< SameLine(offset) before the eye button; 0 => default spacing.
         const char* tooltip_show  = u8"Show password"; ///< Tooltip when currently hidden.
@@ -59,7 +62,7 @@ namespace ImGuiX::Widgets {
             const std::string& pattern,
             bool& out_valid,
             const PasswordToggleConfig& toggle_cfg,
-            ImVec4 error_color = ImVec4(0.9f,0.5f,0.5f,1.0f),
+            ImVec4 error_color = IMGUIX_COLOR_ERROR,
             ImGuiInputTextFlags extra_flags = 0
         ) {
         ImGui::PushID(label);
@@ -208,7 +211,7 @@ namespace ImGuiX::Widgets {
             const PasswordToggleConfig& toggle_cfg,
             const KeyboardToggleConfig& kb_cfg = {},
             VirtualKeyboardConfig vk_cfg = {},
-            ImVec4 error_color = ImVec4(0.9f,0.5f,0.5f,1.0f),
+            ImVec4 error_color = IMGUIX_COLOR_ERROR,
             ImGuiInputTextFlags extra_flags = 0
         ) {
         ImGui::PushID(label);

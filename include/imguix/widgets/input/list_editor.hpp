@@ -14,6 +14,8 @@
 #include <cstring>
 #include <algorithm>
 
+#include <imguix/config/icons.hpp>
+
 namespace ImGuiX::Widgets {
 
     /// \brief Config for ListEditor.
@@ -23,8 +25,8 @@ namespace ImGuiX::Widgets {
         const char* empty_desc  = u8"(empty)";            ///< Preview when list is empty.
 
         // Default to Material Icons PUA. Make sure the font is loaded with PUA ranges.
-        const char* icon_add    = u8"\uE148";             ///< 'add'
-        const char* icon_remove = u8"\uE15D";             ///< 'remove_circle'
+        const char* icon_add    = IMGUIX_ICON_ADD;        ///< 'add'
+        const char* icon_remove = IMGUIX_ICON_REMOVE;     ///< 'remove_circle'
 
         bool       delete_on_right = true;                ///< Remove button placed at right side.
         bool       deduplicate     = false;               ///< Keep unique values on add.

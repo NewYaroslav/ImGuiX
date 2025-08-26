@@ -12,6 +12,8 @@
 #include <algorithm>
 #include <cstring>
 
+#include <imguix/config/colors.hpp>
+
 namespace ImGuiX::Widgets {
 
     /// \brief Proxy type.
@@ -86,7 +88,7 @@ namespace ImGuiX::Widgets {
         float field_width_type        = 0.0f;
 
         // Style
-        ImVec4 error_color = ImVec4(0.9f, 0.5f, 0.5f, 1.0f);
+        ImVec4 error_color = IMGUIX_COLOR_ERROR;
     };
 
     /// \brief Draw proxy settings panel.
