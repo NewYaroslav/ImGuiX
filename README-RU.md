@@ -226,14 +226,46 @@ run-test-sdl2-ems.bat     :: запускает emrun на локальном с
 
 ImGuiX поставляется с `FontManager`, который может автоматически загружать шрифты из JSON-конфига или настраиваться вручную. По умолчанию шрифты читаются из `data/resources/fonts/fonts.json`. Подробности см. в [FONTS-GUIDE-RU.md](docs/FONTS-GUIDE-RU.md).
 
+#### Общие диапазоны символов
+
+Поддерживаемые токены пресетов (добавляйте их в свою строку пресетов):
+
+- `PUA` — `U+E000–U+F8FF` (иконные шрифты: Material, Font Awesome/Fork Awesome)
+- `MiscSymbols` (`Misc`) — `U+2600–U+26FF` (⚠ ☀ ☂ ☺ …)
+- `Dingbats` — `U+2700–U+27BF` (✂ ✈ ✔ ✖ …)
+- `Arrows` — `U+2190–U+21FF` (← ↑ → ↔ …)
+
+> **Примечание.** Диапазоны лишь открывают кодовые точки в атласе; нужен шрифт, который действительно содержит эти глифы.
+
+> **Совет.** Иконные шрифты (Material, Font Awesome/Fork Awesome и т.п.) используют кодовые точки **Private Use Area (PUA)**. Включайте `PUA` в пресеты, чтобы иконки отображались вместе с текстом.
+
+> **Предупреждение.** Каждый дополнительный диапазон и мердженный шрифт увеличивает размер атласа и количество глифов. Держите атлас в разумных пределах (≈4–8 MB). Проверяйте после `fontsBuildNow()` через *Metrics/Debugger → Fonts* или программно (`io.Fonts->TexWidth`, `TexHeight`).
+
+### Пример настройки
+
 Пример ручной настройки в `WindowInstance::onInit()`:
 
 ```cpp
 fontsBeginManual();
+// включаем иконки (PUA) + общие символы (стрелки/misc/dingbats)
+fontsSetRangesPreset("Default+Punct+PUA+LatinExtA"); // LatinExtA для œ/Œ, æ/Æ и т.п.
 fontsAddBody({ "Roboto-Medium.ttf", 16.0f });
-fontsAddMerge(FontRole::Icons, { "forkawesome-webfont.ttf", 16.0f, true });
+// мерджим иконный шрифт (PUA); oversample=4.0f, merge=true
+fontsAddMerge(FontRole::Icons, { "forkawesome-webfont.ttf", 16.0f, 4.0f, true });
+// (опц.) мерджим шрифт с символами, если в Roboto нет глифов
+// fontsAddMerge(ImGuiX::Fonts::FontRole::Symbols,{
+//     "NotoSansSymbols-Regular.ttf", 16.0f, 1.0f, true
+// });
 fontsBuildNow();
 ```
+
+#### Устранение неполадок
+
+- **Иконка отображается как □/отсутствует:** убедитесь, что `PUA` есть в диапазонах **и** иконный шрифт замерджен.
+- **Unicode-символы (⚠ ✈ ←) не рендерятся:** добавьте `MiscSymbols` / `Dingbats` / `Arrows` в диапазоны и мерджите шрифт, содержащий их.
+- **Фолбэк для маркеров:** виджеты пробуют `U+26A0` (⚠) → `U+E002` (Material PUA) → `"(!)"`, если глифы отсутствуют.
+
+> **Совет:** для западноевропейских языков (французский, польский, чешский и т.п.) рекомендуется добавить `+LatinExtA`, так как символы вроде `œ/Œ` находятся в блоке Latin Extended-A. При необходимости включайте `+Latin1Sup`, `+LatinExtB` или `+LatinExtAdditional`.
 
 В репозитории поставляются сторонние шрифты под их исходными лицензиями:
 

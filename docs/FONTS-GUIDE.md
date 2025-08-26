@@ -145,7 +145,7 @@ ImGui::TextUnformatted(u8"\uE8F4"); // Material icon 'visibility' for example
 ```cpp
 ImFont* f = ImGui::GetFont();
 bool has_text  = f->FindGlyphNoFallback((ImWchar)'A');
-bool has_cyr   = f->FindGlyphNoFallback((ImWchar)0x0410); // 'А'
+bool has_cyr   = f->FindGlyphNoFallback((ImWchar)0x0410); // Cyrillic 'A'
 bool has_icon  = f->FindGlyphNoFallback((ImWchar)0xE8F4); // Material icon
 ```
 

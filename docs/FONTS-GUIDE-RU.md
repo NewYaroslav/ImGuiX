@@ -36,8 +36,8 @@ void onInit() override {
     fontsBeginManual();
 
     // Объединённые диапазоны глифов пресетом:
-    // Default (латиница) + кириллица + вьетнамский + полезная пунктуация
-    fontsSetRangesPreset("Default+Cyrillic+Vietnamese+Punct");
+    // Default (латиница) + кириллица + вьетнамский + пунктуация + PUA (иконки)
+    fontsSetRangesPreset("Default+Cyrillic+Vietnamese+Punct+PUA");
 
     // Базовый текстовый шрифт
     fontsAddBody({ "Roboto-Medium.ttf", 18.0f });
@@ -74,7 +74,7 @@ void onInit() override {
   "markdown_sizes": { "body": 16, "h1": 24, "h2": 20, "h3": 18 },
   "locales": {
     "default": {
-      "ranges": "Default+Punct",
+      "ranges": "Default+Punct+PUA",
       "roles": {
         "Body":  [{ "path": "Roboto-Medium.ttf", "size_px": 16 }],
         "Icons": [{ "path": "forkawesome-webfont.ttf", "size_px": 16, "merge": true }]
@@ -106,12 +106,47 @@ void onInit() override {
 * Массив пар `[start, end, start, end, …, 0]` — явное указание диапазонов. Ноль в конце можно опустить — менеджер добавит.
 * `inherits` — можно наследовать роли/диапазоны от базовой локали.
 
-Поддерживаемые токены пресета (на сегодня):
+Поддерживаемые токены пресета:
 
-* `Default` (латиница и базовые символы UI)
-* `Cyrillic`, `Vietnamese`
-* `Japanese`/`JapaneseFull`, `Chinese`/`ChineseFull`, `Korean` (осторожно: крупные наборы)
-* `Punct` — `– — … • “ ” ‘ ’` (в любом случае добавляется и дедуплицируется)
+* `Default` — латиница и базовые символы UI (встроено в ImGui)
+* `Cyrillic`
+* `Vietnamese`
+* `Japanese` / `JapaneseFull`
+* `Chinese` / `ChineseFull`
+* `Korean` (осторожно: крупные наборы)
+* `Punct` — `U+2000–U+206F` (General Punctuation: `– — … • “ ” ‘ ’`)
+* **`PUA`** (алиасы: `Icons`, `PrivateUse`) — `U+E000–U+F8FF` (большинство иконных шрифтов)
+* `Latin1Sup` — `U+0080–U+00FF` (Latin-1 Supplement)
+* `LatinExtA` — `U+0100–U+017F` (Latin Extended-A)
+* `LatinExtB` — `U+0180–U+024F` (Latin Extended-B)
+* `LatinExtAdditional` — `U+1E00–U+1EFF` (Latin Extended Additional)
+* **`MiscSymbols`** (алиас: `Misc`) — `U+2600–U+26FF` (например, `⚠ ☀ ☂ ☺`)
+* **`Dingbats`** — `U+2700–U+27BF` (например, `✂ ✈ ✔ ✖`)
+* **`Arrows`** — `U+2190–U+21FF` (например, `← ↑ → ↔`)
+
+> **Почему важен PUA:** Material Icons (`U+E8F4`) и Font Awesome/Fork Awesome (`U+Fxxx`) находятся в PUA. Без `PUA` в диапазонах иконки не отрисуются, даже если шрифт замерджен.
+
+### Иконные шрифты (PUA) — пример использования
+
+```cpp
+fontsBeginManual();
+fontsSetRangesPreset("Default+Cyrillic+Punct+PUA");    // включаем PUA
+fontsAddBody({ "NotoSans-Regular.ttf", 18.0f });
+fontsAddMerge(FontRole::Icons, { "MaterialIcons-Regular.ttf", 18.0f, true });
+fontsBuildNow();
+
+// Позже
+ImGui::TextUnformatted(u8"\uE8F4"); // пример: иконка Material 'visibility'
+```
+
+**Проверка наличия глифов** (диагностика):
+
+```cpp
+ImFont* f = ImGui::GetFont();
+bool has_text  = f->FindGlyphNoFallback((ImWchar)'A');
+bool has_cyr   = f->FindGlyphNoFallback((ImWchar)0x0410); // 'А'
+bool has_icon  = f->FindGlyphNoFallback((ImWchar)0xE8F4); // иконка Material
+```
 
 ---
 
@@ -148,6 +183,12 @@ void onInit() override {
   * Флаги копятся из `FontFile::freetype_flags` и выставляются на весь атлас (`FontLoaderFlags`/`FontBuilderFlags`).
 * **Диапазоны:** CJK заметно увеличивают атлас — разумно держать отдельные локали/пакеты и переключать по требованию.
 * **`extra_glyphs`:** UTF‑8 строка дополнительных символов (например, спец‑пунктуация). В C++17 `u8"…"` — `const char*` (ОК).
+
+### Семантика ручного режима (пресеты vs явные)
+
+* `fontsSetRangesPreset(...)` и `fontsSetRangesExplicit(...)` **взаимоисключающие** — последнее вызванное побеждает.
+* Чтобы комбинировать латиницу/кириллицу и т.п. с иконками, **предпочитайте пресеты с `+PUA`** вместо смешивания пресета и явных пар.
+* Если нужны явные пары, убедитесь, что они охватывают **все необходимые скрипты**, иначе текст превратится в квадраты.
 
 ---
 
