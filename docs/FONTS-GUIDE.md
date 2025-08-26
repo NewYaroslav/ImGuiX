@@ -106,7 +106,7 @@ void onInit() override {
 * Array of pairs `[start, end, start, end, …, 0]` — explicit ranges. Trailing zero can be omitted—manager adds it.
 * `inherits` — inherit roles/ranges from a base locale.
 
-Supported preset tokens (currently):
+Supported preset tokens:
 
 * `Default` — Latin and basic UI symbols (ImGui built-in)
 * `Cyrillic`
@@ -114,12 +114,15 @@ Supported preset tokens (currently):
 * `Japanese` / `JapaneseFull`
 * `Chinese` / `ChineseFull`
 * `Korean` (beware: large sets)
-* `Punct` — `– — … • “ ” ‘ ’` (deduplicated if added multiple times)
-* **`PUA`** (aliases: `Icons`, `PrivateUse`) — the **Private Use Area** `U+E000–U+F8FF` used by most icon fonts
-* `Latin1Sup` — `U+0080–U+00FF` (Latin-1 Supplement, contains e.g. `é`, `æ`, `ø`)
-* `LatinExtA` — `U+0100–U+017F` (Latin Extended-A, e.g. `œ`, `Œ`, Polish and Czech diacritics)
-* `LatinExtB` — `U+0180–U+024F` (Latin Extended-B, additional Balkan and African Latin letters)
-* `LatinExtAdditional` — `U+1E00–U+1EFF` (Extended Additional set, rare but useful diacritics)
+* `Punct` — `U+2000–U+206F` (General Punctuation; e.g. `– — … • “ ” ‘ ’`)
+* **`PUA`** (aliases: `Icons`, `PrivateUse`) — `U+E000–U+F8FF` (most icon fonts, e.g. Material Icons `U+E8xx`, Font Awesome `U+Fxxx`)
+* `Latin1Sup` — `U+0080–U+00FF` (Latin-1 Supplement)
+* `LatinExtA` — `U+0100–U+017F` (Latin Extended-A)
+* `LatinExtB` — `U+0180–U+024F` (Latin Extended-B)
+* `LatinExtAdditional` — `U+1E00–U+1EFF` (Latin Extended Additional)
+* **`MiscSymbols`** (alias: `Misc`) — `U+2600–U+26FF` (e.g. `⚠ ☀ ☂ ☺`)
+* **`Dingbats`** — `U+2700–U+27BF` (e.g. `✂ ✈ ✔ ✖`)
+* **`Arrows`** — `U+2190–U+21FF` (e.g. `← ↑ → ↔`)
 
 > **Why PUA matters:** Material Icons (e.g., `U+E8F4`) and Font Awesome/Fork Awesome (`U+Fxxx`) reside in PUA.  
 > Without `PUA` in ranges icons won’t render even if the font is merged.

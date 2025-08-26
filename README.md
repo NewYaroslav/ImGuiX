@@ -231,7 +231,20 @@ be configured manually. By default, fonts are read from
 `data/resources/fonts/fonts.json`. For full details see
 [FONTS-GUIDE-RU.md](docs/FONTS-GUIDE-RU.md).
 
-> **Tip (icons):** Icon fonts (Material, Font Awesome/Fork Awesome, etc.) use the **Private Use Area (PUA)** codepoints. Include PUA in glyph ranges (preset token `PUA`) so icons render alongside text.
+#### Common symbol ranges
+
+Supported preset tokens (add to your preset string):
+
+- `PUA` — `U+E000–U+F8FF` (icon fonts: Material, Font Awesome/Fork Awesome)
+- `MiscSymbols` (`Misc`) — `U+2600–U+26FF` (⚠ ☀ ☂ ☺ …)
+- `Dingbats` — `U+2700–U+27BF` (✂ ✈ ✔ ✖ …)
+- `Arrows` — `U+2190–U+21FF` (← ↑ → ↔ …)
+
+> **Note.** Ranges only open codepoints in the atlas; you still need a font that actually contains these glyphs (e.g., a symbols-capable TTF).
+
+> **Tip.** Icon fonts (Material, Font Awesome/Fork Awesome, etc.) use the **Private Use Area (PUA)** codepoints. Include `PUA` in preset ranges so icons render alongside text.
+
+> **Warning.** Each extra range and merged font increases atlas texture size and glyph count. Keep the atlas reasonable (≈4–8 MB). Check after `fontsBuildNow()` via *Metrics/Debugger → Fonts* or programmatically (`io.Fonts->TexWidth`, `TexHeight`).
 
 ### Example setup
 
@@ -239,11 +252,23 @@ An example manual setup in `WindowInstance::onInit()`:
 
 ```cpp
 fontsBeginManual();
+// include icons (PUA) + common symbols (arrows/misc/dingbats)
 fontsSetRangesPreset("Default+Punct+PUA+LatinExtA"); // include LatinExtA for œ/Œ, æ/Æ, etc.
 fontsAddBody({ "Roboto-Medium.ttf", 16.0f });
-fontsAddMerge(FontRole::Icons, { "forkawesome-webfont.ttf", 16.0f, true });
+// merge icon font (PUA); oversample=4.0f, merge=true
+fontsAddMerge(FontRole::Icons, { "forkawesome-webfont.ttf", 16.0f, 4.0f, true }));
+// (optional) merge a symbols-capable font if Roboto lacks glyphs
+// fontsAddMerge(ImGuiX::Fonts::FontRole::Symbols,{ 
+//     "NotoSansSymbols-Regular.ttf", 16.0f, 1.0f, true 
+// });
 fontsBuildNow();
 ```
+
+#### Troubleshooting
+
+- **Icon shows as □/missing:** ensure `PUA` is in ranges **and** the icon font is merged.
+- **Unicode symbols (⚠ ✈ ←) not rendered:** add `MiscSymbols` / `Dingbats` / `Arrows` to ranges and merge a font that contains them.
+- **Markers fallback:** widgets try `U+26A0` (⚠) → `U+E002` (Material PUA) → `"(!)"` if neither glyph exists.
 
 > **Tip:** For Western European languages (French, Polish, Czech, etc.) it is recommended to add `+LatinExtA`
 > since characters like `œ/Œ` are located in the Latin Extended-A block.

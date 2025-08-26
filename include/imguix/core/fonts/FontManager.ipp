@@ -202,20 +202,31 @@ namespace ImGuiX::Fonts {
             else if (tok == u8"Korean")      b.AddRanges(io.Fonts->GetGlyphRangesKorean());
             else if (tok == u8"Punct")       b.AddText(u8"–—…•“”‘’");
             else if (tok == u8"PUA" || tok == u8"Icons" || tok == u8"PrivateUse") {
+                // Private Use Area (BMP
                 static const ImWchar kPUA[] = { 0xE000, 0xF8FF, 0 };
                 b.AddRanges(kPUA);
+            } else if (tok == u8"MiscSymbols" || tok == u8"Misc") {
+                // ⚠, ☀, ☂, ☺, 
+                static const ImWchar kMiscSymbols[] = { 0x2600, 0x26FF, 0 };
+                b.AddRanges(kMiscSymbols);
+            } else if (tok == u8"Dingbats") {
+                // ✂, ✈, ✔, ✖, …
+                static const ImWchar kDingbats[] = { 0x2700, 0x27BF, 0 };
+                b.AddRanges(kDingbats);
+            } else if (tok == u8"Arrows") {
+                // ←, ↑, →, ↔, …
+                static const ImWchar kArrows[] = { 0x2190, 0x21FF, 0 };
+                b.AddRanges(kArrows);
             } else if (tok == u8"LatinExtA") {      // U+0100..U+017F   (œ/Œ здесь)
                 static const ImWchar kLatinExtA[] = { 0x0100, 0x017F, 0 };
                 b.AddRanges(kLatinExtA);
-            }
-            else if (tok == u8"LatinExtB") {        // U+0180..U+024F   (реже нужно)
+            } else if (tok == u8"LatinExtB") {        // U+0180..U+024F   (реже нужно)
                 static const ImWchar kLatinExtB[] = { 0x0180, 0x024F, 0 };
                 b.AddRanges(kLatinExtB);
             } else if (tok == u8"Latin1Sup") {      // U+0080..U+00FF (многие акценты здесь)
                 static const ImWchar kLatin1[] = { 0x0080, 0x00FF, 0 };
                 b.AddRanges(kLatin1);
-            }
-            else if (tok == u8"LatinExtAdditional") { // U+1E00..U+1EFF (редко, но встречается)
+            } else if (tok == u8"LatinExtAdditional") { // U+1E00..U+1EFF (редко, но встречается)
                 static const ImWchar kLatinExtAdd[] = { 0x1E00, 0x1EFF, 0 };
                 b.AddRanges(kLatinExtAdd);
             }

@@ -38,18 +38,19 @@ namespace ImGuiX::Widgets {
     struct AuthPanelConfig {
         ImVec2 panel_size = ImVec2(0.0f, 0.0f); ///< x<=0: fill available width; y<=0: auto-computed
         bool   inputs_fill_width = true;        ///< make input fields fill panel width
-        // Labels
-        std::string header          = u8"Authorization";
-        std::string hint_email      = u8"email";
-        std::string hint_password   = u8"password";
-        std::string hint_host       = u8"host";
-        std::string connected_label = u8"connected";
-        std::string connect_label   = u8"connect";
+        
+        // Labels (now raw pointers; caller owns lifetime)
+        const char* header          = u8"Authorization";
+        const char* hint_email      = u8"email";
+        const char* hint_password   = u8"password";
+        const char* hint_host       = u8"host";
+        const char* connected_label = u8"connected";
+        const char* connect_label   = u8"connect";
 
-        // Tokens / API keys
-        std::string hint_token      = u8"token";
-        std::string hint_api_key    = u8"api key (public)";
-        std::string hint_api_secret = u8"api secret";
+        // Tokens / API keys (now raw pointers)
+        const char* hint_token      = u8"token";
+        const char* hint_api_key    = u8"api key (public)";
+        const char* hint_api_secret = u8"api secret";
 
         // Options
         bool show_host             = false;
@@ -63,18 +64,18 @@ namespace ImGuiX::Widgets {
 
         // Validation toggles
         bool validate_email        = true;
-        bool validate_password     = false;
-        bool validate_host         = false;
-        bool validate_token        = false;
-        bool validate_api_key      = false;
-        bool validate_api_secret   = false;
-
-        // Inline password eye config
-        PasswordToggleConfig toggle_cfg{};
+        bool validate_password     = true;
+        bool validate_host         = true;
+        bool validate_token        = true;
+        bool validate_api_key      = true;
+        bool validate_api_secret   = true;
 
         // Virtual keyboard configs (shared across fields)
         VirtualKeyboardConfig      vk_cfg{};   ///< behavior/locale/etc of VK
         KeyboardToggleConfig       kb_cfg{};   ///< visuals of the VK trigger button
+        
+        // Inline password eye config
+        PasswordToggleConfig toggle_cfg{};     ///< password eye config
 
         // Per-field VK enable switches
         bool vk_host        = false;
@@ -152,14 +153,12 @@ namespace ImGuiX::Widgets {
         height += ImGui::GetFrameHeightWithSpacing();
         
         ImVec2 size = cfg.panel_size;
-        //if (size.x <= 0.0f) size.x = ImGui::GetContentRegionAvail().x; // занять доступную ширину
         if (size.x <= 0.0f) size.x = ImGui::CalcItemWidth();
         if (size.y <= 0.0f) size.y = height;
-        // ImGui::GetWindowWidth() * 0.65f
 
         ImGui::BeginChild(u8"##AuthPanel", size, true);
 
-        ImGui::TextUnformatted(cfg.header.c_str());
+        ImGui::TextUnformatted(cfg.header);
         ImGui::Separator();
         
         if (cfg.inputs_fill_width) ImGui::PushItemWidth(-FLT_MIN);
@@ -169,7 +168,7 @@ namespace ImGuiX::Widgets {
             bool changed = false;
             if (cfg.vk_host) {
                 changed = InputTextWithVKValidated(
-                    u8"##host", cfg.hint_host.c_str(),
+                    u8"##host", cfg.hint_host,
                     data.host, cfg.validate_host, InputValidatePolicy::OnTouch,
                     cfg.host_regex, data.host_valid,
                     cfg.error_color,
@@ -178,7 +177,7 @@ namespace ImGuiX::Widgets {
                 );
             } else {
                 changed = InputTextValidated(
-                    u8"##host", cfg.hint_host.c_str(),
+                    u8"##host", cfg.hint_host,
                     data.host, cfg.validate_host, InputValidatePolicy::OnTouch,
                     cfg.host_regex, data.host_valid, cfg.error_color
                 );
@@ -191,7 +190,7 @@ namespace ImGuiX::Widgets {
             bool changed = false;
             if (cfg.vk_token) {
                 changed = InputPasswordWithToggleVK(
-                    u8"##token", cfg.hint_token.c_str(),
+                    u8"##token", cfg.hint_token,
                     data.token, cfg.validate_token, InputValidatePolicy::OnTouch,
                     cfg.token_regex, data.token_valid,
                     cfg.toggle_cfg, cfg.kb_cfg, cfg.vk_cfg,
@@ -199,7 +198,7 @@ namespace ImGuiX::Widgets {
                 );
             } else {
                 changed = InputPasswordWithToggle(
-                    u8"##token", cfg.hint_token.c_str(),
+                    u8"##token", cfg.hint_token,
                     data.token, cfg.validate_token, InputValidatePolicy::OnTouch,
                     cfg.token_regex, data.token_valid,
                     cfg.toggle_cfg, cfg.error_color
@@ -215,7 +214,7 @@ namespace ImGuiX::Widgets {
                 bool changed = false;
                 if (cfg.vk_api_key) {
                     changed = InputPasswordWithToggleVK(
-                        u8"##api_key", cfg.hint_api_key.c_str(),
+                        u8"##api_key", cfg.hint_api_key,
                         data.api_key, cfg.validate_api_key, InputValidatePolicy::OnTouch,
                         cfg.api_key_regex, data.api_key_valid,
                         cfg.toggle_cfg, cfg.kb_cfg, cfg.vk_cfg,
@@ -223,7 +222,7 @@ namespace ImGuiX::Widgets {
                     );
                 } else {
                     changed = InputPasswordWithToggle(
-                        u8"##api_key", cfg.hint_api_key.c_str(),
+                        u8"##api_key", cfg.hint_api_key,
                         data.api_key, cfg.validate_api_key, InputValidatePolicy::OnTouch,
                         cfg.api_key_regex, data.api_key_valid,
                         cfg.toggle_cfg, cfg.error_color
@@ -236,7 +235,7 @@ namespace ImGuiX::Widgets {
                 bool changed = false;
                 if (cfg.vk_api_secret) {
                     changed = InputPasswordWithToggleVK(
-                        u8"##api_secret", cfg.hint_api_secret.c_str(),
+                        u8"##api_secret", cfg.hint_api_secret,
                         data.api_secret, cfg.validate_api_secret, InputValidatePolicy::OnTouch,
                         cfg.api_secret_regex, data.api_secret_valid,
                         cfg.toggle_cfg, cfg.kb_cfg, cfg.vk_cfg,
@@ -244,7 +243,7 @@ namespace ImGuiX::Widgets {
                     );
                 } else {
                     changed = InputPasswordWithToggle(
-                        u8"##api_secret", cfg.hint_api_secret.c_str(),
+                        u8"##api_secret", cfg.hint_api_secret,
                         data.api_secret, cfg.validate_api_secret, InputValidatePolicy::OnTouch,
                         cfg.api_secret_regex, data.api_secret_valid,
                         cfg.toggle_cfg, cfg.error_color
@@ -259,7 +258,7 @@ namespace ImGuiX::Widgets {
             bool changed = false;
             if (cfg.vk_email) {
                 changed = InputTextWithVKValidated(
-                    u8"##email", cfg.hint_email.c_str(),
+                    u8"##email", cfg.hint_email,
                     data.email, cfg.validate_email, InputValidatePolicy::OnTouch,
                     cfg.email_regex, data.email_valid,
                     cfg.error_color,
@@ -268,7 +267,7 @@ namespace ImGuiX::Widgets {
                 );
             } else {
                 changed = InputTextValidated(
-                    u8"##email", cfg.hint_email.c_str(),
+                    u8"##email", cfg.hint_email,
                     data.email, cfg.validate_email, InputValidatePolicy::OnTouch,
                     cfg.email_regex, data.email_valid, cfg.error_color
                 );
@@ -290,7 +289,7 @@ namespace ImGuiX::Widgets {
             bool changed = false;
             if (cfg.vk_password) {
                 changed = InputPasswordWithToggleVK(
-                    u8"##password", cfg.hint_password.c_str(),
+                    u8"##password", cfg.hint_password,
                     data.password, cfg.validate_password, InputValidatePolicy::OnTouch,
                     cfg.password_regex, data.password_valid,
                     cfg.toggle_cfg, cfg.kb_cfg, cfg.vk_cfg,
@@ -298,7 +297,7 @@ namespace ImGuiX::Widgets {
                 );
             } else {
                 changed = InputPasswordWithToggle(
-                    u8"##password", cfg.hint_password.c_str(),
+                    u8"##password", cfg.hint_password,
                     data.password, cfg.validate_password, InputValidatePolicy::OnTouch,
                     cfg.password_regex, data.password_valid,
                     cfg.toggle_cfg, cfg.error_color
@@ -316,14 +315,14 @@ namespace ImGuiX::Widgets {
                     ImGui::PushStyleColor(ImGuiCol_CheckMark,
                         cfg.connected ? ImVec4(0.14f, 0.8f, 0.27f, 1.0f)
                                       : ImVec4(0.78f, 0.14f, 0.14f, 1.0f));
-                    ImGui::RadioButton(cfg.connected_label.c_str(), true);
+                    ImGui::RadioButton(cfg.connected_label, true);
                     ImGui::PopStyleColor();
                 } else {
-                    ImGui::RadioButton(cfg.connected_label.c_str(), false);
+                    ImGui::RadioButton(cfg.connected_label, false);
                 }
                 ImGui::SameLine();
             }
-            if (ImGui::Button(cfg.connect_label.c_str())) {
+            if (ImGui::Button(cfg.connect_label)) {
                 if (cfg.on_connect) cfg.on_connect();
                 res |= AuthPanelResult::ConnectClicked;
             }

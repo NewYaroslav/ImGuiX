@@ -12,6 +12,11 @@ namespace ImGuiX::Widgets {
 
     /// \brief Configuration for DomainSelector.
     struct DomainSelectorConfig {
+        // Panel
+        ImVec2      panel_size = ImVec2(0.0f, 0.0f); ///< x<=0: fill available width; y<=0: auto-computed
+        bool        inputs_fill_width = true;        ///< make input fields fill panel width
+        bool        border            = true;
+        
         std::string header       = u8"Domain";
         std::string hint_domain  = u8"domain";
         std::string custom_text  = u8"Custom";
@@ -53,9 +58,16 @@ namespace ImGuiX::Widgets {
         ImGuiStorage* st = ImGui::GetStateStorage();
         const ImGuiID key_combo_index = ImGui::GetID("##combo_index");
 
-        ImGui::BeginChild(u8"##DomainSelector", ImVec2(ImGui::GetWindowWidth() * 0.65f, 100.0f), true);
+        float height = ImGui::GetTextLineHeightWithSpacing() + 3.0f * ImGui::GetFrameHeightWithSpacing();
+        ImVec2 size = cfg.panel_size;
+        if (size.x <= 0.0f) size.x = ImGui::CalcItemWidth();
+        if (size.y <= 0.0f) size.y = std::max(height, ImGui::GetFrameHeightWithSpacing());
+        
+        ImGui::BeginChild(u8"##DomainSelector", size, cfg.border);
         ImGui::TextUnformatted(cfg.header.c_str());
         ImGui::Separator();
+        
+        if (cfg.inputs_fill_width) ImGui::PushItemWidth(-FLT_MIN);
 
         bool updated = false;
         bool use_input = false;
@@ -140,8 +152,10 @@ namespace ImGuiX::Widgets {
 
         if (cfg.domains.empty() && cfg.show_help) {
             ImGui::SameLine();
-			ImGuiX::Widgets::HelpMarker(cfg.help_text.c_str());
+            ImGuiX::Widgets::HelpMarker(cfg.help_text.c_str());
         }
+        
+        if (cfg.inputs_fill_width) ImGui::PopItemWidth();
 
         ImGui::EndChild();
         ImGui::PopID();

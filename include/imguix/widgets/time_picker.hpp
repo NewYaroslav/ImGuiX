@@ -14,6 +14,7 @@
 #include <vector>
 #include "arrow_stepper.hpp"
 #include <imguix/utils/time_utils.hpp>  // ImGuiX::Utils::format_hms, etc.
+#include <imguix/extensions/sizing.hpp> // ImGuiX::Extensions::CalcTimeComboWidth(), etc.
 
 namespace ImGuiX::Widgets {
 
@@ -22,9 +23,9 @@ namespace ImGuiX::Widgets {
     struct TimePickerConfig {
         const char* label       = u8"Time";
         const char* desc        = u8"HH:MM:SS";
-        float       combo_width = 160.0f;
+        float       combo_width = 0.0f;
         bool        show_desc   = true;
-        float       field_width = 48.0f;
+        float       field_width = 0.0f;
     };
 
     struct TimeZoneInfo {
@@ -110,11 +111,12 @@ namespace ImGuiX::Widgets {
     struct TimeOffsetPickerConfig {
         const char* label        = u8"Offset";
         const char* desc         = u8"±HH:MM:SS";
-        float       combo_width  = 210.0f;
+        float       combo_width  = 0.0f;
         bool        show_desc    = true;
         bool        show_gmt     = true;
         bool        show_tz_list = true;
-        float       field_width  = 48.0f;
+        float       tz_field_width  = 0.0f;
+        float       hms_field_width = 0.0f;
         const std::vector<TimeZoneInfo>* time_zones = nullptr;
     };
 
@@ -140,18 +142,26 @@ namespace ImGuiX::Widgets {
             ImGuiX::Utils::hms_to_seconds(ph, pm, ps)
         );
 
-        bool changed = false;
+        const ImGuiStyle& st = ImGui::GetStyle();
+        const float combo_width = cfg.combo_width > 0.0f ? 
+            cfg.combo_width : 
+            ImGuiX::Extensions::CalcTimeComboWidth();
 
+        const float field_width = cfg.field_width > 0.0f ? 
+            cfg.field_width : 
+            ImGuiX::Extensions::CalcHMSFieldWidth();
+
+        bool changed = false;
         ImGui::PushID(id);
-        ImGui::SetNextItemWidth(cfg.combo_width);
+        ImGui::SetNextItemWidth(combo_width);
         if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Time", preview.c_str())) {
             if (cfg.show_desc && cfg.desc)
                 ImGui::TextUnformatted(cfg.desc);
 
             // Steppers: wrap enabled (как в версии с seconds-of-day)
-            ArrowStepperConfig sc_h{0, 23, 1, true, cfg.field_width, u8"%02d h"};
-            ArrowStepperConfig sc_m{0, 59, 1, true, cfg.field_width, u8"%02d m"};
-            ArrowStepperConfig sc_s{0, 59, 1, true, cfg.field_width, u8"%02d s"};
+            ArrowStepperConfig sc_h{0, 23, 1, true, field_width, u8"%02d h"};
+            ArrowStepperConfig sc_m{0, 59, 1, true, field_width, u8"%02d m"};
+            ArrowStepperConfig sc_s{0, 59, 1, true, field_width, u8"%02d s"};
 
             bool any = false;
             any |= ArrowStepper(u8"h", hour,   sc_h);
@@ -183,18 +193,26 @@ namespace ImGuiX::Widgets {
     inline bool TimePicker(const char* id, int& seconds, const TimePickerConfig& cfg = {}) {
         bool changed = false;
         std::string preview = ImGuiX::Utils::format_hms(seconds);
+        
+        const float combo_width = cfg.combo_width > 0.0f ? 
+            cfg.combo_width : 
+            ImGuiX::Extensions::CalcTimeComboWidth();
+
+        const float field_width = cfg.field_width > 0.0f ? 
+            cfg.field_width : 
+            ImGuiX::Extensions::CalcHMSFieldWidth();
 
         ImGui::PushID(id);
-        ImGui::SetNextItemWidth(cfg.combo_width);
+        ImGui::SetNextItemWidth(combo_width);
         if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Time", preview.c_str())) {
             if (cfg.show_desc && cfg.desc) ImGui::TextUnformatted(cfg.desc);
 
             int h, m, s; 
             ImGuiX::Utils::seconds_to_hms(seconds, h, m, s);
 
-            ArrowStepperConfig sc_h{0,23,1,true,cfg.field_width,u8"%02d h"};
-            ArrowStepperConfig sc_m{0,59,1,true,cfg.field_width,u8"%02d m"};
-            ArrowStepperConfig sc_s{0,59,1,true,cfg.field_width,u8"%02d s"};
+            ArrowStepperConfig sc_h{0,23,1,true,field_width,u8"%02d h"};
+            ArrowStepperConfig sc_m{0,59,1,true,field_width,u8"%02d m"};
+            ArrowStepperConfig sc_s{0,59,1,true,field_width,u8"%02d s"};
 
             bool any = false;
             any |= ArrowStepper(u8"h", h, sc_h);
@@ -228,18 +246,35 @@ namespace ImGuiX::Widgets {
         const auto& tzlist = cfg.time_zones ? *cfg.time_zones : DefaultTimeZones();
         if (tz_index_io < 0 || tz_index_io >= static_cast<int>(tzlist.size()))
             tz_index_io = 0;
+        
+        const float combo_width = cfg.combo_width > 0.0f ? 
+            cfg.combo_width : 
+            ImGuiX::Extensions::CalcTimeComboWidth();
+
+        const float tz_field_width = cfg.tz_field_width > 0.0f ?
+            cfg.tz_field_width : 
+            ImGuiX::Extensions::CalcFieldWidthForSample(u8"Johannesburg (UTC+2, no DST)");
+
+        const float hms_field_width = cfg.hms_field_width > 0.0f ? 
+            cfg.hms_field_width : 
+            ImGuiX::Extensions::CalcHMSFieldWidth();
 
         bool changed = false;
         std::string preview = ImGuiX::Utils::format_signed_hms(offset_sec);
 
         ImGui::PushID(id);
-        ImGui::SetNextItemWidth(cfg.combo_width);
+        ImGui::SetNextItemWidth(combo_width);
+        ImGui::SetNextWindowSizeConstraints(
+            ImVec2(0, 0),
+            ImVec2(FLT_MAX, ImGui::GetTextLineHeightWithSpacing() * 16) // максимум 16 строк
+        );
         if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Offset", preview.c_str())) {
             if (cfg.show_desc && cfg.desc) ImGui::TextUnformatted(cfg.desc);
 
             // Timezone combo
             if (cfg.show_tz_list && !tzlist.empty()) {
                 const char* cur = tzlist[tz_index_io].label;
+                ImGui::SetNextItemWidth(tz_field_width);
                 if (ImGui::BeginCombo(u8"Timezone", cur)) {
                     for (int i = 0; i < (int)tzlist.size(); ++i) {
                         bool sel = (i == tz_index_io);
@@ -266,7 +301,7 @@ namespace ImGuiX::Widgets {
             {
                 char buf[32];
                 std::snprintf(buf, sizeof(buf), u8"%s", ImGuiX::Utils::format_signed_hms(offset_sec).c_str());
-                ImGui::SetNextItemWidth(140.0f);
+                ImGui::SetNextItemWidth(combo_width);
                 if (ImGui::InputText(u8"##offset_str", buf, sizeof(buf))) {
                     int64_t v = 0;
                     if (ImGuiX::Utils::parse_signed_hms(buf, v)) {
@@ -289,9 +324,9 @@ namespace ImGuiX::Widgets {
                 const bool was_positive = positive;
 
                 // steppers: NO wrap here (we control borders ourselves)
-                ArrowStepperConfig sc_h{0,23,1,false,cfg.field_width,u8"%02d h"};
-                ArrowStepperConfig sc_m{0,59,1,false,cfg.field_width,u8"%02d m"};
-                ArrowStepperConfig sc_s{0,59,1,false,cfg.field_width,u8"%02d s"};
+                ArrowStepperConfig sc_h{0,23,1,false,hms_field_width,u8"%02d h"};
+                ArrowStepperConfig sc_m{0,59,1,false,hms_field_width,u8"%02d m"};
+                ArrowStepperConfig sc_s{0,59,1,false,hms_field_width,u8"%02d s"};
                 
                 sc_h.disable_at_edges = false;
                 sc_m.disable_at_edges = false;

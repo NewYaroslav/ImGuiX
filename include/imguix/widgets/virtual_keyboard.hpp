@@ -44,24 +44,42 @@ namespace ImGuiX::Widgets {
         bool    allow_enter  = true;           ///< Enter appends '\n'
         bool    show_accents = true;           ///< allow accents pane
         bool    remember_pane = true;          ///< store pane mode in ImGuiStorage if no external state
-
-        bool submit_on_enter     = false;      ///< true: Enter submits (like InputTextEnterReturnsTrue)
-        bool capture_hw_enter    = false;      ///< react to physical Enter when VK is focused
-        bool shift_enter_newline = false;      ///< Shift+Enter inserts '\n' instead of submit
+        bool    show_clipboard_buttons = false;///< show Copy/Paste buttons
+        bool    allow_copy_from_text  = true;  ///< Copy enabled
+        bool    allow_paste_into_text = true;  ///< Paste enabled
+        bool    submit_on_enter     = false;   ///< true: Enter submits (like InputTextEnterReturnsTrue)
+        bool    capture_hw_enter    = false;   ///< react to physical Enter when VK is focused
+        bool    shift_enter_newline = false;   ///< Shift+Enter inserts '\n' instead of submit
         std::function<void(const std::string&)> on_submit; ///< callback on submit(text)
     
+        bool  paste_replace_all           = false;  ///< true: replace text, false: append
+        bool  sanitize_paste_newlines     = true;   ///< convert CRLF/CR -> '\n'
+        int   max_text_len_on_paste       = 0;      ///< 0 = unlimited (truncate if >0)
+        float clipboard_buttons_spacing   = 0.0f;   ///< 0 => style.ItemSpacing.x
+        
         // Иконки/шрифт
         ImFont* icon_font = nullptr;  ///< шрифт иконок (например, MaterialIcons); null => использовать текущий
         ImGuiX::Widgets::IconButtonConfig icon_btn{}; ///< стиль для IconButtonCentered
-        std::unordered_map<std::string, const char*> icons {
-            /*
-            {"Shift",   u8"\uE8E7"}, // примеры-заглушки: заменишь на свои PUA
-            {"Space",   u8"\uE5CA"},
-            {"Bksp",    u8"\uE14A"},
-            {"Enter",   u8"\uE5B0"},
-            {"Symbols", u8"\uE8B8"},
-            {"Accents", u8"\uE23E"},
-            */
+        std::unordered_map<std::string, const char*> labels {
+            {u8"Shift",   u8"Shift"},
+            {u8"Space",   u8"Space"},
+            {u8"Bksp",    u8"Bksp"},
+            {u8"Enter",   u8"Enter"},
+            {u8"Symbols", u8"Symbols"},
+            {u8"Accents", u8"Accents"},
+            {u8"Copy",    u8"\uE14D"},
+            {u8"Paste",   u8"\uE14F"}
+        };
+        
+        std::unordered_map<std::string, const char*> tooltips{
+            {u8"Shift",   u8"Shift key"},
+            {u8"Space",   u8"Space key"},
+            {u8"Bksp",    u8"Backspace key"},
+            {u8"Enter",   u8"Enter key"},
+            {u8"Symbols", u8"Switch to symbols"},
+            {u8"Accents", u8"Switch to accents"},
+            {u8"Copy",    u8"Copy to clipboard"},
+            {u8"Paste",   u8"Paste from clipboard"}
         };
         
         // Top preview bar
@@ -96,6 +114,11 @@ namespace ImGuiX::Widgets {
         float   locale_width         = 64.0f;  ///< ширина превью "en"/"ru" (компактно)
         
         float   left_ratio           = 0.60f;  /// < Доли ширины панелей при заданной ширине (size.x>0)
+    
+        // --- bottom row auto widths ---
+        bool  auto_bottom_width      = true;   ///< auto width for Shift/Bksp/Enter
+        float min_wide_key_factor    = 1.6f;   ///< fallback: min wide W = key_size.x * factor
+        float space_width_multiplier = 2.5f;   ///< Space width = wide * multiplier (2..3)
     };
     
     enum class VKSpecialPane : int { Symbols = 0, Accents = 1 };
@@ -434,7 +457,6 @@ namespace ImGuiX::Widgets {
             if (state) state->shift = v;
             else st->SetInt(key_vk_shift_state, v ? 1 : 0);
         };
-        
 
         auto get_pane = [&](){
             if (state) return state->pane;
@@ -445,6 +467,37 @@ namespace ImGuiX::Widgets {
         auto set_pane = [&](VKSpecialPane p){
             if (state) state->pane = p;
             else if (cfg.remember_pane) st->SetInt(key_vk_pane_mode, p==VKSpecialPane::Accents ? 1:0);
+        };
+        
+        auto do_copy = [&](){
+            if (!cfg.allow_copy_from_text) return;
+            ImGui::SetClipboardText(text.c_str());
+        };
+
+        auto do_paste = [&](){
+            if (!cfg.allow_paste_into_text) return;
+            const char* src = ImGui::GetClipboardText();
+            if (!src) return;
+            std::string s(src);
+            if (cfg.sanitize_paste_newlines) {
+                // CRLF/CR -> \n
+                std::string out; out.reserve(s.size());
+                for (size_t i=0;i<s.size();++i){
+                    char c = s[i];
+                    if (c=='\r') { if (i+1<s.size() && s[i+1]=='\n') ++i; out.push_back('\n'); }
+                    else out.push_back(c);
+                }
+                s.swap(out);
+            }
+            if (cfg.max_text_len_on_paste>0) {
+                size_t allowed = (text.size()>= (size_t)cfg.max_text_len_on_paste) ? 0 :
+                                 (size_t)cfg.max_text_len_on_paste - text.size();
+                if (s.size() > allowed) s.resize(allowed);
+            }
+            if (s.empty()) return;
+            if (cfg.paste_replace_all) text = std::move(s);
+            else                       text += s;
+            modified = true;
         };
 
         // --- раскладка / shift состояние ---
@@ -560,6 +613,15 @@ namespace ImGuiX::Widgets {
             if (ascii_single) append_char_ascii(text, label, shift, modified);
             else append_utf8(text, label, modified);
         };
+        
+        auto show_tooltip = [&](const std::string& key) {
+            if (ImGui::IsItemHovered()) {
+                auto it = cfg.tooltips.find(key);
+                if (it != cfg.tooltips.end()) {
+                    ImGui::SetTooltip("%s", it->second);
+                }
+            }
+        };
 
         // --- верхняя область: левая/правая панели ---
         ImVec2 key_size = cfg.key_size;
@@ -567,8 +629,29 @@ namespace ImGuiX::Widgets {
             const float h = ImGui::GetFrameHeight(); // respects font & global scale
             key_size = ImVec2(h, h);                 // square keys by default
         }
+        
+        auto calc_btn_w = [&](const char* s) -> float {
+            // ширина текста + горизонтальные паддинги кнопки
+            ImVec2 ts = ImGui::CalcTextSize(s, nullptr, false);
+            return ts.x + 2.0f * ImGui::GetStyle().FramePadding.x;
+        };
 
         const float frame_h  = ImGui::GetFrameHeight();
+        float wide_w = key_size.x * cfg.min_wide_key_factor; // нижняя граница
+        
+        if (cfg.auto_bottom_width) {
+            wide_w = std::max(wide_w, calc_btn_w(u8"Shift"));
+            wide_w = std::max(wide_w, calc_btn_w(u8"Bksp"));
+            if (cfg.allow_enter)
+                wide_w = std::max(wide_w, calc_btn_w(u8"Enter"));
+        }
+        ImVec2 wide_size (wide_w,                        key_size.y);
+        ImVec2 space_size(wide_w * cfg.space_width_multiplier, key_size.y);
+
+        const char* ICON_COPY  = u8"\uE14D"; // content_copy
+        const char* ICON_PASTE = u8"\uE2C8"; // content_paste
+        ImVec2 clip_size(frame_h, frame_h);
+
         const float btn_h    = cfg.show_bottom ? key_size.y : 0.0f;
         const float combo_h  = (cfg.show_locale_combo && cfg.locale_bottom_right) ? frame_h : 0.0f;
         const float row_h    = (btn_h > combo_h ? btn_h : combo_h);
@@ -687,13 +770,15 @@ namespace ImGuiX::Widgets {
         // Универсальный рендер кнопки (иконка или текст)
         auto ButtonOrIcon = [&](const char* label, const ImVec2& size, bool ascii_single = false) -> bool {
             // если иконка настроена — рисуем иконку
-            auto it = cfg.icons.find(label);
-            if (it != cfg.icons.end() && it->second && it->second[0] != '\0') {
-                // используем скопию конфигура: подменим шрифт при необходимости
-                ImGuiX::Widgets::IconButtonConfig ib = cfg.icon_btn;
-                if (cfg.icon_font) ib.font = cfg.icon_font;
-                // если шрифт не задан, предполагаем, что иконки смержены в текущий
-                return ImGuiX::Widgets::IconButtonCentered(label, it->second, ib);
+            auto it = cfg.labels.find(label);
+            if (it != cfg.labels.end() && it->second && it->second[0] != '\0') {
+                unsigned int cp = static_cast<unsigned char>(it->second[0]);
+                if ((cp & 0xF0) == 0xE0) {
+                    ImGuiX::Widgets::IconButtonConfig ib = cfg.icon_btn;
+                    if (cfg.icon_font) ib.font = cfg.icon_font;
+                    return ImGuiX::Widgets::IconButtonCentered(label, it->second, ib);
+                }
+                return ImGui::Button(label, size);
             }
             // обычная кнопка
             return ImGui::Button(label, size);
@@ -708,21 +793,36 @@ namespace ImGuiX::Widgets {
             const float line_start_x = ImGui::GetCursorPosX();
 
             if (cfg.show_bottom) {
-                const ImVec2 wide(key_size.x * 1.6f, key_size.y);
-                const ImVec2 space_size(key_size.x * 4,   key_size.y);
-                if (ButtonOrIcon(u8"Shift", wide)) press(u8"Shift");
+                if (ButtonOrIcon(u8"Shift", wide_size)) press(u8"Shift");
+                show_tooltip(u8"Shift");
                 ImGui::SameLine();
                 if (ButtonOrIcon(u8"Space", space_size)) press(u8"Space");
+                show_tooltip(u8"Space");
                 ImGui::SameLine();
-                if (ButtonOrIcon(u8"Bksp", wide)) press(u8"Bksp");
+                if (ButtonOrIcon(u8"Bksp", wide_size)) press(u8"Bksp");
+                show_tooltip(u8"Bksp");
                 if (cfg.allow_enter) { 
                     ImGui::SameLine(); 
-                    if (ButtonOrIcon(u8"Enter", wide)) { 
+                    if (ButtonOrIcon(u8"Enter", wide_size)) { 
                         press(u8"Enter"); 
+                        show_tooltip(u8"Enter");
+                    }
+                }
+                // Copy/Paste
+                if (cfg.show_clipboard_buttons) {
+                    if (cfg.allow_copy_from_text) {
+                        ImGui::SameLine(); 
+                        if (ButtonOrIcon(u8"Copy",  clip_size)) do_copy();
+                        show_tooltip(u8"Copy");
+                    }
+                    if (cfg.allow_paste_into_text) {
+                        ImGui::SameLine(); 
+                        if (ButtonOrIcon(u8"Paste", clip_size)) do_paste();
+                        show_tooltip(u8"Paste");
                     }
                 }
             }
-            
+
             // по началу правой части — переключатель режимов
             if (cfg.show_accents && cfg.show_special) {
                 bool has_accents = get_accents_for_locale(locale_name).count > 0;
@@ -739,38 +839,35 @@ namespace ImGuiX::Widgets {
                             VKSpecialPane::Accents : 
                             VKSpecialPane::Symbols);
                     }
+                    show_tooltip(label);
                 }
-				//float offset = right_anchor_offset < 0.0f ? 0.0f : right_anchor_offset;
-                //ImGui::SameLine(offset, style.ItemSpacing.x);
             }
 
             // комбо локали справа
             if (cfg.show_locale_combo && 
-			    cfg.locale_bottom_right && 
-				!cfg.locales.empty()) {
+                cfg.locale_bottom_right && 
+                !cfg.locales.empty()) {
                 // прижать вправо
-				const float line_x0 = line_start_x;
+                const float line_x0 = line_start_x;
                 float w = std::max(64.0f, cfg.locale_width);
                 float x = ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - w;
-                //ImGui::SameLine();
-				
-				// если есть правая панель — выравниваем по её правому краю
-				float target_x;
-				if (cfg.show_special) {
-					// base_x — X-старт контента главного Child в начале рендера
-					target_x = base_x + right_anchor_offset + right_w_outer - w;
-					// переведём в координату строки: SameLine сбивает относительный X,
-					// поэтому ставим курсор жёстко от line_x0.
-					ImGui::SameLine(0.0f, 0.0f);
-					ImGui::SetCursorPosX(target_x);
-				} else {
-					// fallback: правый край всего child-контента
-					target_x = line_x0 + ImGui::GetContentRegionAvail().x - w;
-					ImGui::SameLine(0.0f, 0.0f);
-					ImGui::SetCursorPosX(target_x);
-				}
 
-                //ImGui::SetCursorPosX(x);
+                // если есть правая панель — выравниваем по её правому краю
+                float target_x;
+                if (cfg.show_special) {
+                    // base_x — X-старт контента главного Child в начале рендера
+                    target_x = base_x + right_anchor_offset + right_w_outer - w;
+                    // переведём в координату строки: SameLine сбивает относительный X,
+                    // поэтому ставим курсор жёстко от line_x0.
+                    ImGui::SameLine(0.0f, 0.0f);
+                    ImGui::SetCursorPosX(target_x);
+                } else {
+                    // fallback: правый край всего child-контента
+                    target_x = line_x0 + ImGui::GetContentRegionAvail().x - w;
+                    ImGui::SameLine(0.0f, 0.0f);
+                    ImGui::SetCursorPosX(target_x);
+                }
+
                 ImGui::SetNextItemWidth(w);
                 const char* cur = cfg.locales[locale_index];
                 if (ImGui::BeginCombo(u8"##vk_locale_br", cur, ImGuiComboFlags_HeightSmall)) {
@@ -787,8 +884,8 @@ namespace ImGuiX::Widgets {
             }
         } else 
         if (cfg.show_locale_combo && 
-	        !cfg.locale_bottom_right && 
-			!cfg.locales.empty()) {
+            !cfg.locale_bottom_right && 
+            !cfg.locales.empty()) {
             // старое размещение сверху (компактно)
             ImGui::SetCursorPosY(ImGui::GetCursorPosY() - (cfg.spacing + key_size.y)); // поднять к верху
             ImGui::SetNextItemWidth(std::max(64.0f, cfg.locale_width));

@@ -1,10 +1,10 @@
 #pragma once
 #ifndef _IMGUIX_WIDGETS_DATE_PICKER_HPP_INCLUDED
 #define _IMGUIX_WIDGETS_DATE_PICKER_HPP_INCLUDED
+
 /// \file date_picker.hpp
 /// \brief Date picker (YYYY-MM-DD) with ArrowStepper controls and direct input.
 /// \note Requires arrow_stepper.hpp and time_utils.hpp (Hinnant civil date).
-/// \note Header-only, C++17.
 
 #include <imgui.h>
 #include <algorithm>
@@ -12,7 +12,8 @@
 #include <cstdio>
 #include <string>
 #include "arrow_stepper.hpp"
-#include <imguix/utils/time_utils.hpp> // days_from_civil, civil_from_days, num_days_in_month, clamp_ymdhms, month_short_name
+#include <imguix/utils/time_utils.hpp>  // days_from_civil, civil_from_days, num_days_in_month, clamp_ymdhms, month_short_name
+#include <imguix/extensions/sizing.hpp> // ImGuiX::Extensions::CalcDateComboWidth(), etc.
 
 namespace ImGuiX::Widgets {
 
@@ -23,9 +24,9 @@ namespace ImGuiX::Widgets {
     struct DatePickerConfig {
         const char*     label           = u8"Date";
         const char*     desc            = u8"YYYY-MM-DD";
-        float           combo_width     = 200.0f;
+        float           combo_width     = 0.0f;
         bool            show_desc       = true;
-        float           field_width     = 64.0f;     ///< width per ArrowStepper field
+        float           field_width     = 0.0f;      ///< width per ArrowStepper field
         int             min_year        = 1970;      ///< inclusive
         int             max_year        = 2099;      ///< inclusive
         MonthLabelMode  month_label     = MonthLabelMode::Numeric;
@@ -54,6 +55,18 @@ namespace ImGuiX::Widgets {
         ) {
         // Clamp initial Y/M/D into configured bounds
         ImGuiX::Utils::clamp_ymd(year, month, day, cfg.min_year, cfg.max_year);
+        
+        const float combo_width = cfg.combo_width > 0.0f ? 
+            cfg.combo_width : 
+            ImGuiX::Extensions::CalcDateComboWidth();
+
+        const float year_field_width = cfg.field_width > 0.0f ? 
+            cfg.field_width :
+            ImGuiX::Extensions::CalcYearFieldWidth();   
+
+        const float hms_field_width = cfg.field_width > 0.0f ? 
+            cfg.field_width : 
+            ImGuiX::Extensions::CalcHMSFieldWidth();
 
         bool changed = false;
         const std::string preview = cfg.show_weekday
@@ -61,7 +74,7 @@ namespace ImGuiX::Widgets {
             : ImGuiX::Utils::format_ymd(year, month, day);
 
         ImGui::PushID(id);
-        ImGui::SetNextItemWidth(cfg.combo_width);
+        ImGui::SetNextItemWidth(combo_width);
         if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Date", preview.c_str())) {
             if (cfg.show_desc && cfg.desc) ImGui::TextUnformatted(cfg.desc);
 
@@ -69,7 +82,7 @@ namespace ImGuiX::Widgets {
             {
                 char buf[32];
                 std::snprintf(buf, sizeof(buf), "%s", ImGuiX::Utils::format_ymd(year, month, day).c_str());
-                ImGui::SetNextItemWidth(160.0f);
+                ImGui::SetNextItemWidth(combo_width);
                 if (ImGui::InputText(u8"##date_str", buf, sizeof(buf))) {
                     int64_t y = year; int m = month; int d = day;
                     if (ImGuiX::Utils::parse_ymd(buf, y, m, d)) {
@@ -89,16 +102,18 @@ namespace ImGuiX::Widgets {
             // --- steppers (Y/M/D) -------------------------------------------------
             {
                 // Year: no wrap; Month/Day: no wrap; clamp day after Y/M change.
-                ArrowStepperConfig scY{cfg.min_year, cfg.max_year, 1, false, cfg.field_width, u8"%04d y"};
-                ArrowStepperConfig scM{1, 12, 1, false, cfg.field_width,  u8"%02d m"};
+                ArrowStepperConfig scY{cfg.min_year, cfg.max_year, 1, false, year_field_width, u8"%04d y"};
+                ArrowStepperConfig scM{1, 12, 1, false, hms_field_width,  u8"%02d m"};
                 // Day upper bound depends on (year,month) -> set after Y/M edits.
                 int mdays = ImGuiX::Utils::num_days_in_month(year, month);
-                ArrowStepperConfig scD{1, mdays, 1, false, cfg.field_width, u8"%02d d"};
+                ArrowStepperConfig scD{1, mdays, 1, false, hms_field_width, u8"%02d d"};
 
                 int dy=0, dm=0, dd=0; // deltas from arrows/wheel
                 bool any = false;
 
-                any |= ArrowStepper(u8"Y", *reinterpret_cast<int*>(&year), scY, &dy);
+                int y_i = static_cast<int>(year);
+                any |= ArrowStepper(u8"Y", y_i, scY, &dy);
+                if (y_i != static_cast<int>(year)) { year = static_cast<int64_t>(y_i); any = true; }
                 any |= ArrowStepper(u8"M", month, scM, &dm);
 
                 // Month short label hint (optional)
@@ -153,11 +168,23 @@ namespace ImGuiX::Widgets {
         const std::string preview = cfg.show_weekday
             ? ImGuiX::Utils::format_with_weekday(y, m, d)
             : ImGuiX::Utils::format_ymd(y, m, d);
+            
+        const float combo_width = cfg.combo_width > 0.0f ? 
+            cfg.combo_width : 
+            ImGuiX::Extensions::CalcDateComboWidth();
+
+        const float year_field_width = cfg.field_width > 0.0f ? 
+            cfg.field_width :
+            ImGuiX::Extensions::CalcYearFieldWidth();   
+
+        const float hms_field_width = cfg.field_width > 0.0f ? 
+            cfg.field_width : 
+            ImGuiX::Extensions::CalcHMSFieldWidth();
 
         bool changed = false;
 
         ImGui::PushID(id);
-        ImGui::SetNextItemWidth(cfg.combo_width);
+        ImGui::SetNextItemWidth(combo_width);
         if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Date", preview.c_str())) {
             if (cfg.show_desc && cfg.desc)
                 ImGui::TextUnformatted(cfg.desc);
@@ -166,7 +193,7 @@ namespace ImGuiX::Widgets {
             {
                 char buf[32];
                 std::snprintf(buf, sizeof(buf), "%s", ImGuiX::Utils::format_ymd(y, m, d).c_str());
-                ImGui::SetNextItemWidth(160.0f);
+                ImGui::SetNextItemWidth(combo_width);
                 if (ImGui::InputText(u8"##date_str", buf, sizeof(buf))) {
                     int64_t ny = y; int nm = m; int nd = d;
                     if (ImGuiX::Utils::parse_ymd(buf, ny, nm, nd)) {
@@ -184,8 +211,8 @@ namespace ImGuiX::Widgets {
 
             // --- steppers Y/M/D ------------------------------------------------------
             {
-                ArrowStepperConfig scY{cfg.min_year, cfg.max_year, 1, false, cfg.field_width, u8"%04d y"};
-                ArrowStepperConfig scM{1, 12, 1, false, cfg.field_width,  u8"%02d m"};
+                ArrowStepperConfig scY{cfg.min_year, cfg.max_year, 1, false, year_field_width, u8"%04d y"};
+                ArrowStepperConfig scM{1, 12, 1, false, hms_field_width,  u8"%02d m"};
 
                 int y_i = static_cast<int>(y);
                 int dy=0, dm=0, dd=0;
@@ -204,7 +231,7 @@ namespace ImGuiX::Widgets {
                 // Day depends on (y,m)
                 int mdays = ImGuiX::Utils::num_days_in_month(y, m);
                 if (d > mdays) { d = mdays; any = true; }
-                ArrowStepperConfig scD{1, mdays, 1, false, cfg.field_width, u8"%02d d"};
+                ArrowStepperConfig scD{1, mdays, 1, false, hms_field_width, u8"%02d d"};
                 any |= ArrowStepper(u8"D", d, scD, &dd);
 
                 if (d < 1) { d = 1; any = true; }

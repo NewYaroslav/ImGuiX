@@ -10,19 +10,30 @@
 #include <string>
 #include <algorithm>
 #include <cstdio>
+#include <imguix/extensions/sizing.hpp> // ImGuiX::Extensions::CalcTimeComboWidth(), etc.
 
 namespace ImGuiX::Widgets {
 
     /// \brief Configuration for HoursSelector.
     struct HoursSelectorConfig {
-        const char* label        = u8"Hours";     ///< Combo label (left of preview)
-        const char* empty_hint   = u8"none";      ///< Preview text when no hours selected
-        ImVec2      child_size   = ImVec2(260, 110); ///< Scrolling area size inside combo
-        ImVec2      cell_size    = ImVec2(18, 18);   ///< Clickable cell size for each hour
-        int         rows         = 3;           ///< Grid rows (rows*cols should cover 24)
-        int         cols         = 8;           ///< Grid cols
-        float       combo_width  = 260.0f;      ///< SetNextItemWidth for the combo
+        const char* label        = u8"Hours";    ///< Combo label (left of preview)
+        const char* empty_hint   = u8"none";     ///< Preview text when no hours selected
+        
+        // Toolbar labels
+        const char* label_all      = u8"All";
+        const char* label_none     = u8"None";
+        
+        ImVec2      cell_size    = ImVec2(0, 0); ///< Clickable cell size for each hour
+        int         rows         = 3;            ///< Grid rows (rows*cols should cover 24)
+        int         cols         = 8;            ///< Grid cols
+        float       combo_width  = 0.0f;         ///< SetNextItemWidth for the combo
         bool        use_header_color_for_selected = true; ///< Use ImGuiCol_Header for selected bg
+        bool    show_cell_borders   = true;
+        float   cell_border_thickness = 1.0f;
+        ImU32   cell_border_color   = 0; // 0 = возьмём ImGuiCol_Border
+        ImU32   cell_border_color_hovered = 0;   // 0 = ImGuiCol_HeaderHovered
+        ImU32   cell_border_color_selected = 0;  // 0 = ImGuiCol_Header
+        float   cell_rounding = 0.0f;
     };
 
     /// \brief Renders hours picker (0..23) as a combo with a grid inside.
@@ -68,38 +79,57 @@ namespace ImGuiX::Widgets {
             return acc;
         };
 
-        const float preview_max_w = std::max(0.0f, cfg.combo_width - 32.0f); // leave a little slack
-        std::string preview = build_preview(preview_max_w);
+        const float combo_width = cfg.combo_width > 0.0f ? 
+            cfg.combo_width : 
+            ImGuiX::Extensions::CalcWeekdayComboWidth();
+
+        std::string preview = build_preview(
+            ImGuiX::Extensions::CalcComboPreviewTextMax(combo_width)
+        );
 
         // Local 24-bit mask
         bool mark[24] = {};
         for (int h : selected_hours) if (0 <= h && h < 24) mark[h] = true;
 
+        ImVec2 cell = cfg.cell_size;
+        if (cell.x <= 0.0f || cell.y <= 0.0f) {
+            const float h = ImGui::GetFrameHeight();
+            cell = ImVec2(h, h);
+        }
+
         bool changed = false;
 
         ImGui::PushID(id);
-        ImGui::SetNextItemWidth(cfg.combo_width);
-        if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Hours", preview.c_str())) {
-            ImGui::BeginChild(u8"##hours_grid", cfg.child_size, true);
+        ImGui::SetNextWindowSizeConstraints(ImVec2(0, 0), ImVec2(FLT_MAX, 300.0f));
+        ImGui::SetNextItemWidth(combo_width);
+        if (ImGui::BeginCombo(
+                cfg.label ? cfg.label : u8"Hours", preview.c_str(),
+                ImGuiComboFlags_HeightLargest | ImGuiComboFlags_PopupAlignLeft)) {
+            const ImGuiStyle& st = ImGui::GetStyle();
+            ImGui::Indent(st.FramePadding.x);
 
             // Grid layout
             const int rows = std::max(1, cfg.rows);
             const int cols = std::max(1, cfg.cols);
-            const ImVec2 cell = cfg.cell_size;
 
             // Safety: ensure we can cover all 24 hours even if rows*cols < 24
             const int total = std::max(rows * cols, 24);
 
             // Small toolbar (optional): Select All / Clear
-            if (ImGui::SmallButton(u8"All")) {
+            if (ImGui::SmallButton(cfg.label_all)) {
                 for (int i = 0; i < 24; ++i) mark[i] = true;
                 changed = true;
             }
             ImGui::SameLine();
-            if (ImGui::SmallButton(u8"None")) {
+            if (ImGui::SmallButton(cfg.label_none)) {
                 for (int i = 0; i < 24; ++i) mark[i] = false;
                 changed = true;
             }
+
+            ImDrawList* dl = ImGui::GetWindowDrawList();
+            float cell_rounding = (cfg.cell_rounding < 0.0f)
+                ? ImGui::GetStyle().FrameRounding
+                : cfg.cell_rounding;
 
             // Grid of Selectable cells
             for (int r = 0; r < rows; ++r) {
@@ -129,11 +159,36 @@ namespace ImGuiX::Widgets {
                     if (selected && cfg.use_header_color_for_selected) {
                         ImGui::PopStyleColor();
                     }
+                    
+                    if (cfg.show_cell_borders) {
+                        ImVec2 p0 = ImGui::GetItemRectMin();
+                        ImVec2 p1 = ImGui::GetItemRectMax();
+
+                        // для чёткой 1px линии на целочисленных координатах
+                        p0.x = std::floor(p0.x) + 0.5f;
+                        p0.y = std::floor(p0.y) + 0.5f;
+                        p1.x = std::floor(p1.x) - 0.5f;
+                        p1.y = std::floor(p1.y) - 0.5f;
+
+                        // выбираем цвет: selected/hovered/normal
+                        ImU32 col =
+                            selected ? (cfg.cell_border_color_selected ? cfg.cell_border_color_selected
+                                                                       : ImGui::GetColorU32(ImGuiCol_Header)) :
+                            (ImGui::IsItemHovered() ? (cfg.cell_border_color_hovered ? cfg.cell_border_color_hovered
+                                                                                      : ImGui::GetColorU32(ImGuiCol_HeaderHovered))
+                                                    : (cfg.cell_border_color ? cfg.cell_border_color
+                                                                             : ImGui::GetColorU32(ImGuiCol_Border)));
+
+                        dl->AddRect(p0, p1, col, cell_rounding, 0, cfg.cell_border_thickness);
+                    }
                     ImGui::PopID();
                 }
             }
+            
+            ImGui::SameLine(0, 0);
+            ImGui::Dummy(ImVec2(st.FramePadding.x, 0));
 
-            ImGui::EndChild();
+            ImGui::Unindent(st.FramePadding.x);
             ImGui::EndCombo();
 
             if (changed) {
@@ -143,6 +198,7 @@ namespace ImGuiX::Widgets {
                     if (mark[i]) selected_hours.push_back(i);
             }
         }
+
         ImGui::PopID();
         return changed;
     }
@@ -150,4 +206,3 @@ namespace ImGuiX::Widgets {
 } // namespace ImGuiX::Widgets
 
 #endif // _IMGUIX_WIDGETS_HOURS_SELECTOR_HPP_INCLUDED
-

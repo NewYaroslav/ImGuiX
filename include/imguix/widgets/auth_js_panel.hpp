@@ -19,15 +19,16 @@ namespace ImGuiX::Widgets {
 
     /// \brief UI configuration for AuthJsPanel.
     struct AuthJsPanelConfig {
+        // Panel
+        ImVec2      panel_size = ImVec2(0.0f, 0.0f); ///< x<=0: fill available width; y<=0: auto-computed
+        bool        inputs_fill_width = true;        ///< make input fields fill panel width
+        bool        border            = true;
+
         // Labels / hints
         std::string header               = u8"JS Config";
         std::string hint_user_agent      = u8"User agent";
         std::string hint_accept_language = u8"Accept language";
         std::string label_dnt            = u8"Do Not Track";
-
-        // Panel
-        ImVec2      panel_size           = ImVec2(0, 0); ///< (0,0) → auto width/height
-        bool        border               = true;
 
         // Validation
         bool        validate_user_agent      = true;
@@ -63,13 +64,16 @@ namespace ImGuiX::Widgets {
         ImGui::PushID(id);
 
         // Auto size similar to other panels
-        const ImVec2 size = (cfg.panel_size.x <= 0.f || cfg.panel_size.y <= 0.f)
-                            ? ImVec2(ImGui::GetWindowWidth() * 0.65f, ImGui::GetFrameHeightWithSpacing() * 5.0f)
-                            : cfg.panel_size;
+        float height = ImGui::GetTextLineHeightWithSpacing() + 4.0f * ImGui::GetFrameHeightWithSpacing();
+        ImVec2 size = cfg.panel_size;
+        if (size.x <= 0.0f) size.x = ImGui::CalcItemWidth();
+        if (size.y <= 0.0f) size.y = std::max(height, ImGui::GetFrameHeightWithSpacing());
 
         ImGui::BeginChild(u8"##auth_js_panel", size, cfg.border);
         ImGui::TextUnformatted(cfg.header.c_str());
         ImGui::Separator();
+        
+        if (cfg.inputs_fill_width) ImGui::PushItemWidth(-FLT_MIN);
 
         // User-Agent
         {
@@ -139,6 +143,8 @@ namespace ImGuiX::Widgets {
         if (ImGui::Checkbox(cfg.label_dnt.c_str(), &st.dnt)) {
             changed = true;
         }
+        
+        if (cfg.inputs_fill_width) ImGui::PopItemWidth();
 
         ImGui::EndChild();
         ImGui::PopID();

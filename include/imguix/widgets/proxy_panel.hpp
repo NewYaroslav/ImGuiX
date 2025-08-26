@@ -25,16 +25,25 @@ namespace ImGuiX::Widgets {
         ProxyType   type           = ProxyType::HTTP;
         std::string username;
         std::string password;
+        
+        bool ip_valid        = true; ///< out (set by widget if cfg.validate_ip)
+        bool port_valid      = true; ///< out
+        bool username_valid  = true; ///< out
+        bool password_valid  = true; ///< out
     };
 
     /// \brief UI configuration for ProxyPanel.
     struct ProxyPanelConfig {
+        ImVec2 panel_size             = ImVec2(0, 0); ///< 0→auto width/height
+        bool   inputs_fill_width      = true;         ///< make input fields fill panel width
+        bool   border                 = true;
+
         // Labels
         const char* header            = u8"Proxy settings";
         const char* hint_ip           = u8"ip";
         const char* hint_port         = u8"port";
-        const char* hint_user         = u8"user";
-        const char* hint_pass         = u8"password";
+        const char* hint_username     = u8"user";
+        const char* hint_password     = u8"password";
         const char* label_use_proxy   = u8"use proxy";
         const char* button_check      = u8"check proxy";
         const char* label_checked     = u8"checked";
@@ -45,18 +54,39 @@ namespace ImGuiX::Widgets {
         bool checked                  = false;  ///< result of last check (visual only)
         bool check_ok                 = false;  ///< last check OK (green) vs fail (red)
 
+        // Virtual keyboard configs (shared across fields)
+        VirtualKeyboardConfig      vk_cfg{};   ///< behavior/locale/etc of VK
+        KeyboardToggleConfig       kb_cfg{};   ///< visuals of the VK trigger button
+        
+        PasswordToggleConfig       toggle_cfg{}; ///< password eye config
+        
+        //
+        bool vk_ip                    = true;
+        bool vk_port                  = true;
+        bool vk_username              = true;
+        bool vk_password              = true;
+        
+        // Validation toggles
+        bool validate_ip           = true;
+        bool validate_port         = true;
+        bool validate_username     = true;
+        bool validate_password     = true;
+    
+        const char* ip_regex          = u8R"(^\d{1,3}(\.\d{1,3}){3}$)";
+        const char* port_regex        = u8R"(^[A-Za-z0-9.\-:]+$)";
+        const char* username_regex    = u8R"(^\S+$)";
+        const char* password_regex    = u8R"(^\S+$)";
+        
         // Callbacks
         std::function<void()> on_check = nullptr;
 
-        // Style
-        ImVec4 error_text_color       = ImVec4(0.9f, 0.5f, 0.5f, 1.0f);
-
         // Layout
-        float field_width_host_user   = 160.0f;
-        float field_width_port        = 70.0f;
-        float field_width_type        = 110.0f;
-        ImVec2 panel_size             = ImVec2(0, 0); ///< 0→auto width/height
-        bool   border                 = true;
+        float field_width_host_user   = 0.0f;
+        float field_width_port        = 0.0f;
+        float field_width_type        = 0.0f;
+
+        // Style
+        ImVec4 error_color = ImVec4(0.9f, 0.5f, 0.5f, 1.0f);
     };
 
     /// \brief Draw proxy settings panel.
@@ -68,63 +98,106 @@ namespace ImGuiX::Widgets {
         bool changed = false;
 
         ImGui::PushID(id);
-        const ImVec2 size = (cfg.panel_size.x <= 0.f || cfg.panel_size.y <= 0.f)
-                          ? ImVec2(ImGui::GetWindowWidth() * 0.65f, 148.0f)
-                          : cfg.panel_size;
+        const ImVec2 size = (cfg.panel_size.x <= 0.0f || cfg.panel_size.y <= 0.0f) ? 
+            ImVec2(ImGui::CalcItemWidth(), 
+                   ImGui::GetTextLineHeightWithSpacing() + 4.0f * ImGui::GetFrameHeightWithSpacing()) : 
+            cfg.panel_size;
+                          
+        auto calc_w = [&](const char* s) -> float {
+            // ширина текста + паддинги
+            ImVec2 ts = ImGui::CalcTextSize(s, nullptr, false);
+            return ts.x + 2.0f * ImGui::GetStyle().FramePadding.x;
+        };
 
         ImGui::BeginChild(u8"##proxy_panel", size, cfg.border);
         ImGui::Text(u8"%s", cfg.header ? cfg.header : u8"Proxy");
         ImGui::Separator();
+        
+        if (cfg.inputs_fill_width) ImGui::PushItemWidth(-FLT_MIN);
+        
+        const ImGuiStyle& style = ImGui::GetStyle();
+        float item_w = cfg.field_width_host_user > 0.0f ? 
+            cfg.field_width_host_user : 
+            0.5f * (ImGui::CalcItemWidth() - calc_w(u8":") - 2.0f * style.ItemSpacing.x);
 
         // Collapse inputs when proxy disabled (but still visible)
         ImGui::BeginDisabled(!st.use_proxy);
 
         // --- IP ---
-        bool bad_ip = false;
-        if (!st.ip.empty()) {
-            // Minimal IPv4 check. Extend for hostnames if needed.
-            static const std::regex re_ip(u8R"(^\d{1,3}(\.\d{1,3}){3}$)");
-            bad_ip = !std::regex_match(st.ip, re_ip);
-        }
-
-        if (bad_ip) ImGui::PushStyleColor(ImGuiCol_Text, cfg.error_text_color);
-
-        ImGui::PushItemWidth(cfg.field_width_host_user);
+        ImGui::PushItemWidth(item_w);
         {
-            char buf[256];
-            std::strncpy(buf, st.ip.c_str(), sizeof(buf));
-            buf[sizeof(buf)-1] = '\0';
-            if (ImGui::InputTextWithHint(u8"##proxy.ip", cfg.hint_ip, buf, sizeof(buf)-1,
-                                         ImGuiInputTextFlags_AutoSelectAll)) {
-                st.ip = buf;
-                changed = true;
+            if (cfg.vk_ip) {
+                changed = InputTextWithVKValidated(
+                    u8"##proxy.ip", cfg.hint_ip,
+                    st.ip, cfg.validate_ip, InputValidatePolicy::OnTouch,
+                    cfg.ip_regex, st.ip_valid,
+                    cfg.error_color,
+                    ImGuiInputTextFlags_AutoSelectAll, /*cb*/nullptr, /*ud*/nullptr,
+                    cfg.kb_cfg, cfg.vk_cfg
+                );
+            } else {
+                changed = InputTextValidated(
+                    u8"##proxy.ip", cfg.hint_ip,
+                    st.ip, cfg.validate_ip, InputValidatePolicy::OnTouch,
+                    cfg.ip_regex, st.ip_valid, cfg.error_color
+                );
             }
         }
         ImGui::PopItemWidth();
-        if (bad_ip) ImGui::PopStyleColor();
 
         ImGui::SameLine();
         ImGui::TextUnformatted(u8":");
 
         // --- Port ---
+        const float frame_h = ImGui::GetFrameHeight();
+        const float spacing = style.ItemInnerSpacing.x;
+        ImVec2 btn_sz = cfg.kb_cfg.button_size;
+        if (btn_sz.x <= 0.0f || btn_sz.y <= 0.0f) {
+            btn_sz = ImVec2(frame_h, frame_h);
+        }
+        const float port_w = cfg.field_width_port > 0.0f ? 
+            cfg.field_width_port : 
+            calc_w(u8"65535") + (cfg.vk_port ? (btn_sz.x + spacing) : 0.0f);
+
         ImGui::SameLine();
-        ImGui::PushItemWidth(cfg.field_width_port);
+        ImGui::PushItemWidth(port_w);
         {
-            char pbuf[32];
-            std::snprintf(pbuf, sizeof(pbuf), u8"%d", std::max(0, st.port));
-            if (ImGui::InputTextWithHint(u8"##proxy.port", cfg.hint_port, pbuf, sizeof(pbuf)-1,
-                                         ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_CharsDecimal)) {
-                int v = 0;
-                if (*pbuf) v = std::clamp(std::atoi(pbuf), 0, 65535);
+            std::string pbuf(std::to_string(std::max(0, st.port)));
+            if (cfg.vk_port) {
+                changed = InputTextWithVKValidated(
+                    u8"##proxy.port", cfg.hint_port,
+                    pbuf, cfg.validate_port, InputValidatePolicy::OnTouch,
+                    cfg.port_regex, st.port_valid,
+                    cfg.error_color,
+                    ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_CharsDecimal, 
+                    /*cb*/nullptr, /*ud*/nullptr,
+                    cfg.kb_cfg, cfg.vk_cfg
+                );
+            } else {
+                changed = InputTextValidated(
+                    u8"##proxy.port", cfg.hint_port,
+                    pbuf, cfg.validate_port, InputValidatePolicy::OnTouch,
+                    cfg.port_regex, st.port_valid, cfg.error_color
+                );
+            }
+            if (changed) {
+                int v = std::stoi(pbuf);
+                v = std::clamp(v, 0, 65535);
                 if (v != st.port) { st.port = v; changed = true; }
+                else changed = false;
             }
         }
         ImGui::PopItemWidth();
 
         // --- Type ---
         if (cfg.show_type) {
+            float type_w = cfg.field_width_type > 0.0f ? 
+                cfg.field_width_type :
+                item_w - port_w - 2.0f * spacing;
+                //calc_w(u8"SOCKS 5") 
+            type_w = std::max(calc_w(u8"SOCKS 5") + 2.0f * spacing, type_w);
             ImGui::SameLine();
-            ImGui::PushItemWidth(cfg.field_width_type);
+            ImGui::PushItemWidth(type_w);
             int t = static_cast<int>(st.type);
             const char* items[] = { u8"HTTP", u8"SOCKS 4", u8"SOCKS 5" };
             if (ImGui::Combo(u8"##proxy.type", &t, items, IM_ARRAYSIZE(items))) {
@@ -135,15 +208,24 @@ namespace ImGuiX::Widgets {
         }
 
         // --- User ---
-        ImGui::PushItemWidth(cfg.field_width_host_user);
+        ImGui::PushItemWidth(item_w);
         {
-            char ubuf[256];
-            std::strncpy(ubuf, st.username.c_str(), sizeof(ubuf));
-            ubuf[sizeof(ubuf)-1] = '\0';
-            if (ImGui::InputTextWithHint(u8"##proxy.user", cfg.hint_user, ubuf, sizeof(ubuf)-1,
-                                         ImGuiInputTextFlags_AutoSelectAll)) {
-                st.username = ubuf;
-                changed = true;
+            if (cfg.vk_username) {
+                changed = InputTextWithVKValidated(
+                    u8"##proxy.user", cfg.hint_username,
+                    st.username, cfg.validate_username, InputValidatePolicy::OnTouch,
+                    cfg.username_regex, st.username_valid,
+                    cfg.error_color,
+                    ImGuiInputTextFlags_AutoSelectAll, 
+                    /*cb*/nullptr, /*ud*/nullptr,
+                    cfg.kb_cfg, cfg.vk_cfg
+                );
+            } else {
+                changed = InputTextValidated(
+                    u8"##proxy.user", cfg.hint_username,
+                    st.username, cfg.validate_username, InputValidatePolicy::OnTouch,
+                    cfg.username_regex, st.username_valid, cfg.error_color
+                );
             }
         }
         ImGui::PopItemWidth();
@@ -153,15 +235,23 @@ namespace ImGuiX::Widgets {
 
         // --- Pass ---
         ImGui::SameLine();
-        ImGui::PushItemWidth(cfg.field_width_host_user);
+        ImGui::PushItemWidth(item_w);
         {
-            char pbuf2[256];
-            std::strncpy(pbuf2, st.password.c_str(), sizeof(pbuf2));
-            pbuf2[sizeof(pbuf2)-1] = '\0';
-            if (ImGui::InputTextWithHint(u8"##proxy.pass", cfg.hint_pass, pbuf2, sizeof(pbuf2)-1,
-                                         ImGuiInputTextFlags_Password)) {
-                st.password = pbuf2;
-                changed = true;
+            if (cfg.vk_password) {
+                changed = InputPasswordWithToggleVK(
+                    u8"##proxy.pass", cfg.hint_password,
+                    st.password, cfg.validate_password, InputValidatePolicy::OnTouch,
+                    cfg.password_regex, st.password_valid,
+                    cfg.toggle_cfg, cfg.kb_cfg, cfg.vk_cfg,
+                    cfg.error_color
+                );
+            } else {
+                changed = InputPasswordWithToggle(
+                    u8"##proxy.pass", cfg.hint_password,
+                    st.password, cfg.validate_password, InputValidatePolicy::OnTouch,
+                    cfg.password_regex, st.password_valid,
+                    cfg.toggle_cfg, cfg.error_color
+                );
             }
         }
         ImGui::PopItemWidth();
@@ -175,13 +265,18 @@ namespace ImGuiX::Widgets {
 
         // --- Check button + status ---
         if (cfg.show_check && st.use_proxy) {
+            ImGui::SameLine();
             // Hide button if IP is invalid
-            if (!bad_ip) {
-                ImGui::SameLine();
-                if (ImGui::Button(cfg.button_check)) {
-                    if (cfg.on_check) cfg.on_check();
-                }
+            bool disabled = !st.ip_valid || 
+                            !st.port_valid || 
+                            !st.password_valid || 
+                            !st.username_valid;
+
+            if (disabled) ImGui::BeginDisabled();
+            if (ImGui::Button(cfg.button_check)) {
+                if (!disabled && cfg.on_check) cfg.on_check();
             }
+            if (disabled) ImGui::EndDisabled();
 
             ImGui::SameLine();
             if (cfg.checked) {
@@ -194,6 +289,8 @@ namespace ImGuiX::Widgets {
                 ImGui::RadioButton(cfg.label_checked, false);
             }
         }
+        
+        if (cfg.inputs_fill_width) ImGui::PopItemWidth();
 
         ImGui::EndChild();
         ImGui::PopID();

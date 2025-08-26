@@ -37,14 +37,14 @@ namespace ImGuiX::Widgets {
     /// \param flags        Extra ImGuiInputTextFlags for InputInt (step inside the input is disabled internally).
     /// \return true if value changed (via typing or buttons).
     inline bool InputIntVerticalStepper(
-        const char* label,
-        int* v,
-        int step = 1,
-        int step_fast = 100,
-        int v_min = INT_MIN,
-        int v_max = INT_MAX,
-        ImGuiInputTextFlags flags = 0
-    ) {
+			const char* label,
+			int* v,
+			int step = 1,
+			int step_fast = 100,
+			int v_min = INT_MIN,
+			int v_max = INT_MAX,
+			ImGuiInputTextFlags flags = 0
+		) {
         bool changed = false;
         ImGui::PushID(label);
 

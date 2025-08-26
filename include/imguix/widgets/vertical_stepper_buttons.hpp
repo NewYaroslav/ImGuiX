@@ -21,8 +21,8 @@ namespace ImGuiX::Widgets {
     inline int VerticalStepperButtons(
             const char* id, 
             ImVec2 size, 
-            int step, int 
-            step_fast, 
+            int step, 
+            int step_fast, 
             float gap_y = 1.0f
         ) {
         ImGui::PushID(id);
@@ -67,50 +67,52 @@ namespace ImGuiX::Widgets {
             dl->AddRectFilled(ImVec2(cx - e, cy), ImVec2(cx + e + 1.0f, cy + 1.0f), col_text, 0.0f);
         };
 
-        ImGui::PushButtonRepeat(true);
         int delta = 0;
         const int step_used = ImGui::GetIO().KeyCtrl ? step_fast : step;
 
         ImGui::BeginGroup();
-
+        ImVec2 cur = ImGui::GetCursorScreenPos();
+        ImGui::PushButtonRepeat(true);
         // --- Top (+)
         {
             ImVec2 pos = ImGui::GetCursorScreenPos();
             ImVec2 sz(size.x, top_h);
-            ImGui::InvisibleButton("##up", sz);
+            if (ImGui::InvisibleButton("##up", sz)) {
+                delta += step_used;
+            }
             const bool hov = ImGui::IsItemHovered();
             const bool act = ImGui::IsItemActive();
             draw_bg(pos, sz, hov, act);
             draw_plus(pos, sz);
 
-            if (ImGui::IsItemActive() && ImGui::IsMouseDown(ImGuiMouseButton_Left))
-                delta += step_used;
+            //if (ImGui::IsItemActive() && ImGui::IsMouseDown(ImGuiMouseButton_Left))
+            //    delta += step_used;
         }
 
         // gap
-        ImVec2 cur = ImGui::GetCursorScreenPos();
         ImGui::SetCursorScreenPos(ImVec2(
             cur.x,
-            cur.y - ImGui::GetStyle().ItemSpacing.y - top_h + frame_h - bottom_h
+            std::floor(cur.y + frame_h - bottom_h + 0.5f)
         ));
 
         // --- Bottom (−)
         {
             ImVec2 pos = ImGui::GetCursorScreenPos();
             ImVec2 sz(size.x, bottom_h);
-            ImGui::InvisibleButton("##down", sz);
+            if (ImGui::InvisibleButton("##down", sz)) {
+                delta -= step_used;
+            }
             const bool hov = ImGui::IsItemHovered();
             const bool act = ImGui::IsItemActive();
             draw_bg(pos, sz, hov, act);
             draw_minus(pos, sz);
 
-            if (ImGui::IsItemActive() && ImGui::IsMouseDown(ImGuiMouseButton_Left))
-                delta -= step_used;
+            // if (ImGui::IsItemActive() && ImGui::IsMouseDown(ImGuiMouseButton_Left))
+            //     delta -= step_used;
         }
-
-        ImGui::EndGroup();
         ImGui::PopButtonRepeat();
 
+        ImGui::EndGroup();
         ImGui::PopID();
         return delta;
     }

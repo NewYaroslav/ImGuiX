@@ -52,6 +52,7 @@ namespace ImGuiX::Widgets {
             should_close = true;
         };
         cfg.submit_on_enter  = true;
+        cfg.show_clipboard_buttons = true;
         cfg.border           = false;
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 6.0f);

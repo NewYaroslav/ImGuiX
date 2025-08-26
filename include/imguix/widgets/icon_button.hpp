@@ -22,9 +22,11 @@ namespace ImGuiX::Widgets {
     /// \param text UTF-8 text or icon string.
     /// \param cfg Button appearance options.
     /// \return True if clicked with left mouse button.
-    inline bool IconButtonCentered(const char* id,
-                                   const char* text,
-                                   const IconButtonConfig& cfg = {}) {
+    inline bool IconButtonCentered(
+			const char* id,
+			const char* text,
+			const IconButtonConfig& cfg = {}
+		) {
         ImDrawList* dl = ImGui::GetWindowDrawList();
         const ImVec2 p0 = ImGui::GetCursorScreenPos();
 

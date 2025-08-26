@@ -126,6 +126,8 @@ graph LR
 | ------------------------------------------ | ------------ | -------------------------------- | -------------------------------------------- |
 | Ranges preset vs explicit: last call wins  | FontManager  | Code review / unit test          | Missing glyphs when preset is overridden     |
 | PUA required for icon fonts                | FontManager  | Visual check / glyph presence    | Icons render as tofu (□) without PUA ranges  |
+| **Preset tokens include MiscSymbols/Dingbats/Arrows** | FontManager | Docs + unit test for glyphs      | Symbols (⚠, ✈, ←…) miss without ranges       |
+| **Glyph fallback for markers**: U+26A0 → U+E002 → "(!)" | Widgets/Fonts | Unit test: FindGlyph chain       | Empty icon if neither Unicode nor PUA exists |
 
 ## 5. Concurrency & Reliability
 
@@ -152,6 +154,8 @@ graph LR
 * Oracles: event receipt, resource retrieval, frame rendering.
 * Fixtures: use minimal controllers/models with deterministic behaviour.
 * When adding a module, test table:
+* Font atlas metrics: log atlas texture size and glyph count after `fontsBuildNow`.
+* Budget: keep atlas ≤ 4–8 MB; revisit if adding full CJK + symbols simultaneously.
 
 | Aspect     | Mandatory Test                          |
 | ---------- | --------------------------------------- |
@@ -223,7 +227,9 @@ graph LR
 | Blocked shutdown          | Threaded model not checking `isClosing()`        | Poll flag and join threads in destructor                                         |
 | Text shows as squares     | Ranges include only PUA (icons)                  | Use `fontsSetRangesPreset("Default+...+PUA")` or add non-PUA ranges explicitly   |
 | Icons missing             | PUA not included in ranges                       | Add `PUA` token to preset or explicit pair `0xE000–0xF8FF`                       |
-| PopStyleColor / PopID mismatch   | PushStyleColor/PushID/PushVar вызваны несимметрично | Всегда использовать флаговый паттерн: `bool pushed = false; if(cond){ ImGui::PushStyleColor(...); pushed=true; } ... if(pushed) ImGui::PopStyleColor();` |
+| PopStyleColor / PopID mismatch | PushStyleColor/PushID/PushVar вызваны несимметрично | Всегда использовать флаговый паттерн: `bool pushed = false; if(cond){ ImGui::PushStyleColor(...); pushed=true; } ... if(pushed) ImGui::PopStyleColor();` |
+| Misc symbols not rendered | Missing `MiscSymbols`/`Dingbats`/`Arrows` ranges | Add these presets or merge a symbol font (e.g., Noto Sans Symbols)               |
+| Atlas bloat               | Too many ranges/fonts merged                     | Audit ranges; split icon font; check atlas size in logs/metrics                  |
 
 Quick grep patterns:
 
@@ -290,7 +296,7 @@ Format: `type(scope): short description` where the scope is optional. Keep messa
 
 | Path                     | Role                                                   |
 | ------------------------ | ------------------------------------------------------ |
-| `docs/FONTS-GUIDE.md`    | FontManager usage and window `fonts*` helpers          |
+| `docs/FONTS-GUIDE.md` | FontManager usage; preset tokens including `MiscSymbols`, `Dingbats`, `Arrows`, `PUA` |
 
 ### Dependency Map
 

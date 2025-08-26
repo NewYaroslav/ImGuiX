@@ -201,8 +201,8 @@ namespace ImGuiX::Widgets {
         }
 
         // Compute input width (reserve space for button + inner spacing if toggle is enabled)
-        const float spacing   = style.ItemInnerSpacing.x;
-        const float input_w   = std::max(0.0f, full_width - (btn_sz.x + spacing));
+        const float spacing = style.ItemInnerSpacing.x;
+        const float input_w = std::max(0.0f, full_width - (btn_sz.x + spacing));
 
         // --- input
         ImGui::SetNextItemWidth(input_w);

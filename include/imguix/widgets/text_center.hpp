@@ -53,19 +53,18 @@ namespace ImGuiX::Widgets {
     /// \note The function creates a child region of the target width and centers it, then uses TextWrapped inside.
     inline void TextWrappedCentered(const char* text, float wrap_width = 0.0f) {
         if (!text) return;
+
         const float avail_w = ImGui::GetContentRegionAvail().x;
-        float block_w = (wrap_width > 0.0f) ? std::min(wrap_width, avail_w) : avail_w;
+        const float block_w = (wrap_width > 0.0f) ? std::min(wrap_width, avail_w) : avail_w;
 
         const float x0 = ImGui::GetCursorPosX();
-        const float x  = x0 + (avail_w - block_w) * 0.5f;
-        ImGui::SetCursorPosX(x);
+        const float x  = x0 + (avail_w - block_w) * 0.5f; // центрируем «контейнер»
 
-        ImGui::BeginChild(u8"##TextWrappedCentered", ImVec2(block_w, 0.0f),
-                          false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBackground);
-        ImGui::PushTextWrapPos(0.0f);
-        ImGui::TextWrapped(u8"%s", text);
+        ImGui::SetCursorPosX(x);
+        // wrap позиция задаётся в ЛОКАЛЬНЫХ координатах текущего окна:
+        ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + block_w);
+        ImGui::TextUnformatted(text);
         ImGui::PopTextWrapPos();
-        ImGui::EndChild();
     }
     
     /// \brief Overload for std::string (unformatted).
