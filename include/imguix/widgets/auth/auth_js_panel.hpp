@@ -6,7 +6,7 @@
 /// \brief Browser auth config panel: user-agent, accept-language, and DNT flag.
 /// Uses InputTextWithVKValidated (validation + on-screen keyboard trigger).
 
-#include "validated_input.hpp" // InputTextWithVKValidated, KeyboardToggleConfig, InputValidatePolicy
+#include <imguix/widgets/input/validated_input.hpp> // InputTextWithVKValidated, KeyboardToggleConfig, InputValidatePolicy
 
 namespace ImGuiX::Widgets {
 

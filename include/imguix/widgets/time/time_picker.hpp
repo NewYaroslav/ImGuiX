@@ -12,7 +12,7 @@
 #include <cstdio>
 #include <string>
 #include <vector>
-#include "arrow_stepper.hpp"
+#include <imguix/widgets/input/arrow_stepper.hpp>
 #include <imguix/utils/time_utils.hpp>  // ImGuiX::Utils::format_hms, etc.
 #include <imguix/extensions/sizing.hpp> // ImGuiX::Extensions::CalcTimeComboWidth(), etc.
 

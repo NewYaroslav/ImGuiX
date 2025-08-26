@@ -1,6 +1,6 @@
 #include <imgui.h>
-#include <imguix/widgets/circle_button.hpp>
-#include <imguix/widgets/system_button.hpp>
+#include <imguix/widgets/controls/circle_button.hpp>
+#include <imguix/widgets/controls/system_button.hpp>
 
 namespace ImGuiX::Windows {
     

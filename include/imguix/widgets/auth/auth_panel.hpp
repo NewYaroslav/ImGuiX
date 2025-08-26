@@ -13,7 +13,7 @@
 #include <algorithm>
 #include <type_traits>
 #include <imguix/config/fonts.hpp>
-#include "validated_password_input.hpp"
+#include <imguix/widgets/input/validated_password_input.hpp>
 
 namespace ImGuiX::Widgets {
 

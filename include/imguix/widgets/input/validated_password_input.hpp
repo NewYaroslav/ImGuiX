@@ -8,7 +8,7 @@
 #include <imgui.h>
 #include <string>
 #include "validated_input.hpp" // InputTextValidated, InputValidatePolicy, KeyboardToggleConf
-#include "icon_button.hpp"     // IconButtonCentered
+#include <imguix/widgets/controls/icon_button.hpp>     // IconButtonCentered
 #include <algorithm>
 
 namespace ImGuiX::Widgets {
