@@ -75,6 +75,9 @@
   constexpr float kAnimationSpeed = 0.15f;
   #define IMGUIX_API_VERSION "1.0"
   ```
+- **UI-макросы**: общие иконки и цвета виджетов определены в
+  `include/imguix/config/icons.hpp` и `include/imguix/config/colors.hpp`.
+  Используйте их вместо "жёстко" прописанных литералов.
 
 ### События (EventBus)
 - **Стиль**: PascalCase с суффиксом `Event`

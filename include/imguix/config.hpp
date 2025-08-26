@@ -8,5 +8,8 @@
 #include "config/paths.hpp"
 #include "config/fonts.hpp"
 #include "config/i18n.hpp"
+#include "config/icons.hpp"
+#include "config/colors.hpp"
+#include "config/sizing.hpp"
 
 #endif // _IMGUIX_CONFIG_HPP_INCLUDED

@@ -6,6 +6,7 @@
 /// \brief Helpers to compute widths for Combo preview, fields, and time widgets.
 
 #include <imgui.h>
+#include <imguix/config/sizing.hpp>
 
 namespace ImGuiX::Extensions {
 
@@ -72,13 +73,13 @@ namespace ImGuiX::Extensions {
             bool signed_preview = true,
             ImGuiComboFlags flags = 0
         ) {
-        return CalcComboWidthForPreview(signed_preview ? "+23:59:59" : "23:59:59",
+        return CalcComboWidthForPreview(signed_preview ? IMGUIX_SIZING_TIME_SIGNED : IMGUIX_SIZING_TIME_UNSIGNED,
                                         flags, ImGui::GetStyle().ItemSpacing.x * 0.5f);
     }
 
     /// \brief Recommended field width for HH/MM/SS steppers (fits "+88").
     inline float CalcHMSFieldWidth() {
-        return CalcFieldWidthForSample("+88", ImGui::GetStyle().ItemSpacing.x * 0.25f);
+        return CalcFieldWidthForSample(IMGUIX_SIZING_HMS, ImGui::GetStyle().ItemSpacing.x * 0.25f);
     }
 
     /// \brief Recommended combo width for date preview like "Mon +8888-88-88".
@@ -86,23 +87,23 @@ namespace ImGuiX::Extensions {
     inline float CalcDateComboWidth(
             ImGuiComboFlags flags = 0
         ) {
-		return CalcComboWidthForPreview(
-			"Mon +8888-88-88", flags, ImGui::GetStyle().ItemSpacing.x * 0.5f
-		);
+                return CalcComboWidthForPreview(
+                        IMGUIX_SIZING_DATE, flags, ImGui::GetStyle().ItemSpacing.x * 0.5f
+                );
 	}
 
     /// \brief Recommended field width for a year edit (fits "+8888" or "8888").
     /// \param signed_year If true, reserves '+' for signed years (смещения/офсеты).
     inline float CalcYearFieldWidth(bool signed_year = true) {
         return CalcFieldWidthForSample(
-			signed_year ? "+8888" : "8888",
-			ImGui::GetStyle().ItemSpacing.x * 0.25f
-		);
+                        signed_year ? IMGUIX_SIZING_YEAR_SIGNED : IMGUIX_SIZING_YEAR_UNSIGNED,
+                        ImGui::GetStyle().ItemSpacing.x * 0.25f
+                );
     }
 	
 	inline float CalcWeekdayComboWidth(ImGuiComboFlags flags = 0) {
-		return CalcComboWidthForPreview("Mon, Tue, Wed, Thu, Fri, Sat, Sun",
-										flags, ImGui::GetStyle().ItemSpacing.x * 0.5f);
+                return CalcComboWidthForPreview(IMGUIX_SIZING_WEEKDAYS,
+                                                                                flags, ImGui::GetStyle().ItemSpacing.x * 0.5f);
 	}
 
 } // namespace ImGuiX::Extensions

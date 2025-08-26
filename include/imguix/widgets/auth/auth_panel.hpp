@@ -12,8 +12,10 @@
 #include <cstring>
 #include <algorithm>
 #include <type_traits>
+
 #include <imguix/config/fonts.hpp>
 #include <imguix/widgets/input/validated_password_input.hpp>
+#include <imguix/config/colors.hpp>
 
 namespace ImGuiX::Widgets {
 
@@ -122,7 +124,7 @@ namespace ImGuiX::Widgets {
         const char* api_key_regex    = u8R"(^(?:[A-Za-z0-9._\-]{16,256})$)"; ///< 
         const char* api_secret_regex = u8R"(^(?:[A-Za-z0-9._\-]{16,256})$)"; ///< 
 
-        ImVec4      error_color      = ImVec4(0.9f, 0.5f, 0.5f, 1.0f);
+        ImVec4      error_color      = IMGUIX_COLOR_ERROR;
     };
     
     /// \brief All auth-related fields passed in/out by reference.

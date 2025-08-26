@@ -6,7 +6,10 @@
 /// \brief InputTextWithHint for std::string with regex validation and error tinting.
 
 #include <imgui_stdlib.h>
+
 #include <imguix/extensions/validation.hpp>
+#include <imguix/config/icons.hpp>
+#include <imguix/config/colors.hpp>
 #include "virtual_keyboard_overlay.hpp"
 
 namespace ImGuiX::Widgets {
@@ -22,7 +25,7 @@ namespace ImGuiX::Widgets {
     /// \brief Visual config for the VK trigger button (reusable across inputs).
     struct KeyboardToggleConfig {
         bool        use_icon           = true;                  ///< icon or text
-        const char* icon_text          = u8"\uE312";            ///< PUA 'keyboard' (e.g. Material)
+        const char* icon_text          = IMGUIX_ICON_KEYBOARD;  ///< PUA 'keyboard' (e.g. Material)
         const char* text               = u8"[KB]";              ///< text if use_icon==false
         ImFont*     icon_font          = nullptr;               ///< icon font (nullptr => current)
         ImVec2      button_size        = ImVec2(0,0);           ///< (0,0) => square by frame height
@@ -55,7 +58,7 @@ namespace ImGuiX::Widgets {
             InputValidatePolicy policy,
             const std::string& pattern,
             bool& out_valid,
-            ImVec4 error_color = ImVec4(0.9f,0.5f,0.5f,1.0f),
+            ImVec4 error_color = IMGUIX_COLOR_ERROR,
             ImGuiInputTextFlags flags = 0,
             ImGuiInputTextCallback callback = nullptr,
             void* user_data = nullptr
@@ -179,7 +182,7 @@ namespace ImGuiX::Widgets {
             ImGuiX::Widgets::InputValidatePolicy policy,
             const std::string& pattern,
             bool& out_valid,
-            ImVec4 error_color = ImVec4(0.9f,0.5f,0.5f,1.0f),
+            ImVec4 error_color = IMGUIX_COLOR_ERROR,
             ImGuiInputTextFlags extra_flags = 0,
             ImGuiInputTextCallback callback = nullptr,
             void* user_data = nullptr,

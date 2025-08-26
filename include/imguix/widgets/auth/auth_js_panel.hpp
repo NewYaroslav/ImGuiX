@@ -7,6 +7,7 @@
 /// Uses InputTextWithVKValidated (validation + on-screen keyboard trigger).
 
 #include <imguix/widgets/input/validated_input.hpp> // InputTextWithVKValidated, KeyboardToggleConfig, InputValidatePolicy
+#include <imguix/config/colors.hpp>
 
 namespace ImGuiX::Widgets {
 
@@ -34,7 +35,7 @@ namespace ImGuiX::Widgets {
         bool        validate_user_agent      = true;
         bool        validate_accept_language = true;
         ImGuiX::Widgets::InputValidatePolicy policy = ImGuiX::Widgets::InputValidatePolicy::OnTouch;
-        ImVec4      error_color           = ImVec4(0.9f, 0.5f, 0.5f, 1.0f);
+        ImVec4      error_color           = IMGUIX_COLOR_ERROR;
 
         // Pragmatic regexes (ECMAScript for std::regex)
         // UA: printable ASCII (space through ~), at least 1 char

@@ -75,6 +75,9 @@
   constexpr float kAnimationSpeed = 0.15f;
   #define IMGUIX_API_VERSION "1.0"
   ```
+- **UI macros**: shared widget icons and colors are defined in
+  `include/imguix/config/icons.hpp` and `include/imguix/config/colors.hpp`.
+  Prefer these macros over hard-coded literals.
 
 ### Events (EventBus)
 - **Style**: PascalCase with the `Event` suffix

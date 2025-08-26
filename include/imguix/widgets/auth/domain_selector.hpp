@@ -6,6 +6,7 @@
 /// \brief Domain chooser widget (combo with "Custom" fallback or validated input with VK).
 
 #include <imguix/widgets/input/validated_input.hpp> // InputTextWithVKValidated, KeyboardToggleConfig, InputValidatePolicy
+#include <imguix/config/colors.hpp>
 #include <imguix/widgets/misc/markers.hpp> // HelpMarker
 
 namespace ImGuiX::Widgets {
@@ -30,7 +31,7 @@ namespace ImGuiX::Widgets {
         // Validation (ECMAScript regex for std::regex)
         bool        validate_domain = true;
         ImGuiX::Widgets::InputValidatePolicy policy = ImGuiX::Widgets::InputValidatePolicy::OnTouch;
-        ImVec4      error_color = ImVec4(0.9f, 0.5f, 0.5f, 1.0f);
+        ImVec4      error_color = IMGUIX_COLOR_ERROR;
 
         // Pragmatic host/domain pattern (allows subdomains and optional :port)
         const char* domain_regex = u8R"(^[A-Za-z0-9.\-:]+$)";
