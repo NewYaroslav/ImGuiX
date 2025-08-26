@@ -12,10 +12,6 @@
 
 namespace ImGuiX::Utils {
 
-    // ---------- basic types ----------
-
-    using ts_t = int64_t; ///< POSIX seconds
-
     // ---------- civil date algorithms (Howard Hinnant) ----------
 
     /// @brief Leap year check for civil year.
@@ -58,7 +54,7 @@ namespace ImGuiX::Utils {
 
     /// @brief Split POSIX seconds into Y/M/D/h/m/s.
     void timestamp_to_ymdhms(
-            ts_t ts,
+            int64_t ts,
             int64_t& year,
             int& month,
             int& day,

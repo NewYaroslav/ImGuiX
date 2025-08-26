@@ -1,5 +1,3 @@
-#include <imgui.h>
-
 namespace ImGuiX::Extensions {
 
     inline ImVec4 BlendColors(const ImVec4& fg, const ImVec4& bg) {

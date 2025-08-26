@@ -5,7 +5,7 @@
 /// \file encoding_utils.hpp
 /// \brief Utilities for working with character encodings and string transformations.
 
-#if defined(_WIN32) || defined(_WIN64)
+#ifdef _WIN32
 
 #include <string>
 #include <Windows.h>
@@ -99,7 +99,7 @@ namespace ImGuiX::Utils {
     }
 } // namespace ImGuiX::Utils
 
-#endif // defined(_WIN32) || defined(_WIN64)
+#endif // ifdef _WIN32
 
 #ifdef IMGUIX_HEADER_ONLY
 #   include "encoding_utils.ipp"

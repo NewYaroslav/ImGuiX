@@ -10,9 +10,7 @@ namespace ImGuiX {
         : m_event_bus(), m_registry(),
           m_window_manager(*static_cast<ApplicationContext*>(this)) {
         m_registry.registerResource<OptionsStore>([] {
-            return std::make_shared<OptionsStore>(
-                    std::string(IMGUIX_CONFIG_DIR) + u8"/options.json",
-                    0.5);
+            return std::make_shared<OptionsStore>();
         });
     }
 
@@ -30,9 +28,7 @@ namespace ImGuiX {
 #else
         if (async) {
             m_main_thread = std::thread([this]() {
-#               ifdef IMGUIX_USE_SFML_BACKEND
                 registry().getResource<DeltaClockSfml>().update();
-#               endif
                 startLoop();
                 mainLoop();
             });

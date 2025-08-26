@@ -25,10 +25,6 @@
 #include <nlohmann/json.hpp>
 #include <filesystem>
 
-#include <imguix/config/i18n.hpp>
-#include <imguix/utils/strip_json_comments.hpp>
-#include <imguix/utils/path_utils.hpp>
-
 #include "i18n/PluralRules.hpp"
 #include "i18n/LangStore.hpp"
 

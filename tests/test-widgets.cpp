@@ -31,7 +31,10 @@ namespace i18n = ImGuiX::I18N;
 class I18nController : public ImGuiX::Controller {
 public:
     I18nController(ImGuiX::WindowInterface& window)
-        : Controller(window) {}
+        : Controller(window) {
+        m_state.auth_data.email    = options().getStrOr("email", "guest@example.com");
+        m_state.auth_data.password = options().getStrOr("password", "");
+    }
 
     void drawContent() override {
         // пространство для фонового рендера; всё демо — в drawUi()
@@ -214,7 +217,14 @@ private:
             cfg_api.vk_api_key          = true;
             cfg_api.vk_api_secret       = true;
             cfg_api.show_connect_button = false;
-            ImGuiX::Widgets::AuthPanel("login.api", cfg_api, m_state.auth_data);
+            const auto res = ImGuiX::Widgets::AuthPanel("login.api", cfg_api, m_state.auth_data);
+            using E = ImGuiX::Widgets::AuthPanelResult;
+            if (Has(res, E::EmailChanged) && m_state.auth_data.email_valid) {
+                options().setStr("email", m_state.auth_data.email);
+            }
+            if (Has(res, E::PasswordChanged)) {
+                options().setStr("password", m_state.auth_data.password);
+            }
         }
 
         // --- Validated inputs block ---
@@ -392,63 +402,63 @@ private:
             ImGuiX::Widgets::DatePicker("date_ts", ts, dc_ts);
         }
 
-		// --- Markers ---
-		if (ImGui::CollapsingHeader("Markers")) {
-			// 1) Цветные маркеры (бейджи)
-			ImGui::TextDisabled("Colored markers:");
-			ImGuiX::Widgets::ColoredMarker("OK",          "All good",                  ImVec4(0.10f, 0.75f, 0.30f, 1.0f));
-			ImGui::SameLine();
-			ImGuiX::Widgets::ColoredMarker("WARNING",     "Spread high",               ImVec4(0.95f, 0.75f, 0.10f, 1.0f));
-			ImGui::SameLine();
-			ImGuiX::Widgets::ColoredMarker("ERROR",       "Disconnected",              ImVec4(0.95f, 0.25f, 0.25f, 1.0f));
-			ImGui::SameLine();
-			ImGuiX::Widgets::ColoredMarker("SIMULATION",  "Demo / paper trading",      ImVec4(0.70f, 0.70f, 0.80f, 1.0f));
+        // --- Markers ---
+        if (ImGui::CollapsingHeader("Markers")) {
+            // 1) Цветные маркеры (бейджи)
+            ImGui::TextDisabled("Colored markers:");
+            ImGuiX::Widgets::ColoredMarker("OK",          "All good",                  ImVec4(0.10f, 0.75f, 0.30f, 1.0f));
+            ImGui::SameLine();
+            ImGuiX::Widgets::ColoredMarker("WARNING",     "Spread high",               ImVec4(0.95f, 0.75f, 0.10f, 1.0f));
+            ImGui::SameLine();
+            ImGuiX::Widgets::ColoredMarker("ERROR",       "Disconnected",              ImVec4(0.95f, 0.25f, 0.25f, 1.0f));
+            ImGui::SameLine();
+            ImGuiX::Widgets::ColoredMarker("SIMULATION",  "Demo / paper trading",      ImVec4(0.70f, 0.70f, 0.80f, 1.0f));
 
-			ImGui::Separator();
+            ImGui::Separator();
 
-			// 2) Message markers (иконка с тултипом/текстом)
-			ImGui::TextDisabled("Message markers:");
-			// Help
-			ImGui::TextUnformatted("Help:"); 
-			ImGui::SameLine();
-			ImGuiX::Widgets::HelpMarker("Trading server to place real orders.\nUse with care.");
+            // 2) Message markers (иконка с тултипом/текстом)
+            ImGui::TextDisabled("Message markers:");
+            // Help
+            ImGui::TextUnformatted("Help:"); 
+            ImGui::SameLine();
+            ImGuiX::Widgets::HelpMarker("Trading server to place real orders.\nUse with care.");
 
-			// Info
-			ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x * 2);
-			ImGui::TextUnformatted("Info:"); 
-			ImGui::SameLine();
-			ImGuiX::Widgets::InfoMarker("New version available: v1.4.2. Update when idle.");
+            // Info
+            ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x * 2);
+            ImGui::TextUnformatted("Info:"); 
+            ImGui::SameLine();
+            ImGuiX::Widgets::InfoMarker("New version available: v1.4.2. Update when idle.");
 
-			// Warning
-			ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x * 2);
-			ImGui::TextUnformatted("Warn:"); 
-			ImGui::SameLine();
-			ImGuiX::Widgets::WarningMarker("Funding API rate-limit almost reached; consider backoff.");
+            // Warning
+            ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x * 2);
+            ImGui::TextUnformatted("Warn:"); 
+            ImGui::SameLine();
+            ImGuiX::Widgets::WarningMarker("Funding API rate-limit almost reached; consider backoff.");
 
-			// Success (иконка + инлайн-вариант)
-			ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x * 2);
-			ImGui::TextUnformatted("Success:");
-			ImGui::SameLine();
-			ImGuiX::Widgets::SuccessMarker("License validated. All features enabled.");
-			// Инлайн-текст рядом с иконкой (без тултипа)
-			ImGuiX::Widgets::SuccessMarker("License validated.", ImGuiX::Widgets::MarkerMode::InlineText);
+            // Success (иконка + инлайн-вариант)
+            ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x * 2);
+            ImGui::TextUnformatted("Success:");
+            ImGui::SameLine();
+            ImGuiX::Widgets::SuccessMarker("License validated. All features enabled.");
+            // Инлайн-текст рядом с иконкой (без тултипа)
+            ImGuiX::Widgets::SuccessMarker("License validated.", ImGuiX::Widgets::MarkerMode::InlineText);
 
-			ImGui::Separator();
+            ImGui::Separator();
 
-			// (опционально) Пресеты с SelectableMarker
-			ImGui::TextDisabled("Selectable markers:");
-			static std::vector<std::string> presets = {
-				"London Session", "New York Session", "Asia Session", "Custom Range"
-			};
-			static int last_clicked = -1;
-			for (int i = 0; i < (int)presets.size(); ++i) {
-				if (ImGuiX::Widgets::SelectableMarker(presets[i])) {
-					last_clicked = i;
-				}
-			}
-			ImGui::Separator();
-			ImGui::Text("Last clicked: %s", (last_clicked >= 0 ? presets[last_clicked].c_str() : "none"));
-		}
+            // (опционально) Пресеты с SelectableMarker
+            ImGui::TextDisabled("Selectable markers:");
+            static std::vector<std::string> presets = {
+                "London Session", "New York Session", "Asia Session", "Custom Range"
+            };
+            static int last_clicked = -1;
+            for (int i = 0; i < (int)presets.size(); ++i) {
+                if (ImGuiX::Widgets::SelectableMarker(presets[i])) {
+                    last_clicked = i;
+                }
+            }
+            ImGui::Separator();
+            ImGui::Text("Last clicked: %s", (last_clicked >= 0 ? presets[last_clicked].c_str() : "none"));
+        }
 
         // --- Spinner ---
         if (ImGui::CollapsingHeader("Loading Spinner")) {

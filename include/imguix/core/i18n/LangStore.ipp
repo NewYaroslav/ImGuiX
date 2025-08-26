@@ -8,9 +8,9 @@
 
 #include <nlohmann/json.hpp>
 
-#include "imguix/utils/path_utils.hpp"
-#include "imguix/utils/strip_json_comments.hpp"
-#include "imguix/core/i18n/PluralRules.hpp"
+#include <imguix/utils/path_utils.hpp>
+#include <imguix/utils/strip_json_comments.hpp>
+#include <imguix/core/i18n/PluralRules.hpp>
 
 namespace ImGuiX::I18N {
 

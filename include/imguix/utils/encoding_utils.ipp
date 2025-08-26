@@ -1,4 +1,4 @@
-#if defined(_WIN32) || defined(_WIN64)
+#ifdef _WIN32
 
 namespace ImGuiX::Utils {
 
@@ -95,5 +95,5 @@ namespace ImGuiX::Utils {
 
 } // namespace ImGuiX::Utils
 
-#endif // defined(_WIN32) || defined(_WIN64)
+#endif // #ifdef _WIN32
 

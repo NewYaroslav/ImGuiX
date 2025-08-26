@@ -6,7 +6,6 @@
 /// \brief Generates sequential colors from HSV spectrum.
 
 #include <cstddef>
-
 #include <imgui.h>
 
 namespace ImGuiX::Extensions {
@@ -19,7 +18,7 @@ namespace ImGuiX::Extensions {
 
     ImVec4 hsvToRgb(const Hsv& in);
 
-class ColorGradient {
+    class ColorGradient {
     public:
         explicit ColorGradient(std::size_t count);
 

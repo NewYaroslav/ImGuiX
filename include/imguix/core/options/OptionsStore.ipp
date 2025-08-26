@@ -5,6 +5,9 @@
 #include <cstdio>
 #include <mutex>
 
+#include <imguix/config/paths.hpp>
+#include <imguix/utils/path_utils.hpp>
+
 namespace ImGuiX {
 
     using json = nlohmann::json;
@@ -52,7 +55,7 @@ namespace ImGuiX {
                             m_tmp_path,
                             std::ios::binary | std::ios::trunc);
                     if (!tf.good()) throw std::runtime_error(u8"tmp open failed");
-                    tf << m_root.dump(2);
+                    tf << m_root.dump(4);
                     tf.flush();
                 }
 #ifdef _WIN32
@@ -156,6 +159,17 @@ namespace ImGuiX {
         m_impl->m_path = std::move(path);
         m_impl->m_tmp_path = m_impl->m_path + u8".tmp";
         m_impl->m_save_delay = save_delay_sec;
+        load();
+    }
+    
+    inline OptionsStore::OptionsStore() 
+        : m_impl(std::make_unique<Impl>()) {
+        const std::string base_dir(IMGUIX_CONFIG_DIR);
+        const auto base_abs = ImGuiX::Utils::resolveExecPath(base_dir);
+        std::string path = ImGuiX::Utils::joinPaths(base_abs, u8"options.json");
+        m_impl->m_path = std::move(path);
+        m_impl->m_tmp_path = m_impl->m_path + u8".tmp";
+        m_impl->m_save_delay = 0.5;
         load();
     }
 

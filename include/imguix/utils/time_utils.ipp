@@ -42,7 +42,7 @@ namespace ImGuiX::Utils {
     }
 
     void timestamp_to_ymdhms(
-            ts_t ts,
+            int64_t ts,
             int64_t& year,
             int& month,
             int& day,

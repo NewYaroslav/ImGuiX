@@ -11,6 +11,7 @@
 #include <regex>
 #include <cstring>
 #include <algorithm>
+#include <type_traits>
 #include <imguix/config/fonts.hpp>
 #include "validated_password_input.hpp"
 
@@ -32,7 +33,22 @@ namespace ImGuiX::Widgets {
         return static_cast<AuthPanelResult>(static_cast<unsigned>(a) | static_cast<unsigned>(b));
     }
     
+    inline AuthPanelResult operator&(AuthPanelResult a, AuthPanelResult b) {
+        return static_cast<AuthPanelResult>(static_cast<unsigned>(a) & static_cast<unsigned>(b));
+    }
+    
     inline AuthPanelResult& operator|=(AuthPanelResult& a, AuthPanelResult b) { a = a | b; return a; }
+
+    inline bool Any(ImGuiX::Widgets::AuthPanelResult r) noexcept {
+        using U = std::underlying_type_t<ImGuiX::Widgets::AuthPanelResult>;
+        return static_cast<U>(r) != 0u;
+    }
+
+    inline bool Has(ImGuiX::Widgets::AuthPanelResult r,
+                    ImGuiX::Widgets::AuthPanelResult f) noexcept {
+        using U = std::underlying_type_t<ImGuiX::Widgets::AuthPanelResult>;
+        return (static_cast<U>(r) & static_cast<U>(f)) != 0u;
+    }
 
     /// \brief Configuration for AuthPanel.
     struct AuthPanelConfig {

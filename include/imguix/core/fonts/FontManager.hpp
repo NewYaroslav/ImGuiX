@@ -21,8 +21,6 @@
 #include "font_types.hpp"
 #include "FontManagerViewCRTP.hpp"
 #include "FontManagerControlCRTP.hpp"
-#include <imguix/utils/path_utils.hpp>
-#include <imguix/config/fonts.hpp>
 
 namespace ImGuiX::Fonts {
 

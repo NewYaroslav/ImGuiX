@@ -1,6 +1,4 @@
-#include <imgui.h>
 #include <regex>
-#include <string>
 
 namespace ImGuiX::Extensions {
 

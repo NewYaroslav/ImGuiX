@@ -1,6 +1,4 @@
 #include <algorithm>
-#include <cstddef>
-#include <imgui.h>
 
 namespace ImGuiX::Extensions {
 

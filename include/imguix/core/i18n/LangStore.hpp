@@ -30,8 +30,6 @@
 
 namespace ImGuiX::I18N {
 
-    class PluralRules;
-
     namespace fs = std::filesystem;
 
     /// \class LangStore

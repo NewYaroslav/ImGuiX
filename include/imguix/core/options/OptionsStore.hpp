@@ -29,6 +29,9 @@ namespace ImGuiX {
         /// \param path JSON file path.
         /// \param save_delay_sec Debounce window for saving (seconds).
         explicit OptionsStore(std::string path, double save_delay_sec = 0.5);
+        
+        explicit OptionsStore();
+
         ~OptionsStore();
 
         /// \brief Load from disk (best-effort). Keeps existing values on failure.
@@ -182,15 +185,15 @@ namespace ImGuiX {
 
         /// \brief Get read-only view.
         /// \return View interface.
-        View& view() noexcept { return *this; }
+        View& view() noexcept { return static_cast<View&>(*this); }
 
         /// \brief Get read-only view.
         /// \return View interface.
-        const View& view() const noexcept { return *this; }
+        const View& view() const noexcept { return static_cast<const View&>(*this); }
 
         /// \brief Get mutable interface without load/save.
         /// \return Control interface.
-        Control& control() noexcept { return *this; }
+        Control& control() noexcept { return static_cast<Control&>(*this); }
 
     private:
         struct Impl;
@@ -198,6 +201,9 @@ namespace ImGuiX {
 
         OptionsStore(const OptionsStore&) = delete;
         OptionsStore& operator=(const OptionsStore&) = delete;
+
+        friend struct OptionsStoreViewCRTP<OptionsStore>;
+        friend struct OptionsStoreControlCRTP<OptionsStore>;
     };
 
 } // namespace ImGuiX

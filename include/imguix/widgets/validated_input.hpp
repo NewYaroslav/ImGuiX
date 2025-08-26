@@ -76,7 +76,9 @@ namespace ImGuiX::Widgets {
             return h;
         };
 
-        auto match = [&](const std::string& s){ return !validate || RegexMatchSafe(s, pattern); };
+        auto match = [&](const std::string& s){ 
+			return !validate || RegexMatchSafe(s, pattern); 
+		};
 
         // hash BEFORE drawing the input (to detect external changes)
         const uint32_t prev_hash = static_cast<uint32_t>(st->GetInt(key_prev_hash, -1));
@@ -140,7 +142,7 @@ namespace ImGuiX::Widgets {
         }
         
         ImGui::PopID();
-        return changed;
+        return changed || external_changed;
     }
     
     /// \brief InputTextWithHint + regex validation + on-screen keyboard trigger (overlay).

@@ -13,6 +13,9 @@
 #include <imgui_freetype.h>
 #endif
 
+#include <imguix/utils/path_utils.hpp>
+#include <imguix/config/fonts.hpp>
+
 namespace ImGuiX::Fonts {
     namespace fs = std::filesystem;
 

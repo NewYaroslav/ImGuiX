@@ -1,5 +1,3 @@
-#include <imgui.h>
-
 namespace ImGuiX::Extensions {
 
     inline void BeginDisable(bool disable) {

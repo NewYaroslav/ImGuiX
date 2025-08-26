@@ -104,6 +104,56 @@ graph LR
 * **Event Contract**: every event derives from `Pubsub::Event` and implements `type()` and `name()`
 * **Model Restrictions**: synchronous `notify` functions are deleted to avoid race conditions; use `notifyAsync` only
 
+### UI Sizing & Combo Patterns
+
+**Sizing-хелперы** (`include/imguix/extensions/sizing.hpp`):
+- `CalcTimeComboWidth()`, `CalcDateComboWidth()`, `CalcWeekdayComboWidth()`
+- `CalcHMSFieldWidth()`, `CalcYearFieldWidth()`
+- `CalcComboPreviewTextMax(float combo_w, ImGuiComboFlags flags=0, float slack=1.0f)`
+- `CalcFieldWidthForSample(const char* sample_utf8)`
+
+**Инварианты для Combo:**
+1) Перед `BeginCombo(...)` задать размеры:
+   - `ImGui::SetNextItemWidth(combo_w);`
+   - `ImGui::SetNextWindowSizeConstraints(min, max);` — ограничить высоту списков.
+2) Внутри попапа, если **нет** рамки/child:
+   - слева: `ImGui::Indent(style.FramePadding.x);`
+   - справа: `ImGui::SameLine(0,0); ImGui::Dummy(ImVec2(style.FramePadding.x, 0));`
+   - затем `ImGui::Unindent(style.FramePadding.x);`
+3) Для мультиселект-гридов держать попап открытым:
+   - `ImGui::Selectable(..., /*selected*/, ImGuiSelectableFlags_DontClosePopups, cell_size);`
+4) Превью строки обрезать по пикселям:
+   - `max_text_px = CalcComboPreviewTextMax(combo_w, flags);`
+   - накапливать токены, проверяя `ImGui::CalcTextSize(...) <= max_text_px`; в конце — `"..."`
+5) **Не** хардкодить ширину через `GetWindowWidth()*k` — использовать хелперы/`CalcItemWidth()`.
+
+**MWE: DaysOfWeekSelector (фрагмент)**
+
+```cpp
+const float combo_w = cfg.combo_width > 0 ? cfg.combo_width
+                                          : ImGuiX::Extensions::CalcWeekdayComboWidth();
+ImGui::SetNextItemWidth(combo_w);
+ImGui::SetNextWindowSizeConstraints(ImVec2(0,0),
+    ImVec2(FLT_MAX, ImGui::GetTextLineHeightWithSpacing()*12));
+
+if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Days", preview.c_str(),
+                      ImGuiComboFlags_HeightLargest | ImGuiComboFlags_PopupAlignLeft)) {
+    const ImGuiStyle& st = ImGui::GetStyle();
+    ImGui::Indent(st.FramePadding.x);
+
+    // toolbar ...
+    // grid ...
+    if (ImGui::Selectable(token, selected,
+                          ImGuiSelectableFlags_DontClosePopups, cell_sz)) {
+        selected = !selected;
+    }
+
+    ImGui::SameLine(0,0); ImGui::Dummy(ImVec2(st.FramePadding.x, 0));
+    ImGui::Unindent(st.FramePadding.x);
+    ImGui::EndCombo();
+}
+```
+
 ## 4. Data & Contracts
 
 * Event types are C++ structs; no implicit serialization.
@@ -230,6 +280,10 @@ graph LR
 | PopStyleColor / PopID mismatch | PushStyleColor/PushID/PushVar вызваны несимметрично | Всегда использовать флаговый паттерн: `bool pushed = false; if(cond){ ImGui::PushStyleColor(...); pushed=true; } ... if(pushed) ImGui::PopStyleColor();` |
 | Misc symbols not rendered | Missing `MiscSymbols`/`Dingbats`/`Arrows` ranges | Add these presets or merge a symbol font (e.g., Noto Sans Symbols)               |
 | Atlas bloat               | Too many ranges/fonts merged                     | Audit ranges; split icon font; check atlas size in logs/metrics                  |
+| Превью обрезается/дрожит  | Не учтён реальный `text_max_px` | Вычислять через `CalcComboPreviewTextMax(combo_w, flags)` и дозаполнять с `CalcTextSize` |
+| Контент прилип к краям попапа | Нет внутреннего отступа | Внутри попапа: `Indent(style.FramePadding.x)` слева и `SameLine(0,0); Dummy({style.FramePadding.x,0})` справа; потом `Unindent` |
+| Попап закрывается при клике по ячейке | `Selectable` без флага | Использовать `ImGuiSelectableFlags_DontClosePopups` для мультиселекта |
+| Случайные жёсткие коэффициенты ширины | `GetWindowWidth()*k` | Использовать `SetNextItemWidth(Calc*ComboWidth)`/`CalcItemWidth()` |
 
 Quick grep patterns:
 
