@@ -32,6 +32,7 @@ class I18nController : public ImGuiX::Controller {
 public:
     I18nController(ImGuiX::WindowInterface& window)
         : Controller(window) {
+        m_state.auth_data.host     = options().getStrOr("host", "demo.local");
         m_state.auth_data.email    = options().getStrOr("email", "guest@example.com");
         m_state.auth_data.password = options().getStrOr("password", "");
     }
@@ -219,13 +220,14 @@ private:
             cfg_api.show_connect_button = false;
             const auto res = ImGuiX::Widgets::AuthPanel("login.api", cfg_api, m_state.auth_data);
             using E = ImGuiX::Widgets::AuthPanelResult;
+            if (Has(res, E::HostChanged) && m_state.auth_data.host_valid) {
+                options().setStr("host", m_state.auth_data.host);
+            }
             if (Has(res, E::EmailChanged) && m_state.auth_data.email_valid) {
                 options().setStr("email", m_state.auth_data.email);
-				std::cout << "-email " << m_state.auth_data.email << std::endl;
             }
             if (Has(res, E::PasswordChanged)) {
                 options().setStr("password", m_state.auth_data.password);
-				std::cout << "-password " << m_state.auth_data.password << std::endl;
             }
         }
 
