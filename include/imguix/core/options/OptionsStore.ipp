@@ -4,6 +4,9 @@
 #include <optional>
 #include <cstdio>
 #include <mutex>
+#ifdef __EMSCRIPTEN__
+#   include <emscripten.h>
+#endif
 
 #include <imguix/config/paths.hpp>
 #include <imguix/utils/path_utils.hpp>
@@ -59,10 +62,15 @@ namespace ImGuiX {
                     tf.flush();
                 }
 #ifdef _WIN32
-                MoveFileExA(m_tmp_path.c_str(), m_path.c_str(),
+                MoveFileExA(
+                        m_tmp_path.c_str(),
+                        m_path.c_str(),
                         MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH);
 #else
                 std::rename(m_tmp_path.c_str(), m_path.c_str());
+#   if defined(__EMSCRIPTEN__) && defined(IMGUIX_EMSCRIPTEN_IDBFS)
+                EM_ASM({ FS.syncfs(false, function(err){}); });
+#   endif
 #endif
             } catch (...) {
                 std::remove(m_tmp_path.c_str());
@@ -156,20 +164,35 @@ namespace ImGuiX {
 
     inline OptionsStore::OptionsStore(std::string path, double save_delay_sec)
         : m_impl(std::make_unique<Impl>()) {
+#ifdef __EMSCRIPTEN__
+        if (!ImGuiX::Utils::isAbsolutePath(path)) {
+            path = ImGuiX::Utils::joinPaths("/imguix_fs", path);
+        }
+#endif
         m_impl->m_path = std::move(path);
         m_impl->m_tmp_path = m_impl->m_path + u8".tmp";
         m_impl->m_save_delay = save_delay_sec;
         load();
     }
     
-    inline OptionsStore::OptionsStore() 
+    inline OptionsStore::OptionsStore()
         : m_impl(std::make_unique<Impl>()) {
+        m_impl->m_save_delay = 0.5;
+#ifdef __EMSCRIPTEN__
+        const auto base_abs = ImGuiX::Utils::joinPaths(
+                "/imguix_fs",
+                IMGUIX_CONFIG_DIR);
+        m_impl->m_path = ImGuiX::Utils::joinPaths(
+                base_abs,
+                IMGUIX_OPTIONS_FILENAME);
+        m_impl->m_tmp_path = m_impl->m_path + u8".tmp";
+#else
         const std::string base_dir(IMGUIX_CONFIG_DIR);
         const auto base_abs = ImGuiX::Utils::resolveExecPath(base_dir);
         std::string path = ImGuiX::Utils::joinPaths(base_abs, IMGUIX_OPTIONS_FILENAME);
         m_impl->m_path = std::move(path);
         m_impl->m_tmp_path = m_impl->m_path + u8".tmp";
-        m_impl->m_save_delay = 0.5;
+#endif
         load();
     }
 

@@ -3,6 +3,7 @@
 #endif
 
 #include <imguix/config/paths.hpp>
+#include <imguix/core/options/OptionsStore.hpp>
 
 namespace ImGuiX {
 
@@ -97,7 +98,10 @@ namespace ImGuiX {
             FS.mkdir('/imguix_fs');
             FS.mount(IDBFS, {}, '/imguix_fs');
             FS.syncfs(true, function(){});
+            try { FS.mkdir('/imguix_fs/data'); } catch (e) {}
+            try { FS.mkdir('/imguix_fs/data/config'); } catch (e) {}
         });
+        m_registry.getResource<OptionsStore>().load();
 #   endif
 #endif
         // Ensure initial windows and models are ready before entering loop
