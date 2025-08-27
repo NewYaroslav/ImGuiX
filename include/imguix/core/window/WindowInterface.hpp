@@ -120,6 +120,10 @@ namespace ImGuiX {
         /// \return Language store.
         virtual const ImGuiX::I18N::LangStore& langStore() const = 0;
 
+        /// \brief Access the theme manager.
+        /// \return Theme manager.
+        virtual Themes::ThemeManager& getThemeManager() = 0;
+
     };
 
 } // namespace ImGuiX

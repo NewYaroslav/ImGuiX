@@ -30,6 +30,8 @@
 
 namespace ImGuiX {
 
+    class Controller;
+
     /// \brief Abstract base class for a window instance.
     ///
     /// Combines event handling, rendering, and controller orchestration.
@@ -184,6 +186,10 @@ namespace ImGuiX {
         /// \return Font manager control interface.
         ImGuiX::Fonts::FontManager::Control& fontsControl() noexcept { return m_font_manager.control(); }
 
+        /// \brief Access the theme manager.
+        /// \return Theme manager.
+        ImGuiX::Themes::ThemeManager& getThemeManager() noexcept override { return m_theme_manager; }
+
         // ---
 
         /// \brief Compute file path for storing ImGui ini settings.
@@ -296,6 +302,7 @@ namespace ImGuiX {
         bool m_in_init_phase = false;       ///< Guard flag for onInit phase operations.
         bool m_is_fonts_init = false;       ///< Indicates whether fonts have been built.
         ImGuiX::Fonts::FontManager m_font_manager; ///< Manages ImGui font atlas.
+        ImGuiX::Themes::ThemeManager m_theme_manager; ///< Manages ImGui style themes.
         ImGuiX::I18N::LangStore    m_lang_store{}; ///< Localization storage for this window.
         std::string                m_pending_lang; ///< Language code pending to apply.
 

@@ -44,6 +44,9 @@
 // --- Resource system ---
 #include "core/resource/ResourceRegistry.hpp"      ///< Global registry for shared resources
 
+// --- Theme system ---
+#include "themes/ThemeManager.hpp"                 ///< Theme manager for ImGui styles
+
 // --- Controller and model interfaces ---
 #include "core/application/ApplicationContext.hpp" ///< Interface for application access
 #include "core/window/WindowInterface.hpp"         ///< Interface for window control
