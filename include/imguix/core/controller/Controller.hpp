@@ -64,6 +64,12 @@ namespace ImGuiX {
             return m_window.langStore();
         }
 
+        /// \brief Access the theme manager.
+        /// \return Theme manager instance.
+        Themes::ThemeManager& getThemeManager() {
+            return m_window.getThemeManager();
+        }
+
     protected:
         WindowInterface& m_window; ///< Controlled window instance.
     };

@@ -1,4 +1,6 @@
 #include <algorithm>
+#include <imgui.h>
+#include <imguix/themes/ThemeManager.hpp>
 
 namespace ImGuiX {
 
@@ -111,6 +113,7 @@ namespace ImGuiX {
 #       endif
 
         for (auto& window : m_windows) {
+            window->getThemeManager().updateCurrentTheme(ImGui::GetStyle());
             window->tick();
         }
     }

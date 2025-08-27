@@ -1,5 +1,6 @@
 #include <imgui.h>
 #include <imguix/utils/path_utils.hpp>
+#include <imguix/themes/themes.hpp>
 
 namespace ImGuiX {
 
@@ -8,6 +9,9 @@ namespace ImGuiX {
           m_window_id(id),
           m_window_name(std::move(name)),
           m_application(app) {
+        m_theme_manager.registerTheme("light", std::make_unique<Themes::LightTheme>());
+        m_theme_manager.registerTheme("dark", std::make_unique<Themes::DarkTheme>());
+        m_theme_manager.setTheme("dark");
     }
 
     void WindowInstance::drawContent() {
