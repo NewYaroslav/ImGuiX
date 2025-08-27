@@ -166,7 +166,7 @@ namespace ImGuiX {
         : m_impl(std::make_unique<Impl>()) {
         const std::string base_dir(IMGUIX_CONFIG_DIR);
         const auto base_abs = ImGuiX::Utils::resolveExecPath(base_dir);
-        std::string path = ImGuiX::Utils::joinPaths(base_abs, u8"options.json");
+        std::string path = ImGuiX::Utils::joinPaths(base_abs, IMGUIX_OPTIONS_FILENAME);
         m_impl->m_path = std::move(path);
         m_impl->m_tmp_path = m_impl->m_path + u8".tmp";
         m_impl->m_save_delay = 0.5;

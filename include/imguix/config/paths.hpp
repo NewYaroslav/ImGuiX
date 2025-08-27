@@ -6,4 +6,8 @@
 #   define IMGUIX_CONFIG_DIR u8"data/config"
 #endif
 
+#ifndef IMGUIX_OPTIONS_FILENAME
+#   define IMGUIX_OPTIONS_FILENAME u8"options.json"
+#endif
+
 #endif // _IMGUIX_CONFIG_PATHS_HPP_INCLUDED

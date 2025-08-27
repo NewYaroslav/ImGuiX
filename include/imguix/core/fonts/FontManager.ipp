@@ -563,12 +563,12 @@ namespace ImGuiX::Fonts {
         // If still no Body, try a minimal fallback (Roboto + Icons) using base_dir
         if (!body) {
           FontFile fb{};
-          fb.path = u8"Roboto-Medium.ttf";
+          fb.path = IMGUIX_FONTS_FALLBACK_BODY_BASENAME;
           fb.size_px = m_px_body;
           body = add_single(FontRole::Body, fb);
 
           FontFile ic{};
-          ic.path = u8"forkawesome-webfont.ttf";
+          ic.path = IMGUIX_FONTS_FALLBACK_ICONS_BASENAME;
           ic.size_px = m_px_body;
           ic.merge = true;
           addFontFile(ic, m_params, ranges, base_dir_abs, cfg);
@@ -681,7 +681,7 @@ namespace ImGuiX::Fonts {
         // Fallback: if empty or not found, try base_dir/fonts.json
         if (readTextFile(cfg_path).empty()) {
             const auto base_abs = ImGuiX::Utils::resolveExecPath(m_params.base_dir);
-            cfg_path = ImGuiX::Utils::joinPaths(base_abs, u8"fonts.json");
+            cfg_path = ImGuiX::Utils::joinPaths(base_abs, IMGUIX_FONTS_CONFIG_BASENAME);
         }
 #       endif
 
