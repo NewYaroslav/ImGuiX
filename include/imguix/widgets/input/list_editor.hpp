@@ -41,7 +41,7 @@ namespace ImGuiX::Widgets {
     // ------------------------------- integers -------------------------------
 
     /// \brief Combo-like list editor for integers. One input -> one element. No CSV.
-bool ListEditor(
+	bool ListEditor(
             const char* id,
             const char* label,
             std::vector<int>& items,

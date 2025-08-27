@@ -378,8 +378,11 @@ namespace ImGuiX::Widgets {
 
 
     // --- авто-высота для внутренней области (без внешних паддингов) ---
-    inline float calc_min_inner_height(const VirtualKeyboardConfig& cfg,
-                                       int left_rows, int right_rows) {
+    inline float calc_min_inner_height(
+			const VirtualKeyboardConfig& cfg,
+			int left_rows, 
+			int right_rows
+		) {
         const ImGuiStyle& style = ImGui::GetStyle();
         const float key_h   = cfg.key_size.y;
         const float row_gap = style.ItemSpacing.y;     // вертикальные зазоры между рядами (как в реальном UI)
@@ -412,13 +415,14 @@ namespace ImGuiX::Widgets {
     // -------------- Widget ----------------------
 
     bool VirtualKeyboard(
-            const char* id,
-            std::string& text,
-            VirtualKeyboardConfig cfg
-        );
+			const char* id, 
+			std::string& text, 
+			const VirtualKeyboardConfig& cfg,
+			VirtualKeyboardState* state = nullptr
+		);
 
     // Back-compat overload
-inline bool VirtualKeyboard(const char* id, std::string& text, ImVec2 size) {
+	inline bool VirtualKeyboard(const char* id, std::string& text, ImVec2 size) {
         VirtualKeyboardConfig cfg;
         cfg.size = size;
         return VirtualKeyboard(id, text, cfg);

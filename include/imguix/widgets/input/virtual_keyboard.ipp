@@ -12,15 +12,12 @@
 
 namespace ImGuiX::Widgets {
 
-bool VirtualKeyboard(
-        const char* id,
-        std::string& text,
-        VirtualKeyboardConfig cfg
-    ) {
+    bool VirtualKeyboard(
             const char* id, 
             std::string& text, 
             const VirtualKeyboardConfig& cfg,
-            VirtualKeyboardState* state = nullptr) {
+            VirtualKeyboardState* state
+        ) {
         bool modified = false;
 
         ImGui::PushID(id);
@@ -516,7 +513,6 @@ bool VirtualKeyboard(
 
         return modified;
     }
-
 
 } // namespace ImGuiX::Widgets
 

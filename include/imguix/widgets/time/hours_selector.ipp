@@ -117,7 +117,7 @@ namespace ImGuiX::Widgets {
                     }
 
                     // Use Selectable for highlight/hover; fixed size via Size parameter
-                    if (ImGui::Selectable(label_txt, selected, 0, cell)) {
+                    if (ImGui::Selectable(label_txt, selected, ImGuiSelectableFlags_DontClosePopups, cell)) {
                         mark[idx] = !selected;
                         changed = true;
                     }

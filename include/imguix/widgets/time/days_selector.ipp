@@ -145,7 +145,7 @@ namespace ImGuiX::Widgets {
                             ImGui::GetStyleColorVec4(ImGuiCol_TextSelectedBg));
                     }
 
-                    if (ImGui::Selectable(txt, selected, 0, cell)) {
+                    if (ImGui::Selectable(txt, selected, ImGuiSelectableFlags_DontClosePopups, cell)) {
                         mark[idx] = !selected;
                         changed = true;
                     }
