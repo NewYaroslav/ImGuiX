@@ -221,9 +221,11 @@ private:
             using E = ImGuiX::Widgets::AuthPanelResult;
             if (Has(res, E::EmailChanged) && m_state.auth_data.email_valid) {
                 options().setStr("email", m_state.auth_data.email);
+				std::cout << "-email " << m_state.auth_data.email << std::endl;
             }
             if (Has(res, E::PasswordChanged)) {
                 options().setStr("password", m_state.auth_data.password);
+				std::cout << "-password " << m_state.auth_data.password << std::endl;
             }
         }
 

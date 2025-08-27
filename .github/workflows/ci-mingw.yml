@@ -37,21 +37,6 @@ jobs:
         run: |
           which git
           git --version
-          git -C libs/libmdbx rev-parse --show-toplevel || true
-    
-      - name: Ensure full submodule history & tags (libmdbx)
-        env:
-          PATH: "/c/Program Files/Git/bin:$PATH"
-        run: |
-          set -euo pipefail
-          git submodule update --init --recursive
-          git -C libs/libmdbx config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-          git -C libs/libmdbx fetch --prune --tags --force
-          if git -C libs/libmdbx rev-parse --is-shallow-repository | grep -qi true; then
-            git -C libs/libmdbx fetch --unshallow || git -C libs/libmdbx fetch --deepen=1000
-          fi
-          # жёстко проверяем наличие тега
-          git -C libs/libmdbx describe --tags --abbrev=0 >/dev/null || { echo "ERROR: libmdbx has no tags"; exit 1; }
 
       - name: Configure (Release, Ninja)
         env:
