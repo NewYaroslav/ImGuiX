@@ -34,7 +34,6 @@ option(IMGUIX_SDK_INSTALL_QUICKSTART "Класть quickstart-шаблон в SD
 set(IMGUIX_DEPS_MODE "AUTO" CACHE STRING "AUTO|SYSTEM|BUNDLED")
 set_property(CACHE IMGUIX_DEPS_MODE PROPERTY STRINGS AUTO SYSTEM BUNDLED)
 set(IMGUIX_DEPS_FMT_MODE        "INHERIT" CACHE STRING "INHERIT|AUTO|SYSTEM|BUNDLED")
-set(IMGUIX_DEPS_MDBX_MODE       "INHERIT" CACHE STRING "INHERIT|AUTO|SYSTEM|BUNDLED")
 set(IMGUIX_DEPS_SFML_MODE       "INHERIT" CACHE STRING "INHERIT|AUTO|SYSTEM|BUNDLED")
 set(IMGUIX_DEPS_IMGUI_MODE      "INHERIT" CACHE STRING "INHERIT|AUTO|SYSTEM|BUNDLED")
 set(IMGUIX_DEPS_IMGUI_SFML_MODE "INHERIT" CACHE STRING "INHERIT|AUTO|SYSTEM|BUNDLED")
@@ -69,7 +68,6 @@ endif()
 
 # ===== Deps (modular) =====
 include(cmake/deps/fmt.cmake)
-include(cmake/deps/mdbx.cmake)
 include(cmake/deps/freetype.cmake)
 include(cmake/deps/sfml.cmake)
 include(cmake/deps/imgui.cmake)
@@ -80,7 +78,6 @@ include(cmake/deps/app_icon.cmake)
 
 # ===== Resolve core deps =====
 imguix_use_or_fetch_fmt(FMT_TARGET)                 # ожидается fmt::fmt
-imguix_use_or_fetch_mdbx(MDBX_TARGET)
 imguix_use_or_fetch_nlohmann_json(JSON_TARGET)      # всегда nlohmann_json::nlohmann_json (или алиас)
 
 # ===== Resolve GUI/backend deps =====
@@ -168,7 +165,7 @@ else()
     # Все внешние зависимости — только PRIVATE (чтобы export не падал)
     target_link_libraries(imguix
         PRIVATE fmt::fmt nlohmann_json::nlohmann_json
-        PRIVATE ${MDBX_TARGET} ${IMGUI_LIB} ${BACKEND_LIBS}
+        PRIVATE ${IMGUI_LIB} ${BACKEND_LIBS}
     )
 
     # Бэкенд-макрос должен участвовать в компиляции самого таргета
@@ -414,24 +411,6 @@ if(IMGUIX_SDK_BUNDLE_DEPS)
         if(EXISTS "${PROJECT_SOURCE_DIR}/libs/json/include/nlohmann")
             install(DIRECTORY "${PROJECT_SOURCE_DIR}/libs/json/include/nlohmann"
                     DESTINATION include)
-        endif()
-    endif()
-
-    # --- MDBX: статик + заголовки ---
-    if(TARGET mdbx-static)
-        if(DEFINED MDBX_INSTALL_STATIC AND MDBX_INSTALL_STATIC)
-            message(STATUS "SDK: libmdbx installs itself (MDBX_INSTALL_STATIC=ON) — skipping manual install for headers/lib")
-        else()
-            # Редкий случай: если их install отключён (например, SYSTEM),
-            # можно поставить таргет и заголовки вручную:
-            imguix_install_target_with_headers(mdbx-static)
-            if(EXISTS "${PROJECT_SOURCE_DIR}/libs/libmdbx/mdbx.h")
-                install(FILES
-                    "${PROJECT_SOURCE_DIR}/libs/libmdbx/mdbx.h"
-                    "${PROJECT_SOURCE_DIR}/libs/libmdbx/mdbx.h++"
-                    DESTINATION include
-                )
-            endif()
         endif()
     endif()
 

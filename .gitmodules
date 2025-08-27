@@ -19,6 +19,3 @@
 [submodule "libs/json"]
 	path = libs/json
 	url = https://github.com/nlohmann/json
-[submodule "libs/libmdbx"]
-	path = libs/libmdbx
-	url = https://github.com/erthink/libmdbx.git
