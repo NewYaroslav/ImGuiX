@@ -1,0 +1,51 @@
+#include <cmath>
+
+namespace ImGuiX::Widgets {
+
+    bool IconButtonCentered(
+            const char* id,
+            const char* text,
+            const IconButtonConfig& cfg
+    ) {
+        ImDrawList* dl = ImGui::GetWindowDrawList();
+        const ImVec2 p0 = ImGui::GetCursorScreenPos();
+
+        ImVec2 sz = cfg.size;
+        if (sz.x <= 0.0f || sz.y <= 0.0f) {
+            const float h = ImGui::GetFrameHeight();
+            sz = ImVec2(h, h); // square sized to current frame height
+        }
+
+        ImGui::InvisibleButton(id, sz);
+        const bool hovered = ImGui::IsItemHovered();
+        const bool held    = ImGui::IsItemActive();
+        const bool clicked = ImGui::IsItemClicked(ImGuiMouseButton_Left);
+
+        const ImGuiStyle& style = ImGui::GetStyle();
+        float rounding = (cfg.rounding < 0.0f) ? style.FrameRounding : cfg.rounding;
+
+        const ImU32 bg = ImGui::GetColorU32(
+            held ? ImGuiCol_ButtonActive :
+            hovered ? ImGuiCol_ButtonHovered : ImGuiCol_Button
+        );
+        dl->AddRectFilled(p0, ImVec2(p0.x + sz.x, p0.y + sz.y), bg, rounding);
+
+        if (cfg.draw_border) {
+            const ImU32 bc = cfg.border_col ? cfg.border_col : ImGui::GetColorU32(ImGuiCol_Border);
+            dl->AddRect(p0, ImVec2(p0.x + sz.x, p0.y + sz.y), bc, rounding, 0, cfg.border_thickness);
+        }
+
+        if (cfg.font) ImGui::PushFont(cfg.font);
+        const ImVec2 ts = ImGui::CalcTextSize(text);
+
+        auto snap = [](float v) { return std::floor(v) + 0.5f; };
+        const float tx = snap(p0.x + (sz.x - ts.x) * 0.5f + cfg.text_offset.x);
+        const float ty = snap(p0.y + (sz.y - ts.y) * 0.5f + cfg.text_offset.y);
+        dl->AddText(ImVec2(tx, ty), ImGui::GetColorU32(ImGuiCol_Text), text);
+        if (cfg.font) ImGui::PopFont();
+
+        return clicked;
+    }
+
+} // namespace ImGuiX::Widgets
+
