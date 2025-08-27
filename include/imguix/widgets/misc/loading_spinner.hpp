@@ -8,8 +8,6 @@
 /// Original idea: https://github.com/ocornut/imgui/issues/1901 (adapted).
 
 #include <imgui.h>
-#include <algorithm>
-#include <cmath>
 
 namespace ImGuiX::Widgets {
 
@@ -28,38 +26,7 @@ namespace ImGuiX::Widgets {
     /// \param id Unique widget identifier.
     /// \param cfg Spinner parameters.
     /// \return True if the item was submitted (not clipped).
-    inline bool LoadingSpinner(const char* id, const LoadingSpinnerConfig& cfg = {}) {
-        // Validate / clamp
-        const float radius    = std::max(0.0f, cfg.radius);
-        const float thickness = std::max(1.0f, cfg.thickness);
-        const int   segments  = std::max(8, cfg.segments);
-        const float sweep_rad = std::clamp(cfg.sweep_ratio, 0.05f, 1.0f) * 6.28318530717958647692f; // TAU
-        const float phase     = static_cast<float>(ImGui::GetTime()) * std::max(0.0f, cfg.angular_speed);
-
-        // Reserve item rect using public API
-        // Make item square (2R x 2R) + optional extra top padding (keeps spacing similar to old code)
-        const ImVec2 item_size(2.0f * radius, 2.0f * radius + cfg.extra_top_padding);
-        if (!ImGui::InvisibleButton(id, item_size))
-        {
-            // Even if not clicked/hovered, the item exists and we can draw (unless clipped).
-            // If it was clipped, drawing won't be visible anyway. Continue to draw for consistency.
-        }
-
-        // Compute geometry from item rect
-        const ImVec2 pos_min = ImGui::GetItemRectMin();
-        const ImVec2 center(pos_min.x + radius, pos_min.y + cfg.extra_top_padding * 0.5f + radius);
-
-        ImDrawList* dl = ImGui::GetWindowDrawList();
-        ImU32 col = cfg.color ? cfg.color : ImGui::GetColorU32(ImGuiCol_Text);
-
-        const float a_min = phase;
-        const float a_max = phase + sweep_rad;
-
-        dl->PathClear();
-        dl->PathArcTo(center, radius, a_min, a_max, segments);
-        dl->PathStroke(col, 0 /*flags*/, thickness);
-        return true;
-    }
+    bool LoadingSpinner(const char* id, const LoadingSpinnerConfig& cfg = {});
 
     /// \brief Convenience overload with basic parameters.
     /// \param id Unique widget identifier.
@@ -76,5 +43,8 @@ namespace ImGuiX::Widgets {
     }
 
 } // namespace ImGuiX::Widgets
+#ifdef IMGUIX_HEADER_ONLY
+#   include "loading_spinner.ipp"
+#endif
 
 #endif // _IMGUIX_WIDGETS_LOADING_SPINNER_HPP_INCLUDED
