@@ -20,43 +20,48 @@ namespace ImGuiX::Widgets {
 
     // ---------- configs & data ---------------------------------------------------
 
+    /// \brief Configuration for time-of-day picker.
     struct TimePickerConfig {
-        const char* label       = u8"Time";
-        const char* desc        = u8"HH:MM:SS";
-        float       combo_width = 0.0f;
-        bool        show_desc   = true;
-        float       field_width = 0.0f;
+        const char* label       = u8"Time";      ///< Combo label.
+        const char* desc        = u8"HH:MM:SS"; ///< Format description.
+        float       combo_width = 0.0f;         ///< Width for combo preview.
+        bool        show_desc   = true;         ///< Show format description.
+        float       field_width = 0.0f;         ///< Width per ArrowStepper field.
     };
 
+    /// \brief Timezone entry with offset and DST flag.
     struct TimeZoneInfo {
-        const char* key;
-        const char* label;
-        int         offset_sec;
-        bool        has_dst;
+        const char* key;        ///< Identifier key.
+        const char* label;      ///< Display label.
+        int         offset_sec; ///< Offset in seconds from UTC.
+        bool        has_dst;    ///< True if observes DST.
     };
 
+    /// \brief Get default timezone list.
+    /// \return Reference to built-in time zones.
     const std::vector<TimeZoneInfo>& DefaultTimeZones();
 
+    /// \brief Configuration for signed offset picker.
     struct TimeOffsetPickerConfig {
-        const char* label        = u8"Offset";
-        const char* desc         = u8"±HH:MM:SS";
-        float       combo_width  = 0.0f;
-        bool        show_desc    = true;
-        bool        show_gmt     = true;
-        bool        show_tz_list = true;
-        float       tz_field_width  = 0.0f;
-        float       hms_field_width = 0.0f;
-        const std::vector<TimeZoneInfo>* time_zones = nullptr;
+        const char* label        = u8"Offset";     ///< Combo label.
+        const char* desc         = u8"±HH:MM:SS"; ///< Format description.
+        float       combo_width  = 0.0f;          ///< Width for combo preview.
+        bool        show_desc    = true;          ///< Show format description.
+        bool        show_gmt     = true;          ///< Show GMT offset.
+        bool        show_tz_list = true;          ///< Show timezone list.
+        float       tz_field_width  = 0.0f;       ///< Width for timezone field.
+        float       hms_field_width = 0.0f;       ///< Width for HH:MM:SS field.
+        const std::vector<TimeZoneInfo>* time_zones = nullptr; ///< Custom timezone list.
     };
 
     // ---------- widgets ----------------------------------------------------------
 
-    /// \brief Time-of-day picker editing (hour, minute, second) separately.
-    /// \param id     Unique widget identifier.
-    /// \param hour   In/out [0..23].
+    /// \brief Time-of-day picker editing hour, minute, and second separately.
+    /// \param id Unique widget identifier.
+    /// \param hour In/out [0..23].
     /// \param minute In/out [0..59].
     /// \param second In/out [0..59].
-    /// \param cfg    Picker configuration.
+    /// \param cfg Picker configuration.
     /// \return True if any component changed.
     bool TimePicker(const char* id,
                     int& hour,
@@ -66,7 +71,7 @@ namespace ImGuiX::Widgets {
 
     /// \brief Time-of-day picker (0..86399 seconds).
     /// \param id Unique widget identifier.
-    /// \param seconds In/out: selected time in seconds since midnight.
+    /// \param seconds In/out selected time in seconds since midnight.
     /// \param cfg Picker configuration.
     /// \return True if value changed.
     bool TimePicker(const char* id, int& seconds, const TimePickerConfig& cfg = {});
@@ -74,7 +79,7 @@ namespace ImGuiX::Widgets {
     /// \brief Signed offset picker with timezone list (sign inside value; no separate checkbox).
     /// \param id Unique widget identifier.
     /// \param offset_sec In/out signed seconds (range not enforced; UI edits magnitude 0..23:59:59).
-    /// \param has_dst_out Output flag set when chosen TZ observes DST (false in Custom).
+    /// \param has_dst_out Output flag; set when chosen TZ observes DST (false for Custom).
     /// \param tz_index_io In/out index in timezone list (0 = Custom/manual).
     /// \param cfg Picker configuration.
     /// \return True if value changed.

@@ -18,34 +18,36 @@
 namespace ImGuiX::Widgets {
 
     /// \brief Month label mode for UI hints (steppers remain numeric).
-    enum class MonthLabelMode : int { Numeric = 0, ShortName = 1 };
+    enum class MonthLabelMode : int {
+        Numeric   = 0, ///< Numeric month (1..12).
+        ShortName = 1  ///< Abbreviated month name.
+    };
 
-    /// \brief Config for DatePicker.
+    /// \brief Configuration for date picker widget.
     struct DatePickerConfig {
-        const char*     label           = u8"Date";
-        const char*     desc            = u8"YYYY-MM-DD";
-        float           combo_width     = 0.0f;
-        bool            show_desc       = true;
-        float           field_width     = 0.0f;      ///< width per ArrowStepper field
-        int             min_year        = 1970;      ///< inclusive
-        int             max_year        = 2099;      ///< inclusive
-        MonthLabelMode  month_label     = MonthLabelMode::Numeric;
-        bool            show_weekday    = false;     ///< show weekday hint
-        bool            preserve_time_of_day = true;///< keep hh:mm:ss from original ts
-        // Optional hard TS bounds (disabled if min_ts > max_ts).
-        int64_t         min_ts          = 0;
-        int64_t         max_ts          = std::numeric_limits<int64_t>::max();
+        const char*     label           = u8"Date";      ///< Combo label.
+        const char*     desc            = u8"YYYY-MM-DD";///< Format description.
+        float           combo_width     = 0.0f;          ///< Width for combo preview.
+        bool            show_desc       = true;          ///< Show format description.
+        float           field_width     = 0.0f;          ///< Width per ArrowStepper field.
+        int             min_year        = 1970;          ///< Inclusive lower year.
+        int             max_year        = 2099;          ///< Inclusive upper year.
+        MonthLabelMode  month_label     = MonthLabelMode::Numeric; ///< Month label mode.
+        bool            show_weekday    = false;         ///< Show weekday hint.
+        bool            preserve_time_of_day = true;     ///< Preserve hh:mm:ss from timestamp.
+        int64_t         min_ts          = 0;             ///< Hard minimum timestamp.
+        int64_t         max_ts          = std::numeric_limits<int64_t>::max(); ///< Hard maximum timestamp.
     };
 
     // --- widget -----------------------------------------------------------------
 
     /// \brief Date picker (YYYY-MM-DD) using ArrowStepper; allows direct text input.
-    /// \param id  Unique widget identifier.
+    /// \param id Unique widget identifier.
     /// \param year In/out civil year.
     /// \param month In/out 1..12.
     /// \param day In/out 1..31 (clamped to month length).
-    /// \param cfg  Picker configuration.
-    /// \return true if any component changed.
+    /// \param cfg Picker configuration.
+    /// \return True if any component changed.
     bool DatePicker(
             const char* id,
             int64_t& year,
