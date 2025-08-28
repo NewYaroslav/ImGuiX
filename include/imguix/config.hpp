@@ -10,6 +10,7 @@
 #include "config/i18n.hpp"
 #include "config/icons.hpp"
 #include "config/colors.hpp"
+#include "config/options.hpp"
 #include "config/sizing.hpp"
 #include "config/theme_config.hpp"
 

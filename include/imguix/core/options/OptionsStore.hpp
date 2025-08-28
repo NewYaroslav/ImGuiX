@@ -10,6 +10,8 @@
 #include <string>
 #include <vector>
 
+#include <imguix/config/options.hpp>
+
 #include "OptionsStoreViewCRTP.hpp"
 #include "OptionsStoreControlCRTP.hpp"
 
@@ -28,7 +30,9 @@ namespace ImGuiX {
         /// \brief Construct store.
         /// \param path JSON file path.
         /// \param save_delay_sec Debounce window for saving (seconds).
-        explicit OptionsStore(std::string path, double save_delay_sec = 0.5);
+        explicit OptionsStore(
+                std::string path,
+                double save_delay_sec = IMGUIX_OPTIONS_SAVE_DELAY_SEC);
         
         explicit OptionsStore();
 
