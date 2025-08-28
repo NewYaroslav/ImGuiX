@@ -8,6 +8,7 @@
 #   include <emscripten.h>
 #endif
 
+#include <imguix/config/options.hpp>
 #include <imguix/config/paths.hpp>
 #include <imguix/utils/path_utils.hpp>
 
@@ -19,7 +20,7 @@ namespace ImGuiX {
     struct OptionsStore::Impl {
         std::string m_path;
         std::string m_tmp_path;
-        double m_save_delay{0.5};
+        double m_save_delay{IMGUIX_OPTIONS_SAVE_DELAY_SEC};
 
         mutable std::mutex m_mutex;
         json m_root = json::object();
@@ -177,7 +178,7 @@ namespace ImGuiX {
     
     inline OptionsStore::OptionsStore()
         : m_impl(std::make_unique<Impl>()) {
-        m_impl->m_save_delay = 0.5;
+        m_impl->m_save_delay = IMGUIX_OPTIONS_SAVE_DELAY_SEC;
 #ifdef __EMSCRIPTEN__
         const auto base_abs = ImGuiX::Utils::joinPaths(
                 "/imguix_fs",
