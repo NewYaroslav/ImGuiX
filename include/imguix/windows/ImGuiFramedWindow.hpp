@@ -70,7 +70,7 @@ namespace ImGuiX::Windows {
 
     protected:
         std::string m_title;                  ///< Text displayed on the title bar.
-        WindowFlags m_flags = WindowFlags::None; ///< Current window flags.
+        WindowFlags m_flags = WindowFlags::NoFlags; ///< Current window flags.
         ImGuiFramedWindowConfig m_config;        ///< Runtime configuration values.
         bool m_disable_background = false;       ///< Skip clearing the background when true.
 #       ifdef IMGUIX_USE_SFML_BACKEND

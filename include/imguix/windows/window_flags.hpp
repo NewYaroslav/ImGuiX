@@ -12,7 +12,7 @@ namespace ImGuiX::Windows {
 
     /// \brief Flags used to configure window behavior and appearance.
     enum class WindowFlags : uint32_t {
-        None                       = 0,
+        NoFlags                    = 0,      ///< No flags set
         HasMenuBar                 = 1 << 0, ///< Enable ImGui menu bar region
         EnableTransparency         = 1 << 1, ///< Use DWM transparency (Windows only)
         DisableBackground          = 1 << 2, ///< Disable background color in ImGui::Begin
