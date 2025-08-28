@@ -26,6 +26,9 @@ namespace ImGuiX::Widgets {
     /// \param id Unique widget identifier.
     /// \param cfg Spinner parameters.
     /// \return True if the item was submitted (not clipped).
+    /// \code
+    /// LoadingSpinner("busy");
+    /// \endcode
     bool LoadingSpinner(const char* id, const LoadingSpinnerConfig& cfg = {});
 
     /// \brief Convenience overload with basic parameters.

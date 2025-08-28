@@ -14,6 +14,7 @@ namespace ImGuiX::Widgets {
 
     /// \brief Center a single-line formatted text using ImGui::Text.
     /// \param fmt Format string for std::vsnprintf.
+    /// \param ... printf-style arguments.
     /// \note If text width exceeds available width, falls back to left alignment.
     void TextCenteredFmt(const char* fmt, ...);
 
@@ -28,11 +29,14 @@ namespace ImGuiX::Widgets {
     void TextWrappedCentered(const char* text, float wrap_width = 0.0f);
     
     /// \brief Overload for std::string (unformatted).
+    /// \param s UTF-8 string to render.
     inline void TextUnformattedCentered(const std::string& s) {
         TextUnformattedCentered(s.c_str());
     }
 
     /// \brief Overload for std::string (wrapped).
+    /// \param s Text to render.
+    /// \param wrap_width Desired wrap width in pixels.
     inline void TextWrappedCentered(const std::string& s, float wrap_width = 0.0f) {
         TextWrappedCentered(s.c_str(), wrap_width);
     }
