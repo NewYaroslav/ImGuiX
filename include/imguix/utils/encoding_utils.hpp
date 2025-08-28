@@ -49,12 +49,12 @@ namespace ImGuiX::Utils {
 
 } // namespace ImGuiX::Utils
 #else
+
 #include <string>
+
+#include "detail/common.hpp"
+
 namespace ImGuiX::Utils {
-    namespace detail {
-        template<typename T>
-        inline constexpr bool dependent_false_v = false;
-    }
 
     template<typename Dummy = void>
     std::string Utf8ToAnsi(const std::string&) {
@@ -97,6 +97,7 @@ namespace ImGuiX::Utils {
         static_assert(detail::dependent_false_v<Dummy>, u8"Utf8ToUtf16 is not supported on this platform");
         return {};
     }
+
 } // namespace ImGuiX::Utils
 
 #endif // ifdef _WIN32

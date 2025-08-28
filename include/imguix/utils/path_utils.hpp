@@ -23,12 +23,10 @@
 #    include <unistd.h>
 #endif
 
+#include "detail/common.hpp"
+
 namespace ImGuiX::Utils {
     namespace fs = std::filesystem;
-    namespace detail {
-        template<typename T>
-        inline constexpr bool dependent_false_v = false;
-    }
 
     /// \brief Get full path to current executable.
     /// \tparam Dummy Dummy template parameter for SFINAE.
