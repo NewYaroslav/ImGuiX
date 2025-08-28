@@ -18,6 +18,7 @@
 #include <type_traits>
 #include <stdexcept>
 #include <memory>
+#include <optional>
 
 #include "pubsub/Event.hpp"
 #include "pubsub/EventListener.hpp"
