@@ -16,6 +16,12 @@
 #include <imguix/utils/path_utils.hpp>
 #include <imguix/config/fonts.hpp>
 
+#if defined(IMGUIX_USE_SFML_BACKEND)
+#   include <imgui-SFML.h>
+#elif defined(IMGUIX_USE_GLFW_BACKEND) || defined(IMGUIX_USE_SDL2_BACKEND)
+#   include <imgui_impl_opengl3.h>
+#endif
+
 namespace ImGuiX::Fonts {
     namespace fs = std::filesystem;
 
@@ -329,14 +335,15 @@ namespace ImGuiX::Fonts {
 #   endif
     }
 
-    /// \brief After Fonts->Build(), update backend texture for SFML.
+    /// \brief After Fonts->Build(), update backend texture for active backend.
     inline bool FontManager::updateBackendTexture() {
 #       ifdef IMGUIX_USE_SFML_BACKEND
         // ImGui-SFML provides UpdateFontTexture(); some versions return void.
         return ImGui::SFML::UpdateFontTexture();
+#       elif defined(IMGUIX_USE_GLFW_BACKEND) || defined(IMGUIX_USE_SDL2_BACKEND)
+        ImGui_ImplOpenGL3_DestroyFontsTexture();
+        return ImGui_ImplOpenGL3_CreateFontsTexture();
 #       else
-        // If not using SFML backend, user should replace this with their backend
-        // call. We still return true to not fail builds on other backends.
         return true;
 #       endif
     }
@@ -638,7 +645,7 @@ namespace ImGuiX::Fonts {
         }
       }
 
-        // Update backend texture (SFML or stub true)
+        // Update backend texture for active backend
         if (!updateBackendTexture()) {
             br.success = false;
             br.message = u8"Backend font texture update failed";
