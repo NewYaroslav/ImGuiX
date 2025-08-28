@@ -13,13 +13,18 @@ namespace ImGuiX::Events {
         int id; ///< ID of the closed window.
         std::string window_name; ///< Name of the closed window (for debugging).
 
+        /// \brief Construct event.
+        /// \param id ID of the closed window.
+        /// \param name Window name for debugging.
         WindowClosedEvent(int id, std::string name)
             : id(id), window_name(std::move(name)) {}
 
+        /// \copydoc Pubsub::Event::type
         std::type_index type() const override {
             return typeid(WindowClosedEvent);
         }
 
+        /// \copydoc Pubsub::Event::name
         const char* name() const override {
             return u8"WindowClosedEvent";
         }

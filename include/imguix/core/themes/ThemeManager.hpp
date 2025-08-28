@@ -19,12 +19,21 @@
 
 namespace ImGuiX::Themes {
 
+    /// \brief Manage registration and application of themes.
     class ThemeManager {
     public:
-        
-        /// \brief Register theme under identifier. 
-        /// \param id Theme identifier. 
+
+        /// \brief Construct manager with built-in themes.
+        ThemeManager() {
+            registerTheme("classic", std::make_unique<ClassicTheme>());
+            registerTheme("light",   std::make_unique<LightTheme>());
+            registerTheme("dark",    std::make_unique<DarkTheme>());
+        }
+
+        /// \brief Register theme under identifier.
+        /// \param id Theme identifier.
         /// \param theme Theme instance.
+        /// \return True if existing theme was replaced.
         bool registerTheme(std::string id, std::unique_ptr<Theme> theme) {
             bool replaced = (m_themes.find(id) != m_themes.end());
             m_themes.insert_or_assign(id, std::move(theme));
@@ -32,10 +41,16 @@ namespace ImGuiX::Themes {
             return replaced;
         }
 
+        /// \brief Check whether theme is registered.
+        /// \param id Theme identifier.
+        /// \return True if theme exists.
         bool hasTheme(const std::string& id) const {
             return m_themes.find(id) != m_themes.end();
         }
 
+        /// \brief Remove theme by identifier.
+        /// \param id Theme identifier.
+        /// \return Removed theme or null.
         std::unique_ptr<Theme> unregisterTheme(const std::string& id) {
             auto it = m_themes.find(id);
             if (it == m_themes.end()) return {};
@@ -45,7 +60,7 @@ namespace ImGuiX::Themes {
             return old;
         }
 
-        /// \brief Set active theme identifier. 
+        /// \brief Set active theme identifier.
         /// \param id Identifier of registered theme.
         void setTheme(std::string id) {
             m_current = std::move(id);
@@ -62,12 +77,6 @@ namespace ImGuiX::Themes {
 #               endif
             }
             m_dirty = false;
-        }
-
-        ThemeManager() {
-            registerTheme("classic", std::make_unique<ClassicTheme>());
-            registerTheme("light",   std::make_unique<LightTheme>());
-            registerTheme("dark",    std::make_unique<DarkTheme>());
         }
 
     private:

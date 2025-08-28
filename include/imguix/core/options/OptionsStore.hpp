@@ -19,7 +19,8 @@ namespace ImGuiX {
 
     /// \class OptionsStore
     /// \brief Durable JSON-backed key-value options storage.
-    /// \note Thread-safe. Call update() periodically to perform debounced saves.
+    /// \thread_safety Thread-safe.
+    /// \note Call update() periodically to perform debounced saves.
     class OptionsStore :
         private OptionsStoreViewCRTP<OptionsStore>,
         private OptionsStoreControlCRTP<OptionsStore> {
@@ -34,8 +35,10 @@ namespace ImGuiX {
                 std::string path,
                 double save_delay_sec = IMGUIX_OPTIONS_SAVE_DELAY_SEC);
         
+        /// \brief Construct store using default path from configuration.
         explicit OptionsStore();
 
+        /// \brief Destroy store.
         ~OptionsStore();
 
         /// \brief Load from disk (best-effort). Keeps existing values on failure.
