@@ -5,6 +5,15 @@
 #ifdef __linux__
 #   include <X11/Xlib.h>
 #   include <X11/Xutil.h>
+#   ifdef None
+#       undef None // prevents conflicts with enums and sf::Style::None
+#   endif
+#   ifdef Bool
+#       undef Bool
+#   endif
+#   ifdef Status
+#       undef Status
+#   endif
 #endif
 
 #include <imguix/utils/path_utils.hpp>
