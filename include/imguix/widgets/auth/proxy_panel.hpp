@@ -21,12 +21,12 @@ namespace ImGuiX::Widgets {
 
     /// \brief Mutable model of proxy settings.
     struct ProxySettings {
-        bool        use_proxy      = false;
+        bool        use_proxy      = false;            ///< use proxy
         std::string ip;            ///< host or IPv4 string
-        int         port           = 0;        ///< 0..65535
-        ProxyType   type           = ProxyType::HTTP;
-        std::string username;
-        std::string password;
+        int         port           = 0;                ///< 0..65535
+        ProxyType   type           = ProxyType::HTTP;  ///< proxy protocol type
+        std::string username;                         ///< authentication username
+        std::string password;                         ///< authentication password
         
         bool ip_valid        = true; ///< out (set by widget if cfg.validate_ip)
         bool port_valid      = true; ///< out
@@ -38,7 +38,7 @@ namespace ImGuiX::Widgets {
     struct ProxyPanelConfig {
         ImVec2 panel_size             = ImVec2(0, 0); ///< 0→auto width/height
         bool   inputs_fill_width      = true;         ///< make input fields fill panel width
-        bool   border                 = true;
+        bool   border                 = true;         ///< draw panel border
 
         // Labels
         const char* header            = u8"Proxy settings";
