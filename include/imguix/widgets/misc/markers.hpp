@@ -12,14 +12,24 @@
 #include <imguix/config/colors.hpp>
 
 namespace ImGuiX::Widgets {
-    
+
+    /// \brief Marker display mode.
     enum class MarkerMode : int {
         TooltipOnly = 0,  ///< icon/label + tooltip on hover
         InlineText  = 1   ///< icon/label + inline wrapped text
     };
 
+    /// \brief Show tooltip text with word wrapping.
+    /// \param desc Tooltip text.
+    /// \param wrap_cols Column width for wrapping.
     void TooltipWrapped(const char* desc, float wrap_cols = 35.0f);
-    
+
+    /// \brief Draw icon marker with tooltip or inline text.
+    /// \param icon_utf8 Icon UTF-8 string.
+    /// \param color Icon color.
+    /// \param desc Tooltip or inline text.
+    /// \param mode Display mode.
+    /// \param wrap_cols Column width for wrapping.
     void IconMarker(
             const char* icon_utf8,
             const ImVec4& color,
@@ -45,6 +55,8 @@ namespace ImGuiX::Widgets {
 
     /// \brief Help marker using a question icon with tooltip.
     /// \param desc Help text.
+    /// \param mode Display mode.
+    /// \param icon_utf8 Icon glyph.
     void HelpMarker(
             const char* desc,
             MarkerMode mode = MarkerMode::TooltipOnly,
@@ -53,6 +65,9 @@ namespace ImGuiX::Widgets {
 
     /// \brief Warning marker with yellow icon and text.
     /// \param desc Warning message.
+    /// \param mode Display mode.
+    /// \param color Icon and text color.
+    /// \param icon_utf8 Icon glyph.
     void WarningMarker(
             const char* desc,
             MarkerMode mode = MarkerMode::TooltipOnly,
@@ -62,6 +77,9 @@ namespace ImGuiX::Widgets {
 
     /// \brief Info marker with blue icon and text.
     /// \param desc Information message.
+    /// \param mode Display mode.
+    /// \param color Icon and text color.
+    /// \param icon_utf8 Icon glyph.
     void InfoMarker(
             const char* desc,
             MarkerMode mode = MarkerMode::TooltipOnly,
@@ -71,6 +89,9 @@ namespace ImGuiX::Widgets {
 
     /// \brief Success marker with green icon and text.
     /// \param desc Success message.
+    /// \param mode Display mode.
+    /// \param color Icon and text color.
+    /// \param icon_utf8 Icon glyph.
     void SuccessMarker(
             const char* desc,
             MarkerMode mode = MarkerMode::TooltipOnly,
