@@ -44,6 +44,9 @@ namespace ImGuiX {
         /// \return True if the icon was loaded and applied successfully.
         virtual bool setWindowIcon(const std::string& path) = 0;
 
+        /// \brief Set active theme identifier.
+        /// \param id Identifier of registered theme.
+        virtual void setTheme(std::string id) = 0;
 
         /// \brief Enables or disables background clearing between frames.
         /// \param disable True to disable clearing.
@@ -122,7 +125,7 @@ namespace ImGuiX {
 
         /// \brief Access the theme manager.
         /// \return Theme manager.
-        virtual Themes::ThemeManager& getThemeManager() = 0;
+        virtual ImGuiX::Themes::ThemeManager& themeManager() = 0;
 
     };
 

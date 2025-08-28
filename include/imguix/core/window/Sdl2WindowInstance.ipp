@@ -7,6 +7,15 @@ namespace ImGuiX {
 
     WindowInstance::~WindowInstance() noexcept  {
         saveIniNow();
+
+#       ifdef IMGUI_ENABLE_IMPLOT
+        if (m_implot_ctx) {
+            ImPlot::SetCurrentContext(m_implot_ctx);
+            ImPlot::DestroyContext(m_implot_ctx);
+            m_implot_ctx = nullptr;
+        }
+#       endif
+
         if (m_imgui_ctx) {
             ImGui::SetCurrentContext(m_imgui_ctx);
             ImGui_ImplOpenGL3_Shutdown();
@@ -48,6 +57,11 @@ namespace ImGuiX {
         m_imgui_ctx = ImGui::CreateContext();
         ImGui::SetCurrentContext(m_imgui_ctx);
         
+#       ifdef IMGUI_ENABLE_IMPLOT
+        m_implot_ctx = ImPlot::CreateContext();
+        ImPlot::SetCurrentContext(m_implot_ctx);
+#       endif
+        
         ImGui_ImplSDL2_InitForOpenGL(m_window, m_gl_context);
         ImGui_ImplOpenGL3_Init(selectGlslForSdl(m_window));
         
@@ -69,30 +83,30 @@ namespace ImGuiX {
         m_height = h;
         return create();
     }
-	
-	const char* WindowInstance::selectGlslForSdl(SDL_Window* w) noexcept {
-#	if !defined(IMGUIX_USE_SDL2_BACKEND)
-		(void)w; return IMGUIX_GLSL_VERSION;
-#	else
-		if (!w) return IMGUIX_GLSL_VERSION;
+    
+    const char* WindowInstance::selectGlslForSdl(SDL_Window* w) noexcept {
+#   if !defined(IMGUIX_USE_SDL2_BACKEND)
+        (void)w; return IMGUIX_GLSL_VERSION;
+#   else
+        if (!w) return IMGUIX_GLSL_VERSION;
 
-		int major=0, minor=0, profile=0;
-		if (SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &major) != 0) return IMGUIX_GLSL_VERSION;
-		if (SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &minor) != 0) return IMGUIX_GLSL_VERSION;
-		if (SDL_GL_GetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, &profile) != 0) return IMGUIX_GLSL_VERSION;
+        int major=0, minor=0, profile=0;
+        if (SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &major) != 0) return IMGUIX_GLSL_VERSION;
+        if (SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &minor) != 0) return IMGUIX_GLSL_VERSION;
+        if (SDL_GL_GetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, &profile) != 0) return IMGUIX_GLSL_VERSION;
 
-		if (profile & SDL_GL_CONTEXT_PROFILE_ES)
-			return (major >= 3) ? u8"#version 300 es" : u8"#version 100";
+        if (profile & SDL_GL_CONTEXT_PROFILE_ES)
+            return (major >= 3) ? u8"#version 300 es" : u8"#version 100";
 
-#   	if defined(__APPLE__)
-		return u8"#version 150";
-#   	else
-		if (major > 3 || (major == 3 && minor >= 2) || (profile & SDL_GL_CONTEXT_PROFILE_CORE))
-			return u8"#version 150";
-		return u8"#version 130";
-#   	endif
-#	endif
-	}
+#       if defined(__APPLE__)
+        return u8"#version 150";
+#       else
+        if (major > 3 || (major == 3 && minor >= 2) || (profile & SDL_GL_CONTEXT_PROFILE_CORE))
+            return u8"#version 150";
+        return u8"#version 130";
+#       endif
+#   endif
+    }
 
     void WindowInstance::handleEvents() {
         SDL_Event event;
@@ -116,6 +130,7 @@ namespace ImGuiX {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
+        updateCurrentTheme();
     }
 
     void WindowInstance::present() {
@@ -202,8 +217,14 @@ namespace ImGuiX {
     
     void WindowInstance::setCurrentWindow() {
         if (!m_window || !m_gl_context || !m_imgui_ctx) return;
+#       ifdef IMGUI_ENABLE_IMPLOT
+        if (!m_implot_ctx) return;
+#       endif
         SDL_GL_MakeCurrent(m_window, m_gl_context);
         ImGui::SetCurrentContext(m_imgui_ctx);
+#       ifdef IMGUI_ENABLE_IMPLOT
+        ImPlot::SetCurrentContext(m_implot_ctx);
+#       endif
     }
 
 } // namespace ImGuiX

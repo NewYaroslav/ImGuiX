@@ -36,10 +36,14 @@ namespace ImGuiX::Windows {
         } else {
             m_window.clear(Extensions::ColorToSfml(m_config.clear_color));
         }
+        updateCurrentTheme();
     }
 
     void ImGuiFramedWindow::drawUi() {
         ImGui::SFML::SetCurrentWindow(m_window);
+#       ifdef IMGUI_ENABLE_IMPLOT
+        ImPlot::SetCurrentContext(m_implot_ctx);
+#       endif
         ImGui::PushID(id());
 
         ImGui::SetNextWindowPos({0, 0});
@@ -144,6 +148,12 @@ namespace ImGuiX::Windows {
         m_window.create(sf::VideoMode({static_cast<unsigned int>(width()),  static_cast<unsigned int>(height())}), name(), sf::Style::None);
         m_window.setFramerateLimit(60);
         m_is_open = ImGui::SFML::Init(m_window);
+
+#       ifdef IMGUI_ENABLE_IMPLOT
+        m_implot_ctx = ImPlot::CreateContext();
+        ImPlot::SetCurrentContext(m_implot_ctx);
+#       endif
+
         return m_is_open;
     }
     

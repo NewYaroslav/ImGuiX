@@ -23,7 +23,7 @@ function(imguix_use_or_fetch_imgui_sfml out_sfml out_imgui)
             "${IMGUI_DIR}/imgui_draw.cpp"
             "${IMGUI_DIR}/imgui_widgets.cpp"
             "${IMGUI_DIR}/imgui_tables.cpp"
-            "${IMGUI_DIR}/imgui_demo.cpp"
+            # "${IMGUI_DIR}/imgui_demo.cpp"
             "${IMGUI_DIR}/misc/cpp/imgui_stdlib.cpp"
         )
         add_library(ImGui-SFML::ImGui-SFML ALIAS ImGui-SFML)
@@ -64,12 +64,22 @@ function(imguix_use_or_fetch_imgui_sfml out_sfml out_imgui)
         if(NOT DEFINED IMGUI_SFML_CONFIG_NAME OR IMGUI_SFML_CONFIG_NAME STREQUAL "")
             set(IMGUI_SFML_CONFIG_NAME "imconfig-SFML.h")
         endif()
-        target_include_directories(ImGui-SFML PUBLIC
-            $<BUILD_INTERFACE:${IMGUI_SFML_CONFIG_DIR}>
-        )
-        target_compile_definitions(ImGui-SFML PUBLIC
-            IMGUI_USER_CONFIG="${IMGUI_SFML_CONFIG_NAME}"
-        )
+        
+        if(DEFINED IMGUIX_USER_CONFIG_DIR AND DEFINED IMGUIX_USER_CONFIG_NAME)
+            target_include_directories(ImGui-SFML PUBLIC
+                $<BUILD_INTERFACE:${IMGUIX_USER_CONFIG_DIR}>
+            )
+            target_compile_definitions(ImGui-SFML PUBLIC
+                IMGUI_USER_CONFIG="${IMGUIX_USER_CONFIG_NAME}"
+            )
+        else()
+            target_include_directories(ImGui-SFML PUBLIC
+                $<BUILD_INTERFACE:${IMGUI_SFML_CONFIG_DIR}>
+            )
+            target_compile_definitions(ImGui-SFML PUBLIC
+                IMGUI_USER_CONFIG="${IMGUI_SFML_CONFIG_NAME}"
+            )
+        endif()
 
         set(_created TRUE)
     endif()

@@ -11,5 +11,6 @@
 #include "config/icons.hpp"
 #include "config/colors.hpp"
 #include "config/sizing.hpp"
+#include "config/theme_config.hpp"
 
 #endif // _IMGUIX_CONFIG_HPP_INCLUDED

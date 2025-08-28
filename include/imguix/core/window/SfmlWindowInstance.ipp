@@ -13,6 +13,13 @@ namespace ImGuiX {
 
     WindowInstance::~WindowInstance() noexcept  {
         saveIniNow();
+#       ifdef IMGUI_ENABLE_IMPLOT
+        if (m_implot_ctx) {
+            ImPlot::SetCurrentContext(m_implot_ctx);
+            ImPlot::DestroyContext(m_implot_ctx);
+            m_implot_ctx = nullptr;
+        }
+#       endif
         ImGui::SFML::Shutdown(m_window);
     }
 
@@ -21,6 +28,12 @@ namespace ImGuiX {
         m_window.create(sf::VideoMode({static_cast<unsigned int>(width()),  static_cast<unsigned int>(height())}), name());
         m_window.setFramerateLimit(60);
         m_is_open = ImGui::SFML::Init(m_window);
+
+#       ifdef IMGUI_ENABLE_IMPLOT
+        m_implot_ctx = ImPlot::CreateContext();
+        ImPlot::SetCurrentContext(m_implot_ctx);
+#       endif
+
 #       ifdef _WIN32
         HWND hwnd = m_window.getNativeHandle();
         if (GetForegroundWindow() != hwnd) {
@@ -29,6 +42,7 @@ namespace ImGuiX {
             SetActiveWindow(hwnd);
         }
 #       endif
+
         return m_is_open;
     }
     
@@ -62,6 +76,7 @@ namespace ImGuiX {
         auto& res = registry().getResource<DeltaClockSfml>();
         ImGui::SFML::Update(m_window, res.delta());
         m_window.clear();
+        updateCurrentTheme();
     }
     
     void WindowInstance::present() {
@@ -265,6 +280,9 @@ namespace ImGuiX {
     void WindowInstance::setCurrentWindow() {
         if (m_window.setActive(true)) {
             ImGui::SFML::SetCurrentWindow(m_window);
+#           ifdef IMGUI_ENABLE_IMPLOT
+            ImPlot::SetCurrentContext(m_implot_ctx);
+#           endif
         }
     }
 }

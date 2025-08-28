@@ -25,6 +25,10 @@
 #    include "imgui_glsl_version.hpp"
 #endif
 
+#ifdef IMGUI_ENABLE_IMPLOT
+#include <implot.h>
+#endif
+
 #include "WindowInterface.hpp"
 #include <imguix/config/paths.hpp>
 
@@ -113,6 +117,10 @@ namespace ImGuiX {
         /// \return True if the icon was loaded and applied successfully.
         bool setWindowIcon(const std::string& path) override;
         
+        /// \brief Set active theme identifier.
+        /// \param id Identifier of registered theme.
+        void setTheme(std::string id) override;
+        
         /// \brief Enables or disables clearing the background between frames.
         /// \param disable True to disable clearing.
         void setDisableBackground(bool disable) override {};
@@ -188,7 +196,7 @@ namespace ImGuiX {
 
         /// \brief Access the theme manager.
         /// \return Theme manager.
-        ImGuiX::Themes::ThemeManager& getThemeManager() noexcept override { return m_theme_manager; }
+        ImGuiX::Themes::ThemeManager& themeManager() noexcept override { return m_theme_manager; }
 
         // ---
 
@@ -208,6 +216,8 @@ namespace ImGuiX {
         /// \brief Save ImGui ini settings to disk.
         /// \note Internal use.
         void saveIniNow();
+        
+        void updateCurrentTheme() { themeManager().updateCurrentTheme(); }
         
         /// \brief Request window to switch its UI language.
         /// \param lang Language code.
@@ -283,6 +293,9 @@ namespace ImGuiX {
         SDL_Window* m_window = nullptr;
         ImGuiContext* m_imgui_ctx = nullptr;
         const char* selectGlslForSdl(SDL_Window* w) noexcept;
+#endif
+#ifdef IMGUI_ENABLE_IMPLOT
+        ImPlotContext* m_implot_ctx = nullptr; ///<
 #endif
         int m_window_id;                    ///< Unique window identifier.
         std::string m_window_name;          ///< Internal window name.

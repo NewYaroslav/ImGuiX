@@ -1,6 +1,5 @@
 #include <imgui.h>
 #include <imguix/utils/path_utils.hpp>
-#include <imguix/themes/themes.hpp>
 
 namespace ImGuiX {
 
@@ -11,7 +10,6 @@ namespace ImGuiX {
           m_application(app) {
         m_theme_manager.registerTheme("light", std::make_unique<Themes::LightTheme>());
         m_theme_manager.registerTheme("dark", std::make_unique<Themes::DarkTheme>());
-        m_theme_manager.setTheme("dark");
     }
 
     void WindowInstance::drawContent() {
@@ -57,6 +55,10 @@ namespace ImGuiX {
 
     int WindowInstance::height() const {
         return m_height;
+    }
+    
+    void WindowInstance::setTheme(std::string id) {
+        themeManager().setTheme(std::move(id));
     }
     
     Pubsub::EventBus& WindowInstance::eventBus() {
@@ -175,28 +177,28 @@ namespace ImGuiX {
         m_font_manager.beginManual();
         m_is_fonts_manual = true;
     }
-	
-	void WindowInstance::fontsSetLocale(std::string locale) {
-		if (locale == m_font_manager.activeLocale()) {
-			return;
-		}
-		m_font_manager.setLocale(std::move(locale));
-	}
-	
-	void WindowInstance::fontsSetRangesPreset(std::string preset) {
-		assert(m_in_init_phase && u8"fontsSetRangesPreset() только в onInit()");
-		m_font_manager.setRanges(std::move(preset));
-	}
+    
+    void WindowInstance::fontsSetLocale(std::string locale) {
+        if (locale == m_font_manager.activeLocale()) {
+            return;
+        }
+        m_font_manager.setLocale(std::move(locale));
+    }
+    
+    void WindowInstance::fontsSetRangesPreset(std::string preset) {
+        assert(m_in_init_phase && u8"fontsSetRangesPreset() только в onInit()");
+        m_font_manager.setRanges(std::move(preset));
+    }
 
-	void WindowInstance::fontsSetRangesExplicit(const std::vector<ImWchar>& pairs) {
-		assert(m_in_init_phase && u8"fontsSetRangesExplicit() только в onInit()");
-		m_font_manager.setRanges(pairs);
-	}
+    void WindowInstance::fontsSetRangesExplicit(const std::vector<ImWchar>& pairs) {
+        assert(m_in_init_phase && u8"fontsSetRangesExplicit() только в onInit()");
+        m_font_manager.setRanges(pairs);
+    }
 
-	void WindowInstance::fontsClearRanges() {
-		assert(m_in_init_phase && u8"fontsClearRanges() только в onInit()");
-		m_font_manager.clearRanges();
-	}
+    void WindowInstance::fontsClearRanges() {
+        assert(m_in_init_phase && u8"fontsClearRanges() только в onInit()");
+        m_font_manager.clearRanges();
+    }
 
     void WindowInstance::fontsAddBody(const ImGuiX::Fonts::FontFile& ff) {
         assert(m_in_init_phase && u8"Only allowed in onInit()");

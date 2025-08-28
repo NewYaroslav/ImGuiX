@@ -1,15 +1,68 @@
 #if defined(IMGUIX_USE_SFML_BACKEND)
 
 #include <imgui.h> // necessary for ImGui::*, imgui-SFML.h doesn't include imgui.h
+#include <implot.h>
 #include <imgui-SFML.h> // for ImGui::SFML::* functions and SFML-specific overloads
 #include <imgui_freetype.h>
 #include <SFML/Graphics.hpp>
+
+void ShowBackendCheckerWindow(bool* p_open)
+{
+    if (!ImGui::Begin("Dear ImGui Backend Checker", p_open))
+    {
+        ImGui::End();
+        return;
+    }
+
+    ImGuiIO& io = ImGui::GetIO();
+    ImGui::Text("Dear ImGui %s Backend Checker", ImGui::GetVersion());
+    ImGui::Text("io.BackendPlatformName: %s", io.BackendPlatformName ? io.BackendPlatformName : "NULL");
+    ImGui::Text("io.BackendRendererName: %s", io.BackendRendererName ? io.BackendRendererName : "NULL");
+    ImGui::Separator();
+    
+    if (ImGui::TreeNode("0001: Renderer: Large Mesh Support"))
+    {
+        ImDrawList* draw_list = ImGui::GetWindowDrawList();
+        {
+            static int vtx_count = 60000;
+            ImGui::SliderInt("VtxCount##1", &vtx_count, 0, 100000);
+            ImVec2 p = ImGui::GetCursorScreenPos();
+            for (int n = 0; n < vtx_count / 4; n++)
+            {
+                float off_x = (float)(n % 100) * 3.0f;
+                float off_y = (float)(n % 100) * 1.0f;
+                ImU32 col = IM_COL32(((n * 17) & 255), ((n * 59) & 255), ((n * 83) & 255), 255);
+                draw_list->AddRectFilled(ImVec2(p.x + off_x, p.y + off_y), ImVec2(p.x + off_x + 50, p.y + off_y + 50), col);
+            }
+            ImGui::Dummy(ImVec2(300 + 50, 100 + 50));
+            ImGui::Text("VtxBuffer.Size = %d", draw_list->VtxBuffer.Size);
+        }
+        {
+            static int vtx_count = 60000;
+            ImGui::SliderInt("VtxCount##2", &vtx_count, 0, 100000);
+            ImVec2 p = ImGui::GetCursorScreenPos();
+            for (int n = 0; n < vtx_count / (10*4); n++)
+            {
+                float off_x = (float)(n % 100) * 3.0f;
+                float off_y = (float)(n % 100) * 1.0f;
+                ImU32 col = IM_COL32(((n * 17) & 255), ((n * 59) & 255), ((n * 83) & 255), 255);
+                draw_list->AddText(ImVec2(p.x + off_x, p.y + off_y), col, "ABCDEFGHIJ");
+            }
+            ImGui::Dummy(ImVec2(300 + 50, 100 + 20));
+            ImGui::Text("VtxBuffer.Size = %d", draw_list->VtxBuffer.Size);
+        }
+        ImGui::TreePop();
+    }
+
+    ImGui::End();
+}
 
 int main() {
     sf::RenderWindow window(sf::VideoMode({640, 480}), "ImGui + SFML = <3");
     window.setFramerateLimit(60);
     
     if (!ImGui::SFML::Init(window)) return -1;
+    ImPlot::CreateContext();
     
     ImGuiIO& io = ImGui::GetIO();
     io.Fonts->FontLoader = ImGuiFreeType::GetFontLoader();
@@ -21,6 +74,12 @@ int main() {
     if (!ImGui::SFML::UpdateFontTexture()) return -1;
 
     std::printf("Fonts count: %d\n", io.Fonts->Fonts.Size);
+    std::printf("ImTextureID: %d\n", sizeof(ImTextureID));
+#   ifdef IMGUI_ENABLE_IMPLOT
+    if (m_imgui_ctx) {
+        std::printf("IMGUI_ENABLE_IMPLOT\n");
+    }
+#   endif
 
     sf::CircleShape shape(100.f);
     shape.setFillColor(sf::Color::Green);
@@ -38,6 +97,11 @@ int main() {
         ImGui::SFML::Update(window, deltaClock.restart());
 
         ImGui::ShowDemoWindow();
+        static bool show_implot_demo = true;
+        if (show_implot_demo) ImPlot::ShowDemoWindow(&show_implot_demo);
+        
+        static bool show_implot_checker = true;
+        ShowBackendCheckerWindow(&show_implot_checker);
 
         ImGui::Begin("Hello, world!");
         ImGui::Button("Look at this pretty button");
@@ -49,6 +113,7 @@ int main() {
         window.display();
     }
 
+    ImPlot::DestroyContext();
     ImGui::SFML::Shutdown();
 }
 
@@ -126,7 +191,7 @@ extern "C" void EMSCRIPTEN_KEEPALIVE resize_sdl_window(int width, int height) {
 static void main_loop(void*) {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
-		ImGui_ImplSDL2_ProcessEvent(&event);
+        ImGui_ImplSDL2_ProcessEvent(&event);
 
         if (event.type == SDL_QUIT) {
 #           ifdef __EMSCRIPTEN__
@@ -136,17 +201,17 @@ static void main_loop(void*) {
         } else 
         if (event.type == SDL_WINDOWEVENT && 
             event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
-			int w, h, dw, dh;
-                        SDL_GetWindowSize(g_window, &w, &h); // Physical window size
-                        SDL_GL_GetDrawableSize(g_window, &dw, &dh); // Actual size used for rendering
-                        // Obtain screen DPI
-                        float dpi;
-                        SDL_GetDisplayDPI(0, &dpi, nullptr, nullptr);  // 0 is the display index on which the window appears
-                        // Scale font according to DPI
-                        //g_font_scale = static_cast<float>(dh) / static_cast<float>(h) * (dpi / 96.0f);  // 96.0f is the standard DPI
-			g_font_scale = static_cast<float>(dh) / static_cast<float>(h);
-			printf("g_font_scale: %f\n", g_font_scale);
-		}
+            int w, h, dw, dh;
+            SDL_GetWindowSize(g_window, &w, &h); // Physical window size
+            SDL_GL_GetDrawableSize(g_window, &dw, &dh); // Actual size used for rendering
+            // Obtain screen DPI
+            float dpi;
+            SDL_GetDisplayDPI(0, &dpi, nullptr, nullptr);  // 0 is the display index on which the window appears
+            // Scale font according to DPI
+            //g_font_scale = static_cast<float>(dh) / static_cast<float>(h) * (dpi / 96.0f);  // 96.0f is the standard DPI
+            g_font_scale = static_cast<float>(dh) / static_cast<float>(h);
+            printf("g_font_scale: %f\n", g_font_scale);
+        }
     }
 
     int draw_w, draw_h;
@@ -184,7 +249,7 @@ int main() {
 #   ifdef __EMSCRIPTEN__
     SDL_SetHint(SDL_HINT_EMSCRIPTEN_CANVAS_SELECTOR, "#canvas");
     SDL_SetHint(SDL_HINT_VIDEO_HIGHDPI_DISABLED, "0"); // enable high-DPI support
-	SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "1");
+    SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "1");
 #   endif
 
     g_window = SDL_CreateWindow(
@@ -220,7 +285,7 @@ int main() {
     // Font configuration for HiDPI
     float scale = io.DisplayFramebufferScale.y;
     //float font_size = 13.0f * scale * 2.0f;
-	float font_size = 13.0f * 2.0f;
+    float font_size = 13.0f * 2.0f;
     
     ImFontConfig config;
     config.OversampleH = 2;
@@ -232,13 +297,13 @@ int main() {
     io.FontGlobalScale = 0.5f;
 
 #   ifdef __EMSCRIPTEN__
-	ImGuiStyle& style = ImGui::GetStyle();
-	style.Colors[ImGuiCol_ButtonHovered] = style.Colors[ImGuiCol_Button];
-	style.Colors[ImGuiCol_HeaderHovered] = style.Colors[ImGuiCol_Header];
-	style.Colors[ImGuiCol_FrameBgHovered] = style.Colors[ImGuiCol_FrameBg];
-	style.Colors[ImGuiCol_SliderGrabActive] = style.Colors[ImGuiCol_SliderGrab];
-	style.Colors[ImGuiCol_ScrollbarGrabHovered] = style.Colors[ImGuiCol_ScrollbarGrab];
-	style.Colors[ImGuiCol_TabHovered] = style.Colors[ImGuiCol_Tab];
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.Colors[ImGuiCol_ButtonHovered] = style.Colors[ImGuiCol_Button];
+    style.Colors[ImGuiCol_HeaderHovered] = style.Colors[ImGuiCol_Header];
+    style.Colors[ImGuiCol_FrameBgHovered] = style.Colors[ImGuiCol_FrameBg];
+    style.Colors[ImGuiCol_SliderGrabActive] = style.Colors[ImGuiCol_SliderGrab];
+    style.Colors[ImGuiCol_ScrollbarGrabHovered] = style.Colors[ImGuiCol_ScrollbarGrab];
+    style.Colors[ImGuiCol_TabHovered] = style.Colors[ImGuiCol_Tab];
 #   endif
 
     // Backend implementations

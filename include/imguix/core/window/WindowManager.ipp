@@ -1,6 +1,5 @@
 #include <algorithm>
 #include <imgui.h>
-#include <imguix/themes/ThemeManager.hpp>
 
 namespace ImGuiX {
 
@@ -40,10 +39,10 @@ namespace ImGuiX {
 
     void WindowManager::initializePending() {
         for (auto* window : m_pending_init) {
-			if (!window) continue;
-			window->fontsStartInit();
+            if (!window) continue;
+            window->fontsStartInit();
             window->onInit();
-			window->buildFonts();
+            window->buildFonts();
         }
         m_pending_init.clear();
     }
@@ -113,7 +112,6 @@ namespace ImGuiX {
 #       endif
 
         for (auto& window : m_windows) {
-            window->getThemeManager().updateCurrentTheme(ImGui::GetStyle());
             window->tick();
         }
     }

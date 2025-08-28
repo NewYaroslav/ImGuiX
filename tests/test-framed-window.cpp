@@ -53,7 +53,8 @@ public:
     void onInit() override {
         createController<DemoFramedController>();
         create(800, 600);
-        ImGui::StyleColorsLight();
+        //ImGui::StyleColorsLight();
+        setTheme("light");
         ImGui::GetStyle().WindowRounding = 8.0f;
     }
     

@@ -19,6 +19,9 @@ option(IMGUIX_USE_SDL2_BACKEND "Use SDL2 backend" OFF)
 # ImGui / FreeType
 option(IMGUIX_IMGUI_FREETYPE   "Enable ImGui FreeType rasterizer" ON)
 
+# ImGui / ImPlot
+option(IMGUIX_USE_IMPLOT       "Build ImPlot and link it in" ON)
+
 # JSON vendoring (A by default = OFF -> искать внешнюю зависимость)
 option(IMGUIX_VENDOR_JSON      "Install vendored nlohmann_json headers with ImGuiX" OFF)
 
@@ -44,6 +47,9 @@ set(IMGUIX_DEPS_JSON_MODE       "INHERIT" CACHE STRING "INHERIT|AUTO|SYSTEM|BUND
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+set(IMGUIX_USER_CONFIG_DIR  "${PROJECT_SOURCE_DIR}/include")
+set(IMGUIX_USER_CONFIG_NAME "imguix/config/imconfig-imguix.hpp")
 
 # ===== Module path =====
 list(PREPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -72,9 +78,11 @@ include(cmake/deps/freetype.cmake)
 include(cmake/deps/sfml.cmake)
 include(cmake/deps/imgui.cmake)
 include(cmake/deps/imgui_sfml.cmake)
+include(cmake/deps/implot.cmake)
 include(cmake/deps/nlohmann_json.cmake)
 include(cmake/deps/assets.cmake)
 include(cmake/deps/app_icon.cmake)
+include(cmake/ImGuiXDemos.cmake)
 
 # ===== Resolve core deps =====
 imguix_use_or_fetch_fmt(FMT_TARGET)                 # ожидается fmt::fmt
@@ -109,6 +117,10 @@ elseif(IMGUIX_USE_SDL2_BACKEND)
     set(_IMGUIX_BACKEND_DEFINE IMGUIX_USE_SDL2_BACKEND)
 endif()
 
+if(IMGUIX_USE_IMPLOT)
+    imguix_use_or_fetch_implot(IMPLOT_TARGET)
+endif()
+
 # ===== Library / Header-only switch =====
 if(IMGUIX_HEADER_ONLY)
     message(STATUS "ImGuiX: header-only mode ON")
@@ -119,6 +131,9 @@ if(IMGUIX_HEADER_ONLY)
         $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
         $<INSTALL_INTERFACE:include>
     )
+    
+    target_include_directories(imguix INTERFACE "${IMGUIX_USER_CONFIG_DIR}")
+    target_compile_definitions(imguix INTERFACE IMGUI_USER_CONFIG="${IMGUIX_USER_CONFIG_NAME}")
 
     # (Вариант B) — при вендоринге кладём json-хедеры и даём build-include на сабмодуль
     if(IMGUIX_VENDOR_JSON)
@@ -136,6 +151,10 @@ if(IMGUIX_HEADER_ONLY)
     if(IMGUIX_IMGUI_FREETYPE)
         target_compile_definitions(imguix INTERFACE IMGUI_ENABLE_FREETYPE)
         # НЕ линкуем freetype/SFML/ImGui-SFML в INTERFACE — их добавляет потребитель.
+    endif()
+    
+    if(IMGUIX_USE_IMPLOT)
+        target_compile_definitions(imguix INTERFACE IMGUI_ENABLE_IMPLOT)
     endif()
 
     # Санитарная зачистка интерфейса (чтобы install(EXPORT ...) не тянул чужие цели)
@@ -202,6 +221,11 @@ else()
             $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/libs/json/include>
         )
     endif()
+    
+    if(IMGUIX_USE_IMPLOT)
+        target_compile_definitions(imguix PUBLIC IMGUI_ENABLE_IMPLOT)
+        target_link_libraries(imguix PRIVATE ${IMPLOT_TARGET})
+    endif()
 
     # Санитарная зачистка интерфейса (чтобы install(EXPORT ...) не тянул чужие цели)
     set_property(TARGET imguix PROPERTY INTERFACE_LINK_LIBRARIES "")
@@ -250,6 +274,14 @@ if(IMGUIX_BUILD_TESTS)
 
         target_link_libraries(${TEST_NAME} PRIVATE ${IMGUI_LIB} ${BACKEND_LIBS})
         target_link_libraries(${TEST_NAME} PRIVATE fmt::fmt nlohmann_json::nlohmann_json)
+
+        if(IMGUIX_USE_IMPLOT)
+            target_compile_definitions(imguix PRIVATE IMGUI_ENABLE_IMPLOT)
+            target_link_libraries(${TEST_NAME} PRIVATE implot::implot)
+            imguix_add_implot_demo(${TEST_NAME})
+        endif()
+        
+        imguix_add_imgui_demo(${TEST_NAME})
 
         if(WIN32)
             target_link_libraries(${TEST_NAME} PRIVATE gdi32 user32 comctl32 dwmapi)
@@ -412,6 +444,15 @@ if(IMGUIX_SDK_BUNDLE_DEPS)
             install(DIRECTORY "${PROJECT_SOURCE_DIR}/libs/json/include/nlohmann"
                     DESTINATION include)
         endif()
+    endif()
+    
+    # --- ImPlot: заголовки ---
+    if(EXISTS "${PROJECT_SOURCE_DIR}/libs/implot/implot.h")
+        install(FILES
+            "${PROJECT_SOURCE_DIR}/libs/implot/implot.h"
+            "${PROJECT_SOURCE_DIR}/libs/implot/implot_internal.h"
+            DESTINATION include
+        )
     endif()
 
 endif()

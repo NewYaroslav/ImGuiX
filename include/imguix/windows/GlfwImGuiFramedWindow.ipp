@@ -14,9 +14,16 @@ namespace ImGuiX::Windows {
         m_window = glfwCreateWindow(width(), height(), name().c_str(), nullptr, nullptr);
         if (!m_window) return false;
         glfwMakeContextCurrent(m_window);
+
         IMGUI_CHECKVERSION();
-        if (!ImGui::GetCurrentContext())
+        if (!ImGui::GetCurrentContext()) { 
             ImGui::CreateContext();
+#           ifdef IMGUI_ENABLE_IMPLOT
+            m_implot_ctx = ImPlot::CreateContext();
+            ImPlot::SetCurrentContext(m_implot_ctx);
+#           endif
+        }
+        
         ImGui_ImplGlfw_InitForOpenGL(m_window, true);
         ImGui_ImplOpenGL3_Init();
         m_is_open = true;
@@ -34,9 +41,13 @@ namespace ImGuiX::Windows {
                          m_config.clear_color.z, m_config.clear_color.w);
         }
         glClear(GL_COLOR_BUFFER_BIT);
+        updateCurrentTheme();
     }
 
     void ImGuiFramedWindow::drawUi() {
+#       ifdef IMGUI_ENABLE_IMPLOT
+        ImPlot::SetCurrentContext(m_implot_ctx);
+#       endif
         ImGui::PushID(id());
 
         int fb_w = 0, fb_h = 0;

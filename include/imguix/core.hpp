@@ -28,6 +28,10 @@
 #include <imgui_freetype.h>
 #endif
 
+#ifdef IMGUI_ENABLE_IMPLOT
+#include <implot.h>
+#endif
+
 #include <imgui.h>
 
 // --- Event and PubSub system ---
@@ -45,7 +49,7 @@
 #include "core/resource/ResourceRegistry.hpp"      ///< Global registry for shared resources
 
 // --- Theme system ---
-#include "themes/ThemeManager.hpp"                 ///< Theme manager for ImGui styles
+#include "core/themes/ThemeManager.hpp"            ///< Theme manager for ImGui styles
 
 // --- Controller and model interfaces ---
 #include "core/application/ApplicationContext.hpp" ///< Interface for application access

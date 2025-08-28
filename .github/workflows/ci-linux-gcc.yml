@@ -34,14 +34,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y \
             build-essential cmake ninja-build pkg-config git \
-            # X11/OpenGL for SFML from source
             libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev \
             libgl1-mesa-dev mesa-common-dev \
-            # Audio deps for SFML
             libasound2-dev libflac-dev libvorbis-dev libogg-dev libsndfile1-dev libopenal-dev \
-            # FreeType (IMGUI_ENABLE_FREETYPE)
             libfreetype6-dev \
-            # Optional but sometimes useful
             libudev-dev libdrm-dev
 
       - name: Toolchain versions

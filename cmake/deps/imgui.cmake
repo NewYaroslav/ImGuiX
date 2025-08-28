@@ -48,6 +48,15 @@ function(imguix_use_or_fetch_imgui out_imgui)
         $<BUILD_INTERFACE:${IMGUI_DIR}>
         $<INSTALL_INTERFACE:include>
     )
+	
+	if(DEFINED IMGUIX_USER_CONFIG_DIR AND DEFINED IMGUIX_USER_CONFIG_NAME)
+		target_include_directories(imgui PUBLIC
+			$<BUILD_INTERFACE:${IMGUIX_USER_CONFIG_DIR}>
+		)
+		target_compile_definitions(imgui PUBLIC
+			IMGUI_USER_CONFIG="${IMGUIX_USER_CONFIG_NAME}"
+		)
+	endif()
 
     if(IMGUIX_IMGUI_FREETYPE)
         target_include_directories(imgui PRIVATE "${IMGUI_DIR}/misc/freetype")

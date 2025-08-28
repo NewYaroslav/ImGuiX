@@ -66,8 +66,8 @@ namespace ImGuiX {
 
         /// \brief Access the theme manager.
         /// \return Theme manager instance.
-        Themes::ThemeManager& getThemeManager() {
-            return m_window.getThemeManager();
+        Themes::ThemeManager& themeManager() {
+            return m_window.themeManager();
         }
 
     protected:
