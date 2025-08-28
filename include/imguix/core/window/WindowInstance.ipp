@@ -34,9 +34,18 @@ namespace ImGuiX {
         auto ctrl = std::make_unique<ControllerType>(
             static_cast<WindowInterface&>(*this),
             std::forward<Args>(args)...);
-        ControllerType& ref = *ctrl;
+        ControllerType* ptr = ctrl.get();
+        ControllerType& ref = *ptr;
+        m_pending_controllers.push_back(ptr);
         m_controllers.push_back(std::move(ctrl));
         return ref;
+    }
+
+    void WindowInstance::initializePendingControllers() {
+        for (auto* ctrl : m_pending_controllers) {
+            if (ctrl) ctrl->onInit();
+        }
+        m_pending_controllers.clear();
     }
 
 // --- WindowInterface interface ---

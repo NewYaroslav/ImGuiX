@@ -27,6 +27,9 @@ namespace ImGuiX {
 
         virtual ~Controller() = default;
 
+        /// \brief Optional initialization callback invoked once.
+        virtual void onInit() {}
+
         /// \brief Renders frame content (background, world, etc.).
         virtual void drawContent() = 0;
 

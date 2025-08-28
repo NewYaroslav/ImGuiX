@@ -28,6 +28,7 @@ namespace ImGuiX {
         flushPending();        // move pending windows into the active list
         initializePending();   // run onInit on newly added windows
         removeClosed();        // purge windows that have been closed
+        initializeControllers(); // run onInit on controllers
     }
     
     void WindowManager::flushPending() {
@@ -45,6 +46,12 @@ namespace ImGuiX {
             window->buildFonts();
         }
         m_pending_init.clear();
+    }
+
+    void WindowManager::initializeControllers() {
+        for (auto& window : m_windows) {
+            window->initializePendingControllers();
+        }
     }
 
     void WindowManager::closeAll() {

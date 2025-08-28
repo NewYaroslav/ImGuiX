@@ -95,6 +95,9 @@ namespace ImGuiX {
         template <typename ControllerType, typename... Args>
         ControllerType& createController(Args&&... args);
 
+        /// \brief Call onInit() on controllers pending initialization.
+        void initializePendingControllers();
+
         // --- WindowInterface interface ---
 
         /// \brief Returns the unique ID of this window.
@@ -307,6 +310,7 @@ namespace ImGuiX {
 
         ApplicationContext& m_application;  ///< Reference to the owning application.
         std::vector<std::unique_ptr<Controller>> m_controllers; ///< Attached controllers.
+        std::vector<Controller*> m_pending_controllers; ///< Controllers awaiting onInit.
         std::string m_ini_path;             ///< Path to the window-specific ImGui ini file.
         bool m_is_ini_once = false;         ///< Ensures imgui ini is saved only once.
         bool m_is_ini_loaded = false;       ///< Indicates whether ini settings have been loaded.
