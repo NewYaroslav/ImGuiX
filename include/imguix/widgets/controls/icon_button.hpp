@@ -4,6 +4,9 @@
 
 #include <imgui.h>
 
+/// \file icon_button.hpp
+/// \brief Centered icon or text button widget.
+
 namespace ImGuiX::Widgets {
 
     /// \brief Configuration for IconButtonCentered.
@@ -22,6 +25,11 @@ namespace ImGuiX::Widgets {
     /// \param text UTF-8 text or icon string.
     /// \param cfg Button appearance options.
     /// \return True if clicked with left mouse button.
+    /// \code
+    /// if (IconButtonCentered("ok", "OK")) {
+    ///     // clicked
+    /// }
+    /// \endcode
     bool IconButtonCentered(
             const char* id,
             const char* text,

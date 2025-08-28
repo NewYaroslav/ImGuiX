@@ -9,9 +9,13 @@
 
 namespace ImGuiX::Widgets {
 
-    /// \brief Draw an animated toggle switch (no imgui_internal.h).
+    /// \brief Draw animated toggle switch.
     /// \param id Unique string identifier.
     /// \param state Pointer to boolean storing current state.
+    /// \code
+    /// bool enabled = false;
+    /// ToggleButton("enabled", &enabled);
+    /// \endcode
     void ToggleButton(const char* id, bool* state);
 
 } // namespace ImGuiX::Widgets
