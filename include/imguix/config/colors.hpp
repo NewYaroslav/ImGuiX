@@ -19,4 +19,10 @@
 /// \brief RGBA color for success markers.
 #define IMGUIX_COLOR_SUCCESS ImVec4(0.0f, 0.60f, 0.0f, 1.0f)
 
+/// \brief Default bull candle color for PlotOHLCChart.
+#define IMGUIX_COLOR_OHLC_BULL ImVec4(0.0f, 1.0f, 0.441f, 1.0f)
+
+/// \brief Default bear candle color for PlotOHLCChart.
+#define IMGUIX_COLOR_OHLC_BEAR ImVec4(0.853f, 0.05f, 0.31f, 1.0f)
+
 #endif // _IMGUIX_CONFIG_COLORS_HPP_INCLUDED
