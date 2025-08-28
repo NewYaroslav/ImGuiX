@@ -1,6 +1,6 @@
 /// \file FontManager.hpp
 /// \brief Centralized font loading with optional JSON config (ImGui 1.92 +
-/// FreeType + SFML).
+/// FreeType + backend integration for SFML/GLFW/SDL2).
 /// \note Requires ImGui 1.92+, optional ImGui FreeType.
 ///
 /// Usage modes:
