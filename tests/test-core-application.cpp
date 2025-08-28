@@ -32,7 +32,7 @@ public:
         m_thread = std::thread([this]() { timerThread(); });
     }
 
-    void process() override {}
+    void process(ImGuiX::Pubsub::SyncNotifier& /*notifier*/) override {}
 
     ~TimerModel() override {
         m_stop = true;

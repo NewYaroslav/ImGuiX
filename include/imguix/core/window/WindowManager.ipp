@@ -50,7 +50,7 @@ namespace ImGuiX {
 
     void WindowManager::initializeControllers() {
         for (auto& window : m_windows) {
-            window->initializePendingControllers();
+			window->initializePendingControllers();
         }
     }
 
@@ -157,11 +157,11 @@ namespace ImGuiX {
     void WindowManager::removeClosed() {
         // Remove-erase idiom to drop null or closed windows.
         m_windows.erase(
-            std::remove_if(m_windows.begin(), m_windows.end(),
-                           [](const std::unique_ptr<WindowInstance>& w) {
-                               return w == nullptr || !w->isOpen();
-                           }),
-            m_windows.end());
+			std::remove_if(m_windows.begin(), m_windows.end(),
+			   [](const std::unique_ptr<WindowInstance>& w) {
+				   return w == nullptr || !w->isOpen();
+			   }), m_windows.end()
+		);
     }
 
     std::size_t WindowManager::windowCount() const {

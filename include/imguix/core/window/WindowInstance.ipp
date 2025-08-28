@@ -42,6 +42,7 @@ namespace ImGuiX {
     }
 
     void WindowInstance::initializePendingControllers() {
+        setCurrentWindow();
         for (auto* ctrl : m_pending_controllers) {
             if (ctrl) ctrl->onInit();
         }

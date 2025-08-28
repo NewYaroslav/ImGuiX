@@ -30,7 +30,7 @@ namespace ImGuiX {
         virtual void onInit() {}
 
         /// \brief Called every frame by the application.
-        virtual void process() = 0;
+        virtual void process(ImGuiX::Pubsub::SyncNotifier&) = 0;
 
         /// \brief Requests the application to close gracefully.
         virtual void close() {
@@ -55,8 +55,6 @@ namespace ImGuiX {
 
         // --- Disable synchronous notify interface (unsafe for multithreading) ---
 
-        void notify(const std::shared_ptr<Pubsub::Event>&) const = delete;
-        void notify(const std::unique_ptr<Pubsub::Event>&) const = delete;
         void notify(const Pubsub::Event* const) const = delete;
         void notify(const Pubsub::Event&) const = delete;
 

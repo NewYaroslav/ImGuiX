@@ -72,6 +72,10 @@ namespace ImGuiX {
         Themes::ThemeManager& themeManager() {
             return m_window.themeManager();
         }
+        
+        /// \brief Set active theme identifier.
+        /// \param id Identifier of registered theme.
+        void setTheme(std::string id) { themeManager().setTheme(std::move(id)); }
 
     protected:
         WindowInterface& m_window; ///< Controlled window instance.

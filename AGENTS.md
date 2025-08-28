@@ -102,7 +102,9 @@ graph LR
 
   * Invariant: only one instance per type; access during registration throws.
 * **Event Contract**: every event derives from `Pubsub::Event` and implements `type()` and `name()`
-* **Model Restrictions**: synchronous `notify` functions are deleted to avoid race conditions; use `notifyAsync` only
+* **Model Restrictions**: direct synchronous `notify` functions are deleted to avoid race conditions.
+  Use `notifyAsync` outside of `process()`. Models may emit events synchronously via the
+  `SyncNotifier` parameter passed into `process()`.
 
 ### UI Sizing & Combo Patterns
 

@@ -46,11 +46,11 @@ namespace ImGuiX {
         }
 #       endif
 
-#if defined(__EMSCRIPTEN__)
+#       if defined(__EMSCRIPTEN__)
         (void)async;
         startLoop();
         mainLoop();
-#else
+#       else
         if (async) {
             m_main_thread = std::thread([this]() {
                 registry().getResource<DeltaClockSfml>().update();
@@ -64,7 +64,7 @@ namespace ImGuiX {
             startLoop();
             mainLoop();
         }
-#endif
+#       endif
     }
 
     WindowInstance& Application::createWindowImpl(WindowFactory factory) {
@@ -133,10 +133,11 @@ namespace ImGuiX {
         // Update window lifecycles before rendering the frame
         m_window_manager.prepareFrame();
         initializePendingModels();
+        ImGuiX::Pubsub::SyncNotifier notifier{m_event_bus};
         if (allWindowsClosed()) {
             m_event_bus.process();
             for (auto& model : m_models) {
-                model->process();
+                model->process(notifier);
             }
             m_event_bus.process();
 #ifdef __EMSCRIPTEN__
@@ -148,7 +149,7 @@ namespace ImGuiX {
 
         m_window_manager.initIniAll();
         for (auto& model : m_models) {
-            model->process();
+            model->process(notifier);
         }
         m_event_bus.process();
         

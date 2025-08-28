@@ -26,5 +26,6 @@
 #include "pubsub/cancellation.hpp"
 #include "pubsub/EventAwaiter.hpp"
 #include "pubsub/EventMediator.hpp"
+#include "pubsub/SyncNotifier.hpp"
 
 #endif // _IMGUIX_CORE_PUBSUB_HPP_INCLUDED

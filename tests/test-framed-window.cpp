@@ -10,6 +10,11 @@ class DemoFramedWindow;
 class DemoFramedController : public ImGuiX::Controllers::ExtendedController {
 public:
     using ExtendedController::ExtendedController;
+    
+    void onInit() override {
+        setTheme("light");
+        ImGui::GetStyle().WindowRounding = 8.0f;
+    }
 
     void drawContent() override {
         sf::RenderWindow& target = window().getRenderTarget();
@@ -54,8 +59,8 @@ public:
         createController<DemoFramedController>();
         create(800, 600);
         //ImGui::StyleColorsLight();
-        setTheme("light");
-        ImGui::GetStyle().WindowRounding = 8.0f;
+        //setTheme("light");
+        //ImGui::GetStyle().WindowRounding = 8.0f;
     }
     
     void drawMenuBar() override {
