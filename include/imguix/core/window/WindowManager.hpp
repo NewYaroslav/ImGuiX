@@ -86,6 +86,9 @@ namespace ImGuiX {
         /// \brief Remove windows that are no longer open.
         void removeClosed();
 
+        /// \brief Call onInit() on pending controllers in all windows.
+        void initializeControllers();
+
     protected:
         std::vector<std::unique_ptr<WindowInstance>> m_windows;      ///< Managed windows.
         std::vector<std::unique_ptr<WindowInstance>> m_pending_add;  ///< Newly created windows waiting to be added.
