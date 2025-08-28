@@ -3,16 +3,16 @@
 #define _IMGUIX_THEMES_CORPORATE_GREY_THEME_HPP_INCLUDED
 
 /// \file CorporateGreyTheme.hpp
-/// \brief Корпоративная серая тема для ImGui / ImPlot, адаптированная под современный UI-стиль.
+/// \brief Corporate gray theme for ImGui/ImPlot, tailored to modern UI style.
 ///
-/// Эта тема представляет собой аккуратную, сдержанную серую палитру, которая отлично подходит для
-/// бизнес-приложений и утилитарных интерфейсов. Поддерживает как ImGui, так и ImPlot.
+/// This theme offers a neat, restrained gray palette suited for business applications and utility
+/// interfaces. It supports both ImGui and ImPlot.
 ///
-/// Основана на теме из обсуждения: https://github.com/ocornut/imgui/issues/707  
-/// (Corporate Grey Theme by Sam Hocevar), но переработана и улучшена:
-/// - повторяющиеся цвета вынесены в именованные константы
-/// - добавлена интеграция с ImPlot
-/// - улучшены настройки скруглений, рамок и отступов
+/// Based on the discussion theme: https://github.com/ocornut/imgui/issues/707
+/// (Corporate Grey Theme by Sam Hocevar), but reworked and improved:
+/// - repeated colors moved to named constants
+/// - integration with ImPlot added
+/// - rounding, border, and spacing settings refined
 ///
 /// \author NewYaroslav
 /// \date 2025
@@ -22,7 +22,7 @@
 namespace ImGuiX::Themes {
 
     /// \namespace CorporateGreyConstants
-    /// \brief Общие цветовые константы, используемые в теме Corporate Grey.
+    /// \brief Common color constants used by the Corporate Grey theme.
     namespace CorporateGreyConstants {
         constexpr ImVec4 White             = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
         constexpr ImVec4 MediumGrey       = ImVec4(0.42f, 0.42f, 0.42f, 0.54f);
@@ -46,10 +46,10 @@ namespace ImGuiX::Themes {
     }
 
     /// \class CorporateGreyTheme
-    /// \brief Тематическое оформление интерфейса в серых тонах для ImGui и ImPlot.
+    /// \brief Gray interface theme for ImGui and ImPlot.
     ///
-    /// Реализация темы оформления, адаптированной для корпоративных интерфейсов.
-    /// Поддерживает настройку как ImGui, так и ImPlot.
+    /// Theme implementation tailored for corporate interfaces.
+    /// Configures both ImGui and ImPlot.
     class CorporateGreyTheme final : public Theme {
     public:
         void apply(ImGuiStyle& style) const override {
@@ -138,9 +138,9 @@ namespace ImGuiX::Themes {
 #endif
     };
 
-    /// \brief Регистрирует тему Corporate Grey в ThemeManager.
-    /// \param tm Менеджер тем, в который будет зарегистрирована тема.
-    /// \param id Уникальный идентификатор темы (по умолчанию "corporate-grey").
+    /// \brief Registers the Corporate Grey theme in ThemeManager.
+    /// \param tm Theme manager where the theme will be registered.
+    /// \param id Unique theme identifier (defaults to "corporate-grey").
     inline void registerCorporateGreyTheme(ThemeManager& tm, std::string id = "corporate-grey") {
         tm.registerTheme(std::move(id), std::make_unique<CorporateGreyTheme>());
     }
