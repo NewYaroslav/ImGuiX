@@ -76,19 +76,19 @@ namespace ImGuiX::Windows {
 #       ifdef IMGUIX_USE_SFML_BACKEND
         int m_prev_width = -1;   ///< Width before entering fullscreen.
         int m_prev_height = -1;  ///< Height before entering fullscreen.
+        bool applyCommonWindowSetup();
 #       ifdef _WIN32
         RECT m_minimize_btn_rect = {0}; ///< Rectangle of the minimize button.
         RECT m_maximize_btn_rect = {0}; ///< Rectangle of the maximize button.
         RECT m_close_btn_rect = {0};    ///< Rectangle of the close button.
         bool m_in_manual_sizing = false; ///< True while resizing manually.
         void setupWindowEffects(HWND hwnd);
-        bool applyCommonWindowSetup();
         void applyRoundedRegion(HWND hwnd, int width, int height, int radius);
         static LRESULT CALLBACK SubclassProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
                                      UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-#       endif
     public:
         LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+#       endif
 #       endif
     
     protected:

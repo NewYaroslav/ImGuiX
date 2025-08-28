@@ -1,6 +1,8 @@
+#ifdef _WIN32
 #include <windowsx.h>
 #include <commctrl.h>
 #include <Dwmapi.h>     // For window transparency: https://gist.github.com/Alia5/5d8c48941d1f73c1ef14967a5ffe33d5
+#endif
 #include <imgui.h>
 #include <imgui-SFML.h>
 #include <SFML/Window/Mouse.hpp>
@@ -8,7 +10,9 @@
 #include <imguix/extensions/blend_colors.hpp>
 #include <imguix/extensions/color_utils.hpp>
 
+#ifdef _WIN32
 #define IMGUIX_WM_USER_ROUNDED_REGION (WM_USER + 201)
+#endif
 
 namespace ImGuiX::Windows {
 
@@ -24,6 +28,8 @@ namespace ImGuiX::Windows {
                 SetActiveWindow(hwnd);
             }
         }
+#       else
+        applyCommonWindowSetup();
 #       endif
         return m_is_open;
     }
@@ -239,7 +245,7 @@ namespace ImGuiX::Windows {
                 if (right)  return HTRIGHT;
                 if (top)    return HTTOP;
                 if (bottom) return HTBOTTOM;
-                
+
                 if (PtInRect(&m_minimize_btn_rect, pt)) {
                     return HTCLIENT;
                 }
@@ -258,6 +264,25 @@ namespace ImGuiX::Windows {
                 return DefSubclassProc(hwnd, msg, wParam, lParam);
         }
     }
+#   elif defined(__linux__)
+
+    bool ImGuiFramedWindow::applyCommonWindowSetup() {
+        if (m_window.isOpen() || m_is_open) return true;
+        m_window.create(
+            sf::VideoMode({static_cast<unsigned int>(width()), static_cast<unsigned int>(height())}),
+            name(),
+            sf::Style::None);
+        m_window.setFramerateLimit(60);
+        m_is_open = ImGui::SFML::Init(m_window);
+
+#       ifdef IMGUI_ENABLE_IMPLOT
+        m_implot_ctx = ImPlot::CreateContext();
+        ImPlot::SetCurrentContext(m_implot_ctx);
+#       endif
+
+        return m_is_open;
+    }
+
 #   endif
 
 } // namespace ImGuiX::Windows
