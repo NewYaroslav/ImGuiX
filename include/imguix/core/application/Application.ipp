@@ -1,6 +1,26 @@
 #ifdef __EMSCRIPTEN__
 #   include <emscripten.h>
+#   ifdef IMGUIX_EMSCRIPTEN_IDBFS
+#       ifdef IMGUIX_ASYNCIFY
+EM_ASYNC_JS(void, imguix_mount_idbfs, (void (*cb)(void*), void* ctx), {
+    FS.mkdir('/imguix_fs');
+    FS.mount(IDBFS, {}, '/imguix_fs');
+    await FS.syncfs(true);
+    Module["dynCall_vi"]($0, $1);
+});
+#       else
+EM_JS(void, imguix_mount_idbfs, (void (*cb)(void*), void* ctx), {
+    FS.mkdir('/imguix_fs');
+    FS.mount(IDBFS, {}, '/imguix_fs');
+    FS.syncfs(true, function(err) {
+        Module["dynCall_vi"]($0, $1);
+    });
+});
+#       endif
+#   endif
 #endif
+
+#include <chrono>
 
 #include <imguix/config/paths.hpp>
 #include <imguix/core/options/OptionsStore.hpp>
@@ -10,6 +30,10 @@ namespace ImGuiX {
     Application::Application()
         : m_event_bus(), m_registry(),
           m_window_manager(*static_cast<ApplicationContext*>(this)) {
+        initFilesystem();
+        while (!m_is_fs_ready.load()) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
         m_registry.registerResource<OptionsStore>([] {
             return std::make_shared<OptionsStore>();
         });
@@ -95,13 +119,9 @@ namespace ImGuiX {
 #ifdef __EMSCRIPTEN__
 #   ifdef IMGUIX_EMSCRIPTEN_IDBFS
         EM_ASM({
-            FS.mkdir('/imguix_fs');
-            FS.mount(IDBFS, {}, '/imguix_fs');
-            FS.syncfs(true, function(){});
             try { FS.mkdir('/imguix_fs/data'); } catch (e) {}
             try { FS.mkdir('/imguix_fs/data/config'); } catch (e) {}
         });
-        m_registry.getResource<OptionsStore>().load();
 #   endif
 #endif
         // Ensure initial windows and models are ready before entering loop
@@ -155,5 +175,19 @@ namespace ImGuiX {
         endLoop();
 #endif
     }
+
+    void Application::initFilesystem() {
+#if defined(__EMSCRIPTEN__) && defined(IMGUIX_EMSCRIPTEN_IDBFS)
+        m_is_fs_ready = false;
+        imguix_mount_idbfs(&Application::filesystemReady, this);
+#endif
+    }
+
+#ifdef __EMSCRIPTEN__
+    void Application::filesystemReady(void* arg) {
+        auto* self = static_cast<Application*>(arg);
+        self->m_is_fs_ready = true;
+    }
+#endif
 
 } // namespace ImGuiX

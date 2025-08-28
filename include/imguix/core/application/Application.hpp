@@ -61,6 +61,7 @@ namespace ImGuiX {
         std::thread m_main_thread;                     ///< Thread running the main loop when async.
         std::atomic<bool> m_is_closing{false};         ///< Indicates shutdown in progress.
         std::atomic<bool> m_is_ini_once{false};        ///< Ensures imgui ini is saved only once.
+        std::atomic<bool> m_is_fs_ready{true};         ///< Set when filesystem mount completes.
 
         std::atomic<int> m_next_window_id{0};          ///< Incremental ID for new windows.
         std::string m_app_name = u8"ImGuiX Application"; ///< Application name string.
@@ -86,6 +87,14 @@ namespace ImGuiX {
 
         /// \brief Initializes all pending models.
         void initializePendingModels();
+
+        /// \brief Initialize persistent filesystem (no-op on native builds).
+        void initFilesystem();
+
+#ifdef __EMSCRIPTEN__
+        /// \brief Called when asynchronous filesystem mounting finishes.
+        static void filesystemReady(void* arg);
+#endif
     };
 
 } // namespace ImGuiX
