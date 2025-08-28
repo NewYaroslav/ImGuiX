@@ -26,42 +26,37 @@ namespace ImGuiX::Widgets {
 
     // ---------------- Config ----------------
 
-    /// \class VirtualKeyboardConfig
-    /// \brief
+    /// \brief Configuration for the on-screen keyboard.
     struct VirtualKeyboardConfig {
-        // Заданные размеры. Если <=0 — вычисляется автоматически
-        ImVec2  size         = ImVec2(0, 0);   ///< (w,h).
-        
-        // Геометрия клавиш/отступов
-        ImVec2  key_size     = ImVec2(24, 24); ///< key button size
-        float   spacing      = 4.0f;           ///< spacing between keys
-        float   pane_gap     = 6.0f;           ///< зазор между левой/правой панелью
-        float   height_bias_px = 0.0f;         ///<
-        bool    border       = true;           ///< child border
+        ImVec2  size         = ImVec2(0, 0);   ///< Desired size (w,h). <=0 => auto.
 
-        // Состав панелей
-        bool    show_digits  = true;           ///< top row 1..0
-        bool    show_special = true;           ///< right pane with symbols
-        bool    show_bottom  = true;           ///< bottom row (Shift, Space, Bksp, Enter)
-        bool    allow_enter  = true;           ///< Enter appends '\n'
-        bool    show_accents = true;           ///< allow accents pane
-        bool    remember_pane = true;          ///< store pane mode in ImGuiStorage if no external state
-        bool    show_clipboard_buttons = false;///< show Copy/Paste buttons
-        bool    allow_copy_from_text  = true;  ///< Copy enabled
-        bool    allow_paste_into_text = true;  ///< Paste enabled
-        bool    submit_on_enter     = false;   ///< true: Enter submits (like InputTextEnterReturnsTrue)
-        bool    capture_hw_enter    = false;   ///< react to physical Enter when VK is focused
-        bool    shift_enter_newline = false;   ///< Shift+Enter inserts '\n' instead of submit
-        std::function<void(const std::string&)> on_submit; ///< callback on submit(text)
-    
-        bool  paste_replace_all           = false;  ///< true: replace text, false: append
-        bool  sanitize_paste_newlines     = true;   ///< convert CRLF/CR -> '\n'
-        int   max_text_len_on_paste       = 0;      ///< 0 = unlimited (truncate if >0)
-        float clipboard_buttons_spacing   = 0.0f;   ///< 0 => style.ItemSpacing.x
-        
-        // Иконки/шрифт
-        ImFont* icon_font = nullptr;  ///< шрифт иконок (например, MaterialIcons); null => использовать текущий
-        ImGuiX::Widgets::IconButtonConfig icon_btn{}; ///< стиль для IconButtonCentered
+        ImVec2  key_size     = ImVec2(24, 24); ///< Key button size.
+        float   spacing      = 4.0f;           ///< Spacing between keys.
+        float   pane_gap     = 6.0f;           ///< Gap between left and right panes.
+        float   height_bias_px = 0.0f;         ///< Extra height bias.
+        bool    border       = true;           ///< Draw child border.
+
+        bool    show_digits  = true;           ///< Top row 1..0.
+        bool    show_special = true;           ///< Right pane with symbols.
+        bool    show_bottom  = true;           ///< Bottom row (Shift, Space, Bksp, Enter).
+        bool    allow_enter  = true;           ///< Enter appends '\n'.
+        bool    show_accents = true;           ///< Enable accents pane.
+        bool    remember_pane = true;          ///< Store pane mode in ImGuiStorage.
+        bool    show_clipboard_buttons = false;///< Show Copy/Paste buttons.
+        bool    allow_copy_from_text  = true;  ///< Allow Copy.
+        bool    allow_paste_into_text = true;  ///< Allow Paste.
+        bool    submit_on_enter     = false;   ///< Enter submits (InputTextEnterReturnsTrue).
+        bool    capture_hw_enter    = false;   ///< React to hardware Enter when focused.
+        bool    shift_enter_newline = false;   ///< Shift+Enter inserts '\n'.
+        std::function<void(const std::string&)> on_submit; ///< Callback on submit(text).
+
+        bool  paste_replace_all           = false;  ///< Replace text on paste.
+        bool  sanitize_paste_newlines     = true;   ///< Convert CRLF/CR to '\n'.
+        int   max_text_len_on_paste       = 0;      ///< Truncate if >0; 0 => unlimited.
+        float clipboard_buttons_spacing   = 0.0f;   ///< Spacing for clipboard buttons; 0 => style.ItemSpacing.x.
+
+        ImFont* icon_font = nullptr;  ///< Icon font; null => current.
+        ImGuiX::Widgets::IconButtonConfig icon_btn{}; ///< Style for IconButtonCentered.
         std::unordered_map<std::string, const char*> labels {
             {u8"Shift",   u8"Shift"},
             {u8"Space",   u8"Space"},
@@ -72,7 +67,7 @@ namespace ImGuiX::Widgets {
             {u8"Copy",    IMGUIX_ICON_COPY},
             {u8"Paste",   IMGUIX_ICON_PASTE}
         };
-        
+
         std::unordered_map<std::string, const char*> tooltips{
             {u8"Shift",   u8"Shift key"},
             {u8"Space",   u8"Space key"},
@@ -83,20 +78,17 @@ namespace ImGuiX::Widgets {
             {u8"Copy",    u8"Copy to clipboard"},
             {u8"Paste",   u8"Paste from clipboard"}
         };
-        
-        // Top preview bar
-        bool   show_top_preview      = false;              ///< draw preview line above keyboard
-        float  preview_height        = 0.0f;               ///< 0 => ImGui::GetFrameHeight()
-        bool   preview_border        = true;               ///< draw border around preview bar
-        ImVec4 preview_bg_col        = ImVec4(0,0,0,0);    ///< 0 alpha => no background
-        ImVec4 preview_text_col      = ImVec4(1,1,1,1);    ///< normal preview text color
-        ImVec4 preview_text_invalid  = ImVec4(0.95f,0.35f,0.35f,1.0f); ///< invalid color
 
-        // Validation (regex)
-        bool        validate_with_regex = false;           ///< enable regex validation
-        const char* validate_regex      = nullptr;         ///< ECMA regex (std::regex)
-        
-        // Locale/Layouts
+        bool   show_top_preview      = false;              ///< Draw preview line above keyboard.
+        float  preview_height        = 0.0f;               ///< 0 => ImGui::GetFrameHeight().
+        bool   preview_border        = true;               ///< Draw border around preview bar.
+        ImVec4 preview_bg_col        = ImVec4(0,0,0,0);    ///< 0 alpha => no background.
+        ImVec4 preview_text_col      = ImVec4(1,1,1,1);    ///< Preview text color.
+        ImVec4 preview_text_invalid  = ImVec4(0.95f,0.35f,0.35f,1.0f); ///< Invalid color.
+
+        bool        validate_with_regex = false;           ///< Enable regex validation.
+        const char* validate_regex      = nullptr;         ///< ECMA regex (std::regex).
+
         std::vector<const char*> locales = {
             u8"en",
             u8"es",u8"pt-BR",u8"pt",u8"fr",u8"de",u8"it",
@@ -105,42 +97,42 @@ namespace ImGuiX::Widgets {
             u8"id",u8"vi",u8"th",
             u8"ar",u8"hi",u8"ur"
         };
-        int     start_locale_index = 0;        ///< index inside locales
+        int     start_locale_index = 0;        ///< Starting locale index.
 
-        // Optional header height (for locale combo). If 0 => measured from frame height.
-        float   header_extra_h = 0.0f;         ///<
-        
-        // Размещение селектора локали
-        bool    locale_bottom_right  = true;   ///< true: внизу справа; false: сверху (как раньше)
-        bool    show_locale_combo    = true;   ///< show Combo to choose locale
-        float   locale_width         = 64.0f;  ///< ширина превью "en"/"ru" (компактно)
-        
-        float   left_ratio           = 0.60f;  /// < Доли ширины панелей при заданной ширине (size.x>0)
-    
-        // --- bottom row auto widths ---
-        bool  auto_bottom_width      = true;   ///< auto width for Shift/Bksp/Enter
-        float min_wide_key_factor    = 1.6f;   ///< fallback: min wide W = key_size.x * factor
-        float space_width_multiplier = 2.5f;   ///< Space width = wide * multiplier (2..3)
+        float   header_extra_h = 0.0f;         ///< Extra header height; 0 => auto.
+
+        bool    locale_bottom_right  = true;   ///< true: bottom-right; false: top.
+        bool    show_locale_combo    = true;   ///< Show locale combo.
+        float   locale_width         = 64.0f;  ///< Width of locale preview text.
+
+        float   left_ratio           = 0.60f;  ///< Width fraction of left pane when size.x > 0.
+
+        bool  auto_bottom_width      = true;   ///< Auto width for Shift/Bksp/Enter.
+        float min_wide_key_factor    = 1.6f;   ///< Min wide key = key_size.x * factor.
+        float space_width_multiplier = 2.5f;   ///< Space width multiplier (2..3).
     };
     
     enum class VKSpecialPane : int { Symbols = 0, Accents = 1 };
     
-    /// \class VirtualKeyboardState
-    /// \brief
+    /// \brief Persistent state for VirtualKeyboard.
     struct VirtualKeyboardState {
-        int  locale_index = 0;  ///< текущая локаль
-        bool shift = false;     ///< состояние Shift
-        bool submitted = false;   ///< one-frame flag: true when Enter triggers submit
-        VKSpecialPane pane = VKSpecialPane::Symbols; ///< right pane mode
+        int  locale_index = 0;  ///< Current locale index.
+        bool shift = false;     ///< Shift state.
+        bool submitted = false; ///< True on frame when Enter submits.
+        VKSpecialPane pane = VKSpecialPane::Symbols; ///< Current right pane.
     };
     
     // --- Accents data (lower/upper where meaningful). Compact, pragmatic sets ---
 
-    struct AccentsSet { 
-        const char* const* items; 
-        int count; 
+    /// \brief Set of accent characters for a locale.
+    struct AccentsSet {
+        const char* const* items; ///< Pointer to accent strings.
+        int count;                ///< Number of items.
     };
 
+    /// \brief Get accents set for a locale code.
+    /// \param lc Locale code (e.g., "en").
+    /// \return Accent set or empty set if unsupported.
     inline AccentsSet get_accents_for_locale(const char* lc) {
         // ES
         static const char* ACC_ES[] = {
@@ -347,12 +339,20 @@ namespace ImGuiX::Widgets {
         modified = true;
     }
 
+    /// \brief Append UTF-8 sequence and mark text modified.
+    /// \param text Target string.
+    /// \param s UTF-8 sequence to append.
+    /// \param modified Set true if text changed.
     inline void append_utf8(std::string& text, const char* s, bool& modified) {
         text += s;
         modified = true;
     }
 
-    // --- расчёт минимально достаточной ширины контента (без внешних паддингов) ---
+    /// \brief Compute minimum inner width for keyboard content without outer padding.
+    /// \param cfg Keyboard configuration.
+    /// \param left_cols_max Maximum columns in left pane.
+    /// \param right_cols Columns in right pane.
+    /// \return Minimum inner width in pixels.
     inline float calc_min_inner_width(
             const VirtualKeyboardConfig& cfg,
             int left_cols_max,
@@ -361,7 +361,7 @@ namespace ImGuiX::Widgets {
         const float pad_x   = style.WindowPadding.x;
         const float child_b = style.ChildBorderSize;
 
-        // Если ключи/спейсинг не заданы, подхватываем из текущего стиля
+        // Use style defaults when key size or spacing is zero
         const float k   = (cfg.key_size.x > 0.0f) ? cfg.key_size.x : ImGui::GetFrameHeight();
         const float sp  = (cfg.spacing   > 0.0f) ? cfg.spacing     : style.ItemSpacing.x;
         const float gap = cfg.pane_gap;
@@ -369,39 +369,42 @@ namespace ImGuiX::Widgets {
         const float left_content  = left_cols_max * k + (left_cols_max - 1) * sp;
         const float right_content = cfg.show_special ? (right_cols * k + (right_cols - 1) * sp) : 0.0f;
 
-        // + паддинги И бордеры внутренних панелей
-        float inner = left_content + 2.0f * pad_x + 2.0f * child_b; // левая
+        // Add padding and borders of inner panes
+        float inner = left_content + 2.0f * pad_x + 2.0f * child_b;
         if (cfg.show_special)
-            inner += gap + right_content + 2.0f * pad_x + 2.0f * child_b; // правая
+            inner += gap + right_content + 2.0f * pad_x + 2.0f * child_b;
         return inner;
     }
 
-
-    // --- авто-высота для внутренней области (без внешних паддингов) ---
+    /// \brief Compute minimum inner height for keyboard content without outer padding.
+    /// \param cfg Keyboard configuration.
+    /// \param left_rows Rows in left pane.
+    /// \param right_rows Rows in right pane.
+    /// \return Minimum inner height in pixels.
     inline float calc_min_inner_height(
-			const VirtualKeyboardConfig& cfg,
-			int left_rows, 
-			int right_rows
-		) {
+                        const VirtualKeyboardConfig& cfg,
+                        int left_rows,
+                        int right_rows
+                ) {
         const ImGuiStyle& style = ImGui::GetStyle();
         const float key_h   = cfg.key_size.y;
-        const float row_gap = style.ItemSpacing.y;     // вертикальные зазоры между рядами (как в реальном UI)
+        const float row_gap = style.ItemSpacing.y;     // vertical gap between rows
         const float pad_y   = style.WindowPadding.y;
-        const float child_b = style.ChildBorderSize;   // бордер у внутренних панелей
+        const float child_b = style.ChildBorderSize;   // inner pane border
 
-        // Контент панелей (без паддингов/бордеров)
+        // Content sizes without padding/border
         const float left_content_h  = left_rows  * key_h + (left_rows  - 1) * row_gap;
         const float right_content_h = cfg.show_special ? (right_rows * key_h + (right_rows - 1) * row_gap) : 0.0f;
 
-        // Верхняя зона: максимум из панелей + их внутренние паддинги + их бордеры
+        // Top zone: max of panes plus their padding and borders
         const float top_h = std::max(left_content_h, right_content_h)
                           + 2.0f * pad_y
                           + 2.0f * child_b;
 
-        // Нижняя зона: такой же отступ + высота ряда = max(кнопки, combo локали)
+        // Bottom zone: spacing plus row height = max(buttons, locale combo)
         float bottom_h = 0.0f;
         if (cfg.show_bottom || (cfg.show_locale_combo && cfg.locale_bottom_right)) {
-            const float frame_h = ImGui::GetFrameHeight(); // реальная высота Combo
+            const float frame_h = ImGui::GetFrameHeight();
             const float btn_h   = cfg.show_bottom ? key_h : 0.0f;
             const float combo_h = (cfg.show_locale_combo && cfg.locale_bottom_right) ? frame_h : 0.0f;
             const float row_h   = (btn_h > combo_h ? btn_h : combo_h);
@@ -414,15 +417,25 @@ namespace ImGuiX::Widgets {
 
     // -------------- Widget ----------------------
 
+    /// \brief Render on-screen keyboard bound to text buffer.
+    /// \param id Unique widget identifier.
+    /// \param text In/out text content.
+    /// \param cfg Keyboard configuration.
+    /// \param state Optional persistent state.
+    /// \return True if text changed.
     bool VirtualKeyboard(
-			const char* id, 
-			std::string& text, 
-			const VirtualKeyboardConfig& cfg,
-			VirtualKeyboardState* state = nullptr
-		);
+                        const char* id,
+                        std::string& text,
+                        const VirtualKeyboardConfig& cfg,
+                        VirtualKeyboardState* state = nullptr
+                );
 
-    // Back-compat overload
-	inline bool VirtualKeyboard(const char* id, std::string& text, ImVec2 size) {
+    /// \brief Convenience overload with explicit size.
+    /// \param id Unique widget identifier.
+    /// \param text In/out text content.
+    /// \param size Preferred keyboard size.
+    /// \return True if text changed.
+    inline bool VirtualKeyboard(const char* id, std::string& text, ImVec2 size) {
         VirtualKeyboardConfig cfg;
         cfg.size = size;
         return VirtualKeyboard(id, text, cfg);

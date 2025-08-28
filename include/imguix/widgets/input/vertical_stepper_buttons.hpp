@@ -10,6 +10,7 @@
 
 namespace ImGuiX::Widgets {
 
+    /// \brief Draw vertical stepper buttons and return delta.
     /// \param id        Unique ID (scoped by caller).
     /// \param size      Column size (width, height). If size.{x|y} <= 0 -> uses ImGui::GetFrameHeight().
     /// \param step      Increment per click/hold.

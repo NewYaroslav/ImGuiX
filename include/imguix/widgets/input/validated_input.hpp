@@ -71,12 +71,12 @@ namespace ImGuiX::Widgets {
     /// \param policy      When to apply validation (see \ref InputValidatePolicy).
     /// \param pattern     Regex pattern (ECMA) for validation.
     /// \param out_valid   Out: true if \p value matches \p pattern (or validation disabled).
-    /// \param kb_cfg      Visual config for the VK trigger button.
-    /// \param vk_cfg      Behavior/visual config for the on-screen keyboard overlay.
     /// \param error_color Tint applied while invalid (frame/text).
     /// \param extra_flags Extra ImGuiInputTextFlags OR-ed into the input (optional).
     /// \param callback    Optional ImGui input callback for the input field.
     /// \param user_data   Optional user data for the input callback.
+    /// \param kb_cfg      Visual config for the VK trigger button.
+    /// \param vk_cfg      Behavior/visual config for the on-screen keyboard overlay.
     /// \return true if the value changed this frame (via input or VK).
     bool InputTextWithVKValidated(
             const char* label,
