@@ -1,9 +1,17 @@
-# cmake/deps/sfml.cmake
-# Idempotent helper to provide SFML targets (Graphics, Window, System).
+# ===== deps/sfml.cmake =====
+# Purpose: Provide SFML targets (Graphics, Window, System) from submodule or system.
+# Inputs:  IMGUIX_SFML_SRC_DIR
+# Outputs: out_targets receives "SFML::Graphics;SFML::Window;SFML::System"
+# Notes:   Ensures idempotent addition.
+
+# Resolve SFML dependency
+# Params:
+# - out_targets: variable to receive semicolon-separated target list
+# Behavior:
+# - Reuses existing targets, adds submodule, or finds system package
 # Usage:
-#   imguix_use_or_fetch_sfml(SFML_TARGETS_VAR)
-# Output:
-#   SFML_TARGETS_VAR = "SFML::Graphics;SFML::Window;SFML::System"
+#   imguix_use_or_fetch_sfml(SFML_TARGETS)
+# Idempotent: guarded by global property
 function(imguix_use_or_fetch_sfml out_targets)
     # Already available?
     if(TARGET SFML::Graphics AND TARGET SFML::Window AND TARGET SFML::System)

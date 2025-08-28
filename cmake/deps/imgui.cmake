@@ -1,18 +1,24 @@
-# cmake/deps/imgui.cmake
-# Чистый Dear ImGui (бандл/система) + опционально FreeType и std::string helpers
-# Использование:
-#   imguix_use_or_fetch_imgui(IMGUI_TARGET_OUT)
-#
-# Выход:
-#   IMGUI_TARGET_OUT = imgui::imgui
+# ===== deps/imgui.cmake =====
+# Purpose: Build or reuse Dear ImGui with optional FreeType and std::string helpers.
+# Inputs:  IMGUI_DIR, IMGUIX_IMGUI_STDLIB, IMGUIX_IMGUI_FREETYPE
+# Outputs: out_imgui receives imgui::imgui
+# Notes:   Prefer existing imgui::imgui if available.
 
+# Build or reuse Dear ImGui and expose it as imgui::imgui
+# Params:
+# - out_imgui: variable to receive target name
+# Behavior:
+# - Uses existing imgui::imgui or compiles from ${IMGUI_DIR}
+# Usage:
+#   imguix_use_or_fetch_imgui(IMGUI_TARGET)
+# Idempotent: reuse target if already created
 function(imguix_use_or_fetch_imgui out_imgui)
-    # Где лежит Dear ImGui (по умолчанию сабмодуль)
+    # Locate Dear ImGui directory (default to submodule)
     if(NOT DEFINED IMGUI_DIR OR IMGUI_DIR STREQUAL "")
         set(IMGUI_DIR "${PROJECT_SOURCE_DIR}/libs/imgui")
     endif()
 
-    # Если цель уже есть — вернуть её
+    # If target already exists, return it
     if(TARGET imgui::imgui)
         set(${out_imgui} imgui::imgui PARENT_SCOPE)
         return()
@@ -22,7 +28,7 @@ function(imguix_use_or_fetch_imgui out_imgui)
         return()
     endif()
 
-    # Базовые исходники ImGui
+    # Core ImGui sources
     set(_src
         "${IMGUI_DIR}/imgui.cpp"
         "${IMGUI_DIR}/imgui_draw.cpp"
@@ -30,13 +36,13 @@ function(imguix_use_or_fetch_imgui out_imgui)
         "${IMGUI_DIR}/imgui_tables.cpp"
     )
 
-    # std::string helpers (imgui_stdlib) — только по флагу
-    # (для SFML-бэкенда обычно не нужно, т.к. ImGui-SFML уже добавляет это сам)
+    # std::string helpers (imgui_stdlib) controlled by IMGUIX_IMGUI_STDLIB
+    # SFML backend typically does not need this because ImGui-SFML adds it
     if(IMGUIX_IMGUI_STDLIB)
         list(APPEND _src "${IMGUI_DIR}/misc/cpp/imgui_stdlib.cpp")
     endif()
 
-    # Freetype интеграция (опционально)
+    # Optional FreeType integration
     if(IMGUIX_IMGUI_FREETYPE)
         list(APPEND _src "${IMGUI_DIR}/misc/freetype/imgui_freetype.cpp")
     endif()
@@ -44,19 +50,20 @@ function(imguix_use_or_fetch_imgui out_imgui)
     add_library(imgui STATIC ${_src})
     add_library(imgui::imgui ALIAS imgui)
 
+    # BUILD_INTERFACE: headers from source tree; INSTALL_INTERFACE: installed headers
     target_include_directories(imgui PUBLIC
         $<BUILD_INTERFACE:${IMGUI_DIR}>
         $<INSTALL_INTERFACE:include>
     )
-	
-	if(DEFINED IMGUIX_USER_CONFIG_DIR AND DEFINED IMGUIX_USER_CONFIG_NAME)
-		target_include_directories(imgui PUBLIC
-			$<BUILD_INTERFACE:${IMGUIX_USER_CONFIG_DIR}>
-		)
-		target_compile_definitions(imgui PUBLIC
-			IMGUI_USER_CONFIG="${IMGUIX_USER_CONFIG_NAME}"
-		)
-	endif()
+
+    if(DEFINED IMGUIX_USER_CONFIG_DIR AND DEFINED IMGUIX_USER_CONFIG_NAME)
+        target_include_directories(imgui PUBLIC
+            $<BUILD_INTERFACE:${IMGUIX_USER_CONFIG_DIR}>
+        )
+        target_compile_definitions(imgui PUBLIC
+            IMGUI_USER_CONFIG="${IMGUIX_USER_CONFIG_NAME}"
+        )
+    endif()
 
     if(IMGUIX_IMGUI_FREETYPE)
         target_include_directories(imgui PRIVATE "${IMGUI_DIR}/misc/freetype")

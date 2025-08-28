@@ -1,13 +1,18 @@
-# cmake/deps/assets.cmake
+# ===== deps/assets.cmake =====
+# Purpose: Copy asset directories to runtime or install locations.
+# Inputs:  DIRS, DEST_RUNTIME, EXCLUDE_DIRS, EXCLUDE_PATTERNS
+# Outputs: modifies given target or creates staging target
+# Notes:   EXCLUDE_PATTERNS are reserved for future use.
 
-# Copy arbitrary asset dirs to a target's runtime dir and/or install tree.
+# Copy asset directories to a target's runtime directory
+# Params:
+# - target: target to receive post-build asset copy
+# - DEST_RUNTIME: subdirectory under target runtime dir
+# - DIRS: list of source directories
+# - EXCLUDE_DIRS: subdirectories to remove after copy
 # Usage:
-# imguix_add_assets(<TARGET>
-#     DEST_RUNTIME <subdir-under-runtime>
-#     DIRS <dir1> [<dir2> ...]
-#     [EXCLUDE_DIRS <d1> <d2> ...]
-#     [EXCLUDE_PATTERNS <p1> <p2> ...]  # на будущее, ниже удаляем только EXCLUDE_DIRS
-# )
+#   imguix_add_assets(my_app DIRS data EXCLUDE_DIRS web)
+# Idempotent: no-op if target is missing
 function(imguix_add_assets target)
     set(options)
     set(oneValueArgs DEST_RUNTIME)
@@ -35,7 +40,7 @@ function(imguix_add_assets target)
             VERBATIM
         )
 
-        # Удаляем исключённые подпапки уже в runtime-папке
+        # Remove excluded subdirectories in runtime directory
         foreach(_ex IN LISTS IMGA_EXCLUDE_DIRS)
             add_custom_command(TARGET ${target} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E rm -rf "${_dst}/${_ex}"
@@ -47,12 +52,13 @@ function(imguix_add_assets target)
 endfunction()
 
 
-# One global copy for tests (avoids N copies per test)
+# Stage assets once for tests to avoid per-test copies
+# Params:
+# - SRC: source directory (default assets/data/resources)
+# - DEST: destination directory (default build/tests/data/resources)
 # Usage:
-#   imguix_stage_test_assets(
-#       SRC  <source-dir>   # default: ${PROJECT_SOURCE_DIR}/assets/data/resources
-#       DEST <dest-dir>     # default: ${CMAKE_BINARY_DIR}/tests/data/resources
-#   )
+#   imguix_stage_test_assets(SRC my/assets)
+# Idempotent: recreates staging target each run
 function(imguix_stage_test_assets)
     set(oneValueArgs SRC DEST)
     cmake_parse_arguments(AA "" "${oneValueArgs}" "" ${ARGN})

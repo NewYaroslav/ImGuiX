@@ -1,5 +1,17 @@
-# cmake/deps/mdbx.cmake
-# imguix_use_or_fetch_mdbx(<out_target>)
+# ===== deps/mdbx.cmake =====
+# Purpose: Provide libmdbx target via system package, submodule, or FetchContent.
+# Inputs:  IMGUIX_DEPS_MODE, IMGUIX_DEPS_MDBX_MODE, IMGUIX_SDK_BUNDLE_DEPS
+# Outputs: out_target receives mdbx::mdbx
+# Notes:   Prefers existing targets or system packages before bundling.
+
+# Resolve libmdbx dependency and return mdbx::mdbx
+# Params:
+# - out_target: variable to receive target name
+# Behavior:
+# - Uses existing target, system package, submodule, or FetchContent
+# Usage:
+#   imguix_use_or_fetch_mdbx(MDBX_TARGET)
+# Idempotent: reuse target if already created
 function(imguix_use_or_fetch_mdbx out_target)
     # ---- Effective mode ----
     set(mode "${IMGUIX_DEPS_MDBX_MODE}")
@@ -51,22 +63,22 @@ function(imguix_use_or_fetch_mdbx out_target)
     # ---- BUNDLED/AUTO: submodule? ----
     set(_MDBX_SRC "${PROJECT_SOURCE_DIR}/libs/libmdbx")
     if(EXISTS "${_MDBX_SRC}/CMakeLists.txt")
-        # Нормализуем путь до абсолютного Windows-стиля (D:/...) — важно для MSYS/MinGW
+        # Normalize path to absolute Windows style for MSYS/MinGW
         if(WIN32)
             get_filename_component(_MDBX_SRC_REAL "${_MDBX_SRC}" REALPATH)
         else()
             set(_MDBX_SRC_REAL "${_MDBX_SRC}")
         endif()
         
-        # Build options BEFORE add_subdirectory
+        # Build options before add_subdirectory
         set(MDBX_BUILD_SHARED_LIBRARY OFF CACHE BOOL "" FORCE)
         set(MDBX_BUILD_TOOLS          OFF CACHE BOOL "" FORCE)
         if(IMGUIX_SDK_BUNDLE_DEPS)
-            # чтобы install() сабпроекта поставил статическую либу (+заголовки у них тоже инсталлятся)
+            # Let subproject install static library and headers
             set(MDBX_INSTALL_STATIC ON CACHE BOOL "" FORCE)
         endif()
         
-        # Если в дереве случайно лежит VERSION.json — удаляем, чтобы источником был git
+        # Remove stray VERSION.json so git metadata defines version
         if(EXISTS "${_MDBX_SRC_REAL}/VERSION.json")
             file(REMOVE "${_MDBX_SRC_REAL}/VERSION.json")
             message(STATUS "libmdbx: removed stray VERSION.json (using git metadata)")
@@ -89,7 +101,7 @@ function(imguix_use_or_fetch_mdbx out_target)
 
     # ---- Fallback: FetchContent ----
     include(FetchContent)
-    # Options must be set BEFORE MakeAvailable
+    # Options must be set before MakeAvailable
     set(MDBX_BUILD_SHARED_LIBRARY OFF CACHE BOOL "" FORCE)
     set(MDBX_BUILD_TOOLS          OFF CACHE BOOL "" FORCE)
     if(IMGUIX_SDK_BUNDLE_DEPS)
