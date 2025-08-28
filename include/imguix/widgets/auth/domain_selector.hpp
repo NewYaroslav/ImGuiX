@@ -16,14 +16,14 @@ namespace ImGuiX::Widgets {
         // Panel
         ImVec2      panel_size = ImVec2(0.0f, 0.0f); ///< x<=0: fill available width; y<=0: auto-computed
         bool        inputs_fill_width = true;        ///< make input fields fill panel width
-        bool        border            = true;
+        bool        border            = true;       ///< draw panel border
         
         std::string header       = u8"Domain";
         std::string hint_domain  = u8"domain";
         std::string custom_text  = u8"Custom";
         std::string default_domain;
         std::string help_text;
-        bool        show_help    = false;
+        bool        show_help    = false;           ///< show help marker
 
         /// \brief List of predefined domains. If empty, InputTextWithVKValidated is used directly.
         std::vector<std::string> domains;

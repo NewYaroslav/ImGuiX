@@ -31,21 +31,40 @@ namespace ImGuiX::Widgets {
         ConnectClicked   = 1u << 6
     };
 
+    /// \brief Combine two result masks.
+    /// \param a Left operand.
+    /// \param b Right operand.
+    /// \return Bitwise OR of a and b.
     inline AuthPanelResult operator|(AuthPanelResult a, AuthPanelResult b) {
         return static_cast<AuthPanelResult>(static_cast<unsigned>(a) | static_cast<unsigned>(b));
     }
-    
+
+    /// \brief Intersect two result masks.
+    /// \param a Left operand.
+    /// \param b Right operand.
+    /// \return Bitwise AND of a and b.
     inline AuthPanelResult operator&(AuthPanelResult a, AuthPanelResult b) {
         return static_cast<AuthPanelResult>(static_cast<unsigned>(a) & static_cast<unsigned>(b));
     }
-    
+
+    /// \brief Add flags from b to a.
+    /// \param a Mask to modify.
+    /// \param b Flags to add.
+    /// \return Reference to a after modification.
     inline AuthPanelResult& operator|=(AuthPanelResult& a, AuthPanelResult b) { a = a | b; return a; }
 
+    /// \brief Check if any flag is set.
+    /// \param r Result mask.
+    /// \return True if r is non-zero.
     inline bool Any(ImGuiX::Widgets::AuthPanelResult r) noexcept {
         using U = std::underlying_type_t<ImGuiX::Widgets::AuthPanelResult>;
         return static_cast<U>(r) != 0u;
     }
 
+    /// \brief Check if r contains flag f.
+    /// \param r Result mask.
+    /// \param f Flag mask to test.
+    /// \return True if r has all bits from f.
     inline bool Has(ImGuiX::Widgets::AuthPanelResult r,
                     ImGuiX::Widgets::AuthPanelResult f) noexcept {
         using U = std::underlying_type_t<ImGuiX::Widgets::AuthPanelResult>;
