@@ -22,6 +22,7 @@ namespace ImGuiX {
 
     /// \class ResourceRegistry
     /// \brief Manage registration and access to shared resources in a threadsafe manner.
+    /// \thread_safety Thread-safe.
     /// \note Stores type-erased shared resources and ensures only one instance per type.
     /// \note Access during registration throws or returns `nullopt`.
     class ResourceRegistry {

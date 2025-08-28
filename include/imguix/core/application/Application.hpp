@@ -51,7 +51,14 @@ namespace ImGuiX {
         const std::string& name() const override;
 
     protected:
+        /// \brief Create window via factory.
+        /// \param factory Factory producing window instance.
+        /// \return Reference to created window.
         WindowInstance& createWindowImpl(WindowFactory factory) override;
+
+        /// \brief Create model via factory.
+        /// \param factory Factory producing model instance.
+        /// \return Reference to created model.
         Model& createModelImpl(ModelFactory factory) override;
 
     private:
@@ -93,6 +100,7 @@ namespace ImGuiX {
 
 #ifdef __EMSCRIPTEN__
         /// \brief Called when asynchronous filesystem mounting finishes.
+        /// \param arg User data pointer.
         static void filesystemReady(void* arg);
 #endif
     };

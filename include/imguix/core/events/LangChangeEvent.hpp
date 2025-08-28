@@ -26,6 +26,8 @@ namespace ImGuiX::Events {
             , window_id(target_window_id) {}
 
         /// \brief Factory helper that targets all windows.
+        /// \param language Language code to set.
+        /// \return Configured event.
         static LangChangeEvent ForAll(std::string language) {
             return LangChangeEvent(std::move(language), /*to_all=*/true, /*target_window_id=*/-1);
         }
@@ -33,14 +35,17 @@ namespace ImGuiX::Events {
         /// \brief Factory helper that targets a single window.
         /// \param language Language code to set.
         /// \param target_window_id ID of the window that should change its language.
+        /// \return Configured event.
         static LangChangeEvent ForWindow(std::string language, int target_window_id) {
             return LangChangeEvent(std::move(language), /*to_all=*/false, target_window_id);
         }
 
+        /// \copydoc Pubsub::Event::type
         std::type_index type() const override {
             return typeid(LangChangeEvent);
         }
 
+        /// \copydoc Pubsub::Event::name
         const char* name() const override {
             return u8"LangChangeEvent";
         }

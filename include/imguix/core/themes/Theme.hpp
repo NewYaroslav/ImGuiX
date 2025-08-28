@@ -14,21 +14,26 @@
 
 namespace ImGuiX::Themes {
 
-    /// \berif
+    /// \brief Interface for style themes.
     class Theme {
     public:
         virtual ~Theme() = default;
 
+        /// \brief Apply theme to ImGui style.
+        /// \param style Style to modify.
         virtual void apply(ImGuiStyle& style) const = 0;
 
 #       ifdef IMGUI_ENABLE_IMPLOT
+        /// \brief Apply theme to ImPlot style.
+        /// \param style Style to modify.
         virtual void apply(ImPlotStyle& style) const = 0;
 #       endif
 
     };
-    
-    /// \brief Устанавливает базовые параметры оформления для ImGui.
-    /// \details Применяется всеми темами как стартовое состояние перед наложением цветовой схемы.
+
+    /// \brief Set baseline ImGui style parameters.
+    /// \param style Style to modify.
+    /// \details Used by all themes before applying color scheme.
     inline void applyDefaultImGuiStyle(ImGuiStyle& style) {
         using namespace ImGuiX::Config;
 
@@ -51,46 +56,52 @@ namespace ImGuiX::Themes {
         style.GrabRounding      = GRAB_ROUNDING;
     }
     
-    /// \berif
+    /// \brief Classic ImGui theme.
     class ClassicTheme final : public Theme {
     public:
+        /// \copydoc Theme::apply
         void apply(ImGuiStyle& style) const override {
             ImGui::StyleColorsClassic(&style);
             applyDefaultImGuiStyle(style);
         }
-    
+
 #       ifdef IMGUI_ENABLE_IMPLOT
+        /// \copydoc Theme::apply
         void apply(ImPlotStyle& style) const override {
             ImPlot::StyleColorsClassic(&style);
         }
 #       endif
     };
-    
-    /// \berif
+
+    /// \brief Light color theme.
     class LightTheme final : public Theme {
     public:
+        /// \copydoc Theme::apply
         void apply(ImGuiStyle& style) const override {
             ImGui::StyleColorsLight(&style);
             applyDefaultImGuiStyle(style);
         }
-    
+
 #       ifdef IMGUI_ENABLE_IMPLOT
+        /// \copydoc Theme::apply
         void apply(ImPlotStyle& style) const override {
             ImPlot::StyleColorsLight(&style);
         }
 #       endif
     };
 
-    /// \berif
+    /// \brief Dark color theme.
     class DarkTheme final : public Theme {
     public:
 
+        /// \copydoc Theme::apply
         void apply(ImGuiStyle& style) const override {
             ImGui::StyleColorsDark(&style);
             applyDefaultImGuiStyle(style);
         }
-        
+
 #       ifdef IMGUI_ENABLE_IMPLOT
+        /// \copydoc Theme::apply
         void apply(ImPlotStyle& style) const override {
             ImPlot::StyleColorsDark(&style);
         }
