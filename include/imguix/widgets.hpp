@@ -33,4 +33,8 @@
 #include <imguix/widgets/time/hours_selector.hpp>
 #include <imguix/widgets/time/time_picker.hpp>
 
+#ifdef IMGUI_ENABLE_IMPLOT
+#   include <imguix/widgets/plot/PlotOHLCChart.hpp>
+#endif
+
 #endif // IMGUIX_WIDGETS_HPP_INCLUDED
