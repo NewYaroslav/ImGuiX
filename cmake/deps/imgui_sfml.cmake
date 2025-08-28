@@ -1,10 +1,18 @@
-# cmake/deps/imgui_sfml.cmake
-# Provide ImGui-SFML target and return it as both SFML-wrapper and IMGUI target.
+# ===== deps/imgui_sfml.cmake =====
+# Purpose: Build ImGui-SFML and expose it as both backend and ImGui target.
+# Inputs:  IMGUI_DIR, IMGUI_SFML_DIR, IMGUIX_IMGUI_FREETYPE
+# Outputs: out_sfml receives ImGui-SFML, out_imgui receives ImGui-SFML
+# Notes:   Links SFML and OpenGL; adds FreeType when enabled.
+
+# Build or reuse ImGui-SFML and return target names
+# Params:
+# - out_sfml: variable to receive ImGui-SFML target
+# - out_imgui: variable to receive ImGui target name
+# Behavior:
+# - Creates static ImGui-SFML library if missing
 # Usage:
-#   imguix_use_or_fetch_imgui_sfml(IMGUI_SFML_TARGET OUT_IMGUI_TARGET)
-# Output:
-#   IMGUI_SFML_TARGET = ImGui-SFML
-#   OUT_IMGUI_TARGET  = ImGui-SFML
+#   imguix_use_or_fetch_imgui_sfml(IMGUI_SFML_TARGET OUT_IMGUI)
+# Idempotent: reuses existing target
 function(imguix_use_or_fetch_imgui_sfml out_sfml out_imgui)
     # Resolve dirs
     if(NOT DEFINED IMGUI_DIR OR IMGUI_DIR STREQUAL "")
@@ -28,7 +36,7 @@ function(imguix_use_or_fetch_imgui_sfml out_sfml out_imgui)
         )
         add_library(ImGui-SFML::ImGui-SFML ALIAS ImGui-SFML)
 
-        # Public includes for consumers
+        # BUILD_INTERFACE: headers during build; INSTALL_INTERFACE: headers after install
         target_include_directories(ImGui-SFML PUBLIC
             $<BUILD_INTERFACE:${IMGUI_SFML_DIR}>
             $<INSTALL_INTERFACE:include>

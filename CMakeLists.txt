@@ -1,7 +1,13 @@
 cmake_minimum_required(VERSION 3.18)
 project(ImGuiX LANGUAGES CXX VERSION 0.1.0)
 
-# Normalize REAL_PATH behaviour (MSYS/Windows paths → native first)
+# ===== Root CMakeLists.txt =====
+# Purpose: Configure and build the ImGuiX library and optional SDK.
+# Inputs:  IMGUIX_* options and IMGUIX_DEPS_* modes, IMGUI_DIR
+# Outputs: target imguix and export ImGuiXTargets
+# Notes:   Select backend via IMGUIX_USE_*_BACKEND options.
+
+# Normalize REAL_PATH behavior so MSYS/Windows paths resolve to native form first
 if(POLICY CMP0152)
     cmake_policy(SET CMP0152 NEW)
 endif()
@@ -22,15 +28,17 @@ option(IMGUIX_IMGUI_FREETYPE   "Enable ImGui FreeType rasterizer" ON)
 # ImGui / ImPlot
 option(IMGUIX_USE_IMPLOT       "Build ImPlot and link it in" ON)
 
-# JSON vendoring (A by default = OFF -> искать внешнюю зависимость)
+# JSON vendoring (default OFF to prefer system package)
 option(IMGUIX_VENDOR_JSON      "Install vendored nlohmann_json headers with ImGuiX" OFF)
 
 option(IMGUIX_SDK_FLATTEN_MISC_HEADERS
-       "Also copy imgui_stdlib.h and imgui_freetype.h into include/ root" ON)
- 
-# SDK 
+    "Also copy imgui_stdlib.h and imgui_freetype.h into include/ root" ON)
+
+# SDK
+# Install SDK extras (quickstart, templates, assets)
 option(IMGUIX_SDK_INSTALL      "Устанавливать SDK-«добавки» (quickstart, шаблоны, ассеты)" ON)
 option(IMGUIX_SDK_BUNDLE_DEPS  "Install 3rd-party deps into SDK stage" ON)
+# Place quickstart template into SDK
 option(IMGUIX_SDK_INSTALL_QUICKSTART "Класть quickstart-шаблон в SDK" ON)
 
 # ===== Deps mode =====
@@ -55,9 +63,9 @@ set(IMGUIX_USER_CONFIG_NAME "imguix/config/imconfig-imguix.hpp")
 list(PREPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 # --- std::string helpers for ImGui (imgui_stdlib) ---
-# Если пользователь не задал, выбираем дефолт:
-# - при SFML backend: OFF (ImGui-SFML уже тянет imgui_stdlib.cpp)
-# - иначе: ON
+# If user does not set the option, choose default:
+# - with SFML backend: OFF (ImGui-SFML already provides imgui_stdlib.cpp)
+# - otherwise: ON
 if(NOT DEFINED IMGUIX_IMGUI_STDLIB)
     set(_imgui_stdlib_default ON)
     if(IMGUIX_USE_SFML_BACKEND)
@@ -85,8 +93,8 @@ include(cmake/deps/app_icon.cmake)
 include(cmake/ImGuiXDemos.cmake)
 
 # ===== Resolve core deps =====
-imguix_use_or_fetch_fmt(FMT_TARGET)                 # ожидается fmt::fmt
-imguix_use_or_fetch_nlohmann_json(JSON_TARGET)      # всегда nlohmann_json::nlohmann_json (или алиас)
+imguix_use_or_fetch_fmt(FMT_TARGET)                 # Expect fmt::fmt
+imguix_use_or_fetch_nlohmann_json(JSON_TARGET)      # Always nlohmann_json::nlohmann_json or alias
 
 # ===== Resolve GUI/backend deps =====
 set(BACKEND_LIBS "")
@@ -107,7 +115,7 @@ else()
     set(IMGUI_LIB "${IMGUI_TARGET}")
 endif()
 
-# --- какой макрос бэкенда объявлять ---
+# --- Select backend define ---
 set(_IMGUIX_BACKEND_DEFINE "")
 if(IMGUIX_USE_SFML_BACKEND)
     set(_IMGUIX_BACKEND_DEFINE IMGUIX_USE_SFML_BACKEND)
@@ -127,15 +135,18 @@ if(IMGUIX_HEADER_ONLY)
     add_library(imguix INTERFACE)
     add_library(ImGuiX::imguix ALIAS imguix)
 
+    # BUILD_INTERFACE: headers from source tree during build
+    # INSTALL_INTERFACE: headers exposed after installation
     target_include_directories(imguix INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
         $<INSTALL_INTERFACE:include>
     )
-    
+
+    # Allow user configuration overrides via IMGUI_USER_CONFIG
     target_include_directories(imguix INTERFACE "${IMGUIX_USER_CONFIG_DIR}")
     target_compile_definitions(imguix INTERFACE IMGUI_USER_CONFIG="${IMGUIX_USER_CONFIG_NAME}")
 
-    # (Вариант B) — при вендоринге кладём json-хедеры и даём build-include на сабмодуль
+    # Variant B: when vendoring, add json headers to build include path
     if(IMGUIX_VENDOR_JSON)
         target_include_directories(imguix INTERFACE
             $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/libs/json/include>
@@ -150,14 +161,14 @@ if(IMGUIX_HEADER_ONLY)
 
     if(IMGUIX_IMGUI_FREETYPE)
         target_compile_definitions(imguix INTERFACE IMGUI_ENABLE_FREETYPE)
-        # НЕ линкуем freetype/SFML/ImGui-SFML в INTERFACE — их добавляет потребитель.
+        # Do not link freetype/SFML/ImGui-SFML in INTERFACE; consumers link them
     endif()
-    
+
     if(IMGUIX_USE_IMPLOT)
         target_compile_definitions(imguix INTERFACE IMGUI_ENABLE_IMPLOT)
     endif()
 
-    # Санитарная зачистка интерфейса (чтобы install(EXPORT ...) не тянул чужие цели)
+    # Clean interface to avoid exporting foreign targets
     set_property(TARGET imguix PROPERTY INTERFACE_LINK_LIBRARIES "")
 
 else()
@@ -181,13 +192,13 @@ else()
         set_target_properties(imguix PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
     endif()
 
-    # Все внешние зависимости — только PRIVATE (чтобы export не падал)
+    # Link external dependencies as PRIVATE to keep export minimal
     target_link_libraries(imguix
         PRIVATE fmt::fmt nlohmann_json::nlohmann_json
         PRIVATE ${IMGUI_LIB} ${BACKEND_LIBS}
     )
 
-    # Бэкенд-макрос должен участвовать в компиляции самого таргета
+    # Ensure backend define participates in this target's compilation
     if(_IMGUIX_BACKEND_DEFINE)
         target_compile_definitions(imguix PUBLIC ${_IMGUIX_BACKEND_DEFINE})
     endif()
@@ -195,39 +206,39 @@ else()
     if(IMGUIX_IMGUI_FREETYPE)
         target_compile_definitions(imguix PUBLIC IMGUI_ENABLE_FREETYPE)
 
-        # Нужен include-путь для imgui_freetype.h
+        # Require include path for imgui_freetype.h
         set(_IMGUI_DIR_LOCAL "${IMGUI_DIR}")
         if(NOT _IMGUI_DIR_LOCAL)
             set(_IMGUI_DIR_LOCAL "${PROJECT_SOURCE_DIR}/libs/imgui")
         endif()
         target_include_directories(imguix PRIVATE "${_IMGUI_DIR_LOCAL}/misc/freetype")
-        
-        # Путь к корню Dear ImGui (как ты делаешь для freetype)
+
+        # Resolve Dear ImGui root (same approach as for FreeType)
         set(_IMGUI_DIR_LOCAL "${IMGUI_DIR}")
         if(NOT _IMGUI_DIR_LOCAL)
             set(_IMGUI_DIR_LOCAL "${PROJECT_SOURCE_DIR}/libs/imgui")
         endif()
 
-        # Нужен include-путь для imgui_stdlib.h (misc/cpp)
+        # Require include path for imgui_stdlib.h (misc/cpp)
         target_include_directories(imguix PRIVATE "${_IMGUI_DIR_LOCAL}/misc/cpp")
 
         imguix_use_or_find_freetype(FREETYPE_TARGET)
         target_link_libraries(imguix PRIVATE ${FREETYPE_TARGET})
     endif()
 
-    # (Вариант B) — при вендоринге дадим build-include на сабмодуль json (для исходной сборки)
+    # Variant B: when vendoring, add build include for json submodule
     if(IMGUIX_VENDOR_JSON)
         target_include_directories(imguix PRIVATE
             $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/libs/json/include>
         )
     endif()
-    
+
     if(IMGUIX_USE_IMPLOT)
         target_compile_definitions(imguix PUBLIC IMGUI_ENABLE_IMPLOT)
         target_link_libraries(imguix PRIVATE ${IMPLOT_TARGET})
     endif()
 
-    # Санитарная зачистка интерфейса (чтобы install(EXPORT ...) не тянул чужие цели)
+    # Clean interface to avoid exporting foreign targets
     set_property(TARGET imguix PROPERTY INTERFACE_LINK_LIBRARIES "")
 endif()
 
@@ -258,7 +269,7 @@ if(IMGUIX_BUILD_TESTS)
         target_include_directories(${TEST_NAME} PRIVATE
             "${CMAKE_CURRENT_LIST_DIR}/include"
         )
-        # Дать доступ к imgui_stdlib.h
+        # Provide access to imgui_stdlib.h
         target_include_directories(${TEST_NAME} PRIVATE 
             "${_IMGUI_DIR}/misc/cpp"
         )
@@ -280,18 +291,18 @@ if(IMGUIX_BUILD_TESTS)
             target_link_libraries(${TEST_NAME} PRIVATE implot::implot)
             imguix_add_implot_demo(${TEST_NAME})
         endif()
-        
+
         imguix_add_imgui_demo(${TEST_NAME})
 
         if(WIN32)
             target_link_libraries(${TEST_NAME} PRIVATE gdi32 user32 comctl32 dwmapi)
         endif()
 
-        # Копирование ассетов (POST_BUILD)
+        # Copy assets after build
         imguix_add_assets(${TEST_NAME}
             DEST_RUNTIME data
             DIRS ${PROJECT_SOURCE_DIR}/assets/data
-            EXCLUDE_DIRS web  # выкинет assets/data/web
+            EXCLUDE_DIRS web  # exclude assets/data/web
         )
 
         imguix_copy_and_embed_app_icon(${TEST_NAME})
@@ -316,13 +327,13 @@ install(TARGETS imguix
     INCLUDES DESTINATION include
 )
 
-# Публичные хедеры самой ImGuiX
+# Public headers of ImGuiX
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/imguix
         DESTINATION include)
 
-# (Вариант B) — вендорим json-хедеры по переключателю
+# Variant B: vendor json headers when enabled
 if(IMGUIX_VENDOR_JSON)
-    # Кладём в стандартный инклюд-путь, чтобы <nlohmann/json.hpp> работал из коробки
+    # Place headers so <nlohmann/json.hpp> works out of the box
     install(DIRECTORY ${PROJECT_SOURCE_DIR}/libs/json/include/nlohmann
             DESTINATION include/nlohmann)
 endif()
@@ -340,14 +351,21 @@ configure_package_config_file(
 install(FILES ${CMAKE_BINARY_DIR}/ImGuiXConfig.cmake
         DESTINATION lib/cmake/ImGuiX)
 
-# Экспорт из build-дерева (для локальной проверки find_package)
+# Export from build tree for local find_package()
 export(EXPORT ImGuiXTargets
     NAMESPACE ImGuiX::
     FILE "${CMAKE_BINARY_DIR}/ImGuiXTargets.cmake")
-    
+
 # ===== SDK bundle of 3rd-party deps =====
 
-# Установка таргета с учётом PUBLIC_HEADER
+# Install target and optionally its PUBLIC_HEADER files
+# Params:
+# - tgt: target name to install
+# Behavior:
+# - Installs library and headers if PUBLIC_HEADER is defined
+# Usage:
+#   imguix_install_target_with_headers(imgui)
+# Idempotent: no-op if target is missing
 function(imguix_install_target_with_headers tgt)
     if(NOT TARGET ${tgt})
         return()
@@ -371,7 +389,7 @@ endfunction()
 
 
 if(IMGUIX_SDK_BUNDLE_DEPS)
-    # --- Dear ImGui: кладём только нужные .h, без служебных папок ---
+    # --- Dear ImGui: install only required headers, skip aux folders ---
     set(_IMGUI_DIR "${IMGUI_DIR}")
     if(NOT _IMGUI_DIR)
         set(_IMGUI_DIR "${PROJECT_SOURCE_DIR}/libs/imgui")
@@ -382,12 +400,12 @@ if(IMGUIX_SDK_BUNDLE_DEPS)
             DIRECTORY "${_IMGUI_DIR}/"
             DESTINATION "include"
             FILES_MATCHING
-                # включаем только заголовки
+                # Include headers only
                 PATTERN "*.h"
-                # дополнительно берем хедеры из misc/cpp и misc/freetype
+                # Also take headers from misc/cpp and misc/freetype
                 PATTERN "misc/cpp/*.h"
                 PATTERN "misc/freetype/*.h"
-            # исключаем ненужные каталоги целиком
+            # Exclude irrelevant directories
             PATTERN ".git*"     EXCLUDE
             PATTERN ".github*"  EXCLUDE
             PATTERN "backends"  EXCLUDE
@@ -396,9 +414,9 @@ if(IMGUIX_SDK_BUNDLE_DEPS)
             PATTERN "scripts"   EXCLUDE
             PATTERN "bindings"  EXCLUDE
         )
-        
+
         if(IMGUIX_SDK_FLATTEN_MISC_HEADERS)
-            # Дубли в корень include/ для простых инклюдов
+            # Duplicate misc headers into root include for simple includes
             if(EXISTS "${_IMGUI_DIR}/misc/cpp/imgui_stdlib.h")
                 install(FILES "${_IMGUI_DIR}/misc/cpp/imgui_stdlib.h"
                         DESTINATION "include")
@@ -411,7 +429,7 @@ if(IMGUIX_SDK_BUNDLE_DEPS)
     endif()
 
 
-    # --- ImGui-SFML: статическая либa + заголовки ---
+    # --- ImGui-SFML: static library and headers ---
     if(TARGET ImGui-SFML)
         imguix_install_target_with_headers(ImGui-SFML)
         if(NOT DEFINED IMGUI_SFML_DIR OR IMGUI_SFML_DIR STREQUAL "")
@@ -425,7 +443,7 @@ if(IMGUIX_SDK_BUNDLE_DEPS)
         endif()
     endif()
 
-    # --- fmt: либa + (на всякий) хедеры, если это сабмодуль ---
+    # --- fmt: library and headers if submodule ---
     if(TARGET fmt)
         if(DEFINED FMT_INSTALL AND FMT_INSTALL)
             message(STATUS "SDK: fmt installs itself (FMT_INSTALL=ON) — skipping manual header install")
@@ -438,15 +456,15 @@ if(IMGUIX_SDK_BUNDLE_DEPS)
         endif()
     endif()
 
-    # --- nlohmann-json (header-only) — если вендорим ---
+    # --- nlohmann-json (header-only) when vendored ---
     if(IMGUIX_VENDOR_JSON)
         if(EXISTS "${PROJECT_SOURCE_DIR}/libs/json/include/nlohmann")
             install(DIRECTORY "${PROJECT_SOURCE_DIR}/libs/json/include/nlohmann"
                     DESTINATION include)
         endif()
     endif()
-    
-    # --- ImPlot: заголовки ---
+
+    # --- ImPlot: headers ---
     if(EXISTS "${PROJECT_SOURCE_DIR}/libs/implot/implot.h")
         install(FILES
             "${PROJECT_SOURCE_DIR}/libs/implot/implot.h"
@@ -457,15 +475,15 @@ if(IMGUIX_SDK_BUNDLE_DEPS)
 
 endif()
 
-# --- Quickstart и ресурсы quickstart (всегда под флагом IMGUIX_SDK_INSTALL) ---
+# --- Quickstart and resources (guarded by IMGUIX_SDK_INSTALL) ---
 if(IMGUIX_SDK_INSTALL AND IMGUIX_SDK_INSTALL_QUICKSTART)
-    # ресурсы, если нужны квикстарту
+    # Copy resources required by quickstart
     if(EXISTS "${PROJECT_SOURCE_DIR}/assets/data/resources")
         install(DIRECTORY "${PROJECT_SOURCE_DIR}/assets/data/resources/"
                 DESTINATION quickstart/data/resources)
     endif()
 
-    # сам quickstart-код, если он у тебя есть в репозитории
+    # Install quickstart code if present in repository
     if(EXISTS "${PROJECT_SOURCE_DIR}/quickstart/CMakeLists.txt")
         install(DIRECTORY "${PROJECT_SOURCE_DIR}/quickstart/"
                 DESTINATION quickstart

@@ -1,11 +1,19 @@
-# cmake/deps/app_icon.cmake
+# ===== deps/app_icon.cmake =====
+# Purpose: Copy application icon resources and embed them on Windows.
+# Inputs:  SRC_DIR, RC, ICO, PNG
+# Outputs: modifies given target by adding resource and copying PNG
+# Notes:   No-op on non-Windows platforms.
+
+# Copy and embed application icon for a target
+# Params:
+# - target: target to augment
+# - SRC_DIR: directory with resources (default assets/data/resources/icons)
+# - RC: resource script path
+# - ICO: icon file path
+# - PNG: runtime PNG path
 # Usage:
-#   imguix_copy_and_embed_app_icon(<target>
-#       SRC_DIR <dir-with-rc-and-ico>   # default: ${PROJECT_SOURCE_DIR}/assets/data/resources/icons
-#       RC  <path-to-rc>                # optional
-#       ICO <path-to-ico>               # optional
-#       PNG <path-to-png>               # optional (copied to runtime)
-#   )
+#   imguix_copy_and_embed_app_icon(my_app SRC_DIR my/icons)
+# Idempotent: warns if resources are missing
 function(imguix_copy_and_embed_app_icon target)
     if(NOT WIN32)
         return()

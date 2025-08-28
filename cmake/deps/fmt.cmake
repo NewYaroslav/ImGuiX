@@ -1,5 +1,17 @@
-# cmake/deps/fmt.cmake
-# imguix_use_or_fetch_fmt(<out_target>)
+# ===== deps/fmt.cmake =====
+# Purpose: Provide fmt::fmt target from system, submodule, or FetchContent.
+# Inputs:  IMGUIX_DEPS_MODE, IMGUIX_DEPS_FMT_MODE, IMGUIX_SDK_BUNDLE_DEPS
+# Outputs: out_target receives fmt::fmt
+# Notes:   Prefers system package before bundled sources.
+
+# Resolve fmt dependency and return fmt::fmt
+# Params:
+# - out_target: variable to receive target name
+# Behavior:
+# - Reuses existing fmt::fmt, finds system package, or builds from source
+# Usage:
+#   imguix_use_or_fetch_fmt(FMT_TARGET)
+# Idempotent: reuse target if already available
 function(imguix_use_or_fetch_fmt out_target)
     # Resolve effective mode
     set(mode "${IMGUIX_DEPS_FMT_MODE}")
