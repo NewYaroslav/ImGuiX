@@ -31,6 +31,11 @@ namespace ImGuiX::Widgets {
     // ------------------------------- strings -------------------------------
 
     /// \brief Combo-like list editor for strings. One input -> one element. No CSV.
+    /// \param id Unique widget identifier.
+    /// \param label Visible label for the input.
+    /// \param items In/out list of strings.
+    /// \param cfg Configuration parameters.
+    /// \return True if the list changed.
     bool ListEditor(
             const char* id,
             const char* label,
@@ -41,7 +46,12 @@ namespace ImGuiX::Widgets {
     // ------------------------------- integers -------------------------------
 
     /// \brief Combo-like list editor for integers. One input -> one element. No CSV.
-	bool ListEditor(
+    /// \param id Unique widget identifier.
+    /// \param label Visible label for the input.
+    /// \param items In/out list of integers.
+    /// \param cfg Configuration parameters.
+    /// \return True if the list changed.
+    bool ListEditor(
             const char* id,
             const char* label,
             std::vector<int>& items,
