@@ -8,12 +8,17 @@
 
 namespace ImGuiX::Widgets {
 
-    /// \brief Draw simple circular button with solid fill.
+    /// \brief Draw circular button with solid fill.
     /// \param id Unique string ID.
     /// \param diameter Button diameter in pixels.
     /// \param color Base color.
     /// \return True if button was clicked.
     /// \note Button changes color on hover or active using style.
+    /// \code
+    /// if (CircleButton("play", 24.0f, ImVec4{1, 0, 0, 1})) {
+    ///     // clicked
+    /// }
+    /// \endcode
     bool CircleButton(const char* id, float diameter, const ImVec4& color);
 
 } // namespace ImGuiX::Widgets

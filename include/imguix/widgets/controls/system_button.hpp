@@ -26,17 +26,22 @@ namespace ImGuiX::Widgets {
 
     /// \brief Type of the system-style button.
     enum class SystemButtonType {
-        Close,
-        Minimize,
-        Maximize
+        Close,    ///< Close window
+        Minimize, ///< Minimize window
+        Maximize  ///< Maximize window
     };
 
-    /// \brief Draw system-style button with icon based on type.
+    /// \brief Draw system-style button.
     /// \param id Unique ID string.
     /// \param type Button type.
     /// \param size Button size in pixels.
     /// \return True if button was clicked.
     /// \note Button is highlighted on hover or active using style colors.
+    /// \code
+    /// if (SystemButton("close", SystemButtonType::Close, ImVec2{16, 16})) {
+    ///     // clicked
+    /// }
+    /// \endcode
     bool SystemButton(const char* id, SystemButtonType type, ImVec2 size);
 
 } // namespace ImGuiX::Widgets
