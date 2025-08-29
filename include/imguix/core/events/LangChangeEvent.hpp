@@ -7,13 +7,12 @@
 
 namespace ImGuiX::Events {
 
-    /// \brief Emitted to request a language change.
-    /// Should be applied between frames.
-    /// When using a dynamic font atlas, reload it between frames as well.
+    /// \brief Request language change.
+    /// \details Apply between frames. Reload dynamic font atlas between frames as well.
     class LangChangeEvent : public Pubsub::Event {
     public:
         std::string lang;         ///< Target language code such as "ru", "en", "uk", "pt-BR", "es", or "vi".
-        bool        apply_to_all; ///< true to apply to all windows; false to apply only to a specific window.
+        bool        apply_to_all; ///< True to apply to all windows; false to apply only to a specific window.
         int         window_id;    ///< ID of the target window when apply_to_all is false; ignored otherwise.
 
         /// \brief Constructs a language change event.
@@ -50,6 +49,7 @@ namespace ImGuiX::Events {
             return u8"LangChangeEvent";
         }
         
+        /// \copydoc Pubsub::Event::clone
         std::unique_ptr<Event> clone() const override {
             return std::make_unique<LangChangeEvent>(*this);
         }

@@ -10,8 +10,7 @@ namespace ImGuiX::Pubsub {
 
     /// \class EventMediator
     /// \brief Facilitates event subscriptions and notifications through an associated EventBus.
-    ///
-    /// Provides a unified interface for modules to subscribe to, notify, and asynchronously post events.
+    /// \details Provides a unified interface for modules to subscribe to, notify, and asynchronously post events.
     class EventMediator : public EventListener {
     public:
         /// \brief Constructs EventMediator with a raw pointer to an EventBus instance.
@@ -26,6 +25,7 @@ namespace ImGuiX::Pubsub {
         /// \param bus Unique pointer to the EventBus instance.
         explicit EventMediator(std::unique_ptr<EventBus>& bus) : m_event_bus(bus.get()) {}
 
+        /// \brief Destroy mediator and cancel subscriptions.
         ~EventMediator() noexcept override {
             cancelAllAwaiters();
             unsubscribeAll();
@@ -103,6 +103,12 @@ namespace ImGuiX::Pubsub {
         // --- Await helpers (optionx semantics; ImGuiX naming) ---
 
         /// \brief Await a single occurrence of EventType that matches predicate; auto-unsubscribe.
+        /// \tparam EventType Event type to await.
+        /// \tparam Pred Predicate callable type.
+        /// \tparam Cb Callback callable type.
+        /// \param pred Predicate to filter events.
+        /// \param cb Callback invoked on match.
+        /// \param opt Await options controlling timeout and cancellation.
         template <typename EventType, typename Pred, typename Cb>
         void awaitOnce(Pred&& pred, Cb&& cb, AwaitOptions opt = {}) {
             pruneDeadAwaiters();
@@ -122,6 +128,10 @@ namespace ImGuiX::Pubsub {
         }
 
         /// \brief Await the first EventType (no predicate).
+        /// \tparam EventType Event type to await.
+        /// \tparam Cb Callback callable type.
+        /// \param cb Callback invoked on match.
+        /// \param opt Await options controlling timeout and cancellation.
         template <typename EventType, typename Cb>
         void awaitOnce(Cb&& cb, AwaitOptions opt = {}) {
             awaitOnce<EventType>(
@@ -131,6 +141,14 @@ namespace ImGuiX::Pubsub {
             );
         }
 
+        /// \brief Await once with timeout.
+        /// \tparam EventType Event type to await.
+        /// \tparam Pred Predicate callable type.
+        /// \tparam Cb Callback callable type.
+        /// \param pred Predicate to filter events.
+        /// \param cb Callback invoked on match.
+        /// \param timeout Maximum wait duration.
+        /// \param on_timeout Callback invoked on timeout.
         template <typename EventType, typename Pred, typename Cb>
         void awaitOnce(Pred&& pred, Cb&& cb, std::chrono::milliseconds timeout,
                        std::function<void()> on_timeout = {}) {
@@ -140,6 +158,12 @@ namespace ImGuiX::Pubsub {
             awaitOnce<EventType>(std::forward<Pred>(pred), std::forward<Cb>(cb), std::move(opt));
         }
 
+        /// \brief Await once with timeout (no predicate).
+        /// \tparam EventType Event type to await.
+        /// \tparam Cb Callback callable type.
+        /// \param cb Callback invoked on match.
+        /// \param timeout Maximum wait duration.
+        /// \param on_timeout Callback invoked on timeout.
         template <typename EventType, typename Cb>
         void awaitOnce(Cb&& cb, std::chrono::milliseconds timeout,
                        std::function<void()> on_timeout = {}) {
@@ -221,7 +245,14 @@ namespace ImGuiX::Pubsub {
             return *static_cast<const EventType*>(it->second->event.get());
         }
 
-        /// \brief Multi-shot awaiter; returns token (IAwaiter) to cancel manually.
+        /// \brief Multi-shot awaiter; returns token to cancel manually.
+        /// \tparam EventType Event type to await.
+        /// \tparam Pred Predicate callable type.
+        /// \tparam Cb Callback callable type.
+        /// \param pred Predicate to filter events.
+        /// \param cb Callback invoked on each match.
+        /// \param opt Await options controlling timeout and cancellation.
+        /// \return Token to cancel awaiter.
         template <typename EventType, typename Pred, typename Cb>
         std::shared_ptr<IAwaiter> awaitEach(Pred&& pred, Cb&& cb, AwaitOptions opt = {}) {
             pruneDeadAwaiters();
@@ -243,6 +274,12 @@ namespace ImGuiX::Pubsub {
             return aw;
         }
 
+        /// \brief Multi-shot awaiter without predicate.
+        /// \tparam EventType Event type to await.
+        /// \tparam Cb Callback callable type.
+        /// \param cb Callback invoked on each match.
+        /// \param opt Await options controlling timeout and cancellation.
+        /// \return Token to cancel awaiter.
         template <typename EventType, typename Cb>
         std::shared_ptr<IAwaiter> awaitEach(Cb&& cb, AwaitOptions opt = {}) {
             return awaitEach<EventType>(
@@ -252,6 +289,15 @@ namespace ImGuiX::Pubsub {
             );
         }
 
+        /// \brief Multi-shot awaiter with timeout.
+        /// \tparam EventType Event type to await.
+        /// \tparam Pred Predicate callable type.
+        /// \tparam Cb Callback callable type.
+        /// \param pred Predicate to filter events.
+        /// \param cb Callback invoked on each match.
+        /// \param timeout Maximum wait duration.
+        /// \param on_timeout Callback invoked on timeout.
+        /// \return Token to cancel awaiter.
         template <typename EventType, typename Pred, typename Cb>
         std::shared_ptr<IAwaiter> awaitEach(Pred&& pred, Cb&& cb,
                                             std::chrono::milliseconds timeout,
@@ -262,6 +308,13 @@ namespace ImGuiX::Pubsub {
             return awaitEach<EventType>(std::forward<Pred>(pred), std::forward<Cb>(cb), std::move(opt));
         }
 
+        /// \brief Multi-shot awaiter with timeout (no predicate).
+        /// \tparam EventType Event type to await.
+        /// \tparam Cb Callback callable type.
+        /// \param cb Callback invoked on each match.
+        /// \param timeout Maximum wait duration.
+        /// \param on_timeout Callback invoked on timeout.
+        /// \return Token to cancel awaiter.
         template <typename EventType, typename Cb>
         std::shared_ptr<IAwaiter> awaitEach(Cb&& cb, std::chrono::milliseconds timeout,
                                             std::function<void()> on_timeout = {}) {
@@ -273,7 +326,7 @@ namespace ImGuiX::Pubsub {
             );
         }
 
-        // Untyped hook if needed
+        /// \copydoc EventListener::onEvent
         void onEvent(const Event* const) override {}
 
     private:

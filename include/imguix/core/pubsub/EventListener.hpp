@@ -15,6 +15,7 @@ namespace ImGuiX::Pubsub {
     /// or as raw pointers, depending on the dispatch method.
     class EventListener {
     public:
+        /// \brief Destroy listener.
         virtual ~EventListener() = default;
 
         /// \brief Handles an event notification received as a raw pointer.
