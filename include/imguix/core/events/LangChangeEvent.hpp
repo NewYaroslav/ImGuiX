@@ -49,6 +49,10 @@ namespace ImGuiX::Events {
         const char* name() const override {
             return u8"LangChangeEvent";
         }
+        
+        std::unique_ptr<Event> clone() const override {
+            return std::make_unique<LangChangeEvent>(*this);
+        }
     };
 
 } // namespace ImGuiX::Events

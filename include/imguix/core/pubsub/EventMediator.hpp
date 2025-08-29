@@ -159,35 +159,32 @@ namespace ImGuiX::Pubsub {
         /// \param pred Optional predicate to filter events.
         /// \note Re-registration with the same id is ignored.
         template <typename EventType, typename Pred = std::function<bool(const EventType&)>>
-        void registerCachedEvent(
-                const std::string& id,
-                Pred&& pred = [](const EventType&) { return true; }) {
-            bool need_subscribe = false;
+        void registerCachedEvent(const std::string& id,
+                                 Pred&& pred = [](const EventType&) { return true; }) {
             auto type = std::type_index(typeid(EventType));
-
+            std::unique_ptr<CachedSlot> slot;
             {
                 std::lock_guard<std::mutex> lk(m_cache_mutex);
-                if (m_cached_events.find(id) != m_cached_events.end()) return;
+                if (m_cached_events.count(id)) return;
 
-                CachedSlot slot;
-                slot.type = type;
-                slot.predicate = [p = std::function<bool(const EventType&)>(std::forward<Pred>(pred))](const Event* e) {
-                    return p(*static_cast<const EventType*>(e));
+                slot = std::make_unique<CachedSlot>();
+                slot->type = type;
+
+                auto pred_fn = std::function<bool(const EventType&)>(std::forward<Pred>(pred));
+                slot->predicate = [pred_fn](const Event* e) {
+                    return pred_fn(*static_cast<const EventType*>(e));
                 };
+
+                // Вставим заранее, чтобы lifetime был гарантирован до subscribe()
                 m_cached_events.emplace(id, std::move(slot));
-
-                auto& cnt = m_type_use_count[type];
-                ++cnt;
-                if (cnt == 1) need_subscribe = true;
             }
-
-            if (need_subscribe) {
-                m_event_bus->subscribe<EventType>(
-                    this,
-                    [this](const EventType& e) { handleCachedEvent(e); }
-                );
+            {
                 std::lock_guard<std::mutex> lk(m_cache_mutex);
-                m_unsubscribers[type] = [this]() { m_event_bus->unsubscribe<EventType>(this); };
+                auto& sp = m_cached_events.at(id);
+                m_event_bus->subscribe<EventType>(sp.get());
+                sp->unsubscriber = [bus = m_event_bus, listener = sp.get()]() {
+                    bus->unsubscribe<EventType>(listener);
+                };
             }
         }
 
@@ -195,26 +192,17 @@ namespace ImGuiX::Pubsub {
         /// \param id Identifier used during registration.
         void unregisterCachedEvent(const std::string& id) {
             std::function<void()> unsub;
-            std::type_index type = typeid(void);
-
             {
                 std::lock_guard<std::mutex> lk(m_cache_mutex);
                 auto it = m_cached_events.find(id);
                 if (it == m_cached_events.end()) return;
-                type = it->second.type;
-                m_cached_events.erase(it);
 
-                auto cnt_it = m_type_use_count.find(type);
-                if (cnt_it != m_type_use_count.end() && --cnt_it->second == 0) {
-                    m_type_use_count.erase(cnt_it);
-                    auto u_it = m_unsubscribers.find(type);
-                    if (u_it != m_unsubscribers.end()) {
-                        unsub = std::move(u_it->second);
-                        m_unsubscribers.erase(u_it);
-                    }
+                if (it->second && it->second->unsubscriber) {
+                    unsub = std::move(it->second->unsubscriber);
                 }
+                auto ptr = std::move(it->second);
+                m_cached_events.erase(it);
             }
-
             if (unsub) unsub();
         }
 
@@ -227,9 +215,10 @@ namespace ImGuiX::Pubsub {
             std::lock_guard<std::mutex> lk(m_cache_mutex);
             auto it = m_cached_events.find(id);
             if (it == m_cached_events.end()) return std::nullopt;
-            if (it->second.type != std::type_index(typeid(EventType))) return std::nullopt;
-            if (!it->second.event) return std::nullopt;
-            return *static_cast<const EventType*>(it->second.event.get());
+            if (!it->second) return std::nullopt;
+            if (it->second->type != std::type_index(typeid(EventType))) return std::nullopt;
+            if (!it->second->event) return std::nullopt;
+            return *static_cast<const EventType*>(it->second->event.get());
         }
 
         /// \brief Multi-shot awaiter; returns token (IAwaiter) to cancel manually.
@@ -292,15 +281,27 @@ namespace ImGuiX::Pubsub {
         std::mutex m_mutex;
         std::vector<std::weak_ptr<IAwaiter>> m_awaiters; ///< Weak list of active awaiters
 
-        struct CachedSlot {
+        struct CachedSlot : public EventListener {
             std::type_index type{typeid(void)};
             std::function<bool(const Event* const)> predicate;
             std::unique_ptr<Event> event;
+            std::function<void()> unsubscriber;
+
+            // Конкретный callback подписки
+            std::function<void(const Event*)> handler;
+
+            void onEvent(const Event* const e) override {
+                if (predicate(e)) {
+                    event = cloneEvent(e);
+                }
+            }
+
+            std::unique_ptr<Event> cloneEvent(const Event* const e) {
+                return e ? e->clone() : nullptr;
+            }
         };
 
-        std::unordered_map<std::string, CachedSlot> m_cached_events;
-        std::unordered_map<std::type_index, size_t> m_type_use_count;
-        std::unordered_map<std::type_index, std::function<void()>> m_unsubscribers;
+        std::unordered_map<std::string, std::unique_ptr<CachedSlot>> m_cached_events;
         std::mutex m_cache_mutex;
 
         void pruneDeadAwaiters() {

@@ -20,6 +20,10 @@ public:
     const char* name() const override {
         return "MyEvent";
     }
+    
+    std::unique_ptr<Event> clone() const override {
+        return std::make_unique<MyEvent>(*this);
+    }
 };
 
 // Example listener that reacts to MyEvent and demonstrates different cast methods.

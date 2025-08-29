@@ -28,6 +28,10 @@ namespace ImGuiX::Events {
         const char* name() const override {
             return u8"WindowClosedEvent";
         }
+        
+        std::unique_ptr<Event> clone() const override {
+            return std::make_unique<WindowClosedEvent>(*this);
+        }
     };
 
 } // namespace ImGuiX::Events

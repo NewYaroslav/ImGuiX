@@ -29,6 +29,10 @@ namespace ImGuiX::Pubsub {
         /// \note This method is intended for debugging, logging, or serialization purposes.
         virtual const char* name() const = 0;
         
+        /// \brief Creates a deep copy of the event.
+        /// \return A unique pointer to the cloned event.
+        virtual std::unique_ptr<Event> clone() const = 0;
+        
         /// \brief Checks whether the event is of the specified type.
         /// \tparam T The type to check against.
         /// \return true if the event is of type T; otherwise false.
@@ -57,6 +61,18 @@ namespace ImGuiX::Pubsub {
             return static_cast<const T&>(*this);
         }
     };
+    
+    /// \brief Helper macro for implementing clone() in derived event types.
+    /// \details Should be placed inside the public section of the derived class.
+    /// Example usage:
+    ///   struct MyEvent : public Event {
+    ///       IMGUIX_CLONEABLE_EVENT(MyEvent)
+    ///       ...
+    ///   };
+    #define IMGUIX_CLONEABLE_EVENT(TypeName) \
+        std::unique_ptr<Event> clone() const override { \
+            return std::make_unique<TypeName>(*this); \
+        }
 
 } // namespace ImGuiX::Pubsub
 

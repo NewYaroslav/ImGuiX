@@ -10,6 +10,7 @@ using namespace std::chrono_literals;
 struct TestEvent : Event {
     std::type_index type() const override { return typeid(TestEvent); }
     const char* name() const override { return "TestEvent"; }
+    std::unique_ptr<Event> clone() const override {return std::make_unique<TestEvent>(*this);}
 };
 
 int main() {

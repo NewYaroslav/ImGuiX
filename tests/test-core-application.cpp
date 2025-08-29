@@ -21,6 +21,7 @@ public:
 
     std::type_index type() const override { return typeid(SecondsElapsedEvent); }
     const char* name() const override { return "SecondsElapsedEvent"; }
+    std::unique_ptr<Event> clone() const override {return std::make_unique<SecondsElapsedEvent>(*this);}
 };
 
 /// \brief Model running a timer thread that posts SecondsElapsedEvent.

@@ -10,6 +10,7 @@ struct ValueEvent : Event {
     explicit ValueEvent(int v) : value(v) {}
     std::type_index type() const override { return typeid(ValueEvent); }
     const char* name() const override { return "ValueEvent"; }
+    std::unique_ptr<Event> clone() const override {return std::make_unique<ValueEvent>(*this);}
 };
 
 int main() {
