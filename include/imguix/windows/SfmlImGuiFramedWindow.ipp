@@ -35,6 +35,7 @@ namespace ImGuiX::Windows {
     }
 
     void ImGuiFramedWindow::tick() {
+        setCurrentWindow();
         auto& res = registry().getResource<DeltaClockSfml>();
         ImGui::SFML::Update(m_window, res.delta());
         if (hasFlag(m_flags, WindowFlags::EnableTransparency)) {
@@ -46,10 +47,7 @@ namespace ImGuiX::Windows {
     }
 
     void ImGuiFramedWindow::drawUi() {
-        ImGui::SFML::SetCurrentWindow(m_window);
-#       ifdef IMGUI_ENABLE_IMPLOT
-        ImPlot::SetCurrentContext(m_implot_ctx);
-#       endif
+        setCurrentWindow();
         ImGui::PushID(id());
 
         ImGui::SetNextWindowPos({0, 0});

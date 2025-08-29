@@ -292,7 +292,7 @@ if(IMGUIX_BUILD_TESTS)
         target_link_libraries(${TEST_NAME} PRIVATE fmt::fmt nlohmann_json::nlohmann_json)
 
         if(IMGUIX_USE_IMPLOT)
-            target_compile_definitions(imguix PRIVATE IMGUI_ENABLE_IMPLOT)
+            target_compile_definitions(${TEST_NAME} PRIVATE IMGUI_ENABLE_IMPLOT)
             target_link_libraries(${TEST_NAME} PRIVATE implot::implot)
             imguix_add_implot_demo(${TEST_NAME})
         endif()

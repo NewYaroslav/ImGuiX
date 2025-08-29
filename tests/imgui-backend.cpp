@@ -6,10 +6,8 @@
 #include <imgui_freetype.h>
 #include <SFML/Graphics.hpp>
 
-void ShowBackendCheckerWindow(bool* p_open)
-{
-    if (!ImGui::Begin("Dear ImGui Backend Checker", p_open))
-    {
+void ShowBackendCheckerWindow(bool* p_open) {
+    if (!ImGui::Begin("Dear ImGui Backend Checker", p_open)) {
         ImGui::End();
         return;
     }
@@ -20,8 +18,7 @@ void ShowBackendCheckerWindow(bool* p_open)
     ImGui::Text("io.BackendRendererName: %s", io.BackendRendererName ? io.BackendRendererName : "NULL");
     ImGui::Separator();
     
-    if (ImGui::TreeNode("0001: Renderer: Large Mesh Support"))
-    {
+    if (ImGui::TreeNode("0001: Renderer: Large Mesh Support")) {
         ImDrawList* draw_list = ImGui::GetWindowDrawList();
         {
             static int vtx_count = 60000;
@@ -76,9 +73,7 @@ int main() {
     std::printf("Fonts count: %d\n", io.Fonts->Fonts.Size);
     std::printf("ImTextureID: %d\n", sizeof(ImTextureID));
 #   ifdef IMGUI_ENABLE_IMPLOT
-    if (m_imgui_ctx) {
-        std::printf("IMGUI_ENABLE_IMPLOT\n");
-    }
+    std::printf("IMGUI_ENABLE_IMPLOT\n");
 #   endif
 
     sf::CircleShape shape(100.f);

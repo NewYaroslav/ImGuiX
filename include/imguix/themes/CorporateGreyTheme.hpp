@@ -17,7 +17,7 @@
 /// \author NewYaroslav
 /// \date 2025
 
-#include <imguix/core/themes/Theme.hpp> // ImGuiX::Themes::Theme
+#include <imguix/core/themes/Theme.hpp> // Theme base + applyDefaultImGuiStyle
 
 namespace ImGuiX::Themes {
 

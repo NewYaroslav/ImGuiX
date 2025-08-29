@@ -1,5 +1,7 @@
 #include <iostream>
 #include <imguix/core.hpp>
+#include <random>
+#include <cmath>
 
 // === Core UI: Ввод, валидация, списки, текст ===
 #include <imguix/widgets/input/validated_input.hpp>
@@ -25,12 +27,65 @@
 #include <imguix/widgets/misc/loading_spinner.hpp>
 #include <imguix/widgets/misc/markers.hpp>
 
-namespace i18n = ImGuiX::I18N;
+// === Графики ===
+#ifdef IMGUI_ENABLE_IMPLOT
+#include <imguix/widgets/plot/PlotOHLCChart.hpp>
+#endif
+
+//namespace i18n = ImGuiX::I18N;
+
+#ifdef IMGUI_ENABLE_IMPLOT
+// Генератор OHLCV-баров с шагом времени tf_sec (сек) и временем в миллисекундах
+inline static void GenerateBars(
+        std::vector<ImGuiX::Widgets::OhlcvBar>& out,
+        int count, int tf_sec, std::uint64_t start_time,
+        double start_price, unsigned seed
+    ) {
+    using BarT = ImGuiX::Widgets::OhlcvBar;
+    out.clear();
+    out.reserve(std::max(0, count));
+
+    const std::uint64_t tf_ms = static_cast<std::uint64_t>(tf_sec);
+
+    std::mt19937 rng(seed);
+    std::normal_distribution<double> step(0.0, 0.002);      // ~0.2% шаг
+    std::normal_distribution<double> wick(0.0, 0.0008);     // фитили
+    std::lognormal_distribution<double> voln(0.0, 0.25);    // шум для объёма
+
+    double prev_close = std::max(0.1, start_price);
+
+    for (int i = 0; i < count; ++i) {
+        BarT b;
+        b.time  = start_time + static_cast<std::uint64_t>(i) * tf_sec;
+
+        const double drift = 0.00002 * tf_sec;              // лёгкий дрейф по ТФ
+        const double ch    = (drift + step(rng)) * prev_close;
+
+        b.open  = prev_close;
+        b.close = std::max(0.01, b.open + ch);
+
+        // фитили на основе диапазона бара
+        const double base_range = std::max(1e-6, std::abs(b.close - b.open));
+        const double up_wick    = std::max(0.0, (base_range * 0.5) + wick(rng) * prev_close);
+        const double dn_wick    = std::max(0.0, (base_range * 0.5) + wick(rng) * prev_close);
+
+        b.high  = std::max({b.open, b.close}) + up_wick;
+        b.low   = std::max(0.01, std::min({b.open, b.close}) - dn_wick);
+
+        // объём: базовый + пропорционален диапазону
+        const double range = b.high - b.low;
+        b.volume = std::max(0.0, 800.0 + 50000.0 * range / std::max(1e-6, b.close) * voln(rng));
+
+        out.push_back(b);
+        prev_close = b.close;
+    }
+}
+#endif
 
 // Контроллер окна демо-виджетов
-class I18nController : public ImGuiX::Controller {
+class WidgetsController : public ImGuiX::Controller {
 public:
-    I18nController(ImGuiX::WindowInterface& window)
+    WidgetsController(ImGuiX::WindowInterface& window)
         : Controller(window) {
         m_state.auth_data.host     = options().getStrOr("host", "demo.local");
         m_state.auth_data.email    = options().getStrOr("email", "guest@example.com");
@@ -44,7 +99,7 @@ public:
     void drawUi() override {
         ImGui::PushID(window().id());
         ImGui::PushFont(nullptr, 18.0f); // Размер шрифта (обёртка ImGuiX)
-        ImGui::Begin(window().id() == 0 ? "i18n main" : "i18n child");
+        ImGui::Begin("Widgets Demo");
 
         ImGui::Separator();
         drawWidgetsDemo();
@@ -99,6 +154,20 @@ private:
         ImGuiX::Widgets::LoadingSpinnerConfig sp_cfg{}; // Конфиг спиннера
         std::vector<std::string>              names{"Alice", "Bob"};
         std::vector<int>                      numbers{1, 2, 3};
+        
+#       ifdef IMGUI_ENABLE_IMPLOT
+        // ------------------ 8) OHLC Bars Plot (demo) ------------------
+        int  tf_index = 0;            // 0=M1, 1=M30, 2=H1
+        int  bars_count = 300;        // сколько баров генерить
+        unsigned rng_seed = 42;       // зерно генератора
+        double start_price = 100.0;   // базовая цена
+        // Данные для трёх ТФ (время — миллисекунды)
+        std::vector<ImGuiX::Widgets::OhlcvBar> bars_m1;
+        std::vector<ImGuiX::Widgets::OhlcvBar> bars_m30;
+        std::vector<ImGuiX::Widgets::OhlcvBar> bars_h1;
+
+        ImGuiX::Widgets::OHLCChartConfig ohlc_cfg{}; // конфиг виджета графика
+#       endif
 
         // ------------------ Конструктор: дефолты ------------------
         WidgetsDemoState() {
@@ -491,6 +560,62 @@ private:
             ImGuiX::Widgets::ListEditor("list.names",   "Names",   m_state.names);
             ImGuiX::Widgets::ListEditor("list.numbers", "Numbers", m_state.numbers);
         }
+        
+#       ifdef IMGUI_ENABLE_IMPLOT
+        // --- OHLC Bars / Plot ---
+        if (ImGui::CollapsingHeader("OHLC Bars / Plot")) {
+            // ТФы: M1, M30, H1
+            static const int TFs[] = {60, 30*60, 60*60};
+            static const char* TF_NAMES[] = {"M1", "M30", "H1"};
+
+            // Инициализация данных (разово)
+			/*
+            if (m_state.bars_m1.empty()) {
+                const std::uint64_t start_time = 1700000000ULL;
+                GenerateBars(m_state.bars_m1,  m_state.bars_count, TFs[0], start_time, m_state.start_price, m_state.rng_seed);
+                GenerateBars(m_state.bars_m30, m_state.bars_count, TFs[1], start_time, m_state.start_price, m_state.rng_seed + 1);
+                GenerateBars(m_state.bars_h1,  m_state.bars_count, TFs[2], start_time, m_state.start_price, m_state.rng_seed + 2);
+            }
+			*/
+
+            // Панель управления
+            ImGui::PushItemWidth(160);
+            ImGui::Combo("Timeframe", &m_state.tf_index, TF_NAMES, IM_ARRAYSIZE(TF_NAMES));
+            ImGui::SameLine();
+            ImGui::TextDisabled("(%d)", TFs[m_state.tf_index]);
+            ImGui::PopItemWidth();
+
+            ImGui::SliderInt("Bars", &m_state.bars_count, 50, 2000);
+            //ImGui::SliderFloat("Start Price", &m_state.start_price, 1.0f, 10000.0f, "%.2f");
+            double min_price = 1.0, max_price = 10000.0;
+            ImGui::SliderScalar("Start Price", ImGuiDataType_Double, &m_state.start_price, &min_price, &max_price, "%.2f");
+            ImGui::InputScalar("Seed", ImGuiDataType_U32, &m_state.rng_seed);
+
+            if (ImGui::Button("Regenerate")) {
+                const std::uint64_t start_time = 1700000000ULL;
+                GenerateBars(m_state.bars_m1,  m_state.bars_count, TFs[0], start_time, m_state.start_price, m_state.rng_seed);
+                GenerateBars(m_state.bars_m30, m_state.bars_count, TFs[1], start_time, m_state.start_price, m_state.rng_seed + 1);
+                GenerateBars(m_state.bars_h1,  m_state.bars_count, TFs[2], start_time, m_state.start_price, m_state.rng_seed + 2);
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Shuffle Seed")) {
+                m_state.rng_seed = (m_state.rng_seed * 1664525u + 1013904223u);
+            }
+
+            // Выбор массива баров по текущему ТФ
+            const int tf_sec = TFs[m_state.tf_index];
+            const std::vector<ImGuiX::Widgets::OhlcvBar>& bars =
+                (m_state.tf_index == 0 ? m_state.bars_m1
+                 : m_state.tf_index == 1 ? m_state.bars_m30
+                                         : m_state.bars_h1);
+
+            // Имя серии/окна графика
+            std::string title = std::string("Bars (") + TF_NAMES[m_state.tf_index] + ")";
+
+            // Вызов твоего виджета (использует DefaultBarAdapter: &T::open/.../&T::time)
+            ImGuiX::Widgets::PlotOHLCChart<ImGuiX::Widgets::OhlcvBar>(title.c_str(), bars, m_state.ohlc_cfg);
+        }
+#       endif
     }
 
     void postLanguageChange(const std::string& lang, bool apply_to_all = true) {
@@ -499,20 +624,16 @@ private:
 };
 
 // Окно-приложение: шрифты, размеры, инициализация контроллера
-class I18nWindow : public ImGuiX::WindowInstance {
+class ExampleWindow : public ImGuiX::WindowInstance {
 public:
-    I18nWindow(int id,
+    ExampleWindow(int id,
                ImGuiX::ApplicationContext& app,
                std::string name)
         : WindowInstance(id, app, std::move(name)) {}
 
     void onInit() override {
-        createController<I18nController>();
-
-        // Размеры основного/дочернего окна
+        createController<WidgetsController>();
         create(id() == 0 ? 800 : 640, id() == 0 ? 600 : 480);
-
-        // Иконка окна
         setWindowIcon("data/resources/icons/icon.png");
 
         // Шрифты (ручная сборка)
@@ -526,8 +647,11 @@ public:
 };
 
 int main() {
+#   ifdef IMGUI_ENABLE_IMPLOT
+    std::cout << "IMGUI_ENABLE_IMPLOT" << std::endl;
+#   endif
     ImGuiX::Application app;
-    app.createWindow<I18nWindow>("Main Window");
+    app.createWindow<ExampleWindow>("Main Window");
     app.run();
     return 0;
 }
