@@ -62,7 +62,7 @@ if not exist "%BUILD_PATH%" mkdir "%BUILD_PATH%"
 
 echo Starting compilation...
 emcc ^
-    tests/imgui-backend.cpp ^
+    tests/demo_backend.cpp ^
     libs/imgui/imgui.cpp ^
     libs/imgui/imgui_draw.cpp ^
     libs/imgui/imgui_tables.cpp ^
