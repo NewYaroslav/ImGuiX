@@ -11,15 +11,14 @@ namespace ImGuiX::Pubsub {
 
     /// \class SyncNotifier
     /// \brief Restricted interface for synchronous event notifications.
-    ///
-    /// Instances are created by Application and passed to Model::process().
+    /// \details Instances are created by Application and passed to Model::process().
     /// Direct creation is disallowed to prevent misuse.
     class SyncNotifier {
     public:
-        SyncNotifier(const SyncNotifier &) = delete;
-        SyncNotifier &operator=(const SyncNotifier &) = delete;
-        SyncNotifier(SyncNotifier &&) = delete;
-        SyncNotifier &operator=(SyncNotifier &&) = delete;
+        SyncNotifier(const SyncNotifier &) = delete;            ///< Deleted copy constructor.
+        SyncNotifier &operator=(const SyncNotifier &) = delete; ///< Deleted copy assignment.
+        SyncNotifier(SyncNotifier &&) = delete;                 ///< Deleted move constructor.
+        SyncNotifier &operator=(SyncNotifier &&) = delete;      ///< Deleted move assignment.
 
         /// \brief Notifies subscribers of an event by raw pointer.
         /// \param event Raw pointer to the event.

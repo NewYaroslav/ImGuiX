@@ -14,18 +14,18 @@
 
 namespace ImGuiX::Pubsub {
 
+    /// \brief Awaiter configuration options.
     struct AwaitOptions {
-        std::chrono::steady_clock::duration timeout{}; ///< 0 => no timeout
-        CancellationToken token{};                     ///< empty => no external cancellation
-        bool single_shot{true};
-        std::function<void()> on_timeout{};            ///< called when timeout expires
+        std::chrono::steady_clock::duration timeout{}; ///< Zero means no timeout.
+        CancellationToken token{};                     ///< Empty means no external cancellation.
+        bool single_shot{true};                        ///< True to auto-cancel after first match.
+        std::function<void()> on_timeout{};            ///< Called when timeout expires.
     };
 
     /// \class EventAwaiter
     /// \brief Helper listener that waits for events matching a predicate.
-    ///
-    /// Instances manage their own lifetime by holding a shared_ptr to themselves
-    /// until cancelled or, if single-shot, after the first match.
+    /// \details Holds a shared_ptr to itself until cancelled or, if single-shot, after the first match.
+    /// \tparam EventType Event type to await.
     template <typename EventType>
     class EventAwaiter : public EventListener,
                          public IAwaiterEx,
@@ -33,12 +33,14 @@ namespace ImGuiX::Pubsub {
         static_assert(std::is_base_of<Event, EventType>::value,
                       u8"EventType must derive from ImGuiX::Pubsub::Event");
     public:
+        /// \brief Predicate type to filter events.
         using Predicate = std::function<bool(const EventType&)>;
+        /// \brief Callback invoked when a matching event is received.
         using Callback  = std::function<void(const EventType&)>;
 
-        /// \brief Creates and subscribes a new awaiter.
+        /// \brief Create and subscribe a new awaiter.
         /// \param bus Event bus to subscribe on.
-        /// \param pred Predicate to filter events. If empty, all events match.
+        /// \param predicate Predicate to filter events. If empty, all events match.
         /// \param on_match Callback invoked when a matching event is received.
         /// \param opt Await options controlling timeout/cancellation and single-shot behavior.
         /// \return Shared pointer keeping the awaiter alive.
@@ -54,16 +56,19 @@ namespace ImGuiX::Pubsub {
             return self;
         }
 
+        /// \copydoc IAwaiter::isActive
         bool isActive() const noexcept override {
             return !m_cancelled.load(std::memory_order_relaxed);
         }
 
-        /// \brief Cancels the awaiter (unsubscribe). Idempotent.
+        /// \copydoc IAwaiter::cancel
+        /// \note Idempotent.
         void cancel() noexcept override;
 
+        /// \brief Destroy awaiter and cancel subscription.
         ~EventAwaiter() override { cancel(); }
 
-        // EventListener hook (unused when subscribing via typed API)
+        /// \copydoc EventListener::onEvent
         void onEvent(const Event* const) override {}
 
     private:
@@ -101,6 +106,7 @@ namespace ImGuiX::Pubsub {
             if (m_on_match) m_on_match(ev);
         }
 
+        /// \copydoc IAwaiterEx::pollTimeout
         void pollTimeout() noexcept override {
             if (!isActive()) return;
             if (m_opt.token && m_opt.token.isCancelled()) {
@@ -119,12 +125,12 @@ namespace ImGuiX::Pubsub {
         EventBus&  m_bus;
         Predicate  m_predicate;
         Callback   m_on_match;
-        std::function<void()> m_on_timeout; ///< fired when timeout elapses
+        std::function<void()> m_on_timeout; ///< Fired when timeout elapses.
         AwaitOptions m_opt{};
         bool m_has_deadline{false};
         std::chrono::steady_clock::time_point m_deadline{};
         std::atomic<bool> m_cancelled{false};
-        std::shared_ptr<EventAwaiter> m_retain_self; ///< Keeps this object alive until cancellation
+        std::shared_ptr<EventAwaiter> m_retain_self; ///< Keeps this object alive until cancellation.
     };
 
     template <typename EventType>

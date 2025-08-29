@@ -22,7 +22,8 @@ namespace ImGuiX::Events {
         const char* name() const override {
             return u8"ApplicationExitEvent";
         }
-        
+
+        /// \copydoc Pubsub::Event::clone
         std::unique_ptr<Event> clone() const override {
             return std::make_unique<ApplicationExitEvent>(*this);
         }

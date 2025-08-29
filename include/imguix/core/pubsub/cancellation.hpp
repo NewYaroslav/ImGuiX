@@ -15,12 +15,14 @@ namespace ImGuiX::Pubsub {
     /// \brief Passive handle queried by awaiters for cancellation status.
     class CancellationToken {
     public:
-        /// \brief Checks whether cancellation was requested.
+        /// \brief Check whether cancellation was requested.
+        /// \return True if cancellation requested.
         bool isCancelled() const noexcept {
             return m_state && m_state->flag.load(std::memory_order_relaxed);
         }
 
-        /// \brief Indicates whether this token is valid.
+        /// \brief Check whether this token is valid.
+        /// \return True if token references a source.
         explicit operator bool() const noexcept { return static_cast<bool>(m_state); }
 
     private:
@@ -36,7 +38,8 @@ namespace ImGuiX::Pubsub {
         /// \brief Creates a new cancellation source with fresh state.
         CancellationSource() : m_state(std::make_shared<CancellationToken::State>()) {}
 
-        /// \brief Returns a token linked to this source.
+        /// \brief Return a token linked to this source.
+        /// \return Token sharing this source.
         CancellationToken token() const noexcept {
             CancellationToken t; t.m_state = m_state; return t;
         }

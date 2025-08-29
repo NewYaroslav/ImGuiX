@@ -72,6 +72,7 @@ namespace ImGuiX::Events {
         /// \copydoc Pubsub::Event::name
         const char *name() const override { return u8"LogEvent"; }
 
+        /// \copydoc Pubsub::Event::clone
         std::unique_ptr<Event> clone() const override {
             return std::make_unique<LogEvent>(
                 level,
