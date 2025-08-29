@@ -94,7 +94,7 @@ int main() {
 
 #else
 int main() {
-    static_assert(false, "test-framed-window.cpp requires IMGUIX_USE_SFML_BACKEND defined.");
+    static_assert(false, "test_framed_window.cpp requires IMGUIX_USE_SFML_BACKEND defined.");
     return 0;
 }
 #endif
