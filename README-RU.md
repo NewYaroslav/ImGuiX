@@ -27,6 +27,7 @@
 - [Архитектура](#архитектура)
 - [Web/Emscripten](#webemscripten)
 - [Опции CMake (сводка)](#опции-cmake-сводка)
+- [Макросы компиляции](#макросы-компиляции)
 - [Темы](#темы)
 - [Шрифты и лицензии](#шрифты-и-лицензии)
 - [Лицензия](#лицензия)
@@ -256,6 +257,16 @@ run-test-sdl2-ems.bat     :: запускает emrun на локальном с
 * JSON: `IMGUIX_VENDOR_JSON` — положить заголовки `nlohmann_json` в SDK.
 * Режимы зависимостей:
   `IMGUIX_DEPS_MODE= AUTO|SYSTEM|BUNDLED` + пер-пакетные `IMGUIX_DEPS_*_MODE` (`fmt`, `SFML`, `ImGui`, `ImGui-SFML`, `freetype`, `json`, `mdbx`).
+
+## Макросы компиляции
+
+ImGuiX проверяет набор макросов для подключения дополнительных модулей. Они задаются автоматически при включении соответствующих опций CMake.
+
+- `IMGUI_ENABLE_FREETYPE` — использование FreeType для растеризации шрифтов (`IMGUIX_IMGUI_FREETYPE`).
+- `IMGUI_ENABLE_IMPLOT` — интеграция [ImPlot](https://github.com/epezent/implot) (`IMGUIX_USE_IMPLOT`).
+- `IMGUI_ENABLE_IMPLOT3D` — интеграция [ImPlot3D](https://github.com/jimgries/implot3d) (`IMGUIX_USE_IMPLOT3D`).
+
+Полный список конфигурационных макросов см. в [docs/CONFIGURATION-RU.md](docs/CONFIGURATION-RU.md).
 
 ## Темы
 
