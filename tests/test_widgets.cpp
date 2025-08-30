@@ -29,6 +29,21 @@
 #include <imguix/widgets/auth/proxy_panel.hpp>
 #include <imguix/widgets/misc/loading_spinner.hpp>
 #include <imguix/widgets/misc/markers.hpp>
+#include <imguix/widgets/misc/theme_picker.hpp>
+
+// === Themes ===
+#include <imguix/themes/CorporateGreyTheme.hpp>
+#include <imguix/themes/DarkCharcoalTheme.hpp>
+#include <imguix/themes/DarkGraphiteTheme.hpp>
+#include <imguix/themes/DarkTealTheme.hpp>
+#include <imguix/themes/DeepDarkTheme.hpp>
+#include <imguix/themes/GoldBlackTheme.hpp>
+#include <imguix/themes/GreenBlueTheme.hpp>
+#include <imguix/themes/LightGreenTheme.hpp>
+#include <imguix/themes/OSXTheme.hpp>
+#include <imguix/themes/PearlLightTheme.hpp>
+#include <imguix/themes/SlateDarkTheme.hpp>
+#include <imguix/themes/VisualStudioDarkTheme.hpp>
 
 // === Графики ===
 #ifdef IMGUI_ENABLE_IMPLOT
@@ -99,6 +114,7 @@ public:
         m_state.auth_data.host     = options().getStrOr("host", "demo.local");
         m_state.auth_data.email    = options().getStrOr("email", "guest@example.com");
         m_state.auth_data.password = options().getStrOr("password", "");
+        ImGuiX::Widgets::ApplyStoredTheme(this);
     }
 
     void drawContent() override {
@@ -282,6 +298,11 @@ private:
     // Рендер всей демо-витрины виджетов (сгруппировано под спойлеры)
     void drawWidgetsDemo() {
         ImGui::SeparatorText("Widgets Demo");
+
+        // --- Theme Picker ---
+        if (ImGui::CollapsingHeader("Theme", ImGuiTreeNodeFlags_DefaultOpen)) {
+            ImGuiX::Widgets::ThemePicker("demo.theme", this);
+        }
 
         // --- Authorization block ---
         if (ImGui::CollapsingHeader("Authorization", ImGuiTreeNodeFlags_DefaultOpen)) {
@@ -740,6 +761,21 @@ public:
         createController<WidgetsController>();
         create(id() == 0 ? 800 : 640, id() == 0 ? 600 : 480);
         setWindowIcon("data/resources/icons/icon.png");
+
+        auto& tm = themeManager();
+        ImGuiX::Themes::registerCorporateGreyTheme(tm);
+        ImGuiX::Themes::registerDarkCharcoalTheme(tm);
+        ImGuiX::Themes::registerDarkGraphiteTheme(tm);
+        ImGuiX::Themes::registerDarkTealTheme(tm);
+        ImGuiX::Themes::registerDeepDarkTheme(tm);
+        ImGuiX::Themes::registerGoldBlackTheme(tm);
+        ImGuiX::Themes::registerGreenBlueTheme(tm);
+        ImGuiX::Themes::registerLightGreenTheme(tm);
+        ImGuiX::Themes::registerOSXTheme(tm);
+        ImGuiX::Themes::registerPearlLightTheme(tm);
+        ImGuiX::Themes::registerSlateDarkTheme(tm);
+        ImGuiX::Themes::registerVisualStudioDarkTheme(tm);
+        ImGuiX::Widgets::ApplyStoredTheme(this);
 
         // Шрифты (ручная сборка)
         fontsBeginManual();
