@@ -29,6 +29,10 @@
 #include <implot.h>
 #endif
 
+#ifdef IMGUI_ENABLE_IMPLOT3D
+#include <implot3d.h>
+#endif
+
 #include "WindowInterface.hpp"
 #include <imguix/config/paths.hpp>
 
@@ -325,6 +329,9 @@ namespace ImGuiX {
 #endif
 #ifdef IMGUI_ENABLE_IMPLOT
         ImPlotContext* m_implot_ctx = nullptr; ///<
+#endif
+#ifdef IMGUI_ENABLE_IMPLOT3D
+        ImPlot3DContext* m_implot3d_ctx = nullptr; ///<
 #endif
         int m_window_id;                    ///< Unique window identifier.
         std::string m_window_name;          ///< Internal window name.
