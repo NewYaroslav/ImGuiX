@@ -2,8 +2,8 @@
 #ifndef _IMGUIX_UTILS_VFORMAT_HPP_INCLUDED
 #define _IMGUIX_UTILS_VFORMAT_HPP_INCLUDED
 
-/// \file format.hpp
-/// \brief Function for formatting strings according to a specified format.
+/// \file vformat.hpp
+/// \brief String formatting helpers using printf semantics.
 
 #include <cstdarg>
 #include <vector>
@@ -11,18 +11,9 @@
 
 namespace ImGuiX::Utils {
 
-    /// \brief vsnprintf-based formatter using a va_list (robust, resizes buffer).
-    ///
-    /// This function formats a string using either the custom implementation based on `vsnprintf`).
-    ///
-    /// \param fmt The format string (similar to printf format).
-    /// \param ... A variable number of arguments matching the format string.
-    /// \see https://habr.com/ru/articles/318962/
-    /// \return A formatted std::string.
-    
-    /// \brief vsnprintf-based formatter using a va_list (robust, resizes buffer).
+    /// \brief Format string using a va_list.
     /// \param fmt printf-like format string.
-    /// \param args argument list (will be copied internally).
+    /// \param args Argument list copied internally.
     /// \return Formatted string.
     inline std::string vformat_va(const char *fmt, va_list args) {
         if (!fmt) return {};
@@ -44,7 +35,9 @@ namespace ImGuiX::Utils {
         }
     }
     
-    /// \brief printf-style formatter (varargs) built on top of vformat_va.
+    /// \brief Format string using variable arguments.
+    /// \param fmt printf-like format string.
+    /// \return Formatted string.
     inline std::string vformat(const char* fmt, ...) {
         if (!fmt) return {};
         va_list args; va_start(args, fmt);

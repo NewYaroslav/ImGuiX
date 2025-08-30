@@ -38,7 +38,13 @@
 //namespace i18n = ImGuiX::I18N;
 
 #ifdef IMGUI_ENABLE_IMPLOT
-// Генератор OHLCV-баров с шагом времени tf_sec (сек) и временем в миллисекундах
+/// \brief Generate synthetic OHLCV bars.
+/// \param out Output bar container.
+/// \param count Number of bars to produce.
+/// \param tf_sec Timeframe in seconds.
+/// \param start_time Starting timestamp.
+/// \param start_price Starting price.
+/// \param seed Random seed.
 inline static void GenerateBars(
         std::vector<ImGuiX::Widgets::OhlcvBar>& out,
         int count, int tf_sec, std::uint64_t start_time,
