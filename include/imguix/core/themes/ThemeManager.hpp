@@ -14,6 +14,9 @@
 #ifdef IMGUI_ENABLE_IMPLOT
   #include <implot.h>
 #endif
+#ifdef IMGUI_ENABLE_IMPLOT3D
+  #include <implot3d.h>
+#endif
 
 #include "Theme.hpp"
 
@@ -74,6 +77,9 @@ namespace ImGuiX::Themes {
                 it->second->apply(ImGui::GetStyle());
 #               ifdef IMGUI_ENABLE_IMPLOT
                 it->second->apply(ImPlot::GetStyle());
+#               endif
+#               ifdef IMGUI_ENABLE_IMPLOT3D
+                it->second->apply(ImPlot3D::GetStyle());
 #               endif
             }
             m_dirty = false;
