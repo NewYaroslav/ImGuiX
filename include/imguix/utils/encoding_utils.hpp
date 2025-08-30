@@ -29,7 +29,7 @@ namespace ImGuiX::Utils {
 
     /// \brief Validate UTF-8 string.
     /// \param message String to validate.
-    /// \return `true` if string is valid UTF-8, `false` otherwise.
+    /// \return True if string is valid UTF-8.
     bool IsValidUtf8(const char* message);
 
     /// \brief Convert CP1251 string to UTF-8.
