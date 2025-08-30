@@ -14,6 +14,7 @@ An object-oriented wrapper around [Dear ImGui](https://github.com/ocornut/imgui)
 - [Architecture](#architecture)
 - [Web/Emscripten](#webemscripten)
 - [CMake Options (Summary)](#cmake-options-summary)
+- [Themes](#themes)
 - [Fonts and Licensing](#fonts-and-licensing)
 - [License](#license)
 
@@ -223,6 +224,11 @@ After building, open `http://localhost:8081/index.html` in your browser.
 * JSON: `IMGUIX_VENDOR_JSON` — place `nlohmann_json` headers in the SDK.
 * Dependency modes:
   `IMGUIX_DEPS_MODE= AUTO|SYSTEM|BUNDLED` plus per-package `IMGUIX_DEPS_*_MODE` (`fmt`, `SFML`, `ImGui`, `ImGui-SFML`, `freetype`, `json`, `mdbx`).
+
+## Themes
+
+ImGuiX provides several built-in color themes and supports creating custom ones.
+See [docs/THEMES.md](docs/THEMES.md) for details.
 
 ## Fonts and Licensing
 

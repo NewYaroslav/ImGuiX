@@ -353,6 +353,7 @@ Format: `type(scope): short description` where the scope is optional. Keep messa
 | Path                     | Role                                                   |
 | ------------------------ | ------------------------------------------------------ |
 | `docs/FONTS-GUIDE.md` | FontManager usage; preset tokens including `MiscSymbols`, `Dingbats`, `Arrows`, `PUA` |
+| `docs/THEMES.md`        | Theme guide for built-in styles and creating custom themes |
 
 ### Dependency Map
 
