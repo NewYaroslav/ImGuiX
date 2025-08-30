@@ -44,7 +44,7 @@ namespace ImGuiX {
         private WindowInterface,
         public Pubsub::EventMediator {
     public:
-        /// \brief Constructs the window with a unique ID and name.
+        /// \brief Construct window with unique ID and name.
         /// \param id Unique window identifier.
         /// \param app Reference to application context interface.
         /// \param name Window name (title).
@@ -61,27 +61,29 @@ namespace ImGuiX {
         /// \brief Optional callback invoked after the window is added to the manager.
         virtual void onInit() {}
 
-        /// \brief Initializes the window (e.g., creates backend resources).
+        /// \brief Initialize window and create backend resources.
+        /// \return True on success.
         virtual bool create();
 
-        /// \brief Initializes the window with explicit dimensions.
+        /// \brief Initialize window with explicit dimensions.
         /// \param w Width in pixels.
         /// \param h Height in pixels.
+        /// \return True on success.
         virtual bool create(int w, int h);
 
-        /// \brief Processes input events and window messages.
+        /// \brief Process input events and window messages.
         virtual void handleEvents();
 
-        /// \brief Updates logic for the current frame.
+        /// \brief Update logic for the current frame.
         virtual void tick();
 
-        /// \brief Renders scene content (e.g., world, game objects).
+        /// \brief Render scene content (e.g., world, game objects).
         virtual void drawContent();
 
-        /// \brief Renders UI overlays, HUDs, debug panels.
+        /// \brief Render UI overlays, HUDs, debug panels.
         virtual void drawUi();
 
-        /// \brief Finalizes frame and presents to screen.
+        /// \brief Finalize frame and present to screen.
         virtual void present();
 
         /// \brief Creates and registers a controller of given type.
@@ -100,22 +102,28 @@ namespace ImGuiX {
 
         // --- WindowInterface interface ---
 
-        /// \brief Returns the unique ID of this window.
+        /// \brief Return unique window ID.
+        /// \return Window identifier.
         int id() const override;
 
-        /// \brief Returns the window name used as title.
+        /// \brief Return window name used as title.
+        /// \return Window name.
         const std::string& name() const override;
 
-        /// \brief Current width of the window in pixels.
+        /// \brief Return current window width in pixels.
+        /// \return Width in pixels.
         int width() const override;
 
-        /// \brief Current height of the window in pixels.
+        /// \brief Return current window height in pixels.
+        /// \return Height in pixels.
         int height() const override;
 
-        /// \brief Sets window dimensions in pixels.
+        /// \brief Set window dimensions in pixels.
+        /// \param w New width in pixels.
+        /// \param h New height in pixels.
         void setSize(int w, int h) override;
         
-        /// \brief Sets the window icon from an image file (currently SFML only).
+        /// \brief Set the window icon from an image file (currently SFML only).
         /// \param path Path to the icon image file (must be .png or .bmp, 32x32 or 64x64 recommended).
         /// \return True if the icon was loaded and applied successfully.
         bool setWindowIcon(const std::string& path) override;
@@ -124,57 +132,67 @@ namespace ImGuiX {
         /// \param id Identifier of registered theme.
         void setTheme(std::string id) override;
         
-        /// \brief Enables or disables clearing the background between frames.
+        /// \brief Enable or disable clearing the background between frames.
         /// \param disable True to disable clearing.
-        void setDisableBackground(bool disable) override {};
+        void setDisableBackground(bool disable) override { (void)disable; }
 
-        /// \brief Requests the window to close.
+        /// \brief Request window to close.
         void close() override;
 
-        /// \brief Minimizes the window.
+        /// \brief Minimize the window.
         void minimize() override;
 
-        /// \brief Maximizes the window.
+        /// \brief Maximize the window.
         void maximize() override;
 
-        /// \brief Restores the window from minimized or maximized state.
+        /// \brief Restore the window from minimized or maximized state.
         void restore() override;
 
-        /// \brief Checks whether the window is maximized.
+        /// \brief Return true if the window is maximized.
+        /// \return True when maximized.
         bool isMaximized() const override;
 
-        /// \brief Toggles between maximized and restored states.
+        /// \brief Toggle between maximized and restored states.
         void toggleMaximizeRestore() override;
 
-        /// \brief Activates or deactivates the window.
+        /// \brief Activate or deactivate the window.
+        /// \param active True to activate.
+        /// \return True on success.
         bool setActive(bool active) override;
 
-        /// \brief Returns true if the window currently has focus.
+        /// \brief Return true if the window has focus.
+        /// \return True when active.
         bool isActive() const override;
 
-        /// \brief Shows or hides the window.
+        /// \brief Show or hide the window.
         void setVisible(bool visible) override;
 
-        /// \brief Returns true if the window is open.
+        /// \brief Return true if the window is open.
+        /// \return True while the window exists.
         bool isOpen() const override;
         
-        /// \brief Makes the window context current for rendering.
-        /// Call only between frames before ImGui::NewFrame().
+        /// \brief Make the window context current for rendering.
+        /// \note Call only between frames before ImGui::NewFrame().
         virtual void setCurrentWindow();
 
-        /// \brief Access to the global event bus.
+        /// \brief Provide access to the global event bus.
+        /// \return Event bus.
         Pubsub::EventBus& eventBus() override;
 
-        /// \brief Access to the shared resource registry.
+        /// \brief Provide access to the shared resource registry.
+        /// \return Resource registry.
         ResourceRegistry& registry() override;
 
-        /// \brief Access to the global options store.
+        /// \brief Provide access to the global options store.
+        /// \return Options store control interface.
         OptionsStore::Control& options() override;
 
-        /// \brief Read-only access to the global options store.
+        /// \brief Provide read-only access to the global options store.
+        /// \return Options store view.
         const OptionsStore::View& options() const override;
 
-        /// \brief Reference to the owning application.
+        /// \brief Return reference to the owning application.
+        /// \return Application context interface.
         ApplicationContext& application() override;
 
 #       ifdef IMGUIX_USE_SFML_BACKEND
@@ -333,9 +351,9 @@ namespace ImGuiX {
         ImGuiX::Notify::NotificationManager m_notification_manager{}; ///< Toast notifications manager.
 
 
-        /// \brief Requests the window to switch its UI language.
+        /// \brief Hook before applying requested language.
         /// \param lang Language code to apply.
-        virtual void onBeforeLanguageApply(const std::string& /*lang*/) {};
+        virtual void onBeforeLanguageApply(const std::string& lang) { (void)lang; }
     };
 
 } // namespace ImGuiX

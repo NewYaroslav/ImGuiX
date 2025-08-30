@@ -1,4 +1,6 @@
-// imgui_glsl_version.hpp
+/// \file imgui_glsl_version.hpp
+/// \brief Define GLSL version string based on platform.
+#pragma once
 #ifndef IMGUIX_GLSL_VERSION
 #  if defined(__EMSCRIPTEN__)
 #    define IMGUIX_GLSL_VERSION u8"#version 300 es"   // WebGL2

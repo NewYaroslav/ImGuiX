@@ -3,7 +3,7 @@
 #define _IMGUIX_CORE_TIME_DELTA_CLOCK_SFML_HPP_INCLUDED
 
 /// \file DeltaClockSfml.hpp
-/// \brief Lightweight wrapper around sf::Clock for delta timing.
+/// \brief Wrap sf::Clock for delta timing.
 /// \ingroup Core
 
 #include <SFML/System/Clock.hpp>
@@ -11,15 +11,15 @@
 
 namespace ImGuiX {
 
-    /// \brief SFML-specific delta time clock wrapper.
+    /// \brief Track frame delta time using sf::Clock.
     class DeltaClockSfml {
     public:
-        /// \brief Updates internal delta time by restarting the SFML clock.
+        /// \brief Restart SFML clock and store elapsed time.
         void update() {
             m_delta = m_clock.restart();
         }
 
-        /// \brief Get last delta time value.
+        /// \brief Return elapsed time since last update.
         /// \return Time since last update.
         const sf::Time& delta() const {
             return m_delta;
