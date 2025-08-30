@@ -1,8 +1,22 @@
 # ImGuiX
 
-An object-oriented wrapper around [Dear ImGui](https://github.com/ocornut/imgui) for building complex user interfaces with modular controllers, an event-driven architecture, and MVC-inspired principles.
+ImGuiX is an object-oriented framework built on top of [Dear ImGui](https://github.com/ocornut/imgui).  
+It provides a modular architecture for building **complex, multi-window UIs** with:
 
-> **Note:** ImGuiX uses an *MVC-like* architecture. See [Architecture](#architecture) for details.
+- **MVC-inspired design** — windows, controllers, and models are clearly separated.
+- **Event-driven communication** — components interact through an internal event bus.
+- **Extensibility** — themes, fonts, widgets, and controllers can be registered and reused.
+- **Cross-backend support** — SFML, GLFW, SDL2, and Web/Emscripten.
+
+Unlike raw ImGui, where UI is typically coded in a single function, ImGuiX introduces
+**controllers, lifecycle hooks, and a window manager**.  
+This makes it easier to organize large applications, reuse components, and test logic
+independently of rendering.
+
+> **Note:** ImGuiX keeps the immediate-mode philosophy of Dear ImGui,  
+> but structures it with OOP, an event bus, and an *MVC-like* architecture.  
+> See [Architecture](#architecture) for details.
+
 
 ## Table of Contents
 
@@ -135,13 +149,34 @@ The SDK can include a `quickstart/` folder with a minimal application example. C
 
 ## Architecture
 
-ImGuiX follows an Immediate Mode GUI approach reminiscent of **MVC**.
+ImGuiX combines the **Immediate Mode GUI paradigm** with classical design patterns:
 
-Unlike classic *MVC*, here the roles of *View* and *Controller* are combined: each controller handles both logic and widget rendering within a single frame. Models interact with controllers through an event bus (EventBus), providing loose coupling and flexible event routing.
+- **Immediate-Mode MVC**  
+  - *View* → `WindowInstance` (represents a window and its rendering context).  
+  - *Controller* → subclasses of `Controller` (combine per-frame rendering and logic).  
+  - *Model* → `OptionsStore`, user data, or external backends.  
 
-### System Map
+- **Event-driven communication**  
+  The built-in `EventBus` implements a **Publisher–Subscriber** pattern.  
+  Controllers and models exchange messages without direct dependencies.  
+  Helpers like `EventMediator` simplify subscriptions, while `EventAwaiter` supports
+  one-shot waits and timeouts.
 
-#### Components
+- **Lifecycle / Template Method**  
+  Windows and controllers expose hooks (`onInit`, `drawContent`, `drawUi`, …) that are
+  invoked by the application loop, giving a consistent structure for initialization,
+  per-frame logic, and cleanup.
+
+- **Factories**  
+  Controllers and models are created through factory methods.  
+  `WindowInstance` exposes `createController<T>()` which provides only a restricted
+  `WindowInterface&`, preserving invariants.
+
+- **Strategies / Extensibility**  
+  Themes, fonts, and widgets can be registered dynamically, following a Strategy-like
+  pattern for appearance and behavior.
+
+### System Overview
 
 ```mermaid
 graph TD
@@ -163,9 +198,9 @@ graph TD
     M-->EB
     C-->RR
     M-->RR
-```
+````
 
-#### Event Flow
+### Event Flow
 
 ```mermaid
 sequenceDiagram
