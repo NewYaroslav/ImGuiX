@@ -1,5 +1,7 @@
 # Theme Guide
 
+For the Russian version, see [THEMES-RU.md](THEMES-RU.md).
+
 This document lists the color themes bundled with ImGuiX and shows how to create and use your own themes.
 
 ## Available themes
