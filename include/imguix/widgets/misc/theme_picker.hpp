@@ -11,7 +11,7 @@
 #include <algorithm>
 
 #include <imguix/core/controller/Controller.hpp>
-#include <imguix/core/window/WindowInterface.hpp>
+#include <imguix/core/window/WindowInstance.hpp>
 #include <imguix/extensions/sizing.hpp> // ImGuiX::Extensions::CalcComboWidthForPreview
 #include <imguix/themes/theme_ids.hpp>
 
@@ -109,7 +109,7 @@ namespace ImGuiX::Widgets {
 
     /// \brief Apply stored theme to window if present in options.
     /// \param win Window to update.
-    inline void ApplyStoredTheme(WindowInterface* win) {
+    inline void ApplyStoredTheme(WindowInstance* win) {
         if (!win) return;
         const auto id = win->options().getStrOr(IMGUIX_THEME_STORAGE_KEY, "");
         if (!id.empty()) win->setTheme(id);
