@@ -90,14 +90,16 @@ graph LR
 
 ## 3. Architectural Patterns & Invariants
 
-* **MVC-like**: `Application` owns `WindowManager`, `Model` and `Controller` renderers
+* **Immediate-Mode MVC**: `Application` owns `WindowManager`, models and controllers.
 
-  * Controllers handle both logic and view per frame.
-* **Pub/Sub Event Bus**: `EventBus` with async queue and listener registry
+  * Controllers combine per-frame logic and rendering.
+* **Event-driven communication**: `EventBus` with async queue and listener registry
 
   * Invariant: `process()` must be called on the main thread before frame render.
+* **Lifecycle / Template Method**: windows and controllers expose hooks (`onInit`, `drawContent`, `drawUi`, …) executed by the application loop.
+* **Factories**: controllers and models are created via factory methods. `WindowInstance::createController<T>()` returns a restricted `WindowInterface&`.
+* **Strategies & Extensibility**: themes, fonts and widgets register dynamically. Controllers may use `StrategicController` (Strategy) and `ExtendedController` (Composite).
 * **Mediator**: `EventMediator` wraps subscriptions and notifications; all controllers/models inherit it.
-* **Strategy + Composite**: `StrategicController` selects strategy controllers; `ExtendedController` manages child controllers
 * **Resource Registry**: singleton-like registry providing thread-safe resource access
 
   * Invariant: only one instance per type; access during registration throws.
