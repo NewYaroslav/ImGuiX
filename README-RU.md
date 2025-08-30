@@ -147,6 +147,8 @@ SDK может включать папку `quickstart/` с минимальны
 
 ## Архитектура
 
+Подробное описание см. в [docs/ARCHITECTURE-RU.md](docs/ARCHITECTURE-RU.md) (англоязычная версия: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)).
+
 ImGuiX объединяет философию Immediate Mode GUI с классическими паттернами проектирования:
 
 - **Immediate-Mode MVC**
