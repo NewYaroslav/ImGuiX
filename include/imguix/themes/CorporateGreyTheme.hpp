@@ -18,9 +18,6 @@
 /// \date 2025
 
 #include <imguix/core/themes/Theme.hpp> // Theme base + applyDefaultImGuiStyle
-#ifdef IMGUI_ENABLE_IMPLOT3D
-#   include <implot3d.h>
-#endif
 
 namespace ImGuiX::Themes {
 

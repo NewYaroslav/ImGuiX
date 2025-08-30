@@ -12,9 +12,6 @@
 ///  - added matching ImPlot styling (light)
 
 #include <imguix/core/themes/Theme.hpp> // Theme + applyDefaultImGuiStyle
-#ifdef IMGUI_ENABLE_IMPLOT3D
-#   include <implot3d.h>
-#endif
 
 namespace ImGuiX::Themes {
 
