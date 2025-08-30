@@ -148,6 +148,8 @@ The SDK can include a `quickstart/` folder with a minimal application example. C
 
 ## Architecture
 
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for a full overview (Russian version: [docs/ARCHITECTURE-RU.md](docs/ARCHITECTURE-RU.md)).
+
 ImGuiX combines the **Immediate Mode GUI paradigm** with classical design patterns:
 
 - **Immediate-Mode MVC**  
