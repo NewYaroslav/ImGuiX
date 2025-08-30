@@ -25,3 +25,6 @@
 [submodule "libs/implot3d"]
 	path = libs/implot3d
 	url = https://github.com/brenocq/implot3d.git
+[submodule "libs/ImNodeFlow"]
+	path = libs/ImNodeFlow
+	url = https://github.com/Fattorino/ImNodeFlow.git

@@ -41,7 +41,7 @@ namespace ImGuiX::Themes {
         constexpr ImVec4 ResizeActive     = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
         constexpr ImVec4 Highlight        = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
         constexpr ImVec4 PlotLine         = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
-        constexpr ImVec4 TextDisabled     = ImVec4(0.40f, 0.40f, 0.40f, 1.00f);
+        constexpr ImVec4 TextDisabled     = ImVec4(0.62f, 0.62f, 0.62f, 1.00f);
         constexpr ImVec4 Separator        = ImVec4(0.000f, 0.000f, 0.000f, 0.137f);
     }
 
@@ -101,6 +101,7 @@ namespace ImGuiX::Themes {
             colors[ImGuiCol_NavWindowingDimBg]      = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
 
             applyDefaultImGuiStyle(style);
+            style.DisabledAlpha = 0.75f;
 
 #ifdef IMGUI_HAS_DOCKING
             colors[ImGuiCol_DockingEmptyBg]     = HeaderBase;
