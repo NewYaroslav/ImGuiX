@@ -43,6 +43,8 @@ namespace ImGuiX::Widgets {
             {IMGUIX_THEME_PEARL_LIGHT,    u8"Pearl Light"},
             {IMGUIX_THEME_SLATE_DARK,     u8"Slate Dark"},
             {IMGUIX_THEME_VS_DARK,        u8"Visual Studio Dark"},
+            {IMGUIX_THEME_Y2K,            u8"Y2K"},
+            {IMGUIX_THEME_CYBER_Y2K,      u8"Cyber-Y2K"},
         };
         return themes;
     }

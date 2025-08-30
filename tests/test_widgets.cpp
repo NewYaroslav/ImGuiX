@@ -45,6 +45,8 @@
 #include <imguix/themes/PearlLightTheme.hpp>
 #include <imguix/themes/SlateDarkTheme.hpp>
 #include <imguix/themes/VisualStudioDarkTheme.hpp>
+#include <imguix/themes/Y2KTheme.hpp>
+#include <imguix/themes/CyberY2KTheme.hpp>
 
 // === Графики ===
 #ifdef IMGUI_ENABLE_IMPLOT
@@ -810,6 +812,8 @@ public:
         ImGuiX::Themes::registerPearlLightTheme(tm);
         ImGuiX::Themes::registerSlateDarkTheme(tm);
         ImGuiX::Themes::registerVisualStudioDarkTheme(tm);
+        ImGuiX::Themes::registerY2KTheme(tm);
+        ImGuiX::Themes::registerCyberY2KTheme(tm);
         ImGuiX::Widgets::ApplyStoredTheme(this);
 
         // Шрифты (ручная сборка)

@@ -8,7 +8,7 @@
 #include <utility>
 #include <imgui_internal.h>
 
-#include <imguix/widgets/controls/icon_button.hpp>
+#include <imguix/widgets/controls/system_button.hpp>
 
 namespace ImGuiX::Notify {
 
@@ -109,7 +109,7 @@ namespace ImGuiX::Notify {
                 
                 const ImGuiStyle& style = ImGui::GetStyle();
 
-                const float btn_w = ImGui::GetFrameHeight();
+                const float btn_w = ImFloor(ImGui::GetFrameHeight() - 2.0f);
                 const float right_margin = (m_cfg.close_btn_right_margin >= 0.0f)
                          ? m_cfg.close_btn_right_margin
                          : style.FramePadding.x;
@@ -118,6 +118,14 @@ namespace ImGuiX::Notify {
                 const float cur_x = ImGui::GetCursorPosX();
 
                 ImGui::SetCursorPosX(cur_x + std::max(0.0f, avail - btn_w - right_margin));
+                if (ImGuiX::Widgets::CloseXButton("##close", btn_w)) {
+                    ImGui::PopTextWrapPos(); 
+                    if (m_fonts.text) ImGui::PopFont();
+                    ImGui::PopID();
+                    ImGui::End();
+                    remove(i); height += m_cfg.padding_message_y; --i; continue;
+                }
+                /*
                 ImGuiX::Widgets::IconButtonConfig ib;
                 if (m_fonts.icons) ib.font = m_fonts.icons;
                 if (ImGuiX::Widgets::IconButtonCentered("##close", m_icons.icon_close, ib)) {
@@ -127,6 +135,7 @@ namespace ImGuiX::Notify {
                     ImGui::End();
                     remove(i); height += m_cfg.padding_message_y; --i; continue;
                 }
+                */
             }
 
             if (title_rendered && toast.content() && toast.content()[0])

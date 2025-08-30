@@ -7,6 +7,10 @@
 
 #include <imgui.h>
 
+#ifndef IMGUIX_SYSBTN_BG_ROUNDING
+#define IMGUIX_SYSBTN_BG_ROUNDING 0.0f   // system look -> no rounding
+#endif
+
 /// \brief Extent multiplier for system button icons (default 0.25f).
 #ifndef IMGUIX_SYSBTN_CROSS_EXTENT
 #define IMGUIX_SYSBTN_CROSS_EXTENT 0.25f
@@ -43,6 +47,13 @@ namespace ImGuiX::Widgets {
     /// }
     /// \endcode
     bool SystemButton(const char* id, SystemButtonType type, ImVec2 size);
+    
+    /// Borderless close button like titlebar 'X'.
+    /// size <= 0 -> square with size = GetFrameHeight()
+    inline bool CloseXButton(const char* id, float size = 0.0f) {
+        if (size <= 0.0f) size = ImGui::GetFrameHeight();
+        return SystemButton(id, SystemButtonType::Close, ImVec2(size, size));
+    }
 
 } // namespace ImGuiX::Widgets
 

@@ -20,6 +20,7 @@
 #include <regex>
 
 #include <imguix/config/icons.hpp>
+#include <imguix/widgets/controls/icon_button.hpp>
 
 namespace ImGuiX::Widgets {
 

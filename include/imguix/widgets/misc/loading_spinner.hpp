@@ -21,6 +21,9 @@ namespace ImGuiX::Widgets {
         ImU32 color         = 0;         ///< 0 → use style's ImGuiCol_Text color
         float extra_top_padding = 0.0f;  ///< optional extra vertical padding on top, px
     };
+    
+    /// \brief
+    ImU32 DefaultSpinnerColor();
 
     /// \brief Draw an animated loading spinner.
     /// \param id Unique widget identifier.

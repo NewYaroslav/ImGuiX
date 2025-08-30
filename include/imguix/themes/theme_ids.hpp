@@ -21,6 +21,8 @@
 #define IMGUIX_THEME_PEARL_LIGHT    "pearl-light"
 #define IMGUIX_THEME_SLATE_DARK     "slate-dark"
 #define IMGUIX_THEME_VS_DARK        "vs-dark"
+#define IMGUIX_THEME_Y2K            "y2k"
+#define IMGUIX_THEME_CYBER_Y2K      "cyber-y2k"
 
 /// \brief Storage key used to persist theme selection.
 #define IMGUIX_THEME_STORAGE_KEY    "imguix.theme"

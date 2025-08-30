@@ -7,11 +7,13 @@ This document lists the color themes bundled with ImGuiX and shows how to create
 ## Available themes
 
 ### Built-in
+
 - **Classic** – ImGui classic colors with ImGuiX spacing and rounding tweaks.
 - **Light** – Bright palette suitable for light applications.
 - **Dark** – Dark palette similar to ImGui's default dark mode.
 
 ### Extra themes
+
 - **Corporate Grey** – Restrained grey palette for business interfaces.
 - **Dark Charcoal** – Dark charcoal tones with refined spacing.
 - **Dark Graphite** – Graphite-inspired dark scheme.
@@ -25,6 +27,8 @@ This document lists the color themes bundled with ImGuiX and shows how to create
 - **Pearl Light** – Soft light theme with blue highlights.
 - **Slate Dark** – Dense slate grey theme with blue accents.
 - **Visual Studio Dark** – Theme inspired by Visual Studio.
+- **Y2K** – Light chrome/silver surfaces with cobalt/purple accents and glassy panels (early-2000s tech vibe).
+- **Cyber-Y2K** – Dark tech base with neon cyan/magenta (plus violet, acid-green highlights); high-contrast with subtle glassy panels.
 
 ## Creating a custom theme
 
