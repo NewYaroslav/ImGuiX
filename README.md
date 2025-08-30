@@ -232,7 +232,6 @@ ImGuiX ships with built-in color themes and supports custom ones. Register and a
 auto& tm = themeManager();
 ImGuiX::Themes::registerCorporateGreyTheme(tm);
 tm.setTheme(IMGUIX_THEME_CORPORATE_GREY);
-tm.updateCurrentTheme();
 ```
 
 Widgets manage theme choice and persistence:
