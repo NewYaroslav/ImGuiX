@@ -37,6 +37,7 @@ namespace ImGuiX::Utils {
     
     /// \brief Format string using variable arguments.
     /// \param fmt printf-like format string.
+    /// \param ... Arguments to format.
     /// \return Formatted string.
     inline std::string vformat(const char* fmt, ...) {
         if (!fmt) return {};
