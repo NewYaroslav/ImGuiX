@@ -11,13 +11,15 @@ namespace ImGuiX::Widgets {
 
     /// \brief Configuration for IconButtonCentered.
     struct IconButtonConfig {
-        ImVec2  size{0, 0};           ///< (0,0) => square with height = GetFrameHeight()
-        float   rounding{-1.0f};      ///< Background rounding, -1 to use style
-        ImFont* font{nullptr};        ///< Font for text/icons; null uses current
-        ImVec2  text_offset{0, 0};    ///< Baseline adjustment for text
-        bool    draw_border{false};   ///< Draw border around button
-        ImU32   border_col{0};        ///< Border color, 0 => ImGuiCol_Border
+        ImVec2  size{0, 0};             ///< (0,0) => square with height = GetFrameHeight()
+        float   rounding{-1.0f};        ///< Background rounding, -1 to use style
+        ImFont* font{nullptr};          ///< Font for text/icons; null uses current
+        ImVec2  text_offset{0, 0};      ///< Baseline adjustment for text
+        bool    draw_border{false};     ///< Draw border around button
+        ImU32   border_col{0};          ///< Border color, 0 => ImGuiCol_Border
         float   border_thickness{1.0f}; ///< Border thickness in pixels
+		bool    appear_on_hover{false}; ///< No bg/border until hover/active/focus
+		bool    show_hover_border{true};///< Draw border only when visible
     };
 
     /// \brief Button with centered text or icon.

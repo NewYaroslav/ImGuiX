@@ -408,7 +408,6 @@ namespace ImGuiX::Widgets {
 
                 // Квадратная кнопка размером с высоту текущего фрейма
                 const float btn_w = ImGui::GetFrameHeight();
-                const float btn_h = btn_w;
 
                 // Позиция: правый верхний угол плота с паддингом
                 const ImVec2 btn_pos(plot_pos.x + plot_size.x - pad.x - btn_w,
@@ -423,8 +422,7 @@ namespace ImGuiX::Widgets {
                 ImGui::SetCursorScreenPos(btn_pos);
 
                 ImGuiX::Widgets::IconButtonConfig ibc;
-                ibc.size     = ImVec2(btn_w, btn_h);
-                //ibc.rounding = 6.0f;
+                ibc.appear_on_hover = true;
 
                 // Material Icons: "last_page" ▶|   (U+E5DD). Можно fast_forward: U+E01F
                 constexpr const char* ICON_LAST_PAGE = u8"\uE5DD";

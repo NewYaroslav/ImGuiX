@@ -64,14 +64,6 @@ namespace ImGuiX::Notify {
             ImGui::PushID(static_cast<int>(i));
             
             if (m_cfg.pause_on_hover) {
-                /*
-                const bool hovered = ImGui::IsWindowHovered(
-                    ImGuiHoveredFlags_AllowWhenDisabled | 
-                    ImGuiHoveredFlags_AllowWhenBlockedByPopup | 
-                    ImGuiHoveredFlags_AllowWhenBlockedByActiveItem | 
-                    ImGuiHoveredFlags_AllowWhenOverlapped
-                );
-                */
                 const ImVec2 p0 = ImGui::GetWindowPos();
                 const ImVec2 ws = ImGui::GetWindowSize();
                 const ImVec2 p1(p0.x + ws.x, p0.y + ws.y);
