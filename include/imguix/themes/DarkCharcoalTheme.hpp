@@ -12,6 +12,9 @@
 ///  - provide matching ImPlot styling
 
 #include <imguix/core/themes/Theme.hpp> // Theme + applyDefaultImGuiStyle
+#ifdef IMGUI_ENABLE_IMPLOT3D
+#   include <implot3d.h>
+#endif
 
 namespace ImGuiX::Themes {
 
@@ -211,6 +214,28 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlotCol_Crosshairs]    = ImVec4(1.000f, 0.391f, 0.000f, 1.00f);
 
             applyDefaultImPlotStyle(style);
+        }
+#endif
+#ifdef IMGUI_ENABLE_IMPLOT3D
+        void apply(ImPlot3DStyle& style) const override {
+            using namespace DarkCharcoalConstants;
+
+            ImPlot3D::StyleColorsDark(&style);
+
+            style.Colors[ImPlot3DCol_FrameBg]      = FrameBg;
+            style.Colors[ImPlot3DCol_PlotBg]       = WindowBg;
+            style.Colors[ImPlot3DCol_PlotBorder]   = Border;
+            style.Colors[ImPlot3DCol_LegendBg]     = PopupBg;
+            style.Colors[ImPlot3DCol_LegendBorder] = Border;
+            style.Colors[ImPlot3DCol_LegendText]   = Text;
+            style.Colors[ImPlot3DCol_TitleText]    = Text;
+            style.Colors[ImPlot3DCol_InlayText]    = Text;
+            style.Colors[ImPlot3DCol_AxisText]     = Text;
+
+            style.Colors[ImPlot3DCol_AxisGrid]     = ImVec4(0.35f, 0.35f, 0.35f, 0.55f);
+            style.Colors[ImPlot3DCol_AxisTick]     = ImVec4(0.60f, 0.60f, 0.60f, 0.80f);
+
+            applyDefaultImPlot3DStyle(style);
         }
 #endif
     };
