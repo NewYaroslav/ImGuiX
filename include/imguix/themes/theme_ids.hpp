@@ -15,6 +15,7 @@
 #define IMGUIX_THEME_DEEP_DARK      "deep-dark"
 #define IMGUIX_THEME_GOLD_BLACK     "gold-black"
 #define IMGUIX_THEME_GREEN_BLUE     "green-blue"
+#define IMGUIX_THEME_LIGHT_BLUE     "light-blue"
 #define IMGUIX_THEME_LIGHT_GREEN    "light-green"
 #define IMGUIX_THEME_OSX_LIGHT      "osx-light"
 #define IMGUIX_THEME_PEARL_LIGHT    "pearl-light"

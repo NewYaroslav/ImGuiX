@@ -39,6 +39,7 @@
 #include <imguix/themes/DeepDarkTheme.hpp>
 #include <imguix/themes/GoldBlackTheme.hpp>
 #include <imguix/themes/GreenBlueTheme.hpp>
+#include <imguix/themes/LightBlueTheme.hpp>
 #include <imguix/themes/LightGreenTheme.hpp>
 #include <imguix/themes/OSXTheme.hpp>
 #include <imguix/themes/PearlLightTheme.hpp>
@@ -770,6 +771,7 @@ public:
         ImGuiX::Themes::registerDeepDarkTheme(tm);
         ImGuiX::Themes::registerGoldBlackTheme(tm);
         ImGuiX::Themes::registerGreenBlueTheme(tm);
+        ImGuiX::Themes::registerLightBlueTheme(tm);
         ImGuiX::Themes::registerLightGreenTheme(tm);
         ImGuiX::Themes::registerOSXTheme(tm);
         ImGuiX::Themes::registerPearlLightTheme(tm);
