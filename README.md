@@ -28,6 +28,7 @@ independently of rendering.
 - [Architecture](#architecture)
 - [Web/Emscripten](#webemscripten)
 - [CMake Options (Summary)](#cmake-options-summary)
+- [Compile-Time Macros](#compile-time-macros)
 - [Themes](#themes)
 - [Fonts and Licensing](#fonts-and-licensing)
 - [License](#license)
@@ -148,6 +149,8 @@ The SDK can include a `quickstart/` folder with a minimal application example. C
 
 ## Architecture
 
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for a full overview (Russian version: [docs/ARCHITECTURE-RU.md](docs/ARCHITECTURE-RU.md)).
+
 ImGuiX combines the **Immediate Mode GUI paradigm** with classical design patterns:
 
 - **Immediate-Mode MVC**  
@@ -258,6 +261,16 @@ After building, open `http://localhost:8081/index.html` in your browser.
 * JSON: `IMGUIX_VENDOR_JSON` — place `nlohmann_json` headers in the SDK.
 * Dependency modes:
   `IMGUIX_DEPS_MODE= AUTO|SYSTEM|BUNDLED` plus per-package `IMGUIX_DEPS_*_MODE` (`fmt`, `SFML`, `ImGui`, `ImGui-SFML`, `freetype`, `json`).
+
+## Compile-Time Macros
+
+ImGuiX checks several macros to toggle optional integrations. They are defined automatically when corresponding CMake options are enabled.
+
+- `IMGUI_ENABLE_FREETYPE` — use FreeType for font rasterization (`IMGUIX_IMGUI_FREETYPE`).
+- `IMGUI_ENABLE_IMPLOT` — integrate [ImPlot](https://github.com/epezent/implot) (`IMGUIX_USE_IMPLOT`).
+- `IMGUI_ENABLE_IMPLOT3D` — integrate [ImPlot3D](https://github.com/jimgries/implot3d) (`IMGUIX_USE_IMPLOT3D`).
+
+See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for other configuration macros.
 
 ## Themes
 

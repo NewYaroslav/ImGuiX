@@ -1,5 +1,7 @@
 # Architecture
 
+For the Russian version, see [ARCHITECTURE-RU.md](ARCHITECTURE-RU.md).
+
 ImGuiX blends the **Immediate Mode GUI** approach of Dear ImGui with classic
 object-oriented patterns. The framework organizes a UI application into
 well-defined components and communication channels so large projects remain

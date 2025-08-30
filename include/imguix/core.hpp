@@ -32,6 +32,10 @@
 #include <implot.h>
 #endif
 
+#ifdef IMGUI_ENABLE_IMPLOT3D
+#include <implot3d.h>
+#endif
+
 #include <imgui.h>
 
 // --- Event and PubSub system ---

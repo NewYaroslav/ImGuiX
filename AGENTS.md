@@ -354,6 +354,7 @@ Format: `type(scope): short description` where the scope is optional. Keep messa
 
 | Path                     | Role                                                   |
 | ------------------------ | ------------------------------------------------------ |
+| `docs/ARCHITECTURE.md`   | System architecture overview (Russian: `docs/ARCHITECTURE-RU.md`) |
 | `docs/FONTS-GUIDE.md` | FontManager usage; preset tokens including `MiscSymbols`, `Dingbats`, `Arrows`, `PUA` |
 | `docs/THEMES.md`        | Theme guide for built-in styles and creating custom themes |
 
