@@ -37,10 +37,10 @@ option(IMGUIX_SDK_FLATTEN_MISC_HEADERS
 
 # SDK
 # Install SDK extras (quickstart, templates, assets)
-option(IMGUIX_SDK_INSTALL      "Устанавливать SDK-«добавки» (quickstart, шаблоны, ассеты)" ON)
+option(IMGUIX_SDK_INSTALL      "Install SDK extras (quickstart, templates, assets)" ON)
 option(IMGUIX_SDK_BUNDLE_DEPS  "Install 3rd-party deps into SDK stage" ON)
 # Place quickstart template into SDK
-option(IMGUIX_SDK_INSTALL_QUICKSTART "Класть quickstart-шаблон в SDK" ON)
+option(IMGUIX_SDK_INSTALL_QUICKSTART "Install quickstart template into SDK" ON)
 
 # ===== Deps mode =====
 set(IMGUIX_DEPS_MODE "AUTO" CACHE STRING "AUTO|SYSTEM|BUNDLED")
