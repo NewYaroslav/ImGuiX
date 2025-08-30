@@ -7,6 +7,43 @@ object-oriented patterns. The framework organizes a UI application into
 well-defined components and communication channels so large projects remain
 maintainable.
 
+## Directory Layout
+
+```
+.
+├── include/
+│   └── imguix/
+│       ├── config/
+│       ├── controllers/
+│       │   ├── ApplicationController.hpp
+│       │   ├── ExtendedController.hpp
+│       │   └── StrategicController.hpp
+│       ├── core/
+│       │   ├── application/
+│       │   ├── controller/
+│       │   ├── events/
+│       │   ├── fonts/
+│       │   ├── i18n/
+│       │   ├── model/
+│       │   ├── notify/
+│       │   ├── options/
+│       │   ├── pubsub/
+│       │   ├── resource/
+│       │   ├── themes/
+│       │   └── window/
+│       ├── extensions/
+│       ├── themes/
+│       ├── utils/
+│       ├── widgets/
+│       └── windows/
+├── docs/
+├── examples/
+│   └── quickstart/
+├── libs/
+├── src/
+└── tests/
+```
+
 ## Core Components
 - **Application** – owns global services and the main loop.
 - **WindowManager** – creates and tracks windows.
