@@ -386,9 +386,9 @@ namespace ImGuiX::Pubsub {
         void handleCachedEvent(const EventType& e) {
             std::lock_guard<std::mutex> lk(m_cache_mutex);
             for (auto& [id, slot] : m_cached_events) {
-                if (slot.type != std::type_index(typeid(EventType))) continue;
-                if (slot.predicate(&e)) {
-                    slot.event = std::make_unique<EventType>(e);
+                if (slot->type != std::type_index(typeid(EventType))) continue;
+                if (slot->predicate(&e)) {
+                    slot->event = std::make_unique<EventType>(e);
                 }
             }
         }
