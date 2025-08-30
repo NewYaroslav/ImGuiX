@@ -19,11 +19,15 @@ namespace ImGuiX::Windows {
         SDL_GL_MakeCurrent(m_window, m_gl_context);
 
         IMGUI_CHECKVERSION();
-        if (!ImGui::GetCurrentContext()) { 
+        if (!ImGui::GetCurrentContext()) {
             ImGui::CreateContext();
 #           ifdef IMGUI_ENABLE_IMPLOT
             m_implot_ctx = ImPlot::CreateContext();
             ImPlot::SetCurrentContext(m_implot_ctx);
+#           endif
+#           ifdef IMGUI_ENABLE_IMPLOT3D
+            m_implot3d_ctx = ImPlot3D::CreateContext();
+            ImPlot3D::SetCurrentContext(m_implot3d_ctx);
 #           endif
         }
 
@@ -51,6 +55,9 @@ namespace ImGuiX::Windows {
     void ImGuiFramedWindow::drawUi() {
 #       ifdef IMGUI_ENABLE_IMPLOT
         ImPlot::SetCurrentContext(m_implot_ctx);
+#       endif
+#       ifdef IMGUI_ENABLE_IMPLOT3D
+        ImPlot3D::SetCurrentContext(m_implot3d_ctx);
 #       endif
         ImGui::PushID(id());
 
