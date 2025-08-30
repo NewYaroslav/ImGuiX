@@ -266,6 +266,21 @@ if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Days", preview.c_str(),
 3. Add backend-specific build scripts and tests.
 4. Run contract tests to ensure window controls (size, visibility, active state) work.
 
+### Build and test on Linux (GCC)
+
+1. `git submodule update --init --recursive` to fetch bundled deps.
+2. `sudo apt-get install -y build-essential cmake ninja-build pkg-config git \
+      libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev \
+      libgl1-mesa-dev mesa-common-dev \
+      libasound2-dev libflac-dev libvorbis-dev libogg-dev libsndfile1-dev libopenal-dev \
+      libfreetype-dev libudev-dev libdrm-dev`.
+3. `cmake -S . -B build -G "Ninja" \
+      -DIMGUIX_DEPS_MODE=BUNDLED -DIMGUIX_VENDOR_JSON=ON \
+      -DIMGUIX_BUILD_TESTS=ON -DBUILD_SHARED_LIBS=OFF -DIMGUIX_BUILD_SHARED=OFF \
+      -DIMGUIX_IMGUI_FREETYPE=ON`.
+4. `cmake --build build`.
+5. `ctest --test-dir build`.
+
 ### PR & ADR templates
 
 * **PR**: "feat(scope): summary" + motivation, test output.
