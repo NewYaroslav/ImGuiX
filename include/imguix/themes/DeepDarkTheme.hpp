@@ -207,6 +207,7 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlotCol_PlotBorder]    = Border;
             style.Colors[ImPlotCol_LegendBg]      = PopupBg;
             style.Colors[ImPlotCol_LegendBorder]  = Border;
+            style.Colors[ImPlotCol_LegendText]    = Text;
 
             style.Colors[ImPlotCol_TitleText]     = Text;
             style.Colors[ImPlotCol_InlayText]     = Text;
@@ -219,6 +220,8 @@ namespace ImGuiX::Themes {
             // Selection/crosshair use the red accent to match plot colors
             style.Colors[ImPlotCol_Selection]     = ImVec4(1.00f, 0.00f, 0.00f, 0.55f);
             style.Colors[ImPlotCol_Crosshairs]    = ImVec4(1.00f, 0.00f, 0.00f, 1.00f);
+
+            applyDefaultImPlotStyle(style);
         }
 #endif
     };

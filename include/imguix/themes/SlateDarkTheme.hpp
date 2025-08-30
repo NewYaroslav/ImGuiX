@@ -165,6 +165,7 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlotCol_PlotBorder]   = Border;
             style.Colors[ImPlotCol_LegendBg]     = PopupBg;
             style.Colors[ImPlotCol_LegendBorder] = Border;
+            style.Colors[ImPlotCol_LegendText]   = Text;
             style.Colors[ImPlotCol_TitleText]    = Text;
             style.Colors[ImPlotCol_InlayText]    = Text;
             style.Colors[ImPlotCol_AxisText]     = Text;
@@ -172,6 +173,8 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlotCol_AxisTick]     = ImVec4(0.55f, 0.55f, 0.55f, 0.80f);
             style.Colors[ImPlotCol_Selection]    = AccentBase;
             style.Colors[ImPlotCol_Crosshairs]   = AccentBase;
+
+            applyDefaultImPlotStyle(style);
         }
 #endif
     };

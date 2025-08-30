@@ -175,6 +175,7 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlotCol_PlotBorder]    = Border;
             style.Colors[ImPlotCol_LegendBg]      = PopupBg;
             style.Colors[ImPlotCol_LegendBorder]  = Border;
+            style.Colors[ImPlotCol_LegendText]    = Text;
 
             style.Colors[ImPlotCol_TitleText]     = Text;
             style.Colors[ImPlotCol_InlayText]     = Text;
@@ -187,6 +188,8 @@ namespace ImGuiX::Themes {
             // Use the blue accent for selection/crosshairs to contrast green elements
             style.Colors[ImPlotCol_Selection]     = ImVec4(0.26f, 0.59f, 0.98f, 0.55f);
             style.Colors[ImPlotCol_Crosshairs]    = Blue;
+
+            applyDefaultImPlotStyle(style);
         }
 #endif
     };

@@ -192,6 +192,7 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlotCol_PlotBorder]    = GoldBorder;
             style.Colors[ImPlotCol_LegendBg]      = PopupBg;
             style.Colors[ImPlotCol_LegendBorder]  = GoldBorder;
+            style.Colors[ImPlotCol_LegendText]    = Text;
 
             style.Colors[ImPlotCol_TitleText]     = Text;
             style.Colors[ImPlotCol_InlayText]     = Text;
@@ -204,6 +205,8 @@ namespace ImGuiX::Themes {
             // Selection/crosshair in golden accent
             style.Colors[ImPlotCol_Selection]     = ImVec4(GoldBright.x, GoldBright.y, GoldBright.z, 0.65f);
             style.Colors[ImPlotCol_Crosshairs]    = GoldBright;
+
+            applyDefaultImPlotStyle(style);
         }
 #endif
     };

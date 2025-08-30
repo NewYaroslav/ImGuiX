@@ -174,6 +174,7 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlotCol_PlotBorder]    = Border;
             style.Colors[ImPlotCol_LegendBg]      = Panel;
             style.Colors[ImPlotCol_LegendBorder]  = Border;
+            style.Colors[ImPlotCol_LegendText]    = Text;
 
             style.Colors[ImPlotCol_TitleText]     = Text;
             style.Colors[ImPlotCol_InlayText]     = Text;
@@ -185,6 +186,8 @@ namespace ImGuiX::Themes {
 
             style.Colors[ImPlotCol_Selection]     = ImVec4(PanelActive.x, PanelActive.y, PanelActive.z, 0.65f);
             style.Colors[ImPlotCol_Crosshairs]    = PanelActive;
+
+            applyDefaultImPlotStyle(style);
         }
 #endif
     };

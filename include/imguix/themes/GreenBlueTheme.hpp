@@ -208,6 +208,7 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlotCol_PlotBorder]    = Border;
             style.Colors[ImPlotCol_LegendBg]      = PopupBg;
             style.Colors[ImPlotCol_LegendBorder]  = Border;
+            style.Colors[ImPlotCol_LegendText]    = Text;
 
             style.Colors[ImPlotCol_TitleText]     = Text;
             style.Colors[ImPlotCol_InlayText]     = Text;
@@ -220,6 +221,8 @@ namespace ImGuiX::Themes {
             // Match selection/crosshair to green-blue accents
             style.Colors[ImPlotCol_Selection]     = ImVec4(0.13f, 0.75f, 1.00f, 0.65f); // cyan, semi-opaque
             style.Colors[ImPlotCol_Crosshairs]    = ImVec4(0.13f, 0.75f, 0.75f, 1.00f); // teal
+
+            applyDefaultImPlotStyle(style);
         }
 #endif
     };
