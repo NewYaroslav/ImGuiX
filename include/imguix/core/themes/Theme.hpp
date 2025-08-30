@@ -55,6 +55,28 @@ namespace ImGuiX::Themes {
         style.PopupBorderSize   = POPUP_BORDER_SIZE;
         style.GrabRounding      = GRAB_ROUNDING;
     }
+
+#   ifdef IMGUI_ENABLE_IMPLOT
+    /// \brief Set baseline ImPlot style parameters.
+    /// \param style Style to modify.
+    /// \details Used by all themes before applying color scheme.
+    inline void applyDefaultImPlotStyle(ImPlotStyle& style) {
+        using namespace ImGuiX::Config;
+
+        style.UseISO8601     = true;
+        style.Use24HourClock = true;
+
+        style.PlotBorderSize = FRAME_BORDER_SIZE;
+        style.PlotPadding    = WINDOW_PADDING;
+        style.LabelPadding   = ITEM_SPACING;
+
+        style.LegendPadding        = WINDOW_PADDING;
+        style.LegendInnerPadding   = WINDOW_PADDING;
+        style.LegendSpacing        = ITEM_SPACING;
+        style.MousePosPadding      = WINDOW_PADDING;
+        style.AnnotationPadding    = ITEM_SPACING;
+    }
+#   endif
     
     /// \brief Classic ImGui theme.
     class ClassicTheme final : public Theme {
@@ -69,6 +91,7 @@ namespace ImGuiX::Themes {
         /// \copydoc Theme::apply
         void apply(ImPlotStyle& style) const override {
             ImPlot::StyleColorsClassic(&style);
+            applyDefaultImPlotStyle(style);
         }
 #       endif
     };
@@ -86,6 +109,7 @@ namespace ImGuiX::Themes {
         /// \copydoc Theme::apply
         void apply(ImPlotStyle& style) const override {
             ImPlot::StyleColorsLight(&style);
+            applyDefaultImPlotStyle(style);
         }
 #       endif
     };
@@ -104,6 +128,7 @@ namespace ImGuiX::Themes {
         /// \copydoc Theme::apply
         void apply(ImPlotStyle& style) const override {
             ImPlot::StyleColorsDark(&style);
+            applyDefaultImPlotStyle(style);
         }
 #       endif
     };

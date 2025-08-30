@@ -197,6 +197,7 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlotCol_PlotBorder]    = Border;
             style.Colors[ImPlotCol_LegendBg]      = PopupBg;
             style.Colors[ImPlotCol_LegendBorder]  = Border;
+            style.Colors[ImPlotCol_LegendText]    = Text;
             style.Colors[ImPlotCol_TitleText]     = Text;
             style.Colors[ImPlotCol_InlayText]     = Text;
             style.Colors[ImPlotCol_AxisText]      = Text;
@@ -208,6 +209,8 @@ namespace ImGuiX::Themes {
             // Selection/crosshair in signature orange
             style.Colors[ImPlotCol_Selection]     = ImVec4(1.000f, 0.391f, 0.000f, 0.65f);
             style.Colors[ImPlotCol_Crosshairs]    = ImVec4(1.000f, 0.391f, 0.000f, 1.00f);
+
+            applyDefaultImPlotStyle(style);
         }
 #endif
     };

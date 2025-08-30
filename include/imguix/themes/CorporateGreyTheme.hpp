@@ -127,6 +127,7 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlotCol_PlotBorder]    = ImVec4(0.15f, 0.15f, 0.15f, 1.0f);
             style.Colors[ImPlotCol_LegendBg]      = DarkGrey25;
             style.Colors[ImPlotCol_LegendBorder]  = ImVec4(0.12f, 0.12f, 0.12f, 0.71f);
+            style.Colors[ImPlotCol_LegendText]    = White;
             style.Colors[ImPlotCol_TitleText]     = White;
             style.Colors[ImPlotCol_InlayText]     = White;
             style.Colors[ImPlotCol_AxisText]      = White;
@@ -134,6 +135,8 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlotCol_AxisTick]      = ImVec4(0.45f, 0.45f, 0.45f, 0.70f);
             style.Colors[ImPlotCol_Selection]     = Highlight;
             style.Colors[ImPlotCol_Crosshairs]    = Highlight;
+
+            applyDefaultImPlotStyle(style);
         }
 #endif
     };

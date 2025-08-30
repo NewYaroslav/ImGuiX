@@ -175,6 +175,7 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlotCol_PlotBorder]    = Border;
             style.Colors[ImPlotCol_LegendBg]      = PopupBg;
             style.Colors[ImPlotCol_LegendBorder]  = Border;
+            style.Colors[ImPlotCol_LegendText]    = Text;
 
             style.Colors[ImPlotCol_TitleText]     = Text;
             style.Colors[ImPlotCol_InlayText]     = Text;
@@ -187,6 +188,8 @@ namespace ImGuiX::Themes {
             // Blue selection/crosshair to match controls
             style.Colors[ImPlotCol_Selection]     = ImVec4(Blue.x, Blue.y, Blue.z, 0.55f);
             style.Colors[ImPlotCol_Crosshairs]    = Blue;
+
+            applyDefaultImPlotStyle(style);
         }
 #endif
     };
