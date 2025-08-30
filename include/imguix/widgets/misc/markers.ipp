@@ -54,7 +54,7 @@ void HelpMarker(
         const char* desc,
         MarkerMode mode,
         const char* icon_utf8) {
-    ImGui::TextDisabled(icon_utf8);
+    ImGui::TextDisabled("%s", icon_utf8);
     if (mode == MarkerMode::InlineText) {
         ImGui::SameLine();
         ImGui::TextWrapped("%s", desc);
