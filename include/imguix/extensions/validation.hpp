@@ -12,7 +12,8 @@ namespace ImGuiX::Extensions {
 
     /// \brief Safe regex match. Returns true if matches or if regex is invalid (fail-open).
     /// \param s       Input string to validate.
-    /// \param pattern Regex pattern (std::string). If empty or invalid, returns true.
+    /// \param pattern Regex pattern. If empty or invalid, returns true.
+    /// \return True if pattern matches or validation is skipped.
     inline bool RegexMatchSafe(const std::string& s, const std::string& pattern);
 
     /// \brief Begin invalid styling if condition is true.
