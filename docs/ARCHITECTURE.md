@@ -15,9 +15,6 @@ maintainable.
 │   └── imguix/
 │       ├── config/
 │       ├── controllers/
-│       │   ├── ApplicationController.hpp
-│       │   ├── ExtendedController.hpp
-│       │   └── StrategicController.hpp
 │       ├── core/
 │       │   ├── application/
 │       │   ├── controller/
