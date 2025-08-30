@@ -125,12 +125,45 @@ public:
     void drawUi() override {
         ImGui::PushID(window().id());
         ImGui::PushFont(nullptr, 18.0f); // Размер шрифта (обёртка ImGuiX)
+        static bool show_imgui_demo = false;
+#       ifdef IMGUI_ENABLE_IMPLOT
+        static bool show_implot_demo = false;
+#       endif
+#       ifdef IMGUI_ENABLE_IMPLOT3D
+        static bool show_implot3d_demo = false;
+#       endif
+        if (ImGui::BeginMainMenuBar()) {
+            if (ImGui::BeginMenu("Demo")) {
+                if (ImGui::MenuItem("ImGui", nullptr, false, !show_imgui_demo)) {
+                    show_imgui_demo = true;
+                }
+#               ifdef IMGUI_ENABLE_IMPLOT
+                if (ImGui::MenuItem("ImPlot", nullptr, false, !show_implot_demo)) {
+                    show_implot_demo = true;
+                }
+#               endif
+#               ifdef IMGUI_ENABLE_IMPLOT3D
+                if (ImGui::MenuItem("ImPlot3D", nullptr, false, !show_implot3d_demo)) {
+                    show_implot3d_demo = true;
+                }
+#               endif
+                ImGui::EndMenu();
+            }
+            ImGui::EndMainMenuBar();
+        }
         ImGui::Begin("Widgets Demo");
 
         ImGui::Separator();
         drawWidgetsDemo();
 
         ImGui::End();
+        if (show_imgui_demo) ImGui::ShowDemoWindow(&show_imgui_demo);
+#       ifdef IMGUI_ENABLE_IMPLOT
+        if (show_implot_demo) ImPlot::ShowDemoWindow(&show_implot_demo);
+#       endif
+#       ifdef IMGUI_ENABLE_IMPLOT3D
+        if (show_implot3d_demo) ImPlot3D::ShowDemoWindow(&show_implot3d_demo);
+#       endif
         ImGui::PopFont();
         ImGui::PopID();
     }
