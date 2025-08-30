@@ -17,6 +17,7 @@ This document lists the color themes bundled with ImGuiX and shows how to create
 - **Deep Dark** – Nearly black theme for high-contrast setups.
 - **Gold & Black** – Black background with gold accents.
 - **Green & Blue** – Dark background with green/blue accents.
+- **Light Blue** – Light background with subtle blue accents.
 - **Light Green** – Light background with subtle green accents.
 - **OSX Light** – macOS-like light appearance.
 - **Pearl Light** – Soft light theme with blue highlights.

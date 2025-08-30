@@ -37,6 +37,7 @@ namespace ImGuiX::Widgets {
             {IMGUIX_THEME_DEEP_DARK,      u8"Deep Dark"},
             {IMGUIX_THEME_GOLD_BLACK,     u8"Gold Black"},
             {IMGUIX_THEME_GREEN_BLUE,     u8"Green Blue"},
+            {IMGUIX_THEME_LIGHT_BLUE,     u8"Light Blue"},
             {IMGUIX_THEME_LIGHT_GREEN,    u8"Light Green"},
             {IMGUIX_THEME_OSX_LIGHT,      u8"OSX Light"},
             {IMGUIX_THEME_PEARL_LIGHT,    u8"Pearl Light"},
