@@ -125,6 +125,7 @@ namespace ImGuiX::Windows {
 
         ImGui::End();
         ImGui::PopID();
+        notifications().render();
     }
 
 } // namespace ImGuiX::Windows

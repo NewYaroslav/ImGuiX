@@ -24,6 +24,7 @@ namespace ImGuiX {
         for (auto& ctrl : m_controllers) {
             ctrl->drawUi();
         }
+        notifications().render();
     }
 
     template <typename ControllerType, typename... Args>
@@ -99,6 +100,22 @@ namespace ImGuiX {
 
     const ImGuiX::I18N::LangStore& WindowInstance::langStore() const {
         return m_lang_store;
+    }
+    
+    ImGuiX::Fonts::FontManager::View& WindowInstance::fontsView() noexcept { 
+        return m_font_manager.view(); 
+    }
+
+    ImGuiX::Fonts::FontManager::Control& WindowInstance::fontsControl() noexcept { 
+        return m_font_manager.control(); 
+    }
+
+    ImGuiX::Themes::ThemeManager& WindowInstance::themeManager() noexcept { 
+        return m_theme_manager; 
+    }
+    
+    ImGuiX::Notify::NotificationManager& WindowInstance::notifications() {
+        return m_notification_manager;
     }
 
     std::string WindowInstance::iniPath() const {

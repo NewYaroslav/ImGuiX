@@ -19,7 +19,6 @@
 #include <algorithm>
 #include <regex>
 
-#include <imguix/widgets/controls/icon_button.hpp>
 #include <imguix/config/icons.hpp>
 
 namespace ImGuiX::Widgets {

@@ -22,6 +22,9 @@
 #include <imguix/widgets/time/hours_selector.hpp>
 #include <imguix/widgets/time/days_selector.hpp>
 
+// === Уведомления ===
+#include <imguix/widgets/notify/notifications.hpp>
+
 // === Дополнительно: прокси, спиннер, маркеры ===
 #include <imguix/widgets/auth/proxy_panel.hpp>
 #include <imguix/widgets/misc/loading_spinner.hpp>
@@ -561,22 +564,118 @@ private:
             ImGuiX::Widgets::ListEditor("list.numbers", "Numbers", m_state.numbers);
         }
         
+        // --- Notifications ---
+        if (ImGui::CollapsingHeader("Notifications", ImGuiTreeNodeFlags_DefaultOpen)) {
+            // Примеры без заголовка (аналог оригинала)
+            if (ImGui::Button("Success")) {
+                ImGuiX::Widgets::NotifyFmt(
+                    this, ImGuiX::Notify::Type::Success, 0,
+                    u8"That is a success! {}", "(Format here)"
+                );
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Warning")) {
+                ImGuiX::Widgets::NotifyFmt(
+                    this, ImGuiX::Notify::Type::Warning, 0,
+                    u8"This is a warning!"
+                );
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Error")) {
+                ImGuiX::Widgets::NotifyFmt(
+                    this, ImGuiX::Notify::Type::Error, 0,
+                    u8"Segmentation fault"
+                );
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Info")) {
+                ImGuiX::Widgets::NotifyFmt(
+                    this, ImGuiX::Notify::Type::Info, 0,
+                    u8"Info about ImGui..."
+                );
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Info long")) {
+                ImGuiX::Widgets::NotifyFmt(
+                    this, ImGuiX::Notify::Type::Info, 0,
+                    u8"Hi, I'm a long notification. I'm here to show you that you can write a lot of text in me. "
+                    u8"I'm also here to show you that I can wrap text, so you don't have to worry about that."
+                );
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Notify with button")) {
+                ImGuiX::Widgets::NotifyWithButtonFmt(
+                    this,
+                    ImGuiX::Notify::Type::Error,
+                    0,
+                    u8"Click me!",
+                    // on_click: постим «успех»
+                    [this]() {
+                        ImGuiX::Widgets::NotifyFmt(
+                            this, ImGuiX::Notify::Type::Success, 0,
+                            u8"Thanks for clicking!"
+                        );
+                    },
+                    // title, content
+                    u8"Notification", "Content with action"
+                );
+            }
+
+            ImGui::Separator();
+            ImGui::TextDisabled(u8"Do it yourself:");
+
+            // Поля ввода, как в оригинале
+            static char title_buf[4096]   = u8"Hello there!";
+            static char content_buf[4096] = u8"General Kenobi! \n- Grievous";
+            ImGui::InputTextMultiline(u8"Title",   title_buf,   IM_ARRAYSIZE(title_buf));
+            ImGui::InputTextMultiline(u8"Content", content_buf, IM_ARRAYSIZE(content_buf));
+
+            static int duration_ms = 5000;
+            ImGui::InputInt(u8"Duration (ms)", &duration_ms, 100);
+            if (duration_ms < 0) duration_ms = 0;
+
+            static const char* type_str[] = { u8"None", u8"Success", u8"Warning", u8"Error", u8"Info" };
+            static ImGuiX::Notify::Type type = ImGuiX::Notify::Type::Success;
+            if (ImGui::BeginCombo(u8"Type", type_str[static_cast<int>(type)])) {
+                for (int n = 0; n < IM_ARRAYSIZE(type_str); ++n) {
+                    const bool selected = (static_cast<int>(type) == n);
+                    if (ImGui::Selectable(type_str[n], selected)) {
+                        type = static_cast<ImGuiX::Notify::Type>(n);
+                    }
+                    if (selected) ImGui::SetItemDefaultFocus();
+                }
+                ImGui::EndCombo();
+            }
+
+            static bool enable_title = true, enable_content = true;
+            ImGui::Checkbox(u8"Enable title", &enable_title);
+            ImGui::SameLine();
+            ImGui::Checkbox(u8"Enable content", &enable_content);
+
+            if (ImGui::Button(u8"Show")) {
+                ImGuiX::Notify::Notification toast(type, duration_ms);
+                if (enable_title)   toast.setTitle("%s", title_buf);
+                if (enable_content) toast.setContent("%s", content_buf);
+                ImGuiX::Widgets::InsertNotification(this, std::move(toast));
+            }
+        }
+
 #       ifdef IMGUI_ENABLE_IMPLOT
         // --- OHLC Bars / Plot ---
-        if (ImGui::CollapsingHeader("OHLC Bars / Plot")) {
+        if (ImGui::CollapsingHeader(u8"OHLC Bars / Plot")) {
             // ТФы: M1, M30, H1
             static const int TFs[] = {60, 30*60, 60*60};
             static const char* TF_NAMES[] = {"M1", "M30", "H1"};
 
             // Инициализация данных (разово)
-			/*
+            /*
             if (m_state.bars_m1.empty()) {
                 const std::uint64_t start_time = 1700000000ULL;
                 GenerateBars(m_state.bars_m1,  m_state.bars_count, TFs[0], start_time, m_state.start_price, m_state.rng_seed);
                 GenerateBars(m_state.bars_m30, m_state.bars_count, TFs[1], start_time, m_state.start_price, m_state.rng_seed + 1);
                 GenerateBars(m_state.bars_h1,  m_state.bars_count, TFs[2], start_time, m_state.start_price, m_state.rng_seed + 2);
             }
-			*/
+            */
 
             // Панель управления
             ImGui::PushItemWidth(160);

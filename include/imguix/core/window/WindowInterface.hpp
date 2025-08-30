@@ -126,7 +126,10 @@ namespace ImGuiX {
         /// \brief Access the theme manager.
         /// \return Theme manager.
         virtual ImGuiX::Themes::ThemeManager& themeManager() = 0;
-
+        
+        /// \brief Access the notification manager.
+        /// \return Notification manager instance.
+        virtual ImGuiX::Notify::NotificationManager &notifications() = 0;
     };
 
 } // namespace ImGuiX

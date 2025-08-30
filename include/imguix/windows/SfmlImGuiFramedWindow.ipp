@@ -128,6 +128,7 @@ namespace ImGuiX::Windows {
         ImGui::End();
         
         ImGui::PopID();
+        notifications().render();
     }
 
 #   ifdef _WIN32

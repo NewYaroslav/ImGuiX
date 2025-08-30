@@ -51,6 +51,9 @@
 // --- Theme system ---
 #include "core/themes/ThemeManager.hpp"            ///< Theme manager for ImGui styles
 
+// --- Notification system ---
+#include "core/notify/NotificationManager.hpp"     ///< Toast notification manager
+
 // --- Controller and model interfaces ---
 #include "core/application/ApplicationContext.hpp" ///< Interface for application access
 #include "core/window/WindowInterface.hpp"         ///< Interface for window control

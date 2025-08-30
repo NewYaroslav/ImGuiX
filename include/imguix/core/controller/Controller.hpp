@@ -61,6 +61,12 @@ namespace ImGuiX {
             return m_window;
         }
         
+        /// \brief Access the notification manager.
+        /// \return Notification manager instance.
+        ImGuiX::Notify::NotificationManager &notifications() {
+            return m_window.notifications();
+        }
+        
         /// \brief Get language store.
         /// \return Language store.
         const ImGuiX::I18N::LangStore& langStore() const {
@@ -75,7 +81,9 @@ namespace ImGuiX {
         
         /// \brief Set active theme identifier.
         /// \param id Identifier of registered theme.
-        void setTheme(std::string id) { themeManager().setTheme(std::move(id)); }
+        void setTheme(std::string id) { 
+            themeManager().setTheme(std::move(id)); 
+        }
 
     protected:
         WindowInterface& m_window; ///< Controlled window instance.

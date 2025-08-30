@@ -191,17 +191,43 @@ namespace ImGuiX {
         
         /// \brief Read-only view of the font manager.
         /// \return Font manager view.
-        ImGuiX::Fonts::FontManager::View& fontsView() noexcept { return m_font_manager.view(); }
+        ImGuiX::Fonts::FontManager::View& fontsView() noexcept;
 
         /// \brief Control interface for the font manager.
         /// \return Font manager control interface.
-        ImGuiX::Fonts::FontManager::Control& fontsControl() noexcept { return m_font_manager.control(); }
+        ImGuiX::Fonts::FontManager::Control& fontsControl() noexcept;
+        
+        /// \brief Request window to switch its UI language.
+        /// \param lang Language code.
+        void requestLanguageChange(const std::string& lang);
+        
+        /// \brief Apply pending language change.
+        /// \note Internal use.
+        void applyPendingLanguageChange();
+        
+        /// \brief Start font initialization.
+        /// \note Internal use.
+        void fontsStartInit();
+
+        /// \brief Build fonts atlas.
+        /// \note Internal use.
+        void buildFonts();
+
+        // --- Themes ---
 
         /// \brief Access the theme manager.
         /// \return Theme manager.
-        ImGuiX::Themes::ThemeManager& themeManager() noexcept override { return m_theme_manager; }
+        ImGuiX::Themes::ThemeManager& themeManager() noexcept override;
+        
+        void updateCurrentTheme() { themeManager().updateCurrentTheme(); }
 
-        // ---
+        // --- Notification ---
+        
+        /// \brief Access the notification manager.
+        /// \return Notification manager instance.
+        ImGuiX::Notify::NotificationManager &notifications() override;
+
+        // --- ImGui ini ---
 
         /// \brief Compute file path for storing ImGui ini settings.
         /// \return Absolute path to ini file.
@@ -219,24 +245,6 @@ namespace ImGuiX {
         /// \brief Save ImGui ini settings to disk.
         /// \note Internal use.
         void saveIniNow();
-        
-        void updateCurrentTheme() { themeManager().updateCurrentTheme(); }
-        
-        /// \brief Request window to switch its UI language.
-        /// \param lang Language code.
-        void requestLanguageChange(const std::string& lang);
-        
-        /// \brief Apply pending language change.
-        /// \note Internal use.
-        void applyPendingLanguageChange();
-        
-        /// \brief Start font initialization.
-        /// \note Internal use.
-        void fontsStartInit();
-
-        /// \brief Build fonts atlas.
-        /// \note Internal use.
-        void buildFonts();
 
     protected:
 
@@ -318,10 +326,11 @@ namespace ImGuiX {
         bool m_is_fonts_manual = false;     ///< True when manual font configuration is active.
         bool m_in_init_phase = false;       ///< Guard flag for onInit phase operations.
         bool m_is_fonts_init = false;       ///< Indicates whether fonts have been built.
-        ImGuiX::Fonts::FontManager m_font_manager; ///< Manages ImGui font atlas.
+        ImGuiX::Fonts::FontManager m_font_manager;    ///< Manages ImGui font atlas.
         ImGuiX::Themes::ThemeManager m_theme_manager; ///< Manages ImGui style themes.
-        ImGuiX::I18N::LangStore    m_lang_store{}; ///< Localization storage for this window.
-        std::string                m_pending_lang; ///< Language code pending to apply.
+        ImGuiX::I18N::LangStore    m_lang_store{};    ///< Localization storage for this window.
+        std::string                m_pending_lang;    ///< Language code pending to apply.
+        ImGuiX::Notify::NotificationManager m_notification_manager{}; ///< Toast notifications manager.
 
 
         /// \brief Requests the window to switch its UI language.

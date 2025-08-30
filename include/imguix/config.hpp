@@ -13,5 +13,6 @@
 #include "config/options.hpp"
 #include "config/sizing.hpp"
 #include "config/theme_config.hpp"
+#include "config/notifications.hpp"
 
 #endif // _IMGUIX_CONFIG_HPP_INCLUDED
