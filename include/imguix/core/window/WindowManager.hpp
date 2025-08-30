@@ -3,14 +3,14 @@
 #define _IMGUIX_CORE_WINDOW_MANAGER_HPP_INCLUDED
 
 /// \file WindowManager.hpp
-/// \brief WindowManager controls and orchestrates all active windows.
+/// \brief Control and orchestrate all active windows.
 /// \ingroup Core
 
 namespace ImGuiX {
 
     /// \brief Manage all windows in the application.
-    /// \note Delegates lifecycle operations to each registered window instance.
-    /// \note Provides interfaces for ticking, drawing, and shutdown control.
+    /// \note Delegate lifecycle operations to each registered window instance.
+    /// \note Provide interfaces for ticking, drawing, and shutdown control.
     class WindowManager : public Pubsub::EventMediator {
     public:
         /// \brief Construct window manager with access to the application.
@@ -29,7 +29,7 @@ namespace ImGuiX {
         void addWindow(std::unique_ptr<WindowInstance> window);
 
         /// \brief Prepare window state before each frame.
-        /// \note Moves pending windows, initializes them, and removes closed windows.
+        /// \note Move pending windows, initialize them, and remove closed windows.
         void prepareFrame();
 
         /// \brief Close all managed windows.
@@ -53,16 +53,16 @@ namespace ImGuiX {
         void shutdown();
 
     private:
-        /// \brief Forward handle_events to all windows.
+        /// \brief Forward handleEvents to all windows.
         void handleEvents();
 
         /// \brief Forward tick to all windows.
         void tickAll();
 
-        /// \brief Forward draw_ui to all windows.
+        /// \brief Forward drawUi to all windows.
         void drawUiAll();
 
-        /// \brief Forward draw_content to all windows.
+        /// \brief Forward drawContent to all windows.
         void drawContentAll();
 
         /// \brief Forward present to all windows.
