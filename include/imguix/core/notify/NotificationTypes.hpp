@@ -19,7 +19,7 @@ namespace ImGuiX::Notify {
 
     /// \brief Toast lifecycle phase.
     enum class Phase : std::uint8_t { FadeIn, Wait, FadeOut, Expired, COUNT };
-    
+
     /// \brief Auto-duration mode.
     enum class AutoDurationMode : std::uint8_t { Off, PerChar, WPM };
     
@@ -36,7 +36,7 @@ namespace ImGuiX::Notify {
         // Rendering
         float wrap_width_frac     = 1.0f / 3.0f; ///< text wrap as viewport fraction
         float opacity             = 0.8f;        ///< global opacity
-        float close_btn_right_margin = 0.0f;     ///<
+        float close_btn_right_margin = 0.0f;     ///< margin between close button and right edge
         bool  use_separator       = false;       ///< separator between title/content
         bool  use_dismiss_button  = true;        ///< show close button
         int   render_limit        = 5;           ///< 0 = unlimited
@@ -57,38 +57,38 @@ namespace ImGuiX::Notify {
             // ImGuiWindowFlags_NoDocking             |
             ImGuiWindowFlags_NoSavedSettings;
             
-        // --- авто-длительность ---
+        // --- auto duration ---
         AutoDurationMode auto_mode = AutoDurationMode::WPM;
 
-        // PerChar: на сколько миллисекунд продлеваем на символ
-        float ms_per_char = 32.0f; // подбирается по вкусу (20–60мс)
+        // PerChar: milliseconds added per character
+        float ms_per_char = 32.0f; ///< tune between 20 and 60 ms
 
-        // WPM: скорость чтения (слов/мин) и средняя длина слова (символов)
-        float reading_wpm         = 220.0f;
-        float avg_chars_per_word  = 5.0f;
+        // WPM: reading speed and average word length
+        float reading_wpm        = 220.0f; ///< words per minute
+        float avg_chars_per_word = 5.0f;   ///< average characters per word
 
-        // Доп. надбавка за переносы строк (если текст длинный и реально занимает несколько строк)
-        int   extra_per_line_ms = 120;
+        // Extra time per wrapped line when text spans multiple lines
+        int   extra_per_line_ms = 120;     ///< milliseconds per wrapped line
 
-        // Ограничения и поведение
-        int   min_dismiss_ms = 1500;
-        int   max_dismiss_ms = 15000;
-        bool  pause_on_hover = true; // «заморозить таймер» когда тост под курсором
+        // Limits and behaviour
+        int   min_dismiss_ms = 1500;       ///< minimum dismiss time
+        int   max_dismiss_ms = 15000;      ///< maximum dismiss time
+        bool  pause_on_hover = true;       ///< pause timer when hovered
     };
     
     /// \brief Icon config (non-owning pointers to FA6 glyphs).
     struct IconConfig {
-        const char* icon_success = IMGUIX_NOTIFY_ICON_SUCCESS;
-        const char* icon_warning = IMGUIX_NOTIFY_ICON_WARNING;
-        const char* icon_error   = IMGUIX_NOTIFY_ICON_ERROR;
-        const char* icon_info    = IMGUIX_NOTIFY_ICON_INFO;
-        const char* icon_close   = IMGUIX_NOTIFY_ICON_CLOSE;
+        const char* icon_success = IMGUIX_NOTIFY_ICON_SUCCESS; ///< success icon
+        const char* icon_warning = IMGUIX_NOTIFY_ICON_WARNING; ///< warning icon
+        const char* icon_error   = IMGUIX_NOTIFY_ICON_ERROR;   ///< error icon
+        const char* icon_info    = IMGUIX_NOTIFY_ICON_INFO;    ///< info icon
+        const char* icon_close   = IMGUIX_NOTIFY_ICON_CLOSE;   ///< close icon
     };
-    
-    /// \brief Настройка шрифтов (опционально).
+
+    /// \brief Optional font configuration.
     struct FontConfig {
-        ImFont* text  = nullptr; ///< текстовый шрифт (если null — текущий)
-        ImFont* icons = nullptr; ///< шрифт иконок (если null — иконки смержены)
+        ImFont* text  = nullptr; ///< text font; null uses current
+        ImFont* icons = nullptr; ///< icon font; null uses merged icons
     };
 
 } // namespace ImGuiX::Notify

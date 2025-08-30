@@ -20,11 +20,16 @@ namespace ImGuiX::Notify {
     class Notification {
     public:
         /// \brief Construct empty toast.
+        /// \param type Notification type.
+        /// \param dismiss_ms Auto-dismiss delay in milliseconds.
         explicit Notification(Type type, int dismiss_ms = 0)
             : m_flags(0), m_type(type), m_dismiss_ms(dismiss_ms),
               m_created(std::chrono::steady_clock::now()) {}
 
         /// \brief Construct with printf-style content.
+        /// \param type Notification type.
+        /// \param fmt Format string.
+        /// \param ... Format arguments.
         Notification(Type type, const char* fmt, ...) : Notification(type) {
             va_list ap; va_start(ap, fmt);
             m_content = ImGuiX::Utils::vformat_va(fmt, ap);
@@ -32,6 +37,10 @@ namespace ImGuiX::Notify {
         }
 
         /// \brief Construct with printf-style content and dismiss time.
+        /// \param type Notification type.
+        /// \param dismiss_ms Auto-dismiss delay in milliseconds.
+        /// \param fmt Format string.
+        /// \param ... Format arguments.
         Notification(Type type, int dismiss_ms, const char* fmt, ...) : Notification(type, dismiss_ms) {
             va_list ap; va_start(ap, fmt);
             m_content = ImGuiX::Utils::vformat_va(fmt, ap);
@@ -39,6 +48,8 @@ namespace ImGuiX::Notify {
         }
 
         /// \brief Set title (printf-style).
+        /// \param fmt Format string.
+        /// \param ... Format arguments.
         void setTitle(const char* fmt, ...) {
             va_list ap; va_start(ap, fmt);
             m_title = ImGuiX::Utils::vformat_va(fmt, ap);
@@ -46,6 +57,8 @@ namespace ImGuiX::Notify {
         }
 
         /// \brief Set content (printf-style).
+        /// \param fmt Format string.
+        /// \param ... Format arguments.
         void setContent(const char* fmt, ...) {
             va_list ap; va_start(ap, fmt);
             m_content = ImGuiX::Utils::vformat_va(fmt, ap);
@@ -53,25 +66,42 @@ namespace ImGuiX::Notify {
         }
 
         /// \brief Set button label (printf-style).
+        /// \param fmt Format string.
+        /// \param ... Format arguments.
         void setButtonLabel(const char* fmt, ...) {
             va_list ap; va_start(ap, fmt);
             m_button_label = ImGuiX::Utils::vformat_va(fmt, ap);
             va_end(ap);
         }
 
-        /// \brief Setters.
+        /// \brief Set notification type.
+        /// \param t New type.
         void setType(Type t) { m_type = t; }
+        /// \brief Set window flags.
+        /// \param flags Window flags to merge.
         void setWindowFlags(ImGuiWindowFlags flags) { m_flags = flags; }
+        /// \brief Set button callback.
+        /// \param fn Callback executed on button press.
         void setOnButtonPress(std::function<void()> fn) { m_on_button = std::move(fn); }
 
-        /// \brief Getters.
-        const char* title()       const { return m_title.c_str(); }
-        const char* content()     const { return m_content.c_str(); }
+        /// \brief Get title.
+        /// \return Title C-string.
+        const char* title() const { return m_title.c_str(); }
+        /// \brief Get content.
+        /// \return Content C-string.
+        const char* content() const { return m_content.c_str(); }
+        /// \brief Get button label.
+        /// \return Button label C-string.
         const char* buttonLabel() const { return m_button_label.c_str(); }
+        /// \brief Get button callback.
+        /// \return Callback executed on button press.
         const std::function<void()>& onButtonPress() const { return m_on_button; }
+        /// \brief Get notification type.
+        /// \return Notification type.
         Type type() const { return m_type; }
 
-        /// \brief Default title inferred from type (if explicit title is empty).
+        /// \brief Default title inferred from type if title is empty.
+        /// \return Title string or null.
         const char* defaultTitle() const {
             if (!m_title.empty()) return m_title.c_str();
             switch (m_type) {
@@ -84,6 +114,7 @@ namespace ImGuiX::Notify {
         }
 
         /// \brief Color inferred from type (uses IMGUIX_NOTIFY_COLOR_*).
+        /// \return RGBA color.
         ImVec4 color() const {
             switch (m_type) {
                 case Type::Success: return IMGUIX_NOTIFY_COLOR_SUCCESS;
@@ -95,6 +126,8 @@ namespace ImGuiX::Notify {
         }
 
         /// \brief Phase based on elapsed time and config.
+        /// \param cfg Notification configuration.
+        /// \return Current phase.
         Phase phase(const Config& cfg) const {
             using namespace std::chrono;
             const auto elapsed = duration_cast<milliseconds>(steady_clock::now() - m_created).count();
@@ -105,6 +138,10 @@ namespace ImGuiX::Notify {
             return Phase::FadeIn;
         }
         
+        /// \brief Phase using explicit dismiss time.
+        /// \param cfg Notification configuration.
+        /// \param effective_dismiss_ms Effective dismiss time in milliseconds.
+        /// \return Current phase.
         Phase phase(const Config& cfg, int effective_dismiss_ms) const {
             using namespace std::chrono;
             const auto elapsed = elapsedMs();
@@ -116,6 +153,8 @@ namespace ImGuiX::Notify {
         }
 
         /// \brief Fade factor 0..opacity according to phase.
+        /// \param cfg Notification configuration.
+        /// \return Fade multiplier.
         float fadePercent(const Config& cfg) const {
             using namespace std::chrono;
             const float elapsed = static_cast<float>(duration_cast<milliseconds>(steady_clock::now() - m_created).count());
@@ -126,6 +165,10 @@ namespace ImGuiX::Notify {
             return cfg.opacity;
         }
         
+        /// \brief Fade factor with explicit dismiss time.
+        /// \param cfg Notification configuration.
+        /// \param effective_dismiss_ms Effective dismiss time in milliseconds.
+        /// \return Fade multiplier.
         float fadePercent(const Config& cfg, int effective_dismiss_ms) const {
             using namespace std::chrono;
             const float elapsed = static_cast<float>(duration_cast<milliseconds>(steady_clock::now() - m_created).count());
@@ -135,6 +178,8 @@ namespace ImGuiX::Notify {
             return cfg.opacity;
         }
         
+        /// \brief Update pause state when hovered.
+        /// \param hovered True if notification is hovered.
         inline void updateHover(bool hovered) {
             using clock = std::chrono::steady_clock;
             const auto now = clock::now();
@@ -147,16 +192,24 @@ namespace ImGuiX::Notify {
         }
 
         /// \brief Effective window flags (instance flags override base config; tooltip layer optional).
+        /// \param cfg Notification configuration.
+        /// \return Combined window flags.
         ImGuiWindowFlags windowFlags(const Config& cfg) const {
             ImGuiWindowFlags flags = m_flags ? m_flags : cfg.base_window_flags;
             if (cfg.use_tooltip_layer) flags |= ImGuiWindowFlags_Tooltip;
             return flags;
         }
 
+        /// \brief User-specified dismiss override.
+        /// \return Delay in milliseconds.
         int userDismissMs() const noexcept { return m_dismiss_ms; }
 
+        /// \brief Content string length.
+        /// \return Number of characters.
         int contentLength() const noexcept { return static_cast<int>(m_content.size()); }
         
+        /// \brief Elapsed time excluding paused intervals.
+        /// \return Milliseconds since creation.
         inline std::int64_t elapsedMs() const {
             using clock = std::chrono::steady_clock;
             using ms    = std::chrono::milliseconds;

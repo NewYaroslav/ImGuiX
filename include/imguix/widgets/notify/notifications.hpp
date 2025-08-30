@@ -153,7 +153,13 @@ namespace ImGuiX::Widgets {
 
     // -------------------- fmt-style helpers (optional) --------------------
 
-    /// \brief Post a notification using fmt with compile-time checked format (string literal).
+    /// \brief Post a notification using fmt with compile-time checked format.
+    /// \tparam Args Format argument types.
+    /// \param ctrl Controller with a NotificationManager.
+    /// \param type Notification type.
+    /// \param dismiss_ms Auto-dismiss delay in milliseconds.
+    /// \param fmt_s Format string.
+    /// \param args Format arguments.
     template<class... Args>
     inline void NotifyFmt(
             Controller* ctrl,
@@ -169,6 +175,12 @@ namespace ImGuiX::Widgets {
     }
 
     /// \brief Post a notification using fmt for a runtime format string.
+    /// \tparam Args Format argument types.
+    /// \param ctrl Controller with a NotificationManager.
+    /// \param type Notification type.
+    /// \param dismiss_ms Auto-dismiss delay in milliseconds.
+    /// \param fmt_rt Runtime format string.
+    /// \param args Format arguments.
     template<class... Args>
     inline void NotifyFmtRuntime(
             Controller* ctrl,
@@ -184,7 +196,16 @@ namespace ImGuiX::Widgets {
         InsertNotification(ctrl, std::move(n));
     }
 
-    /// \brief Post a notification with title/content via fmt (both literals).
+    /// \brief Post a notification with title and content via fmt.
+    /// \tparam ArgsT Title argument types.
+    /// \tparam ArgsC Content argument types.
+    /// \param ctrl Controller with a NotificationManager.
+    /// \param type Notification type.
+    /// \param dismiss_ms Auto-dismiss delay in milliseconds.
+    /// \param title_fmt Title format string.
+    /// \param title_args Title format arguments.
+    /// \param content_fmt Content format string.
+    /// \param content_args Content format arguments.
     template<class... ArgsT, class... ArgsC>
     inline void NotifyWithTitleFmt(
             Controller* ctrl,
@@ -202,7 +223,18 @@ namespace ImGuiX::Widgets {
         InsertNotification(ctrl, std::move(n));
     }
 
-    /// \brief Post a notification with a button via fmt (all literals).
+    /// \brief Post a notification with a button via fmt.
+    /// \tparam ArgsT Title argument types.
+    /// \tparam ArgsC Content argument types.
+    /// \param ctrl Controller with a NotificationManager.
+    /// \param type Notification type.
+    /// \param dismiss_ms Auto-dismiss delay in milliseconds.
+    /// \param button_label Button label.
+    /// \param on_click Callback executed on button click.
+    /// \param title_fmt Title format string.
+    /// \param title_args Title format arguments.
+    /// \param content_fmt Content format string.
+    /// \param content_args Content format arguments.
     template<class... ArgsT, class... ArgsC>
     inline void NotifyWithButtonFmt(
             Controller* ctrl,
