@@ -4,9 +4,10 @@
 
 /// \file core.hpp
 /// \brief Primary include file aggregating core ImGuiX components.
-/// 
+///
 /// Includes the main interfaces and modules for application control,
-/// window and event systems, controller-model interaction, and resource management.
+/// window and event systems, controller-model interaction, and resource
+/// management.
 
 #if defined(IMGUIX_USE_SFML_BACKEND)
 #include <SFML/Graphics.hpp>
@@ -18,8 +19,8 @@
 #include <imgui_impl_opengl3.h>
 #elif defined(IMGUIX_USE_SDL2_BACKEND)
 #include <SDL.h>
-#include <imgui_impl_sdl2.h>
 #include <imgui_impl_opengl3.h>
+#include <imgui_impl_sdl2.h>
 #else
 // No backend specified
 #endif
@@ -35,33 +36,36 @@
 #include <imgui.h>
 
 // --- Event and PubSub system ---
-#include "core/pubsub.hpp"                         ///< EventBus, Event, EventMediator
-#include "core/events.hpp"                         ///< Common built-in events
+#include "core/events.hpp" ///< Common built-in events
+#include "core/pubsub.hpp" ///< EventBus, Event, EventMediator
 
 // --- Locale and Fonts ---
-#include "core/i18n.hpp"                           ///< Localization utilities
-#include "core/fonts/FontManager.hpp"              ///< FontManager: centralized font loading (ImGui atlas + FreeType)
+#include "core/fonts/FontManager.hpp" ///< FontManager: centralized font loading (ImGui atlas + FreeType)
+#include "core/i18n.hpp" ///< Localization utilities
 
 // --- Options Store ---
-#include "core/options/OptionsStore.hpp"           ///< JSON-backed options store
+#include "core/options/OptionsStore.hpp" ///< JSON-backed options store
 
 // --- Resource system ---
-#include "core/resource/ResourceRegistry.hpp"      ///< Global registry for shared resources
+#include "core/resource/ResourceRegistry.hpp" ///< Global registry for shared resources
 
 // --- Theme system ---
-#include "core/themes/ThemeManager.hpp"            ///< Theme manager for ImGui styles
+#include "core/themes/ThemeManager.hpp" ///< Theme manager for ImGui styles
+
+// --- Notification system ---
+#include "core/notify/NotificationManager.hpp" ///< Toast notification manager
 
 // --- Controller and model interfaces ---
 #include "core/application/ApplicationContext.hpp" ///< Interface for application access
-#include "core/window/WindowInterface.hpp"         ///< Interface for window control
-#include "core/controller/Controller.hpp"          ///< Base interface for controllers
-#include "core/model/Model.hpp"                    ///< Base interface for models
+#include "core/window/WindowInterface.hpp" ///< Interface for window control
+#include "core/controller/Controller.hpp"  ///< Base interface for controllers
+#include "core/model/Model.hpp"            ///< Base interface for models
 
 // --- Windowing system ---
-#include "core/window/WindowInstance.hpp"          ///< Abstract window interface
-#include "core/window/WindowManager.hpp"           ///< Window management
+#include "core/window/WindowInstance.hpp" ///< Abstract window interface
+#include "core/window/WindowManager.hpp"  ///< Window management
 
 // --- Application infrastructure ---
-#include "core/application/Application.hpp"        ///< Main application class
+#include "core/application/Application.hpp" ///< Main application class
 
 #endif // _IMGUIX_CORE_HPP_INCLUDED

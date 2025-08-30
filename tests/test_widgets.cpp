@@ -107,13 +107,13 @@ public:
         ImGui::End();
         ImGui::PopFont();
         ImGui::PopID();
+
     }
 
 private:
     // --- служебные поля контроллера (пример, если пригодятся) ---
     std::string m_last_font_lang;
     int         m_items_count{1};
-    int         m_notif_count{2};
 
     // Состояние демо: хранит конфиги и данные всех виджетов
     struct WidgetsDemoState {
@@ -388,6 +388,93 @@ private:
         if (ImGui::CollapsingHeader("Proxy Settings")) {
             if (ImGuiX::Widgets::ProxyPanel("proxy.panel", m_state.proxy_cfg, m_state.proxy)) {
                 // применить настройки к сетевому слою при необходимости
+            }
+        }
+
+        // --- Notifications demo ---
+        if (ImGui::CollapsingHeader("Notifications")) {
+            if (ImGui::CollapsingHeader("Examples without title", ImGuiTreeNodeFlags_DefaultOpen)) {
+                if (ImGui::Button("Success")) {
+                    notifications().push(ImGuiX::Notify::Notification(
+                        ImGuiX::Notify::Type::Success, 3000, "That is a success! %s", "(Format here)"));
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("Warning")) {
+                    notifications().push(ImGuiX::Notify::Notification(
+                        ImGuiX::Notify::Type::Warning, 3000, "This is a warning!"));
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("Error")) {
+                    notifications().push(ImGuiX::Notify::Notification(
+                        ImGuiX::Notify::Type::Error, 3000, "Segmentation fault"));
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("Info")) {
+                    notifications().push(ImGuiX::Notify::Notification(
+                        ImGuiX::Notify::Type::Info, 3000, "Info about ImGui..."));
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("Info long")) {
+                    notifications().push(ImGuiX::Notify::Notification(
+                        ImGuiX::Notify::Type::Info,
+                        3000,
+                        "Hi, I'm a long notification. I'm here to show you that you can write a lot of text in me. "
+                        "I'm also here to show you that I can wrap text, so you don't have to worry about that."));
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("Notify with button")) {
+                    ImGuiX::Notify::Notification toast(
+                        ImGuiX::Notify::Type::Error, 3000, "Notification content");
+                    toast.setButtonLabel("Click me!");
+                    toast.setOnButtonPress([this]() {
+                        notifications().push(ImGuiX::Notify::Notification(
+                            ImGuiX::Notify::Type::Success, 3000, "Thanks for clicking!"));
+                    });
+                    notifications().push(std::move(toast));
+                }
+            }
+
+            if (ImGui::CollapsingHeader("Do it yourself", ImGuiTreeNodeFlags_DefaultOpen)) {
+                static char title[ImGuiX::Notify::kMaxMsgLength] = "Hello there!";
+                ImGui::InputTextMultiline("Title", title, sizeof(title));
+
+                static char content[ImGuiX::Notify::kMaxMsgLength] = "General Kenobi! \n- Grevious";
+                ImGui::InputTextMultiline("Content", content, sizeof(content));
+
+                static int duration = 5000;
+                ImGui::InputInt("Duration (ms)", &duration, 100);
+                if (duration < 0) duration = 0;
+
+                static const char* type_str[] = {"None", "Success", "Warning", "Error", "Info"};
+                static ImGuiX::Notify::Type type = ImGuiX::Notify::Type::Success;
+                if (ImGui::BeginCombo("Type", type_str[static_cast<int>(type)])) {
+                    for (int n = 0; n < IM_ARRAYSIZE(type_str); ++n) {
+                        bool selected = static_cast<int>(type) == n;
+                        if (ImGui::Selectable(type_str[n], selected)) {
+                            type = static_cast<ImGuiX::Notify::Type>(n);
+                        }
+                        if (selected) {
+                            ImGui::SetItemDefaultFocus();
+                        }
+                    }
+                    ImGui::EndCombo();
+                }
+
+                static bool enable_title = true, enable_content = true;
+                ImGui::Checkbox("Enable title", &enable_title);
+                ImGui::SameLine();
+                ImGui::Checkbox("Enable content", &enable_content);
+
+                if (ImGui::Button("Show")) {
+                    ImGuiX::Notify::Notification toast(type, duration);
+                    if (enable_title) {
+                        toast.setTitle("%s", title);
+                    }
+                    if (enable_content) {
+                        toast.setContent("%s", content);
+                    }
+                    notifications().push(std::move(toast));
+                }
             }
         }
 

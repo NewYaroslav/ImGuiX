@@ -127,6 +127,7 @@ namespace ImGuiX {
         for (auto& window : m_windows) {
             if (!window->isOpen()) continue;
             window->drawUi();
+            window->notifications().render();
         }
     }
 

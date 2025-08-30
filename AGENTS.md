@@ -591,8 +591,8 @@ If future style conflicts arise, this section takes precedence over legacy comme
 ## 17. C++ Code Formatting
 
 ### Indentation & Whitespace
-* Use 4 spaces; never use tabs.
-* Indent all code within a `namespace` by one level.
+* Use 4 spaces for every indentation level; never use tabs or 2-space indents.
+* Indent all code within a `namespace` by one level (4 spaces).
 * Soft line limit of 120 characters.
 
 ### Braces
@@ -659,6 +659,7 @@ return ImGui::GetIO().Fonts->AddFontFromFileTTF(
 ### Includes
 * Order includes as: header of the current file, then standard library headers `<...>`, then external or project headers `"..."`.
 * Separate these groups with a blank line.
+* Core dependencies are aggregated in `include/imguix/core.hpp`; prefer including this header to pull in core components and maintain dependency order.
 
 ## 18. C++ Naming Conventions
 
