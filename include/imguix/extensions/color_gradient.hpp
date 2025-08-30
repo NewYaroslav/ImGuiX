@@ -10,16 +10,26 @@
 
 namespace ImGuiX::Extensions {
 
+    /// \brief HSV color components.
     struct Hsv {
-        double h; /// angle in degrees
-        double s; /// fraction between 0 and 1
-        double v; /// fraction between 0 and 1
+        /// \brief Hue angle in degrees.
+        double h;
+        /// \brief Saturation as fraction [0,1].
+        double s;
+        /// \brief Value as fraction [0,1].
+        double v;
     };
 
+    /// \brief Convert HSV color to RGBA vector.
+    /// \param in HSV color.
+    /// \return Corresponding RGBA color with alpha = 1.
     ImVec4 hsvToRgb(const Hsv& in);
 
+    /// \brief Generates sequential colors from HSV spectrum.
     class ColorGradient {
     public:
+        /// \brief Construct gradient for given number of colors.
+        /// \param count Number of colors to cycle through.
         explicit ColorGradient(std::size_t count);
 
         /// \brief Retrieve next color from gradient.

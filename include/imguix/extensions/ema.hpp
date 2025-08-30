@@ -12,6 +12,7 @@ namespace ImGuiX::Extensions {
     /// \brief Exponential moving average stored in ImGui storage.
     class Ema {
     public:
+        /// \brief Default smoothing factor.
         static constexpr float kDefaultAlpha = 0.1f;
 
         /// \brief Reset stored value.
