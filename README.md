@@ -156,9 +156,6 @@ The SDK can include a `quickstart/` folder with a minimal application example. C
 │   └── imguix/
 │       ├── config/
 │       ├── controllers/
-│       │   ├── ApplicationController.hpp
-│       │   ├── ExtendedController.hpp
-│       │   └── StrategicController.hpp
 │       ├── core/
 │       │   ├── application/
 │       │   ├── controller/
