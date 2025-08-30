@@ -36,34 +36,39 @@ namespace ImGuiX {
         /// \brief Renders UI overlay (widgets, HUDs, debug).
         virtual void drawUi() = 0;
 
-        /// \brief Access to the global event bus via window.
+        /// \brief Access the global event bus.
+        /// \return Event bus.
         Pubsub::EventBus& eventBus() {
             return m_window.eventBus();
         }
 
-        /// \brief Access to the global resource registry via window.
+        /// \brief Access the global resource registry.
+        /// \return Resource registry.
         ResourceRegistry& registry() {
             return m_window.registry();
         }
 
-        /// \brief Access to the global options store via window.
+        /// \brief Access the global options store.
+        /// \return Options store.
         OptionsStore::Control& options() {
             return m_window.options();
         }
 
         /// \brief Read-only access to the global options store.
+        /// \return Options store view.
         const OptionsStore::View& options() const {
             return static_cast<const WindowInterface&>(m_window).options();
         }
 
-        /// \brief Returns reference to the associated window control.
+        /// \brief Access associated window control.
+        /// \return Window control.
         WindowInterface& window() {
             return m_window;
         }
         
         /// \brief Access the notification manager.
         /// \return Notification manager instance.
-        ImGuiX::Notify::NotificationManager &notifications() {
+        ImGuiX::Notify::NotificationManager& notifications() {
             return m_window.notifications();
         }
         
