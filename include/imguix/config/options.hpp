@@ -5,6 +5,7 @@
 /// \brief Options store configuration values.
 
 #ifndef IMGUIX_OPTIONS_SAVE_DELAY_SEC
+/// \brief Delay before saving options in seconds.
 #   define IMGUIX_OPTIONS_SAVE_DELAY_SEC 0.5
 #endif
 

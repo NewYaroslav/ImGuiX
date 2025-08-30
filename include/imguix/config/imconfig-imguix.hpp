@@ -1,16 +1,16 @@
 #pragma once
 
-// ---- ImDrawIdx selection --------------------------------------------------
-// Для ImPlot важно поддерживать 32-bits индексы
-// Смотреть: https://github.com/ocornut/imgui/issues/2591
+/// \file imconfig-imguix.hpp
+/// \brief ImGui configuration overrides for ImGuiX.
+/// \details Forces 32-bit indices and includes backend config when needed.
 
 #ifdef ImDrawIdx
 #  undef ImDrawIdx
 #endif
+/// \brief Use 32-bit indices for ImDrawIdx to support ImPlot.
 #define ImDrawIdx unsigned int
 
-// Если используем SFML-бэкенд — подтянем их дефолтный конфиг,
-// чтобы сохранить совместимость (горячие клавиши, цвета и т.п.).
 #ifdef IMGUIX_USE_SFML_BACKEND
+/// \brief Include SFML backend config for hotkeys and colors.
 #   include "imconfig-SFML.h"
 #endif
