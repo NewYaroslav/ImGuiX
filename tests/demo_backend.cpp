@@ -2,6 +2,7 @@
 
 #include <imgui.h> // necessary for ImGui::*, imgui-SFML.h doesn't include imgui.h
 #include <implot.h>
+#include <implot3d.h>
 #include <imgui-SFML.h> // for ImGui::SFML::* functions and SFML-specific overloads
 #include <imgui_freetype.h>
 #include <SFML/Graphics.hpp>
@@ -60,6 +61,7 @@ int main() {
     
     if (!ImGui::SFML::Init(window)) return -1;
     ImPlot::CreateContext();
+    ImPlot3D::CreateContext();
     
     ImGuiIO& io = ImGui::GetIO();
     io.Fonts->FontLoader = ImGuiFreeType::GetFontLoader();
@@ -95,6 +97,9 @@ int main() {
         static bool show_implot_demo = true;
         if (show_implot_demo) ImPlot::ShowDemoWindow(&show_implot_demo);
         
+        static bool show_implot3d_demo = true;
+        if (show_implot3d_demo) ImPlot3D::ShowDemoWindow(&show_implot3d_demo);
+        
         static bool show_implot_checker = true;
         ShowBackendCheckerWindow(&show_implot_checker);
 
@@ -109,6 +114,7 @@ int main() {
     }
 
     ImPlot::DestroyContext();
+    ImPlot3D::DestroyContext();
     ImGui::SFML::Shutdown();
 }
 
