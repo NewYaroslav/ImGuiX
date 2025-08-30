@@ -85,7 +85,7 @@ cmake --build build --target install --config Release
 Key options:
 
 * `IMGUIX_SDK_INSTALL` — enables SDK installation (together with the library's `install(...)`).
-* `IMGUIX_SDK_BUNDLE_DEPS` — places external dependencies into the SDK if they are built internally (fmt, SFML, ImGui-SFML, libmdbx, nlohmann_json when vendored).
+* `IMGUIX_SDK_BUNDLE_DEPS` — places external dependencies into the SDK if they are built internally (fmt, SFML, ImGui-SFML, nlohmann_json when vendored).
 * `IMGUIX_SDK_INSTALL_QUICKSTART` — adds a `quickstart/` folder with a minimal example and resources.
 * `IMGUIX_SDK_FLATTEN_MISC_HEADERS` — duplicates `imgui_stdlib.h` and `imgui_freetype.h` into the `include/` root for convenient includes.
 
@@ -122,7 +122,6 @@ target_link_libraries(myapp PRIVATE ImGuiX::imguix ${IMGUI_SFML_LIB} SFML::Graph
 ```cmake
 # The top-level project has its own dependencies (example):
 find_package(fmt CONFIG REQUIRED)
-# libmdbx: either find_package(MDBX CONFIG) or add_subdirectory(external/libmdbx) and alias mdbx::mdbx
 
 set(IMGUIX_DEPS_MODE SYSTEM CACHE STRING "" FORCE) # forbid our submodule from pulling bundled deps
 add_subdirectory(external/ImGuiX)
@@ -223,12 +222,26 @@ After building, open `http://localhost:8081/index.html` in your browser.
 * ImGui: `IMGUIX_IMGUI_FREETYPE` (enable FreeType), `IMGUIX_IMGUI_STDLIB` (enabled by default for non-SFML backends).
 * JSON: `IMGUIX_VENDOR_JSON` — place `nlohmann_json` headers in the SDK.
 * Dependency modes:
-  `IMGUIX_DEPS_MODE= AUTO|SYSTEM|BUNDLED` plus per-package `IMGUIX_DEPS_*_MODE` (`fmt`, `SFML`, `ImGui`, `ImGui-SFML`, `freetype`, `json`, `mdbx`).
+  `IMGUIX_DEPS_MODE= AUTO|SYSTEM|BUNDLED` plus per-package `IMGUIX_DEPS_*_MODE` (`fmt`, `SFML`, `ImGui`, `ImGui-SFML`, `freetype`, `json`).
 
 ## Themes
 
-ImGuiX provides several built-in color themes and supports creating custom ones.
-See [docs/THEMES.md](docs/THEMES.md) for details.
+ImGuiX ships with built-in color themes and supports custom ones. Register and apply a theme:
+
+```cpp
+auto& tm = themeManager();
+ImGuiX::Themes::registerCorporateGreyTheme(tm);
+tm.setTheme(IMGUIX_THEME_CORPORATE_GREY);
+```
+
+Widgets manage theme choice and persistence:
+
+```cpp
+ImGuiX::Widgets::ApplyStoredTheme(this);
+ImGuiX::Widgets::ThemePicker("demo.theme", this);
+```
+
+See [docs/THEMES.md](docs/THEMES.md) for the full API and theme list.
 
 ## Fonts and Licensing
 
