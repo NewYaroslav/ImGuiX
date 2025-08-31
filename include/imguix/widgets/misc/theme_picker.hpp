@@ -61,6 +61,9 @@ namespace ImGuiX::Widgets {
     /// \param ctrl Controller that owns ThemeManager and OptionsStore.
     /// \param cfg Widget configuration.
     /// \return True if selection changed.
+    /// \code{.cpp}
+    /// ThemePicker("ui-theme", ctrl);
+    /// \endcode
     inline bool ThemePicker(const char* id,
                             Controller* ctrl,
                             const ThemePickerConfig& cfg = {}) {

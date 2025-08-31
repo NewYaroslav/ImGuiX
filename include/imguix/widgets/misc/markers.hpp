@@ -15,8 +15,8 @@ namespace ImGuiX::Widgets {
 
     /// \brief Marker display mode.
     enum class MarkerMode : int {
-        TooltipOnly = 0,  ///< icon/label + tooltip on hover
-        InlineText  = 1   ///< icon/label + inline wrapped text
+        TooltipOnly = 0,  ///< Icon/label with tooltip on hover.
+        InlineText  = 1   ///< Icon/label with inline wrapped text.
     };
 
     /// \brief Show tooltip text with word wrapping.
