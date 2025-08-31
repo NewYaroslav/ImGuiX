@@ -392,6 +392,21 @@ This repository bundles third-party fonts under their original licenses:
 
 All fonts are included unmodified. See `THIRD-PARTY-NOTICES.md` for per-family attributions.
 
+## Related Projects
+
+ImGuiX bundles several upstream libraries as git submodules:
+
+- [Dear ImGui](https://github.com/ocornut/imgui) — immediate-mode GUI library we build on.
+- [fmt](https://github.com/fmtlib/fmt) — fast, type-safe formatting for modern C++.
+- [FreeType](https://github.com/freetype/freetype) — font rasterization engine used for high-quality text rendering.
+- [GLFW](https://github.com/glfw/glfw) — multi-platform window, context, and input library.
+- [ImGui-SFML](https://github.com/SFML/imgui-sfml) — binding that integrates Dear ImGui with SFML.
+- [ImNodeFlow](https://github.com/Fattorino/ImNodeFlow) — node-based editor & blueprint system for Dear ImGui.
+- [ImPlot](https://github.com/epezent/implot) — immediate-mode plotting for Dear ImGui.
+- [ImPlot3D](https://github.com/brenocq/implot3d) — 3D plotting extension for ImPlot.
+- [nlohmann/json](https://github.com/nlohmann/json) — header-only JSON library.
+- [SFML](https://github.com/SFML/SFML) — Simple and Fast Multimedia Library for graphics, audio, and windowing.
+
 ## License
 
 MIT — see [LICENSE](./LICENSE)
