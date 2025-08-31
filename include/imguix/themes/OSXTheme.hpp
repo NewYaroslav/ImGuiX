@@ -154,7 +154,7 @@ namespace ImGuiX::Themes {
             // Unified roundings/paddings/borders from config
             applyDefaultImGuiStyle(style);
 
-#ifdef IMGUI_HAS_DOCKING
+#ifdef IMGUIX_HAS_DOCKING
             colors[ImGuiCol_DockingEmptyBg]        = WindowBg;
             colors[ImGuiCol_DockingPreview]        = ImVec4(Blue.x, Blue.y, Blue.z, 0.70f);
 
@@ -171,7 +171,9 @@ namespace ImGuiX::Themes {
 
             ImPlot::StyleColorsLight(&style);
 
-            style.Colors[ImPlotCol_PlotBg]        = WindowBg;
+            ImVec4 frame = FrameBg; frame.w = 1.0f;
+            style.Colors[ImPlotCol_FrameBg]      = frame;
+            style.Colors[ImPlotCol_PlotBg]       = WindowBg;
             style.Colors[ImPlotCol_PlotBorder]    = Border;
             style.Colors[ImPlotCol_LegendBg]      = PopupBg;
             style.Colors[ImPlotCol_LegendBorder]  = Border;
@@ -184,6 +186,8 @@ namespace ImGuiX::Themes {
             // Light grid/ticks over bright bg
             style.Colors[ImPlotCol_AxisGrid]      = ImVec4(0.78f, 0.78f, 0.78f, 0.60f);
             style.Colors[ImPlotCol_AxisTick]      = ImVec4(0.35f, 0.35f, 0.35f, 0.90f);
+            style.Colors[ImPlotCol_AxisBgHovered] = ButtonHovered;
+            style.Colors[ImPlotCol_AxisBgActive]  = ButtonActive;
 
             // Blue selection/crosshair to match controls
             style.Colors[ImPlotCol_Selection]     = ImVec4(Blue.x, Blue.y, Blue.z, 0.55f);

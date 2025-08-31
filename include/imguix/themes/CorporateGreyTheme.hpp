@@ -103,7 +103,7 @@ namespace ImGuiX::Themes {
             applyDefaultImGuiStyle(style);
             style.DisabledAlpha = 0.75f;
 
-#ifdef IMGUI_HAS_DOCKING
+#ifdef IMGUIX_HAS_DOCKING
             colors[ImGuiCol_DockingEmptyBg]     = HeaderBase;
             colors[ImGuiCol_Tab]                = DarkGrey25;
             colors[ImGuiCol_TabHovered]         = TextDisabled;
@@ -124,7 +124,9 @@ namespace ImGuiX::Themes {
             ImPlot::StyleColorsDark(&style);
 
             using namespace CorporateGreyConstants;
-            style.Colors[ImPlotCol_PlotBg]        = DarkGrey25;
+            ImVec4 frame = MediumGrey; frame.w = 1.0f;
+            style.Colors[ImPlotCol_FrameBg]      = frame;
+            style.Colors[ImPlotCol_PlotBg]       = DarkGrey25;
             style.Colors[ImPlotCol_PlotBorder]    = ImVec4(0.15f, 0.15f, 0.15f, 1.0f);
             style.Colors[ImPlotCol_LegendBg]      = DarkGrey25;
             style.Colors[ImPlotCol_LegendBorder]  = ImVec4(0.12f, 0.12f, 0.12f, 0.71f);
@@ -134,6 +136,8 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlotCol_AxisText]      = White;
             style.Colors[ImPlotCol_AxisGrid]      = ImVec4(0.25f, 0.25f, 0.25f, 0.45f);
             style.Colors[ImPlotCol_AxisTick]      = ImVec4(0.45f, 0.45f, 0.45f, 0.70f);
+            style.Colors[ImPlotCol_AxisBgHovered] = ScrollbarHover;
+            style.Colors[ImPlotCol_AxisBgActive]  = ScrollbarActive;
             style.Colors[ImPlotCol_Selection]     = Highlight;
             style.Colors[ImPlotCol_Crosshairs]    = Highlight;
 

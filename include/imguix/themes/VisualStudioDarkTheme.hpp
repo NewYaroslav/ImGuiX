@@ -153,7 +153,7 @@ namespace ImGuiX::Themes {
             // Unified roundings/paddings/borders from config
             applyDefaultImGuiStyle(style);
 
-#ifdef IMGUI_HAS_DOCKING
+#ifdef IMGUIX_HAS_DOCKING
             colors[ImGuiCol_DockingEmptyBg]        = Bg;
             colors[ImGuiCol_DockingPreview]        = ImVec4(PanelActive.x, PanelActive.y, PanelActive.z, 0.70f);
 
@@ -170,7 +170,9 @@ namespace ImGuiX::Themes {
 
             ImPlot::StyleColorsDark(&style);
 
-            style.Colors[ImPlotCol_PlotBg]        = Bg;
+            ImVec4 frame = Panel; frame.w = 1.0f;
+            style.Colors[ImPlotCol_FrameBg]      = frame;
+            style.Colors[ImPlotCol_PlotBg]       = Bg;
             style.Colors[ImPlotCol_PlotBorder]    = Border;
             style.Colors[ImPlotCol_LegendBg]      = Panel;
             style.Colors[ImPlotCol_LegendBorder]  = Border;
@@ -183,6 +185,8 @@ namespace ImGuiX::Themes {
             // Subtle neutral grid/ticks for VS dark
             style.Colors[ImPlotCol_AxisGrid]      = ImVec4(0.32f, 0.32f, 0.34f, 0.55f);
             style.Colors[ImPlotCol_AxisTick]      = ImVec4(0.60f, 0.60f, 0.62f, 0.90f);
+            style.Colors[ImPlotCol_AxisBgHovered] = ButtonHovered;
+            style.Colors[ImPlotCol_AxisBgActive]  = ButtonActive;
 
             style.Colors[ImPlotCol_Selection]     = ImVec4(PanelActive.x, PanelActive.y, PanelActive.z, 0.65f);
             style.Colors[ImPlotCol_Crosshairs]    = PanelActive;

@@ -176,7 +176,7 @@ namespace ImGuiX::Themes {
             // Unify sizes/roundings from config
             applyDefaultImGuiStyle(style);
 
-#ifdef IMGUI_HAS_DOCKING
+#ifdef IMGUIX_HAS_DOCKING
             colors[ImGuiCol_DockingEmptyBg]        = WindowBg;
             colors[ImGuiCol_DockingPreview]        = ImVec4(0.26f, 0.59f, 0.98f, 0.55f); // accent overlay
 
@@ -193,7 +193,9 @@ namespace ImGuiX::Themes {
 
             ImPlot::StyleColorsDark(&style);
 
-            style.Colors[ImPlotCol_PlotBg]        = WindowBg;
+            ImVec4 frame = FrameBg; frame.w = 1.0f;
+            style.Colors[ImPlotCol_FrameBg]      = frame;
+            style.Colors[ImPlotCol_PlotBg]       = WindowBg;
             style.Colors[ImPlotCol_PlotBorder]    = Border;
             style.Colors[ImPlotCol_LegendBg]      = PopupBg;
             style.Colors[ImPlotCol_LegendBorder]  = Border;
@@ -206,6 +208,8 @@ namespace ImGuiX::Themes {
             // Subtle bluish grid/ticks for dark teal background
             style.Colors[ImPlotCol_AxisGrid]      = ImVec4(0.25f, 0.35f, 0.42f, 0.50f);
             style.Colors[ImPlotCol_AxisTick]      = ImVec4(0.55f, 0.65f, 0.70f, 0.85f);
+            style.Colors[ImPlotCol_AxisBgHovered] = ButtonHovered;
+            style.Colors[ImPlotCol_AxisBgActive]  = ButtonActive;
 
             // Selection/crosshair use the same accent
             style.Colors[ImPlotCol_Selection]     = ImVec4(0.26f, 0.59f, 0.98f, 0.65f);
