@@ -28,3 +28,6 @@
 [submodule "libs/ImNodeFlow"]
 	path = libs/ImNodeFlow
 	url = https://github.com/Fattorino/ImNodeFlow.git
+[submodule "libs/ImGuiFileDialog"]
+	path = libs/ImGuiFileDialog
+	url = https://github.com/aiekick/ImGuiFileDialog.git
