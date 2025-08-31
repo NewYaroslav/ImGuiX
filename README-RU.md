@@ -384,6 +384,21 @@ fontsBuildNow();
 
 Все шрифты включены без изменений. См. `THIRD-PARTY-NOTICES.md` для указания авторства по семействам.
 
+## Связанные проекты
+
+ImGuiX включает ряд внешних библиотек в качестве git-сабмодулей:
+
+- [Dear ImGui](https://github.com/ocornut/imgui) — базовая библиотека для immediate-mode UI.
+- [fmt](https://github.com/fmtlib/fmt) — быстрый типобезопасный форматер строк для C++.
+- [FreeType](https://github.com/freetype/freetype) — движок растеризации шрифтов.
+- [GLFW](https://github.com/glfw/glfw) — кроссплатформенное создание окон, контекстов и ввод.
+- [ImGui-SFML](https://github.com/SFML/imgui-sfml) — связывает Dear ImGui с SFML.
+- [ImNodeFlow](https://github.com/Fattorino/ImNodeFlow) — редактор узлов и блюпринтов для Dear ImGui.
+- [ImPlot](https://github.com/epezent/implot) — библиотека построения графиков для Dear ImGui.
+- [ImPlot3D](https://github.com/brenocq/implot3d) — 3D-дополнение к ImPlot.
+- [nlohmann/json](https://github.com/nlohmann/json) — заголовочная библиотека работы с JSON.
+- [SFML](https://github.com/SFML/SFML) — Simple and Fast Multimedia Library для графики, аудио и окон.
+
 ## Лицензия
 
 MIT — см. [LICENSE](./LICENSE)
