@@ -36,6 +36,9 @@ option(IMGUIX_USE_IMNODEFLOW   "Build and link ImNodeFlow" ON)
 option(IMGUIX_USE_IMGUIFILEDIALOG        "Build and link ImGuiFileDialog" ON)
 option(IMGUIX_IMGUIFILEDIALOG_USE_STD_FS "Use std::filesystem in ImGuiFileDialog" ON)
 
+# ImGui / ImGuiColorTextEdit
+option(IMGUIX_USE_IMTEXTEDITOR "Build and link ImGuiColorTextEdit" ON)
+
 # portable-file-dialog
 option(IMGUIX_USE_PFD          "Build and link portable-file-dialogs (header-only)" ON)
 
@@ -109,6 +112,7 @@ include(cmake/deps/implot.cmake)
 include(cmake/deps/implot3d.cmake)
 include(cmake/deps/imnodeflow.cmake)
 include(cmake/deps/imgui_file_dialog.cmake)
+include(cmake/deps/imtexteditor.cmake)
 include(cmake/deps/portable_file_dialogs.cmake)
 include(cmake/deps/imspinner.cmake)
 include(cmake/deps/nlohmann_json.cmake)
@@ -163,6 +167,10 @@ endif()
 
 if(IMGUIX_USE_IMGUIFILEDIALOG)
     imguix_use_or_fetch_imguifiledialog(IGFD_TARGET)
+endif()
+
+if(IMGUIX_USE_IMTEXTEDITOR)
+    imguix_use_or_fetch_imtexteditor(IMTEXTEDITOR_TARGET)
 endif()
 
 if(IMGUIX_USE_PFD)
@@ -222,6 +230,10 @@ if(IMGUIX_HEADER_ONLY)
     
     if(IMGUIX_USE_IMGUIFILEDIALOG)
         target_compile_definitions(imguix INTERFACE IMGUI_ENABLE_IMGUIFILEDIALOG)
+    endif()
+	
+	if(IMGUIX_USE_IMTEXTEDITOR)
+        target_compile_definitions(imguix INTERFACE IMGUI_ENABLE_IMTEXTEDITOR)
     endif()
     
     if(IMGUIX_USE_PFD)
@@ -318,6 +330,11 @@ else()
         target_compile_definitions(imguix PUBLIC IMGUI_ENABLE_IMGUIFILEDIALOG)
         target_link_libraries(imguix PRIVATE ${IGFD_TARGET})
     endif()
+	
+	if(IMGUIX_USE_IMTEXTEDITOR)
+        target_compile_definitions(imguix PUBLIC IMGUI_ENABLE_IMTEXTEDITOR)
+        target_link_libraries(imguix PRIVATE ${IMTEXTEDITOR_TARGET})
+    endif()
     
     if(IMGUIX_USE_PFD)
         target_compile_definitions(imguix PUBLIC IMGUI_ENABLE_PFD)
@@ -403,7 +420,12 @@ if(IMGUIX_BUILD_TESTS)
             target_compile_definitions(${TEST_NAME} PRIVATE IMGUI_ENABLE_IMGUIFILEDIALOG)
             target_link_libraries(${TEST_NAME} PRIVATE imguifiledialog::imguifiledialog)
         endif()
-        
+
+		if(IMGUIX_USE_IMTEXTEDITOR)
+			target_compile_definitions(${TEST_NAME} PRIVATE IMGUI_ENABLE_IMTEXTEDITOR)
+			target_link_libraries(${TEST_NAME} PRIVATE imtexteditor::imtexteditor)
+		endif()
+
         if(IMGUIX_USE_IMSPINNER)
             target_compile_definitions(${TEST_NAME} PRIVATE IMGUI_ENABLE_IMSPINNER)
             target_link_libraries(${TEST_NAME} PRIVATE imspinner::imspinner)
@@ -617,6 +639,13 @@ if(IMGUIX_SDK_BUNDLE_DEPS)
             "${PROJECT_SOURCE_DIR}/libs/ImGuiFileDialog/ImGuiFileDialogConfig.h"
             DESTINATION include)
     endif()
+	
+	# --- ImGuiColorTextEdit: headers ---
+	if(EXISTS "${PROJECT_SOURCE_DIR}/libs/ImGuiColorTextEdit/TextEditor.h")
+		install(FILES
+			"${PROJECT_SOURCE_DIR}/libs/ImGuiColorTextEdit/TextEditor.h"
+			DESTINATION include)
+	endif()
     
     # --- portable-file-dialogs: headers ---
     if(EXISTS "${PROJECT_SOURCE_DIR}/libs/portable-file-dialogs/portable-file-dialogs.h")

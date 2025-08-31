@@ -69,6 +69,10 @@
 #include <imspinner.h>
 #endif
 
+#ifdef IMGUI_ENABLE_IMTEXTEDITOR
+#include <TextEditor.h>
+#endif
+
 #ifdef IMGUI_ENABLE_IMPLOT
 /// \brief Generate synthetic OHLCV bars.
 /// \param out Output bar container.
@@ -208,6 +212,10 @@ public:
         static bool show_imspinner_demo = false;
 #       endif
 
+#       ifdef IMGUI_ENABLE_IMTEXTEDITOR
+        static bool show_text_editor = false;
+#       endif
+
         if (ImGui::BeginMainMenuBar()) {
             if (ImGui::BeginMenu("Demo")) {
                 if (ImGui::MenuItem("ImGui", nullptr, false, !show_imgui_demo)) {
@@ -243,8 +251,11 @@ public:
 #               endif
 
 #               ifdef IMGUI_ENABLE_IMSPINNER
-                if (ImGui::MenuItem("ImSpinner", nullptr, false, !show_imspinner_demo))
-                    show_imspinner_demo = true;
+                if (ImGui::MenuItem("ImSpinner", nullptr, false, !show_imspinner_demo)) show_imspinner_demo = true;
+#               endif
+
+#               ifdef IMGUI_ENABLE_IMTEXTEDITOR
+                if (ImGui::MenuItem("Code Editor", nullptr, false, !show_text_editor)) show_text_editor = true;
 #               endif
                 ImGui::EndMenu();
             }
@@ -322,7 +333,7 @@ public:
         }
 #       endif
 
-#ifdef IMGUI_ENABLE_IMSPINNER
+#       ifdef IMGUI_ENABLE_IMSPINNER
         if (show_imspinner_demo) {
             ImGui::Begin("ImSpinner Demo", &show_imspinner_demo);
 #           ifdef IMSPINNER_DEMO
@@ -332,7 +343,26 @@ public:
 #           endif
             ImGui::End();
         }
-#endif
+#       endif
+
+#       ifdef IMGUI_ENABLE_IMTEXTEDITOR
+        static TextEditor s_editor;
+        if (show_text_editor) {
+            // ленивые дефолты
+            static bool init = false;
+            if (!init) {
+                s_editor.SetLanguageDefinition(TextEditor::LanguageDefinition::CPlusPlus());
+                s_editor.SetPalette(TextEditor::GetDarkPalette());
+                s_editor.SetShowWhitespaces(false);
+                s_editor.SetText("// Hello from ImGuiColorTextEdit\nint main(){return 0;}\n");
+                init = true;
+            }
+
+            ImGui::Begin("Code Editor", &show_text_editor);
+            s_editor.Render("TextEditor");    // рисуем виджет редактора
+            ImGui::End();
+        }
+#       endif
 
         ImGui::PopFont();
         ImGui::PopID();
