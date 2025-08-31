@@ -57,6 +57,10 @@
 #include <ImNodeFlow.h>   // ImFlow::Editor, BaseNode, etc.
 #endif
 
+#ifdef IMGUI_ENABLE_IMGUIFILEDIALOG
+#include <ImGuiFileDialog.h>
+#endif
+
 #ifdef IMGUI_ENABLE_IMPLOT
 /// \brief Generate synthetic OHLCV bars.
 /// \param out Output bar container.
@@ -180,6 +184,9 @@ public:
 #       ifdef IMGUI_ENABLE_IMNODEFLOW
         static bool show_imnodeflow_demo = false;
 #       endif
+#       ifdef IMGUI_ENABLE_IMGUIFILEDIALOG
+        static bool show_igfd = false;
+#       endif
         if (ImGui::BeginMainMenuBar()) {
             if (ImGui::BeginMenu("Demo")) {
                 if (ImGui::MenuItem("ImGui", nullptr, false, !show_imgui_demo)) {
@@ -200,6 +207,11 @@ public:
                     show_imnodeflow_demo = true;
                 }
 #               endif
+#               ifdef IMGUI_ENABLE_IMGUIFILEDIALOG
+                if (ImGui::MenuItem("File Dialog", nullptr, false, !show_igfd)) {
+                    show_igfd = true;
+                }
+#               endif
                 ImGui::EndMenu();
             }
             ImGui::EndMainMenuBar();
@@ -211,12 +223,15 @@ public:
 
         ImGui::End();
         if (show_imgui_demo) ImGui::ShowDemoWindow(&show_imgui_demo);
+
 #       ifdef IMGUI_ENABLE_IMPLOT
         if (show_implot_demo) ImPlot::ShowDemoWindow(&show_implot_demo);
 #       endif
+
 #       ifdef IMGUI_ENABLE_IMPLOT3D
         if (show_implot3d_demo) ImPlot3D::ShowDemoWindow(&show_implot3d_demo);
 #       endif
+
 #       ifdef IMGUI_ENABLE_IMNODEFLOW
         if (show_imnodeflow_demo) {
             ImGui::Begin("ImNodeFlow Demo", &show_imnodeflow_demo);
@@ -224,6 +239,26 @@ public:
             ImGui::End();
         }
 #       endif
+
+#       ifdef IMGUI_ENABLE_IMGUIFILEDIALOG
+        if (show_igfd) {
+            ImGui::Begin("ImGuiFileDialog", &show_igfd);
+            if (ImGui::Button("Open...")) {
+                IGFD::FileDialogConfig cfg;   // путь/фильтры см. README
+                cfg.path = ".";
+                ImGuiFileDialog::Instance()->OpenDialog("OpenDlg", "Open File", ".*", cfg);
+            }
+            if (ImGuiFileDialog::Instance()->Display("OpenDlg")) {
+                if (ImGuiFileDialog::Instance()->IsOk()) {
+                    const std::string path = ImGuiFileDialog::Instance()->GetFilePathName();
+                    // TODO: использовать path
+                }
+                ImGuiFileDialog::Instance()->Close();
+            }
+            ImGui::End();
+        }
+#       endif
+
         ImGui::PopFont();
         ImGui::PopID();
     }
