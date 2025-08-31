@@ -3,7 +3,7 @@
 #define _IMGUIX_WIDGETS_TOGGLE_BUTTON_HPP_INCLUDED
 
 /// \file toggle_button.hpp
-/// \brief Provides a simple animated toggle switch for ImGui (public API only).
+/// \brief Animated toggle switch for ImGui.
 
 #include <imgui.h>
 
@@ -12,7 +12,7 @@ namespace ImGuiX::Widgets {
     /// \brief Draw animated toggle switch.
     /// \param id Unique string identifier.
     /// \param state Pointer to boolean storing current state.
-    /// \code
+    /// \code{.cpp}
     /// bool enabled = false;
     /// ToggleButton("enabled", &enabled);
     /// \endcode
