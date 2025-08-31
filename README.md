@@ -25,6 +25,7 @@ independently of rendering.
 - [SDK Installation](#sdk-installation)
 - [Using as a Dependency](#using-as-a-dependency)
 - [Quick Start / Examples](#quick-start--examples)
+- [Project Structure](#project-structure)
 - [Architecture](#architecture)
 - [Web/Emscripten](#webemscripten)
 - [CMake Options (Summary)](#cmake-options-summary)
@@ -146,6 +147,40 @@ target_link_libraries(myapp PRIVATE ImGuiX::imguix)
 ## Quick Start / Examples
 
 The SDK can include a `quickstart/` folder with a minimal application example. Copy the `quickstart` directory into your project or add it as sources, build, and you're ready to go.
+
+## Project Structure
+
+```
+.
+├── include/
+│   └── imguix/
+│       ├── config/
+│       ├── controllers/
+│       ├── core/
+│       │   ├── application/
+│       │   ├── controller/
+│       │   ├── events/
+│       │   ├── fonts/
+│       │   ├── i18n/
+│       │   ├── model/
+│       │   ├── notify/
+│       │   ├── options/
+│       │   ├── pubsub/
+│       │   ├── resource/
+│       │   ├── themes/
+│       │   └── window/
+│       ├── extensions/
+│       ├── themes/
+│       ├── utils/
+│       ├── widgets/
+│       └── windows/
+├── docs/
+├── examples/
+│   └── quickstart/
+├── libs/
+├── src/
+└── tests/
+```
 
 ## Architecture
 
