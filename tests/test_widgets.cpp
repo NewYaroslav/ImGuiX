@@ -65,6 +65,10 @@
 #include <portable-file-dialogs.h>
 #endif
 
+#ifdef IMGUI_ENABLE_IMSPINNER
+#include <imspinner.h>
+#endif
+
 #ifdef IMGUI_ENABLE_IMPLOT
 /// \brief Generate synthetic OHLCV bars.
 /// \param out Output bar container.
@@ -179,48 +183,68 @@ public:
         ImGui::PushID(window().id());
         ImGui::PushFont(nullptr, 18.0f); // Размер шрифта (обёртка ImGuiX)
         static bool show_imgui_demo = false;
+
 #       ifdef IMGUI_ENABLE_IMPLOT
         static bool show_implot_demo = false;
 #       endif
+
 #       ifdef IMGUI_ENABLE_IMPLOT3D
         static bool show_implot3d_demo = false;
 #       endif
+
 #       ifdef IMGUI_ENABLE_IMNODEFLOW
         static bool show_imnodeflow_demo = false;
 #       endif
+
 #       ifdef IMGUI_ENABLE_IMGUIFILEDIALOG
         static bool show_igfd = false;
 #       endif
+
 #       ifdef IMGUI_ENABLE_PFD
         static bool show_pfd = false;
 #       endif
+
+#       ifdef IMGUI_ENABLE_IMSPINNER
+        static bool show_imspinner_demo = false;
+#       endif
+
         if (ImGui::BeginMainMenuBar()) {
             if (ImGui::BeginMenu("Demo")) {
                 if (ImGui::MenuItem("ImGui", nullptr, false, !show_imgui_demo)) {
                     show_imgui_demo = true;
                 }
+
 #               ifdef IMGUI_ENABLE_IMPLOT
                 if (ImGui::MenuItem("ImPlot", nullptr, false, !show_implot_demo)) {
                     show_implot_demo = true;
                 }
 #               endif
+
 #               ifdef IMGUI_ENABLE_IMPLOT3D
                 if (ImGui::MenuItem("ImPlot3D", nullptr, false, !show_implot3d_demo)) {
                     show_implot3d_demo = true;
                 }
 #               endif
+
 #               ifdef IMGUI_ENABLE_IMNODEFLOW
                 if (ImGui::MenuItem("ImNodeFlow", nullptr, false, !show_imnodeflow_demo)) {
                     show_imnodeflow_demo = true;
                 }
 #               endif
+
 #               ifdef IMGUI_ENABLE_IMGUIFILEDIALOG
                 if (ImGui::MenuItem("File Dialog", nullptr, false, !show_igfd)) {
                     show_igfd = true;
                 }
 #               endif
+
 #               ifdef IMGUI_ENABLE_PFD
                 if (ImGui::MenuItem("File Dialog (pfd)", nullptr, false, !show_pfd)) show_pfd = true;
+#               endif
+
+#               ifdef IMGUI_ENABLE_IMSPINNER
+                if (ImGui::MenuItem("ImSpinner", nullptr, false, !show_imspinner_demo))
+                    show_imspinner_demo = true;
 #               endif
                 ImGui::EndMenu();
             }
@@ -297,6 +321,18 @@ public:
             ImGui::End();
         }
 #       endif
+
+#ifdef IMGUI_ENABLE_IMSPINNER
+        if (show_imspinner_demo) {
+            ImGui::Begin("ImSpinner Demo", &show_imspinner_demo);
+#           ifdef IMSPINNER_DEMO
+            ImSpinner::demoSpinners();   // демо из README
+#           else
+            ImGui::TextDisabled("Build without IMSPINNER_DEMO");
+#           endif
+            ImGui::End();
+        }
+#endif
 
         ImGui::PopFont();
         ImGui::PopID();

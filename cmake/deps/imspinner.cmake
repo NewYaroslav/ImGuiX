@@ -1,0 +1,41 @@
+# Provides: imguix_use_or_fetch_imspinner(<OUT_VAR>)
+# Exports target: imspinner::imspinner (header-only)
+function(imguix_use_or_fetch_imspinner OUT_VAR)
+    # Try system if когда-нибудь появится пакет (на будущее)
+    if(NOT DEFINED IMGUIX_DEPS_IMSPINNER_MODE)
+        set(IMGUIX_DEPS_IMSPINNER_MODE "INHERIT")
+    endif()
+    set(_mode "${IMGUIX_DEPS_IMSPINNER_MODE}")
+    if(_mode STREQUAL "INHERIT")
+        set(_mode "${IMGUIX_DEPS_MODE}")
+    endif()
+
+    set(_found FALSE)
+    if(_mode STREQUAL "AUTO" OR _mode STREQUAL "SYSTEM")
+        find_package(imspinner CONFIG QUIET)
+        if(TARGET imspinner::imspinner)
+            set(${OUT_VAR} imspinner::imspinner PARENT_SCOPE)
+            set(_found TRUE)
+        endif()
+    endif()
+    if(_found)
+        return()
+    endif()
+
+    # Bundled: header-only target
+    set(_IMSPIN_DIR "${IMSPINNER_DIR}")
+    if(NOT _IMSPIN_DIR)
+        set(_IMSPIN_DIR "${PROJECT_SOURCE_DIR}/libs/imspinner")
+    endif()
+    if(NOT EXISTS "${_IMSPIN_DIR}/imspinner.h")
+        message(FATAL_ERROR "imspinner not found at ${_IMSPIN_DIR}. "
+                            "Set IMSPINNER_DIR or add submodule libs/imspinner.")
+    endif()
+
+    add_library(imspinner INTERFACE)
+    add_library(imspinner::imspinner ALIAS imspinner)
+    target_include_directories(imspinner INTERFACE "${_IMSPIN_DIR}")
+    target_link_libraries(imspinner INTERFACE imgui::imgui) # для imgui_internal.h
+    # Опц.: включить демо-функции через макрос IMSPINNER_DEMO на нужных таргетах
+    set(${OUT_VAR} imspinner::imspinner PARENT_SCOPE)
+endfunction()
