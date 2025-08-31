@@ -12,11 +12,11 @@ namespace ImGuiX::Windows {
 
     /// \brief Configuration parameters for ImGuiFramedWindow.
     struct ImGuiFramedWindowConfig {
-        int min_width = 640;         ///< Minimum window width in pixels.
-        int min_height = 480;        ///< Minimum window height in pixels.
-        int frame_corner_radius = 8; ///< Radius of the outer window corners.
-        int resize_border = 8;       ///< Thickness of the manual resize border.
-        int title_bar_height = 32;   ///< Height of the custom title bar.
+        int min_width = 640;           ///< Minimum window width in pixels.
+        int min_height = 480;          ///< Minimum window height in pixels.
+        int frame_corner_radius = 8;   ///< Radius of the outer window corners.
+        int resize_border = 8;         ///< Thickness of the manual resize border.
+        int title_bar_height = 32 ;    ///< Height of the custom title bar.
         const char* close_button_text = u8"X##imguix_btn_close"; ///< Label for the close button.
         const char* minimize_button_text = u8"_##imguix_btn_minimize"; ///< Label for the minimize button.
         const char* maximize_button_text = u8"[]##imguix_btn_maximize"; ///< Label for the maximize button.

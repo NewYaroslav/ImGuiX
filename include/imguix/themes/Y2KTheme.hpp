@@ -7,8 +7,8 @@
 ///
 /// Aesthetics:
 ///  - light chrome/silver surfaces (XP-era vibe)
-///  - cobalt primary, tech-purple secondary
-///  - occasional magenta/lime accents on active states
+///  - cobalt primary, azure secondary
+///  - optional magenta/lime as tertiary accents (mainly for plots)
 ///
 /// Notes:
 ///  - repeated colors are grouped in Y2KConstants
@@ -23,90 +23,77 @@ namespace ImGuiX::Themes {
     /// \brief Color constants for the Y2K theme.
     namespace Y2KConstants {
         // Text
-        constexpr ImVec4 Text                   = ImVec4(0.051f, 0.075f, 0.129f, 1.000f); // #0D1321
-        constexpr ImVec4 TextDisabled           = ImVec4(0.350f, 0.400f, 0.470f, 1.000f);
+        constexpr ImVec4 Text                   = ImVec4(0.070f, 0.090f, 0.140f, 1.000f);  // #121729
+        constexpr ImVec4 TextDisabled           = ImVec4(0.420f, 0.470f, 0.540f, 1.000f);
 
-        // Backgrounds (chrome/silver)
-        constexpr ImVec4 WindowBg               = ImVec4(0.914f, 0.925f, 0.945f, 1.000f); // #E9ECF1
-        constexpr ImVec4 ChildBg                = ImVec4(0.827f, 0.855f, 0.890f, 0.650f); // #D3DAE3, glassy
-        constexpr ImVec4 PopupBg                = ImVec4(0.827f, 0.855f, 0.890f, 0.980f); // #D3DAE3
+        // Backgrounds (neutral, low-blue)
+        constexpr ImVec4 WindowBg               = ImVec4(0.945f, 0.957f, 0.980f, 1.000f);  // #F1F4FA
+        constexpr ImVec4 ChildBg                = ImVec4(0.965f, 0.973f, 0.988f, 0.920f);  // #F6F8FC @92%
+        constexpr ImVec4 PopupBg                = ImVec4(0.965f, 0.973f, 0.988f, 0.980f);
 
-        // Borders
-        constexpr ImVec4 Border                 = ImVec4(0.592f, 0.651f, 0.694f, 1.000f); // #97A6B1
-        constexpr ImVec4 BorderShadow           = ImVec4(0.000f, 0.000f, 0.000f, 0.000f);
-
-        // Frames
-        constexpr ImVec4 FrameBg                = ImVec4(0.827f, 0.855f, 0.890f, 0.95f); // #D3DAE3
-        constexpr ImVec4 FrameBgHovered         = ImVec4(0.000f, 0.500f, 1.000f, 0.35f);  // ↑ альфа, чистый cobal
-        constexpr ImVec4 FrameBgActive          = ImVec4(0.000f, 0.350f, 0.900f, 0.55f);  // чуть темнее/насыщеннее
+        // Borders / separators
+        constexpr ImVec4 Border                 = ImVec4(0.718f, 0.773f, 0.816f, 0.90f);   // #B7C5D0
+        constexpr ImVec4 BorderShadow           = ImVec4(0.000f, 0.000f, 0.000f, 0.00f);
+        constexpr ImVec4 Separator              = ImVec4(0.718f, 0.773f, 0.816f, 1.00f);
+        constexpr ImVec4 SeparatorHovered       = ImVec4(0.000f, 0.682f, 0.937f, 0.45f);   // azure @45%
+        constexpr ImVec4 SeparatorActive        = ImVec4(0.000f, 0.682f, 0.937f, 0.75f);
 
         // Titles / Menu
-        /*
-        constexpr ImVec4 TitleBg                = ImVec4(0.827f, 0.855f, 0.890f, 0.950f);
-        constexpr ImVec4 TitleBgCollapsed       = ImVec4(0.827f, 0.855f, 0.890f, 0.750f);
-        constexpr ImVec4 TitleBgActive          = ImVec4(0.000f, 0.400f, 1.000f, 0.250f);
-        constexpr ImVec4 MenuBarBg              = ImVec4(0.827f, 0.855f, 0.890f, 1.000f);
-        */
-        constexpr ImVec4 TitleBg                = ImVec4(0.914f, 0.925f, 0.945f, 1.000f); // #E9ECF1
-        constexpr ImVec4 TitleBgCollapsed       = ImVec4(0.914f, 0.925f, 0.945f, 1.000f); // opaque
-        constexpr ImVec4 TitleBgActive          = ImVec4(0.820f, 0.880f, 1.000f, 1.000f); // #D1E0FF (light cobalt tint)
-        constexpr ImVec4 MenuBarBg              = ImVec4(0.827f, 0.855f, 0.890f, 1.000f);
-
-        // Scrollbar
-        constexpr ImVec4 ScrollbarBg            = ImVec4(0.827f, 0.855f, 0.890f, 0.850f);
-        constexpr ImVec4 ScrollbarGrab          = ImVec4(0.000f, 0.400f, 1.000f, 0.400f);
-        constexpr ImVec4 ScrollbarGrabHovered   = ImVec4(0.000f, 0.400f, 1.000f, 0.600f);
-        constexpr ImVec4 ScrollbarGrabActive    = ImVec4(0.000f, 0.400f, 1.000f, 0.800f);
+        constexpr ImVec4 TitleBg                = ImVec4(0.945f, 0.957f, 0.980f, 1.000f);
+        constexpr ImVec4 TitleBgCollapsed       = ImVec4(0.945f, 0.957f, 0.980f, 1.000f);
+        constexpr ImVec4 TitleBgActive          = ImVec4(0.867f, 0.914f, 1.000f, 1.000f);  // #DDE9FF
+        constexpr ImVec4 MenuBarBg              = ImVec4(0.930f, 0.945f, 0.969f, 1.000f);
 
         // Accents
-        constexpr ImVec4 CheckMark              = ImVec4(0.000f, 0.400f, 1.000f, 1.000f); // cobalt
-        constexpr ImVec4 AccentPurple           = ImVec4(0.478f, 0.000f, 1.000f, 1.000f); // #7A00FF
+        constexpr ImVec4 AccentPrimary          = ImVec4(0.231f, 0.510f, 0.965f, 1.000f); // #3B82F6
+        constexpr ImVec4 AccentPrimaryHover     = ImVec4(0.000f, 0.467f, 1.000f, 0.85f);  // #0077FF
+        constexpr ImVec4 AccentPrimaryActive    = ImVec4(0.000f, 0.396f, 0.925f, 1.000f); // #0065EC
+        constexpr ImVec4 AccentSecondary        = ImVec4(0.000f, 0.682f, 0.937f, 1.000f); // #00AEEF
+
+        // (tertiary, used mainly in plots)
         constexpr ImVec4 AccentMagenta          = ImVec4(1.000f, 0.000f, 0.800f, 1.000f); // #FF00CC
         constexpr ImVec4 AccentLime             = ImVec4(0.725f, 1.000f, 0.000f, 1.000f); // #B9FF00
 
-        // Buttons / Headers
-		/*
-        constexpr ImVec4 Button                 = ImVec4(0.000f, 0.400f, 1.000f, 0.750f);
-        constexpr ImVec4 ButtonHovered          = ImVec4(0.240f, 0.620f, 1.000f, 0.85f);  // lighter cobalt
-        constexpr ImVec4 ButtonActive           = ImVec4(0.000f, 0.400f, 1.000f, 0.95f);  // cobalt strong
-		*/
-		
-		constexpr ImVec4 Button          = ImVec4(0.000f, 0.400f, 1.000f, 0.60f);
-		constexpr ImVec4 ButtonHovered   = ImVec4(0.000f, 0.500f, 1.000f, 0.90f);  // ярче, больше альфа
-		constexpr ImVec4 ButtonActive    = ImVec4(0.000f, 0.350f, 0.900f, 1.00f);  // нажатие — темнее/насыщеннее
+        // Frames (affects Combo/Input)
+        constexpr ImVec4 FrameBg                = ImVec4(0.953f, 0.961f, 0.973f, 0.98f);
+        constexpr ImVec4 FrameBgHovered         = ImVec4(0.231f, 0.510f, 0.965f, 0.18f);
+        constexpr ImVec4 FrameBgActive          = ImVec4(0.000f, 0.396f, 0.925f, 0.32f);
 
-        //constexpr ImVec4 Header                 = ImVec4(0.000f, 0.400f, 1.000f, 0.500f);
-        constexpr ImVec4 Header                 = ImVec4(0.000f, 0.400f, 1.000f, 0.20f);
-        constexpr ImVec4 HeaderHovered          = ImVec4(0.000f, 0.400f, 1.000f, 0.32f);  // 32%
-        constexpr ImVec4 HeaderActive           = ImVec4(0.000f, 0.400f, 1.000f, 0.42f);  // 42
+        // Buttons
+        constexpr ImVec4 Button                 = ImVec4(0.231f, 0.510f, 0.965f, 0.45f);
+        constexpr ImVec4 ButtonHovered          = AccentPrimaryHover;
+        constexpr ImVec4 ButtonActive           = AccentPrimaryActive;
 
-        // Separators / grips
-        constexpr ImVec4 Separator              = Border;
-        constexpr ImVec4 SeparatorHovered       = ImVec4(0.000f, 0.400f, 1.000f, 0.780f);
-        constexpr ImVec4 SeparatorActive        = ImVec4(0.478f, 0.000f, 1.000f, 1.000f);
+        // Sliders / checks
+        constexpr ImVec4 CheckMark              = AccentPrimaryActive;
+        constexpr ImVec4 SliderGrab             = AccentPrimary;
+        constexpr ImVec4 SliderGrabActive       = AccentPrimaryActive;
 
-        constexpr ImVec4 ResizeGrip             = ImVec4(0.000f, 0.400f, 1.000f, 0.400f);
-        constexpr ImVec4 ResizeGripHovered      = ImVec4(0.000f, 0.400f, 1.000f, 0.700f);
-        constexpr ImVec4 ResizeGripActive       = ImVec4(0.478f, 0.000f, 1.000f, 0.900f);
+        // Headers / Tabs
+        constexpr ImVec4 Header                 = ImVec4(0.231f, 0.510f, 0.965f, 0.18f);
+        constexpr ImVec4 HeaderHovered          = ImVec4(0.231f, 0.510f, 0.965f, 0.28f);
+        constexpr ImVec4 HeaderActive           = ImVec4(0.000f, 0.396f, 0.925f, 0.40f);
 
-        // Tabs
-		/*
-        constexpr ImVec4 Tab                   = ImVec4(0.000f, 0.400f, 1.000f, 0.55f);
-        constexpr ImVec4 TabHovered            = ImVec4(0.240f, 0.620f, 1.000f, 0.85f);
-        constexpr ImVec4 TabActive             = ImVec4(0.000f, 0.400f, 1.000f, 0.85f);
-		*/
-		constexpr ImVec4 Tab             		= ImVec4(0.000f, 0.400f, 1.000f, 0.55f);
-		constexpr ImVec4 TabHovered      		= ImVec4(0.000f, 0.500f, 1.000f, 0.85f);
-		constexpr ImVec4 TabActive       		= ImVec4(0.000f, 0.400f, 1.000f, 0.85f);
-        //constexpr ImVec4 Tab                    = ImVec4(0.000f, 0.400f, 1.000f, 0.550f);
-        //constexpr ImVec4 TabHovered             = ImVec4(0.478f, 0.000f, 1.000f, 0.850f);
-        //constexpr ImVec4 TabActive              = ImVec4(0.000f, 0.400f, 1.000f, 0.850f);
+        constexpr ImVec4 Tab                    = ImVec4(0.231f, 0.510f, 0.965f, 0.55f);
+        constexpr ImVec4 TabHovered             = AccentPrimaryHover;
+        constexpr ImVec4 TabActive              = ImVec4(0.231f, 0.510f, 0.965f, 0.80f);
         constexpr ImVec4 TabUnfocused           = ImVec4(0.827f, 0.855f, 0.890f, 0.900f);
         constexpr ImVec4 TabUnfocusedActive     = ImVec4(0.000f, 0.400f, 1.000f, 0.700f);
 
+        // Scrollbar
+        constexpr ImVec4 ScrollbarBg            = ImVec4(0.945f, 0.957f, 0.980f, 0.85f);
+        constexpr ImVec4 ScrollbarGrab          = ImVec4(0.231f, 0.510f, 0.965f, 0.35f);
+        constexpr ImVec4 ScrollbarGrabHovered   = ImVec4(0.231f, 0.510f, 0.965f, 0.55f);
+        constexpr ImVec4 ScrollbarGrabActive    = ImVec4(0.000f, 0.396f, 0.925f, 0.80f);
+
+        // Resize grips
+        constexpr ImVec4 ResizeGrip             = ImVec4(0.000f, 0.400f, 1.000f, 0.40f);
+        constexpr ImVec4 ResizeGripHovered      = ImVec4(0.000f, 0.400f, 1.000f, 0.70f);
+        constexpr ImVec4 ResizeGripActive       = AccentSecondary;
+
         // Plots
         constexpr ImVec4 PlotLines              = ImVec4(0.000f, 0.400f, 1.000f, 1.000f); // cobalt
-        constexpr ImVec4 PlotLinesHovered       = ImVec4(0.478f, 0.000f, 1.000f, 1.000f); // purple
+        constexpr ImVec4 PlotLinesHovered       = AccentSecondary;                         // azure
         constexpr ImVec4 PlotHistogram          = AccentLime;
         constexpr ImVec4 PlotHistogramHovered   = AccentMagenta;
 
@@ -118,7 +105,7 @@ namespace ImGuiX::Themes {
     } // namespace Y2KConstants
 
     /// \class Y2KTheme
-    /// \brief Light Y2K theme with cobalt/purple accents and glassy panels.
+    /// \brief Light Y2K theme with cobalt/azure accents and glassy panels.
     class Y2KTheme final : public Theme {
     public:
         void apply(ImGuiStyle& style) const override {
@@ -150,8 +137,8 @@ namespace ImGuiX::Themes {
             colors[ImGuiCol_ScrollbarGrabActive]   = ScrollbarGrabActive;
 
             colors[ImGuiCol_CheckMark]             = CheckMark;
-            colors[ImGuiCol_SliderGrab]            = CheckMark;
-            colors[ImGuiCol_SliderGrabActive]      = Y2KConstants::AccentPurple;
+            colors[ImGuiCol_SliderGrab]            = SliderGrab;
+            colors[ImGuiCol_SliderGrabActive]      = SliderGrabActive;
 
             colors[ImGuiCol_Button]                = Button;
             colors[ImGuiCol_ButtonHovered]         = ButtonHovered;
@@ -185,7 +172,25 @@ namespace ImGuiX::Themes {
 
             colors[ImGuiCol_NavHighlight]          = NavHighlight;
             colors[ImGuiCol_NavWindowingHighlight] = NavWindowingHighlight;
-            // Note: NavWindowingDimBg / ModalWindowDimBg left as defaults.
+
+            colors[ImGuiCol_TableHeaderBg]         = TitleBgActive;
+            colors[ImGuiCol_TableBorderStrong]     = ImVec4(Border.x, Border.y, Border.z, 1.0f);
+            colors[ImGuiCol_TableBorderLight]      = ImVec4(Border.x, Border.y, Border.z, 0.50f);
+                                                   
+            colors[ImGuiCol_TableRowBg]            = ImVec4(1,1,1,0.00f);
+            colors[ImGuiCol_TableRowBgAlt]         = ImVec4(0,0,0,0.03f);
+
+            colors[ImGuiCol_NavWindowingDimBg]     = ImVec4(0,0,0,0.20f);
+            colors[ImGuiCol_ModalWindowDimBg]      = ImVec4(0,0,0,0.35f);
+            
+#ifdef IMGUIX_HAS_DOCKING
+            colors[ImGuiCol_DockingPreview] = AccentSecondary;
+            colors[ImGuiCol_DockingEmptyBg] = ImVec4(
+                WindowBg.x,
+                WindowBg.y,
+                WindowBg.z, 1.0f
+            );
+#endif
 
             // Unify sizes/roundings/paddings/borders from config
             applyDefaultImGuiStyle(style);
@@ -197,8 +202,11 @@ namespace ImGuiX::Themes {
 
             ImPlot::StyleColorsLight(&style);
 
+            ImVec4 frame = ChildBg; frame.w = 1.0f;
+            style.Colors[ImPlotCol_FrameBg]        = frame;
             style.Colors[ImPlotCol_PlotBg]         = WindowBg;
             style.Colors[ImPlotCol_PlotBorder]     = Border;
+            
             style.Colors[ImPlotCol_LegendBg]       = PopupBg;
             style.Colors[ImPlotCol_LegendBorder]   = Border;
             style.Colors[ImPlotCol_LegendText]     = Text;
@@ -207,11 +215,14 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlotCol_InlayText]      = Text;
             style.Colors[ImPlotCol_AxisText]       = Text;
 
-            // Light grid/ticks over bright bg
-            style.Colors[ImPlotCol_AxisGrid]       = ImVec4(0.75f, 0.75f, 0.75f, 0.60f);
-            style.Colors[ImPlotCol_AxisTick]       = ImVec4(0.40f, 0.40f, 0.40f, 0.90f);
+            //style.Colors[ImPlotCol_AxisGrid]       = ImVec4(0.75f, 0.75f, 0.75f, 0.60f);
+            //style.Colors[ImPlotCol_AxisTick]       = ImVec4(0.40f, 0.40f, 0.40f, 0.90f);
+            style.Colors[ImPlotCol_AxisGrid]       = ImVec4(Border.x, Border.y, Border.z, 0.60f);
+            style.Colors[ImPlotCol_AxisTick]       = ImVec4(Text.x,   Text.y,   Text.z,   0.90f);
+            
+            style.Colors[ImPlotCol_AxisBgHovered]  = ButtonHovered;
+            style.Colors[ImPlotCol_AxisBgActive]   = ButtonActive;
 
-            // Use cobalt/purple accents
             style.Colors[ImPlotCol_Selection]      = ImVec4(0.000f, 0.400f, 1.000f, 0.55f);
             style.Colors[ImPlotCol_Crosshairs]     = ImVec4(0.000f, 0.400f, 1.000f, 1.00f);
 
@@ -235,8 +246,8 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlot3DCol_InlayText]    = Text;
             style.Colors[ImPlot3DCol_AxisText]     = Text;
 
-            style.Colors[ImPlot3DCol_AxisGrid]     = ImVec4(0.75f, 0.75f, 0.75f, 0.60f);
-            style.Colors[ImPlot3DCol_AxisTick]     = ImVec4(0.40f, 0.40f, 0.40f, 0.90f);
+            style.Colors[ImPlotCol_AxisGrid]       = ImVec4(Border.x, Border.y, Border.z, 0.60f);
+            style.Colors[ImPlotCol_AxisTick]       = ImVec4(Text.x,   Text.y,   Text.z,   0.90f);
 
             applyDefaultImPlot3DStyle(style);
         }

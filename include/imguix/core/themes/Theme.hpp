@@ -71,19 +71,38 @@ namespace ImGuiX::Themes {
     /// \details Used by all themes before applying color scheme.
     inline void applyDefaultImPlotStyle(ImPlotStyle& style) {
         using namespace ImGuiX::Config;
+        const ImGuiStyle& ig = ImGui::GetStyle();
 
         style.UseISO8601     = true;
         style.Use24HourClock = true;
 
         style.PlotBorderSize = FRAME_BORDER_SIZE;
         style.PlotPadding    = WINDOW_PADDING;
-        style.LabelPadding   = ITEM_SPACING;
+        //style.LabelPadding   = ITEM_SPACING;
+        style.LabelPadding       = ig.ItemInnerSpacing;
 
         style.LegendPadding        = WINDOW_PADDING;
-        style.LegendInnerPadding   = WINDOW_PADDING;
+        //style.LegendInnerPadding   = WINDOW_PADDING;
+        style.LegendInnerPadding = ig.ItemInnerSpacing;
         style.LegendSpacing        = ITEM_SPACING;
-        style.MousePosPadding      = WINDOW_PADDING;
-        style.AnnotationPadding    = ITEM_SPACING;
+        style.MousePosPadding    = ig.ItemInnerSpacing;
+        //style.MousePosPadding      = WINDOW_PADDING;
+        //style.AnnotationPadding    = ITEM_SPACING;
+        style.AnnotationPadding  = ImVec2(ig.ItemInnerSpacing.x * 0.5f, ig.ItemInnerSpacing.y * 0.5f);
+
+        // Сетка/тики: minor чуть прозрачнее/тоньше
+        style.MinorAlpha   = 0.35f;
+        const float px     = ig.FrameBorderSize > 0.0f ? ig.FrameBorderSize : 1.0f;
+        style.MajorTickLen = ImVec2(10.0f, 10.0f);
+        style.MinorTickLen = ImVec2(5.0f,  5.0f);
+        style.MajorTickSize= ImVec2(px, px);
+        style.MinorTickSize= ImVec2(px * 0.75f, px * 0.75f);
+        style.MajorGridSize= ImVec2(px, px);
+        style.MinorGridSize= ImVec2(px * 0.75f, px * 0.75f);
+
+        // Базовые размеры плота (разумные дефолты)
+        style.PlotDefaultSize = ImVec2(480.0f, 320.0f);
+        style.PlotMinSize     = ImVec2(200.0f, 150.0f);
     }
 #   endif
 
@@ -100,6 +119,9 @@ namespace ImGuiX::Themes {
         style.LegendPadding      = WINDOW_PADDING;
         style.LegendInnerPadding = WINDOW_PADDING;
         style.LegendSpacing      = ITEM_SPACING;
+        
+        //const ImPlot3DStyle& ig = ImGui::GetStyle();
+        //style.PlotBorderSize = ig.FrameBorderSize;
     }
 #   endif
     

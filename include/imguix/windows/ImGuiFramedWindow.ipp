@@ -153,14 +153,13 @@ namespace ImGuiX::Windows {
 
         ImGui::PopStyleVar();
     }
-    
+
     void ImGuiFramedWindow::drawImGuiStyledControlButtons(float title_padding_x) {
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
 
-        float btn_height = m_config.title_bar_height - ImGui::GetStyle().FramePadding.y * 2.0f;
-        float btn_padding = ImGui::GetStyle().ItemSpacing.x * 2.0f + btn_height * 3.0f + title_padding_x;
+        const float btn_height = m_config.title_bar_height - ImGui::GetStyle().FramePadding.y * 2.0f;
+        const float btn_padding = ImGui::GetStyle().ItemSpacing.x * 2.0f + btn_height * 3.0f + title_padding_x;
         ImVec2 btn_size(btn_height, btn_height);
-
         ImVec2 btn_min, btn_max;
         float center_y = (m_config.title_bar_height - btn_size.y) * 0.5f;
         ImGui::SetCursorPos(ImVec2(ImGui::GetWindowWidth() - btn_padding, center_y));

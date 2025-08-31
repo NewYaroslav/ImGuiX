@@ -10,10 +10,10 @@ namespace ImGuiX::Widgets {
         AuthPanelResult res = AuthPanelResult::None;
         ImGui::PushID(id);
 
-    // Compute a conservative height to keep the child stable.
-    float height = 0.0f;
-    height += ImGui::GetTextLineHeightWithSpacing(); // header
-    height = std::max(height, ImGui::GetFrameHeightWithSpacing());
+		// Compute a conservative height to keep the child stable.
+		float height = 0.0f;
+		height += ImGui::GetTextLineHeightWithSpacing(); // header
+		height = std::max(height, ImGui::GetFrameHeightWithSpacing());
 
         if (cfg.show_host)      height += ImGui::GetFrameHeightWithSpacing();
         if (cfg.show_email)     height += ImGui::GetFrameHeightWithSpacing();

@@ -49,12 +49,14 @@ namespace ImGuiX::Windows {
     void ImGuiFramedWindow::drawUi() {
         setCurrentWindow();
         ImGui::PushID(id());
+        
+        const ImGuiStyle& style = ImGui::GetStyle();
 
         ImGui::SetNextWindowPos({0, 0});
         ImGui::SetNextWindowSize(ImVec2((float)m_window.getSize().x, (float)m_window.getSize().y));
 
         ImVec2 char_size = ImGui::CalcTextSize(u8"W");
-        ImVec2 padding = ImGui::GetStyle().WindowPadding;
+        ImVec2 padding = style.WindowPadding;
         float title_padding_x = padding.x + char_size.x * 2.0f;
 
         const ImGuiWindowFlags flags = 
@@ -66,14 +68,15 @@ namespace ImGuiX::Windows {
             ImGuiWindowFlags_NoBringToFrontOnFocus;
 
         if (hasFlag(m_flags, WindowFlags::DisableBackground) || m_disable_background) {
-            ImVec4 border_color = ImGui::GetStyle().Colors[ImGuiCol_Border];
-            ImVec4 background_color = ImGui::GetStyle().Colors[ImGuiCol_WindowBg];
+            ImVec4 border_color = style.Colors[ImGuiCol_Border];
+            ImVec4 background_color = style.Colors[ImGuiCol_WindowBg];
             ImVec4 new_color = Extensions::BlendColors(border_color, background_color);
             ImGui::PushStyleColor(ImGuiCol_Border, new_color);
             ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0));
         }
 
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+        const float inset = style.WindowBorderSize; 
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(inset, inset));
         ImGui::Begin(u8"##imguix_framed_window", nullptr, flags);
         ImGui::PopStyleVar();
         
@@ -82,6 +85,7 @@ namespace ImGuiX::Windows {
         }
 
         // --- Title bar
+        //ImGui::SetCursorPosY(1.0f);
         ImGui::BeginChild(u8"##imguix_title_bar", ImVec2(0, m_config.title_bar_height), false,
                           ImGuiWindowFlags_NoScrollbar | 
                           ImGuiWindowFlags_NoDecoration);
@@ -110,12 +114,14 @@ namespace ImGuiX::Windows {
         
         // --- Menu Bar
         if (hasFlag(m_flags, WindowFlags::HasMenuBar)) {
-            ImGui::SetCursorPosY(m_config.title_bar_height);
+            ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 0.0f);
+            ImGui::SetCursorPosY(m_config.title_bar_height + inset);
             ImGui::BeginChild(u8"##imguix_menu_bar", ImVec2(0, 0), false,
                               ImGuiWindowFlags_MenuBar | 
                               ImGuiWindowFlags_NoScrollbar | 
                               ImGuiWindowFlags_NoDecoration |
                               ImGuiWindowFlags_AlwaysAutoResize);
+            ImGui::PopStyleVar();
             drawMenuBar();
             ImGui::EndChild();
         }
