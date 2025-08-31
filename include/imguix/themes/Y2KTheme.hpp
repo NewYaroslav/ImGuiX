@@ -96,12 +96,24 @@ namespace ImGuiX::Themes {
         constexpr ImVec4 PlotLinesHovered       = AccentSecondary;                         // azure
         constexpr ImVec4 PlotHistogram          = AccentLime;
         constexpr ImVec4 PlotHistogramHovered   = AccentMagenta;
+        constexpr ImVec4 PlotAxisGrid           = ImVec4(Border.x, Border.y, Border.z, 0.60f);
+        constexpr ImVec4 PlotAxisTick           = ImVec4(Text.x,   Text.y,   Text.z,   0.90f);
+        constexpr ImVec4 PlotSelection          = ImVec4(0.000f, 0.400f, 1.000f, 0.55f);
+        constexpr ImVec4 PlotCrosshairs         = ImVec4(0.000f, 0.400f, 1.000f, 1.00f);
+
+        // Tables
+        constexpr ImVec4 TableBorderStrong      = ImVec4(Border.x, Border.y, Border.z, 1.00f);
+        constexpr ImVec4 TableBorderLight       = ImVec4(Border.x, Border.y, Border.z, 0.50f);
+        constexpr ImVec4 TableRowBg             = ImVec4(1.000f, 1.000f, 1.000f, 0.00f);
+        constexpr ImVec4 TableRowBgAlt          = ImVec4(0.000f, 0.000f, 0.000f, 0.03f);
 
         // Misc / Navigation
         constexpr ImVec4 TextSelectedBg         = ImVec4(0.000f, 0.400f, 1.000f, 0.350f);
         constexpr ImVec4 DragDropTarget         = ImVec4(0.000f, 0.400f, 1.000f, 0.950f);
         constexpr ImVec4 NavHighlight           = HeaderHovered;
         constexpr ImVec4 NavWindowingHighlight  = ImVec4(0.700f, 0.700f, 0.700f, 0.700f);
+        constexpr ImVec4 NavWindowingDimBg      = ImVec4(0.000f, 0.000f, 0.000f, 0.20f);
+        constexpr ImVec4 ModalWindowDimBg       = ImVec4(0.000f, 0.000f, 0.000f, 0.35f);
     } // namespace Y2KConstants
 
     /// \class Y2KTheme
@@ -174,14 +186,14 @@ namespace ImGuiX::Themes {
             colors[ImGuiCol_NavWindowingHighlight] = NavWindowingHighlight;
 
             colors[ImGuiCol_TableHeaderBg]         = TitleBgActive;
-            colors[ImGuiCol_TableBorderStrong]     = ImVec4(Border.x, Border.y, Border.z, 1.0f);
-            colors[ImGuiCol_TableBorderLight]      = ImVec4(Border.x, Border.y, Border.z, 0.50f);
-                                                   
-            colors[ImGuiCol_TableRowBg]            = ImVec4(1,1,1,0.00f);
-            colors[ImGuiCol_TableRowBgAlt]         = ImVec4(0,0,0,0.03f);
+            colors[ImGuiCol_TableBorderStrong]     = TableBorderStrong;
+            colors[ImGuiCol_TableBorderLight]      = TableBorderLight;
 
-            colors[ImGuiCol_NavWindowingDimBg]     = ImVec4(0,0,0,0.20f);
-            colors[ImGuiCol_ModalWindowDimBg]      = ImVec4(0,0,0,0.35f);
+            colors[ImGuiCol_TableRowBg]            = TableRowBg;
+            colors[ImGuiCol_TableRowBgAlt]         = TableRowBgAlt;
+
+            colors[ImGuiCol_NavWindowingDimBg]     = NavWindowingDimBg;
+            colors[ImGuiCol_ModalWindowDimBg]      = ModalWindowDimBg;
             
 #ifdef IMGUIX_HAS_DOCKING
             colors[ImGuiCol_DockingPreview] = AccentSecondary;
@@ -215,16 +227,14 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlotCol_InlayText]      = Text;
             style.Colors[ImPlotCol_AxisText]       = Text;
 
-            //style.Colors[ImPlotCol_AxisGrid]       = ImVec4(0.75f, 0.75f, 0.75f, 0.60f);
-            //style.Colors[ImPlotCol_AxisTick]       = ImVec4(0.40f, 0.40f, 0.40f, 0.90f);
-            style.Colors[ImPlotCol_AxisGrid]       = ImVec4(Border.x, Border.y, Border.z, 0.60f);
-            style.Colors[ImPlotCol_AxisTick]       = ImVec4(Text.x,   Text.y,   Text.z,   0.90f);
+            style.Colors[ImPlotCol_AxisGrid]       = PlotAxisGrid;
+            style.Colors[ImPlotCol_AxisTick]       = PlotAxisTick;
             
             style.Colors[ImPlotCol_AxisBgHovered]  = ButtonHovered;
             style.Colors[ImPlotCol_AxisBgActive]   = ButtonActive;
 
-            style.Colors[ImPlotCol_Selection]      = ImVec4(0.000f, 0.400f, 1.000f, 0.55f);
-            style.Colors[ImPlotCol_Crosshairs]     = ImVec4(0.000f, 0.400f, 1.000f, 1.00f);
+            style.Colors[ImPlotCol_Selection]      = PlotSelection;
+            style.Colors[ImPlotCol_Crosshairs]     = PlotCrosshairs;
 
             applyDefaultImPlotStyle(style);
         }
@@ -246,8 +256,8 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlot3DCol_InlayText]    = Text;
             style.Colors[ImPlot3DCol_AxisText]     = Text;
 
-            style.Colors[ImPlotCol_AxisGrid]       = ImVec4(Border.x, Border.y, Border.z, 0.60f);
-            style.Colors[ImPlotCol_AxisTick]       = ImVec4(Text.x,   Text.y,   Text.z,   0.90f);
+            style.Colors[ImPlot3DCol_AxisGrid]     = PlotAxisGrid;
+            style.Colors[ImPlot3DCol_AxisTick]     = PlotAxisTick;
 
             applyDefaultImPlot3DStyle(style);
         }
