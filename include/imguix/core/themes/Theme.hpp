@@ -63,6 +63,9 @@ namespace ImGuiX::Themes {
         style.ChildBorderSize   = CHILD_BORDER_SIZE;
         style.PopupBorderSize   = POPUP_BORDER_SIZE;
         style.GrabRounding      = GRAB_ROUNDING;
+#       ifdef IMGUIX_HAS_DOCKING
+        style.WindowRounding    = 0.0f;
+#       endif
     }
 
 #   ifdef IMGUI_ENABLE_IMPLOT
@@ -78,31 +81,30 @@ namespace ImGuiX::Themes {
 
         style.PlotBorderSize = FRAME_BORDER_SIZE;
         style.PlotPadding    = WINDOW_PADDING;
-        //style.LabelPadding   = ITEM_SPACING;
-        style.LabelPadding       = ig.ItemInnerSpacing;
+        style.LabelPadding   = ig.ItemInnerSpacing;
 
-        style.LegendPadding        = WINDOW_PADDING;
-        //style.LegendInnerPadding   = WINDOW_PADDING;
+        style.LegendPadding      = WINDOW_PADDING;
         style.LegendInnerPadding = ig.ItemInnerSpacing;
-        style.LegendSpacing        = ITEM_SPACING;
+        style.LegendSpacing      = ITEM_SPACING;
         style.MousePosPadding    = ig.ItemInnerSpacing;
-        //style.MousePosPadding      = WINDOW_PADDING;
-        //style.AnnotationPadding    = ITEM_SPACING;
-        style.AnnotationPadding  = ImVec2(ig.ItemInnerSpacing.x * 0.5f, ig.ItemInnerSpacing.y * 0.5f);
+        style.AnnotationPadding  = ImVec2(
+                ig.ItemInnerSpacing.x * ANNOTATION_PADDING_SCALE,
+                ig.ItemInnerSpacing.y * ANNOTATION_PADDING_SCALE
+        );
 
-        // Сетка/тики: minor чуть прозрачнее/тоньше
-        style.MinorAlpha   = 0.35f;
-        const float px     = ig.FrameBorderSize > 0.0f ? ig.FrameBorderSize : 1.0f;
-        style.MajorTickLen = ImVec2(10.0f, 10.0f);
-        style.MinorTickLen = ImVec2(5.0f,  5.0f);
-        style.MajorTickSize= ImVec2(px, px);
-        style.MinorTickSize= ImVec2(px * 0.75f, px * 0.75f);
-        style.MajorGridSize= ImVec2(px, px);
-        style.MinorGridSize= ImVec2(px * 0.75f, px * 0.75f);
+        // Grid and ticks: minor lines slightly thinner
+        style.MinorAlpha   = PLOT_MINOR_ALPHA;
+        const float px     = ig.FrameBorderSize > 0.0f ? ig.FrameBorderSize : FRAME_BORDER_SIZE;
+        style.MajorTickLen = PLOT_MAJOR_TICK_LEN;
+        style.MinorTickLen = PLOT_MINOR_TICK_LEN;
+        style.MajorTickSize = ImVec2(px, px);
+        style.MinorTickSize = ImVec2(px * PLOT_MINOR_SCALE, px * PLOT_MINOR_SCALE);
+        style.MajorGridSize = ImVec2(px, px);
+        style.MinorGridSize = ImVec2(px * PLOT_MINOR_SCALE, px * PLOT_MINOR_SCALE);
 
-        // Базовые размеры плота (разумные дефолты)
-        style.PlotDefaultSize = ImVec2(480.0f, 320.0f);
-        style.PlotMinSize     = ImVec2(200.0f, 150.0f);
+        // Plot sizes
+        style.PlotDefaultSize = PLOT_DEFAULT_SIZE;
+        style.PlotMinSize     = PLOT_MIN_SIZE;
     }
 #   endif
 
@@ -113,15 +115,21 @@ namespace ImGuiX::Themes {
     inline void applyDefaultImPlot3DStyle(ImPlot3DStyle& style) {
         using namespace ImGuiX::Config;
 
+        const ImGuiStyle& ig = ImGui::GetStyle();
+        const float px = ig.FrameBorderSize > 0.0f ? ig.FrameBorderSize : FRAME_BORDER_SIZE;
+
+        style.LineWeight   = px;
+        style.MarkerWeight = px;
+
         style.PlotPadding    = WINDOW_PADDING;
-        style.LabelPadding   = ITEM_SPACING;
+        style.LabelPadding   = ig.ItemInnerSpacing;
 
         style.LegendPadding      = WINDOW_PADDING;
-        style.LegendInnerPadding = WINDOW_PADDING;
+        style.LegendInnerPadding = ig.ItemInnerSpacing;
         style.LegendSpacing      = ITEM_SPACING;
-        
-        //const ImPlot3DStyle& ig = ImGui::GetStyle();
-        //style.PlotBorderSize = ig.FrameBorderSize;
+
+        style.PlotDefaultSize = PLOT_DEFAULT_SIZE;
+        style.PlotMinSize     = PLOT_MIN_SIZE;
     }
 #   endif
     
