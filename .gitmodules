@@ -34,3 +34,6 @@
 [submodule "libs/portable-file-dialogs"]
 	path = libs/portable-file-dialogs
 	url = https://github.com/samhocevar/portable-file-dialogs.git
+[submodule "libs/imspinner"]
+	path = libs/imspinner
+	url = https://github.com/dalerank/imspinner.git
