@@ -13,23 +13,24 @@ namespace ImGuiX::Widgets {
 
     /// \brief Configuration for LoadingSpinner.
     struct LoadingSpinnerConfig {
-        float radius        = 24.0f;     ///< circle radius in pixels
-        float thickness     = 6.5f;      ///< stroke thickness in pixels
-        int   segments      = 20;        ///< number of segments used to draw the arc (>= 8 recommended)
-        float angular_speed = 4.0f;      ///< radians per second added to the phase
-        float sweep_ratio   = 0.80f;     ///< arc sweep as fraction of full circle (0..1], e.g. 0.8 → 288°
-        ImU32 color         = 0;         ///< 0 → use style's ImGuiCol_Text color
-        float extra_top_padding = 0.0f;  ///< optional extra vertical padding on top, px
+        float radius        = 24.0f;     ///< Circle radius in pixels.
+        float thickness     = 6.5f;      ///< Stroke thickness in pixels.
+        int   segments      = 20;        ///< Segment count for arc (>= 8 recommended).
+        float angular_speed = 4.0f;      ///< Radians per second added to the phase.
+        float sweep_ratio   = 0.80f;     ///< Arc sweep as fraction of full circle (0..1], e.g. 0.8 → 288°.
+        ImU32 color         = 0;         ///< 0 → use style's ImGuiCol_Text color.
+        float extra_top_padding = 0.0f;  ///< Optional extra top padding in pixels.
     };
-    
-    /// \brief
+
+    /// \brief Compute default spinner color from style.
+    /// \return Spinner color based on current style.
     ImU32 DefaultSpinnerColor();
 
     /// \brief Draw an animated loading spinner.
     /// \param id Unique widget identifier.
     /// \param cfg Spinner parameters.
     /// \return True if the item was submitted (not clipped).
-    /// \code
+    /// \code{.cpp}
     /// LoadingSpinner("busy");
     /// \endcode
     bool LoadingSpinner(const char* id, const LoadingSpinnerConfig& cfg = {});

@@ -24,8 +24,8 @@ namespace ImGuiX::Widgets {
 
     /// \brief Center a wrapped text block by placing it into a centered child.
     /// \param text Text to render.
-    /// \param wrap_width Desired wrap width in pixels (<= avail). If <= 0, uses available width.
-    /// \note The function creates a child region of the target width and centers it, then uses TextWrapped inside.
+    /// \param wrap_width Wrap width in pixels; if <= 0 uses available width.
+    /// \note Creates centered child of the target width and calls TextWrapped inside.
     void TextWrappedCentered(const char* text, float wrap_width = 0.0f);
     
     /// \brief Overload for std::string (unformatted).
@@ -36,7 +36,7 @@ namespace ImGuiX::Widgets {
 
     /// \brief Overload for std::string (wrapped).
     /// \param s Text to render.
-    /// \param wrap_width Desired wrap width in pixels.
+    /// \param wrap_width Wrap width in pixels; if <= 0 uses available width.
     inline void TextWrappedCentered(const std::string& s, float wrap_width = 0.0f) {
         TextWrappedCentered(s.c_str(), wrap_width);
     }
