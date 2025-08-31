@@ -4,7 +4,7 @@
 #include <imgui.h>
 
 /// \file circle_button.hpp
-/// \brief Provides a utility for drawing circular ImGui buttons.
+/// \brief Circular button helper for ImGui.
 
 namespace ImGuiX::Widgets {
 
@@ -14,7 +14,7 @@ namespace ImGuiX::Widgets {
     /// \param color Base color.
     /// \return True if button was clicked.
     /// \note Button changes color on hover or active using style.
-    /// \code
+    /// \code{.cpp}
     /// if (CircleButton("play", 24.0f, ImVec4{1, 0, 0, 1})) {
     ///     // clicked
     /// }

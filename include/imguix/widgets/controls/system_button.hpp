@@ -3,7 +3,7 @@
 #define _IMGUIX_WIDGETS_SYSTEM_BUTTON_HPP_INCLUDED
 
 /// \file system_button.hpp
-/// \brief Provides custom system-style buttons (close, minimize, maximize) for ImGui windows.
+/// \brief Custom system-style buttons for ImGui windows.
 
 #include <imgui.h>
 
@@ -41,15 +41,22 @@ namespace ImGuiX::Widgets {
     /// \param size Button size in pixels.
     /// \return True if button was clicked.
     /// \note Button is highlighted on hover or active using style colors.
-    /// \code
+    /// \code{.cpp}
     /// if (SystemButton("close", SystemButtonType::Close, ImVec2{16, 16})) {
     ///     // clicked
     /// }
     /// \endcode
     bool SystemButton(const char* id, SystemButtonType type, ImVec2 size);
-    
-    /// Borderless close button like titlebar 'X'.
-    /// size <= 0 -> square with size = GetFrameHeight()
+
+    /// \brief Borderless close button like titlebar 'X'.
+    /// \param id Unique ID string.
+    /// \param size Button size in pixels; 0 => square using GetFrameHeight().
+    /// \return True if button was clicked.
+    /// \code{.cpp}
+    /// if (CloseXButton("close")) {
+    ///     // clicked
+    /// }
+    /// \endcode
     inline bool CloseXButton(const char* id, float size = 0.0f) {
         if (size <= 0.0f) size = ImGui::GetFrameHeight();
         return SystemButton(id, SystemButtonType::Close, ImVec2(size, size));
