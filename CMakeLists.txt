@@ -29,6 +29,9 @@ option(IMGUIX_IMGUI_FREETYPE   "Enable ImGui FreeType rasterizer" ON)
 option(IMGUIX_USE_IMPLOT       "Build ImPlot and link it in" ON)
 option(IMGUIX_USE_IMPLOT3D     "Build ImPlot3D and link it in" ON)
 
+# ImGui / ImNodeFlow
+option(IMGUIX_USE_IMNODEFLOW   "Build and link ImNodeFlow" ON)
+
 # JSON vendoring (default OFF to prefer system package)
 option(IMGUIX_VENDOR_JSON      "Install vendored nlohmann_json headers with ImGuiX" OFF)
 
@@ -94,6 +97,7 @@ include(cmake/deps/imgui.cmake)
 include(cmake/deps/imgui_sfml.cmake)
 include(cmake/deps/implot.cmake)
 include(cmake/deps/implot3d.cmake)
+include(cmake/deps/imnodeflow.cmake)
 include(cmake/deps/nlohmann_json.cmake)
 include(cmake/deps/assets.cmake)
 include(cmake/deps/app_icon.cmake)
@@ -140,6 +144,10 @@ if(IMGUIX_USE_IMPLOT3D)
     imguix_use_or_fetch_implot3d(IMPLOT3D_TARGET)
 endif()
 
+if(IMGUIX_USE_IMNODEFLOW)
+    imguix_use_or_fetch_imnodeflow(IMNODEFLOW_TARGET)
+endif()
+
 # ===== Library / Header-only switch =====
 if(IMGUIX_HEADER_ONLY)
     message(STATUS "ImGuiX: header-only mode ON")
@@ -181,6 +189,10 @@ if(IMGUIX_HEADER_ONLY)
 
     if(IMGUIX_USE_IMPLOT3D)
         target_compile_definitions(imguix INTERFACE IMGUI_ENABLE_IMPLOT3D)
+    endif()
+    
+    if(IMGUIX_USE_IMNODEFLOW)
+        target_compile_definitions(imguix INTERFACE IMGUI_ENABLE_IMNODEFLOW)
     endif()
 
     # Clean interface to avoid exporting foreign targets
@@ -257,6 +269,11 @@ else()
         target_compile_definitions(imguix PUBLIC IMGUI_ENABLE_IMPLOT3D)
         target_link_libraries(imguix PRIVATE ${IMPLOT3D_TARGET})
     endif()
+    
+    if(IMGUIX_USE_IMNODEFLOW)
+        target_compile_definitions(imguix PUBLIC IMGUI_ENABLE_IMNODEFLOW)
+        target_link_libraries(imguix PRIVATE ${IMNODEFLOW_TARGET})
+    endif()
 
     # Clean interface to avoid exporting foreign targets
     set_property(TARGET imguix PROPERTY INTERFACE_LINK_LIBRARIES "")
@@ -316,6 +333,11 @@ if(IMGUIX_BUILD_TESTS)
             target_compile_definitions(${TEST_NAME} PRIVATE IMGUI_ENABLE_IMPLOT3D)
             target_link_libraries(${TEST_NAME} PRIVATE implot3d::implot3d)
             imguix_add_implot3d_demo(${TEST_NAME})
+        endif()
+        
+        if(IMGUIX_USE_IMNODEFLOW)
+            target_compile_definitions(${TEST_NAME} PRIVATE IMGUI_ENABLE_IMNODEFLOW)
+            target_link_libraries(${TEST_NAME} PRIVATE imnodeflow::imnodeflow)
         endif()
 
         imguix_add_imgui_demo(${TEST_NAME})
@@ -504,6 +526,15 @@ if(IMGUIX_SDK_BUNDLE_DEPS)
         install(FILES
             "${PROJECT_SOURCE_DIR}/libs/implot3d/implot3d.h"
             "${PROJECT_SOURCE_DIR}/libs/implot3d/implot3d_internal.h"
+            DESTINATION include
+        )
+    endif()
+    
+    
+    # --- ImNodeFlow: headers ---
+    if(EXISTS "${PROJECT_SOURCE_DIR}/libs/ImNodeFlow/include/ImNodeFlow.h")
+        install(FILES
+            "${PROJECT_SOURCE_DIR}/libs/ImNodeFlow/include/ImNodeFlow.h"
             DESTINATION include
         )
     endif()

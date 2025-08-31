@@ -53,7 +53,9 @@
 #include <imguix/widgets/plot/PlotOHLCChart.hpp>
 #endif
 
-//namespace i18n = ImGuiX::I18N;
+#ifdef IMGUI_ENABLE_IMNODEFLOW
+#include <ImNodeFlow.h>   // ImFlow::Editor, BaseNode, etc.
+#endif
 
 #ifdef IMGUI_ENABLE_IMPLOT
 /// \brief Generate synthetic OHLCV bars.
@@ -109,6 +111,47 @@ inline static void GenerateBars(
 }
 #endif
 
+#ifdef IMGUI_ENABLE_IMNODEFLOW
+class SimpleSum final : public ImFlow::BaseNode {
+public:
+    SimpleSum() {
+        setTitle("Simple sum");
+        setStyle(ImFlow::NodeStyle::green());
+
+        // Фильтр ставим на ВХОД
+        addIN<int>("A", 0, ImFlow::ConnectionFilter::SameType());
+
+        // ВЫХОД: во второй параметр передаём стиль пина (или nullptr)
+        addOUT<int>("Result", nullptr)
+            ->behaviour([this]() { return getInVal<int>("A") + b_; });
+    }
+
+    void draw() override {
+        ImGui::SetNextItemWidth(100.0f);
+        ImGui::InputInt("B", &b_);
+    }
+private:
+    int b_ = 0;
+};
+
+// Редактор/хэндлер графа
+static ImFlow::ImNodeFlow g_editor;
+
+void DrawNodeEditorFrame() {
+    static bool inited = false;
+    if (!inited) {
+        // Создаём узел на сцене (позиция в пикселях экранных координат)
+        g_editor.placeNodeAt<SimpleSum>(ImVec2(120, 80));
+        inited = true;
+    }
+
+    // Рисуем редактор внутри окна ImGui
+    ImGui::Begin("Node Editor");
+    g_editor.update();           // <-- вместо g_editor.draw(...)
+    ImGui::End();
+}
+#endif
+
 // Контроллер окна демо-виджетов
 class WidgetsController : public ImGuiX::Controller {
 public:
@@ -134,6 +177,9 @@ public:
 #       ifdef IMGUI_ENABLE_IMPLOT3D
         static bool show_implot3d_demo = false;
 #       endif
+#       ifdef IMGUI_ENABLE_IMNODEFLOW
+        static bool show_imnodeflow_demo = false;
+#       endif
         if (ImGui::BeginMainMenuBar()) {
             if (ImGui::BeginMenu("Demo")) {
                 if (ImGui::MenuItem("ImGui", nullptr, false, !show_imgui_demo)) {
@@ -147,6 +193,11 @@ public:
 #               ifdef IMGUI_ENABLE_IMPLOT3D
                 if (ImGui::MenuItem("ImPlot3D", nullptr, false, !show_implot3d_demo)) {
                     show_implot3d_demo = true;
+                }
+#               endif
+#               ifdef IMGUI_ENABLE_IMNODEFLOW
+                if (ImGui::MenuItem("ImNodeFlow", nullptr, false, !show_imnodeflow_demo)) {
+                    show_imnodeflow_demo = true;
                 }
 #               endif
                 ImGui::EndMenu();
@@ -165,6 +216,13 @@ public:
 #       endif
 #       ifdef IMGUI_ENABLE_IMPLOT3D
         if (show_implot3d_demo) ImPlot3D::ShowDemoWindow(&show_implot3d_demo);
+#       endif
+#       ifdef IMGUI_ENABLE_IMNODEFLOW
+        if (show_imnodeflow_demo) {
+            ImGui::Begin("ImNodeFlow Demo", &show_imnodeflow_demo);
+            DrawNodeEditorFrame();              // <- твоя функция с g_editor.draw(...)
+            ImGui::End();
+        }
 #       endif
         ImGui::PopFont();
         ImGui::PopID();
