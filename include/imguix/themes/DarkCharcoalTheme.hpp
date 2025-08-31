@@ -173,7 +173,7 @@ namespace ImGuiX::Themes {
             // Unify sizes/roundings from config
             applyDefaultImGuiStyle(style);
 
-#ifdef IMGUI_HAS_DOCKING
+#ifdef IMGUIX_HAS_DOCKING
             // In the original snippet, Docking colors were commented; we set reasonable matches.
             colors[ImGuiCol_DockingEmptyBg]        = WindowBg;
             colors[ImGuiCol_DockingPreview]        = ImVec4(1.000f, 0.391f, 0.000f, 0.781f); // orange, semi-opaque
@@ -193,7 +193,9 @@ namespace ImGuiX::Themes {
             // Start from ImPlot's dark defaults, then apply our colors.
             ImPlot::StyleColorsDark(&style);
 
-            style.Colors[ImPlotCol_PlotBg]        = WindowBg;
+            ImVec4 frame = FrameBg; frame.w = 1.0f;
+            style.Colors[ImPlotCol_FrameBg]      = frame;
+            style.Colors[ImPlotCol_PlotBg]       = WindowBg;
             style.Colors[ImPlotCol_PlotBorder]    = Border;
             style.Colors[ImPlotCol_LegendBg]      = PopupBg;
             style.Colors[ImPlotCol_LegendBorder]  = Border;
@@ -205,6 +207,8 @@ namespace ImGuiX::Themes {
             // Subtle grid/ticks over dark bg
             style.Colors[ImPlotCol_AxisGrid]      = ImVec4(0.35f, 0.35f, 0.35f, 0.55f);
             style.Colors[ImPlotCol_AxisTick]      = ImVec4(0.60f, 0.60f, 0.60f, 0.80f);
+            style.Colors[ImPlotCol_AxisBgHovered] = ButtonHovered;
+            style.Colors[ImPlotCol_AxisBgActive]  = ButtonActive;
 
             // Selection/crosshair in signature orange
             style.Colors[ImPlotCol_Selection]     = ImVec4(1.000f, 0.391f, 0.000f, 0.65f);

@@ -163,6 +163,11 @@ namespace ImGuiX::Themes {
 
             // Unify sizes/roundings/paddings/borders from config
             applyDefaultImGuiStyle(style);
+
+#ifdef IMGUIX_HAS_DOCKING
+            colors[ImGuiCol_DockingPreview] = Blue;
+            colors[ImGuiCol_DockingEmptyBg] = WindowBg;
+#endif
         }
 
 #ifdef IMGUI_ENABLE_IMPLOT
@@ -171,7 +176,9 @@ namespace ImGuiX::Themes {
 
             ImPlot::StyleColorsLight(&style);
 
-            style.Colors[ImPlotCol_PlotBg]        = WindowBg;
+            ImVec4 frame = FrameBg; frame.w = 1.0f;
+            style.Colors[ImPlotCol_FrameBg]        = frame;
+            style.Colors[ImPlotCol_PlotBg]         = WindowBg;
             style.Colors[ImPlotCol_PlotBorder]    = Border;
             style.Colors[ImPlotCol_LegendBg]      = PopupBg;
             style.Colors[ImPlotCol_LegendBorder]  = Border;
@@ -182,8 +189,10 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlotCol_AxisText]      = Text;
 
             // Light-ish grid/ticks over bright bg
-            style.Colors[ImPlotCol_AxisGrid]      = ImVec4(0.75f, 0.75f, 0.75f, 0.60f);
-            style.Colors[ImPlotCol_AxisTick]      = ImVec4(0.40f, 0.40f, 0.40f, 0.90f);
+            style.Colors[ImPlotCol_AxisGrid]       = ImVec4(0.75f, 0.75f, 0.75f, 0.60f);
+            style.Colors[ImPlotCol_AxisTick]       = ImVec4(0.40f, 0.40f, 0.40f, 0.90f);
+            style.Colors[ImPlotCol_AxisBgHovered]  = ButtonHovered;
+            style.Colors[ImPlotCol_AxisBgActive]   = ButtonActive;
 
             // Use the blue accent for selection/crosshairs
             style.Colors[ImPlotCol_Selection]     = ImVec4(0.26f, 0.59f, 0.98f, 0.55f);

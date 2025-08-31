@@ -140,7 +140,7 @@ namespace ImGuiX::Themes {
             // Unify sizes/roundings from theme_config.hpp
             applyDefaultImGuiStyle(style);
 
-#ifdef IMGUI_HAS_DOCKING
+#ifdef IMGUIX_HAS_DOCKING
             colors[ImGuiCol_DockingEmptyBg]        = ChildBg;
             colors[ImGuiCol_Tab]                   = FrameBg;
             colors[ImGuiCol_TabHovered]            = FrameBgHovered;
@@ -161,6 +161,8 @@ namespace ImGuiX::Themes {
             using namespace SlateDarkConstants;
 
             ImPlot::StyleColorsDark(&style);
+            ImVec4 frame = FrameBg; frame.w = 1.0f;
+            style.Colors[ImPlotCol_FrameBg]      = frame;
             style.Colors[ImPlotCol_PlotBg]       = WindowBg;
             style.Colors[ImPlotCol_PlotBorder]   = Border;
             style.Colors[ImPlotCol_LegendBg]     = PopupBg;
@@ -171,6 +173,8 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlotCol_AxisText]     = Text;
             style.Colors[ImPlotCol_AxisGrid]     = ImVec4(0.30f, 0.30f, 0.30f, 0.50f);
             style.Colors[ImPlotCol_AxisTick]     = ImVec4(0.55f, 0.55f, 0.55f, 0.80f);
+            style.Colors[ImPlotCol_AxisBgHovered] = ButtonHovered;
+            style.Colors[ImPlotCol_AxisBgActive]  = ButtonActive;
             style.Colors[ImPlotCol_Selection]    = AccentBase;
             style.Colors[ImPlotCol_Crosshairs]   = AccentBase;
 

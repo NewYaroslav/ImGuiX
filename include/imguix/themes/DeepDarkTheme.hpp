@@ -185,7 +185,7 @@ namespace ImGuiX::Themes {
             // Unified roundings/paddings/borders from config
             applyDefaultImGuiStyle(style);
 
-#ifdef IMGUI_HAS_DOCKING
+#ifdef IMGUIX_HAS_DOCKING
             // Original snippet had docking colors commented out; we pick sane defaults.
             colors[ImGuiCol_DockingEmptyBg]        = WindowBg;
             colors[ImGuiCol_DockingPreview]        = ImVec4(0.33f, 0.67f, 0.86f, 1.00f); // cyan overlay
@@ -203,7 +203,9 @@ namespace ImGuiX::Themes {
 
             ImPlot::StyleColorsDark(&style);
 
-            style.Colors[ImPlotCol_PlotBg]        = WindowBg;
+            ImVec4 frame = FrameBg; frame.w = 1.0f;
+            style.Colors[ImPlotCol_FrameBg]      = frame;
+            style.Colors[ImPlotCol_PlotBg]       = WindowBg;
             style.Colors[ImPlotCol_PlotBorder]    = Border;
             style.Colors[ImPlotCol_LegendBg]      = PopupBg;
             style.Colors[ImPlotCol_LegendBorder]  = Border;
@@ -216,6 +218,8 @@ namespace ImGuiX::Themes {
             // Subtle grid/ticks over deep dark bg
             style.Colors[ImPlotCol_AxisGrid]      = ImVec4(0.35f, 0.35f, 0.35f, 0.40f);
             style.Colors[ImPlotCol_AxisTick]      = ImVec4(0.65f, 0.65f, 0.65f, 0.70f);
+            style.Colors[ImPlotCol_AxisBgHovered] = ButtonHovered;
+            style.Colors[ImPlotCol_AxisBgActive]  = ButtonActive;
 
             // Selection/crosshair use the red accent to match plot colors
             style.Colors[ImPlotCol_Selection]     = ImVec4(1.00f, 0.00f, 0.00f, 0.55f);

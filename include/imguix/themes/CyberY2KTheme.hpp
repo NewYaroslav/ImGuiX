@@ -173,6 +173,11 @@ namespace ImGuiX::Themes {
 
             // Unify sizes/roundings/paddings/borders from config
             applyDefaultImGuiStyle(style);
+
+#ifdef IMGUIX_HAS_DOCKING
+            colors[ImGuiCol_DockingPreview] = Cyan;
+            colors[ImGuiCol_DockingEmptyBg] = WindowBg;
+#endif
         }
 
 #ifdef IMGUI_ENABLE_IMPLOT
@@ -181,6 +186,8 @@ namespace ImGuiX::Themes {
 
             ImPlot::StyleColorsDark(&style);
 
+            ImVec4 frame = FrameBg; frame.w = 1.0f;
+            style.Colors[ImPlotCol_FrameBg]        = frame;
             style.Colors[ImPlotCol_PlotBg]         = WindowBg;
             style.Colors[ImPlotCol_PlotBorder]     = Border;
             style.Colors[ImPlotCol_LegendBg]       = PopupBg;
@@ -194,6 +201,8 @@ namespace ImGuiX::Themes {
             // Grid/ticks over dark bg
             style.Colors[ImPlotCol_AxisGrid]       = ImVec4(0.164f, 0.204f, 0.251f, 0.60f); // #2A3440
             style.Colors[ImPlotCol_AxisTick]       = ImVec4(0.902f, 0.945f, 1.000f, 0.90f); // Text @ 0.9
+            style.Colors[ImPlotCol_AxisBgHovered]  = ButtonHovered;
+            style.Colors[ImPlotCol_AxisBgActive]   = ButtonActive;
 
             // Neon accents
             style.Colors[ImPlotCol_Selection]      = ImVec4(0.000f, 0.898f, 1.000f, 0.55f);

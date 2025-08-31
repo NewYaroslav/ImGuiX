@@ -171,7 +171,7 @@ namespace ImGuiX::Themes {
             // Unify sizes/roundings/paddings/borders from config
             applyDefaultImGuiStyle(style);
 
-#ifdef IMGUI_HAS_DOCKING
+#ifdef IMGUIX_HAS_DOCKING
             colors[ImGuiCol_DockingEmptyBg]        = WindowBg;
             colors[ImGuiCol_DockingPreview]        = ImVec4(GoldBright.x, GoldBright.y, GoldBright.z, 0.70f); // warm overlay
 
@@ -188,7 +188,9 @@ namespace ImGuiX::Themes {
 
             ImPlot::StyleColorsDark(&style);
 
-            style.Colors[ImPlotCol_PlotBg]        = WindowBg;
+            ImVec4 frame = FrameBg; frame.w = 1.0f;
+            style.Colors[ImPlotCol_FrameBg]      = frame;
+            style.Colors[ImPlotCol_PlotBg]       = WindowBg;
             style.Colors[ImPlotCol_PlotBorder]    = GoldBorder;
             style.Colors[ImPlotCol_LegendBg]      = PopupBg;
             style.Colors[ImPlotCol_LegendBorder]  = GoldBorder;
@@ -201,6 +203,8 @@ namespace ImGuiX::Themes {
             // Warm grid/ticks to match gold-ish palette
             style.Colors[ImPlotCol_AxisGrid]      = ImVec4(0.40f, 0.32f, 0.18f, 0.45f);
             style.Colors[ImPlotCol_AxisTick]      = ImVec4(0.75f, 0.60f, 0.30f, 0.85f);
+            style.Colors[ImPlotCol_AxisBgHovered] = ButtonHovered;
+            style.Colors[ImPlotCol_AxisBgActive]  = ButtonActive;
 
             // Selection/crosshair in golden accent
             style.Colors[ImPlotCol_Selection]     = ImVec4(GoldBright.x, GoldBright.y, GoldBright.z, 0.65f);
