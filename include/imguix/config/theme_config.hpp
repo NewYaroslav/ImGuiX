@@ -57,6 +57,27 @@ namespace ImGuiX::Config {
     /// \brief Spacing between items.
     constexpr ImVec2 ITEM_SPACING         = ImVec2(6.0f, 2.0f);
 
+    /// \brief Alpha multiplier for minor plot grid lines.
+    constexpr float PLOT_MINOR_ALPHA       = 0.35f;
+
+    /// \brief Scaling factor for minor ticks and grids.
+    constexpr float PLOT_MINOR_SCALE       = 0.75f;
+
+    /// \brief Major tick lengths for plots.
+    constexpr ImVec2 PLOT_MAJOR_TICK_LEN   = ImVec2(10.0f, 10.0f);
+
+    /// \brief Minor tick lengths for plots.
+    constexpr ImVec2 PLOT_MINOR_TICK_LEN   = ImVec2(5.0f, 5.0f);
+
+    /// \brief Default plot size.
+    constexpr ImVec2 PLOT_DEFAULT_SIZE     = ImVec2(480.0f, 320.0f);
+
+    /// \brief Minimum plot size.
+    constexpr ImVec2 PLOT_MIN_SIZE         = ImVec2(200.0f, 150.0f);
+
+    /// \brief Scale applied to annotation padding.
+    constexpr float ANNOTATION_PADDING_SCALE = 0.5f;
+
 } // namespace ImGuiX::Config
 
 #endif // _IMGUIX_CONFIG_THEME_HPP_INCLUDED
