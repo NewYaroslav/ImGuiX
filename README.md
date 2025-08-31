@@ -152,34 +152,34 @@ The SDK can include a `quickstart/` folder with a minimal application example. C
 
 ```
 .
-├── include/
-│   └── imguix/
-│       ├── config/
-│       ├── controllers/
-│       ├── core/
-│       │   ├── application/
-│       │   ├── controller/
-│       │   ├── events/
-│       │   ├── fonts/
-│       │   ├── i18n/
-│       │   ├── model/
-│       │   ├── notify/
-│       │   ├── options/
-│       │   ├── pubsub/
-│       │   ├── resource/
-│       │   ├── themes/
-│       │   └── window/
-│       ├── extensions/
-│       ├── themes/
-│       ├── utils/
-│       ├── widgets/
-│       └── windows/
-├── docs/
-├── examples/
-│   └── quickstart/
-├── libs/
-├── src/
-└── tests/
+├── include/            # public headers
+│   └── imguix/         # main library headers
+│       ├── config/     # configuration helpers
+│       ├── controllers/  # controller utilities
+│       ├── core/       # core framework modules
+│       │   ├── application/ # application and context
+│       │   ├── controller/  # base controller class
+│       │   ├── events/      # built-in event types
+│       │   ├── fonts/       # font manager
+│       │   ├── i18n/        # internationalization
+│       │   ├── model/       # model base classes
+│       │   ├── notify/      # notifications
+│       │   ├── options/     # options storage
+│       │   ├── pubsub/      # event bus
+│       │   ├── resource/    # resource registry
+│       │   ├── themes/      # theme manager
+│       │   └── window/      # window interfaces
+│       ├── extensions/  # utility extensions
+│       ├── themes/      # built-in themes
+│       ├── utils/       # utility functions
+│       ├── widgets/     # reusable widgets
+│       └── windows/     # window helpers
+├── docs/               # project documentation
+├── examples/           # sample applications
+│   └── quickstart/     # minimal starter project
+├── libs/               # bundled dependencies
+├── src/                # library sources
+└── tests/              # tests and demos
 ```
 
 ## Architecture
