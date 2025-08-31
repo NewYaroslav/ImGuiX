@@ -240,7 +240,8 @@ namespace ImGuiX {
         /// \brief Access the theme manager.
         /// \return Theme manager.
         ImGuiX::Themes::ThemeManager& themeManager() noexcept override;
-        
+
+        /// \brief Apply the currently selected theme.
         void updateCurrentTheme() { themeManager().updateCurrentTheme(); }
 
         // --- Notification ---
@@ -328,10 +329,10 @@ namespace ImGuiX {
         const char* selectGlslForSdl(SDL_Window* w) noexcept;
 #endif
 #ifdef IMGUI_ENABLE_IMPLOT
-        ImPlotContext* m_implot_ctx = nullptr; ///<
+        ImPlotContext* m_implot_ctx = nullptr; ///< ImPlot context.
 #endif
 #ifdef IMGUI_ENABLE_IMPLOT3D
-        ImPlot3DContext* m_implot3d_ctx = nullptr; ///<
+        ImPlot3DContext* m_implot3d_ctx = nullptr; ///< ImPlot3D context.
 #endif
         int m_window_id;                    ///< Unique window identifier.
         std::string m_window_name;          ///< Internal window name.
