@@ -61,6 +61,10 @@
 #include <ImGuiFileDialog.h>
 #endif
 
+#ifdef IMGUI_ENABLE_PFD
+#include <portable-file-dialogs.h>
+#endif
+
 #ifdef IMGUI_ENABLE_IMPLOT
 /// \brief Generate synthetic OHLCV bars.
 /// \param out Output bar container.
@@ -187,6 +191,9 @@ public:
 #       ifdef IMGUI_ENABLE_IMGUIFILEDIALOG
         static bool show_igfd = false;
 #       endif
+#       ifdef IMGUI_ENABLE_PFD
+        static bool show_pfd = false;
+#       endif
         if (ImGui::BeginMainMenuBar()) {
             if (ImGui::BeginMenu("Demo")) {
                 if (ImGui::MenuItem("ImGui", nullptr, false, !show_imgui_demo)) {
@@ -211,6 +218,9 @@ public:
                 if (ImGui::MenuItem("File Dialog", nullptr, false, !show_igfd)) {
                     show_igfd = true;
                 }
+#               endif
+#               ifdef IMGUI_ENABLE_PFD
+                if (ImGui::MenuItem("File Dialog (pfd)", nullptr, false, !show_pfd)) show_pfd = true;
 #               endif
                 ImGui::EndMenu();
             }
@@ -255,6 +265,35 @@ public:
                 }
                 ImGuiFileDialog::Instance()->Close();
             }
+            ImGui::End();
+        }
+#       endif
+
+#       ifdef IMGUI_ENABLE_PFD
+        if (show_pfd) {
+            ImGui::Begin("portable-file-dialogs", &show_pfd);
+
+            static std::string last_open, last_save;
+            if (ImGui::Button("Open...")) {
+                auto sel = pfd::open_file("Open file",
+                                          ".",            // стартовая папка
+                                          { "All files", "*" },
+                                          pfd::opt::multiselect).result();
+                if (!sel.empty()) last_open = sel.front(); // возьми первый, либо перечисли все
+            }
+            ImGui::SameLine();
+            ImGui::TextDisabled("%s", last_open.c_str());
+
+            if (ImGui::Button("Save As...")) {
+                last_save = pfd::save_file("Save file", ".", { "Text", "*.txt", "All files", "*" }).result();
+            }
+            ImGui::SameLine();
+            ImGui::TextDisabled("%s", last_save.c_str());
+
+            if (ImGui::Button("Message box")) {
+                pfd::message("Notice", "Operation finished.", pfd::choice::ok, pfd::icon::info).result();
+            }
+
             ImGui::End();
         }
 #       endif

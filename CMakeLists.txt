@@ -36,6 +36,9 @@ option(IMGUIX_USE_IMNODEFLOW   "Build and link ImNodeFlow" ON)
 option(IMGUIX_USE_IMGUIFILEDIALOG        "Build and link ImGuiFileDialog" ON)
 option(IMGUIX_IMGUIFILEDIALOG_USE_STD_FS "Use std::filesystem in ImGuiFileDialog" ON)
 
+# portable-file-dialog
+option(IMGUIX_USE_PFD          "Build and link portable-file-dialogs (header-only)" ON)
+
 # JSON vendoring (default OFF to prefer system package)
 option(IMGUIX_VENDOR_JSON      "Install vendored nlohmann_json headers with ImGuiX" OFF)
 
@@ -103,6 +106,7 @@ include(cmake/deps/implot.cmake)
 include(cmake/deps/implot3d.cmake)
 include(cmake/deps/imnodeflow.cmake)
 include(cmake/deps/imgui_file_dialog.cmake)
+include(cmake/deps/portable_file_dialogs.cmake)
 include(cmake/deps/nlohmann_json.cmake)
 include(cmake/deps/assets.cmake)
 include(cmake/deps/app_icon.cmake)
@@ -157,6 +161,10 @@ if(IMGUIX_USE_IMGUIFILEDIALOG)
     imguix_use_or_fetch_imguifiledialog(IGFD_TARGET)
 endif()
 
+if(IMGUIX_USE_PFD)
+    imguix_use_or_fetch_pfd(PFD_TARGET)
+endif()
+
 # ===== Library / Header-only switch =====
 if(IMGUIX_HEADER_ONLY)
     message(STATUS "ImGuiX: header-only mode ON")
@@ -206,6 +214,11 @@ if(IMGUIX_HEADER_ONLY)
     
     if(IMGUIX_USE_IMGUIFILEDIALOG)
         target_compile_definitions(imguix INTERFACE IMGUI_ENABLE_IMGUIFILEDIALOG)
+    endif()
+    
+    if(IMGUIX_USE_PFD)
+        target_compile_definitions(imguix INTERFACE IMGUI_ENABLE_PFD)
+        # include-dir пойдёт транзитивно у потребителей, если они залинкуются на pfd::pfd
     endif()
 
     # Clean interface to avoid exporting foreign targets
@@ -292,6 +305,11 @@ else()
         target_compile_definitions(imguix PUBLIC IMGUI_ENABLE_IMGUIFILEDIALOG)
         target_link_libraries(imguix PRIVATE ${IGFD_TARGET})
     endif()
+    
+    if(IMGUIX_USE_PFD)
+        target_compile_definitions(imguix PUBLIC IMGUI_ENABLE_PFD)
+        target_link_libraries(imguix PRIVATE ${PFD_TARGET})
+    endif()
 
     # Clean interface to avoid exporting foreign targets
     set_property(TARGET imguix PROPERTY INTERFACE_LINK_LIBRARIES "")
@@ -356,6 +374,11 @@ if(IMGUIX_BUILD_TESTS)
         if(IMGUIX_USE_IMNODEFLOW)
             target_compile_definitions(${TEST_NAME} PRIVATE IMGUI_ENABLE_IMNODEFLOW)
             target_link_libraries(${TEST_NAME} PRIVATE imnodeflow::imnodeflow)
+        endif()
+        
+        if(IMGUIX_USE_PFD)
+            target_compile_definitions(${TEST_NAME} PRIVATE IMGUI_ENABLE_PFD)
+            target_link_libraries(${TEST_NAME} PRIVATE pfd::pfd)
         endif()
         
         if(IMGUIX_USE_IMGUIFILEDIALOG)
@@ -568,6 +591,13 @@ if(IMGUIX_SDK_BUNDLE_DEPS)
             "${PROJECT_SOURCE_DIR}/libs/ImGuiFileDialog/ImGuiFileDialog.h"
             "${PROJECT_SOURCE_DIR}/libs/ImGuiFileDialog/ImGuiFileDialogConfig.h"
             DESTINATION include)
+    endif()
+    
+    if(EXISTS "${PROJECT_SOURCE_DIR}/libs/portable-file-dialogs/portable-file-dialogs.h")
+        install(FILES
+            "${PROJECT_SOURCE_DIR}/libs/portable-file-dialogs/portable-file-dialogs.h"
+            DESTINATION include
+        )
     endif()
 
 endif()
