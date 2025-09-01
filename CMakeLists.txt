@@ -42,7 +42,7 @@ option(IMGUIX_USE_IMTEXTEDITOR "Build and link ImGuiColorTextEdit" ON)
 # portable-file-dialog
 option(IMGUIX_USE_PFD          "Build and link portable-file-dialogs (header-only)" ON)
 
-# ImGui / portable-file-dialog
+# ImGui / imgui-command-palette
 option(IMGUIX_USE_IMCMD        "Build and link imgui-command-palette" ON)
 
 # ImGui / imspinner
