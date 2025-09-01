@@ -16,6 +16,7 @@
 #include <imguix/config/fonts.hpp>
 #include <imguix/widgets/input/validated_password_input.hpp>
 #include <imguix/config/colors.hpp>
+#include <imguix/core/controller/Controller.hpp>
 
 namespace ImGuiX::Widgets {
 
@@ -173,6 +174,36 @@ namespace ImGuiX::Widgets {
             AuthPanelConfig& cfg,
             AuthData& data
         );
+
+#   ifdef IMGUIX_DEMO
+    /// \brief Render demo for AuthPanel widget.
+    /// \param ctrl Controller to access options storage.
+    inline void DemoAuthPanel(ImGuiX::Controller* ctrl) {
+        static AuthPanelConfig auth_cfg{};
+        static AuthData auth_data{};
+        AuthPanel("login.panel", auth_cfg, auth_data);
+
+        AuthPanelConfig cfg_api{};
+        cfg_api.header              = u8"Authorization (API key)";
+        cfg_api.show_api_keys       = true;
+        cfg_api.vk_api_key          = true;
+        cfg_api.vk_api_secret       = true;
+        cfg_api.show_connect_button = false;
+        const auto res = AuthPanel("login.api", cfg_api, auth_data);
+        using E = AuthPanelResult;
+        if (ctrl) {
+            if (Has(res, E::HostChanged) && auth_data.host_valid) {
+                ctrl->options().setStr("host", auth_data.host);
+            }
+            if (Has(res, E::EmailChanged) && auth_data.email_valid) {
+                ctrl->options().setStr("email", auth_data.email);
+            }
+            if (Has(res, E::PasswordChanged)) {
+                ctrl->options().setStr("password", auth_data.password);
+            }
+        }
+    }
+#   endif
 
 } // namespace ImGuiX::Widgets
 

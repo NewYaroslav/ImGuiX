@@ -313,26 +313,7 @@ private:
 
     void demoAuthorization() {
         if (ImGui::CollapsingHeader("Authorization", ImGuiTreeNodeFlags_DefaultOpen)) {
-            ImGuiX::Widgets::AuthPanel(
-                "login.panel", m_state.auth_cfg, m_state.auth_data);
-
-            ImGuiX::Widgets::AuthPanelConfig cfg_api{};
-            cfg_api.header              = u8"Authorization (API key)";
-            cfg_api.show_api_keys       = true;
-            cfg_api.vk_api_key          = true;
-            cfg_api.vk_api_secret       = true;
-            cfg_api.show_connect_button = false;
-            const auto res = ImGuiX::Widgets::AuthPanel("login.api", cfg_api, m_state.auth_data);
-            using E = ImGuiX::Widgets::AuthPanelResult;
-            if (Has(res, E::HostChanged) && m_state.auth_data.host_valid) {
-                options().setStr("host", m_state.auth_data.host);
-            }
-            if (Has(res, E::EmailChanged) && m_state.auth_data.email_valid) {
-                options().setStr("email", m_state.auth_data.email);
-            }
-            if (Has(res, E::PasswordChanged)) {
-                options().setStr("password", m_state.auth_data.password);
-            }
+            ImGuiX::Widgets::DemoAuthPanel(this);
         }
 
         if (ImGui::CollapsingHeader("Validated Inputs")) {
@@ -351,14 +332,11 @@ private:
         }
 
         if (ImGui::CollapsingHeader("Domain Selector")) {
-            if (ImGuiX::Widgets::DomainSelector("domain.selector", m_state.dom_cfg, m_state.auth_data.host)) {
-                // Реакция на изменение хоста при необходимости
-            }
+            ImGuiX::Widgets::DemoDomainSelector();
         }
 
         if (ImGui::CollapsingHeader("JS Panel")) {
-            ImGuiX::Widgets::AuthJsPanelConfig js_cfg{};
-            ImGuiX::Widgets::AuthJsPanel("js.panel", js_cfg, m_state.js_st);
+            ImGuiX::Widgets::DemoAuthJsPanel();
         }
 
         if (ImGui::CollapsingHeader("Proxy Settings")) {
@@ -406,94 +384,7 @@ private:
 
     void demoNotifications() {
         if (ImGui::CollapsingHeader("Notifications", ImGuiTreeNodeFlags_DefaultOpen)) {
-            if (ImGui::Button("Success")) {
-                ImGuiX::Widgets::NotifyFmt(
-                    this, ImGuiX::Notify::Type::Success, 0,
-                    u8"That is a success! {}", "(Format here)"
-                );
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Warning")) {
-                ImGuiX::Widgets::NotifyFmt(
-                    this, ImGuiX::Notify::Type::Warning, 0,
-                    u8"This is a warning!"
-                );
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Error")) {
-                ImGuiX::Widgets::NotifyFmt(
-                    this, ImGuiX::Notify::Type::Error, 0,
-                    u8"Segmentation fault"
-                );
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Info")) {
-                ImGuiX::Widgets::NotifyFmt(
-                    this, ImGuiX::Notify::Type::Info, 0,
-                    u8"Info about ImGui..."
-                );
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Info long")) {
-                ImGuiX::Widgets::NotifyFmt(
-                    this, ImGuiX::Notify::Type::Info, 0,
-                    u8"Hi, I'm a long notification. I'm here to show you that you can write a lot of text in me. "
-                    u8"I'm also here to show you that I can wrap text, so you don't have to worry about that."
-                );
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Notify with button")) {
-                ImGuiX::Widgets::NotifyWithButtonFmt(
-                    this,
-                    ImGuiX::Notify::Type::Error,
-                    0,
-                    u8"Click me!",
-                    [this]() {
-                        ImGuiX::Widgets::NotifyFmt(
-                            this, ImGuiX::Notify::Type::Success, 0,
-                            u8"Thanks for clicking!"
-                        );
-                    },
-                    u8"Notification", "Content with action"
-                );
-            }
-
-            ImGui::Separator();
-            ImGui::TextDisabled(u8"Do it yourself:");
-
-            static char title_buf[4096]   = u8"Hello there!";
-            static char content_buf[4096] = u8"General Kenobi! \n- Grievous";
-            ImGui::InputTextMultiline(u8"Title",   title_buf,   IM_ARRAYSIZE(title_buf));
-            ImGui::InputTextMultiline(u8"Content", content_buf, IM_ARRAYSIZE(content_buf));
-
-            static int duration_ms = 5000;
-            ImGui::InputInt(u8"Duration (ms)", &duration_ms, 100);
-            if (duration_ms < 0) duration_ms = 0;
-
-            static const char* type_str[] = { u8"None", u8"Success", u8"Warning", u8"Error", u8"Info" };
-            static ImGuiX::Notify::Type type = ImGuiX::Notify::Type::Success;
-            if (ImGui::BeginCombo(u8"Type", type_str[static_cast<int>(type)])) {
-                for (int n = 0; n < IM_ARRAYSIZE(type_str); ++n) {
-                    const bool selected = (static_cast<int>(type) == n);
-                    if (ImGui::Selectable(type_str[n], selected)) {
-                        type = static_cast<ImGuiX::Notify::Type>(n);
-                    }
-                    if (selected) ImGui::SetItemDefaultFocus();
-                }
-                ImGui::EndCombo();
-            }
-
-            static bool enable_title = true, enable_content = true;
-            ImGui::Checkbox(u8"Enable title", &enable_title);
-            ImGui::SameLine();
-            ImGui::Checkbox(u8"Enable content", &enable_content);
-
-            if (ImGui::Button(u8"Show")) {
-                ImGuiX::Notify::Notification toast(type, duration_ms);
-                if (enable_title)   toast.setTitle("%s", title_buf);
-                if (enable_content) toast.setContent("%s", content_buf);
-                ImGuiX::Widgets::InsertNotification(this, std::move(toast));
-            }
+            ImGuiX::Widgets::DemoNotifications(this);
         }
     }
 
