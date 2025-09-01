@@ -37,7 +37,7 @@ option(IMGUIX_USE_IMGUIFILEDIALOG        "Build and link ImGuiFileDialog" ON)
 option(IMGUIX_IMGUIFILEDIALOG_USE_STD_FS "Use std::filesystem in ImGuiFileDialog" ON)
 
 # ImGui / ImGuiColorTextEdit
-option(IMGUIX_USE_IMTEXTEDITOR "Build and link ImGuiColorTextEdit" ON)
+option(IMGUIX_USE_IMTEXTEDITOR "Build and link ImGuiColorTextEdit" OFF)
 
 # portable-file-dialog
 option(IMGUIX_USE_PFD          "Build and link portable-file-dialogs (header-only)" ON)
