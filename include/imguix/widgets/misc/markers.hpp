@@ -7,6 +7,7 @@
 
 #include <imgui.h>
 #include <string>
+#include <vector>
 
 #include <imguix/config/icons.hpp>
 #include <imguix/config/colors.hpp>
@@ -98,6 +99,58 @@ namespace ImGuiX::Widgets {
             const ImVec4& color = IMGUIX_COLOR_SUCCESS,
             const char* icon_utf8 = IMGUIX_ICON_SUCCESS
         );
+
+#ifdef IMGUIX_DEMO
+    /// \brief Render demo for marker widgets.
+    inline void DemoMarkers() {
+        ImGui::TextDisabled("Colored markers:");
+        ColoredMarker("OK",         "All good",             ImVec4(0.10f, 0.75f, 0.30f, 1.0f));
+        ImGui::SameLine();
+        ColoredMarker("WARNING",    "Spread high",          ImVec4(0.95f, 0.75f, 0.10f, 1.0f));
+        ImGui::SameLine();
+        ColoredMarker("ERROR",      "Disconnected",         ImVec4(0.95f, 0.25f, 0.25f, 1.0f));
+        ImGui::SameLine();
+        ColoredMarker("SIMULATION", "Demo / paper trading", ImVec4(0.70f, 0.70f, 0.80f, 1.0f));
+
+        ImGui::Separator();
+
+        ImGui::TextDisabled("Message markers:");
+        ImGui::TextUnformatted("Help:");
+        ImGui::SameLine();
+        HelpMarker("Trading server to place real orders.\nUse with care.");
+
+        ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x * 2);
+        ImGui::TextUnformatted("Info:");
+        ImGui::SameLine();
+        InfoMarker("New version available: v1.4.2. Update when idle.");
+
+        ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x * 2);
+        ImGui::TextUnformatted("Warn:");
+        ImGui::SameLine();
+        WarningMarker("Funding API rate-limit almost reached; consider backoff.");
+
+        ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x * 2);
+        ImGui::TextUnformatted("Success:");
+        ImGui::SameLine();
+        SuccessMarker("License validated. All features enabled.");
+        SuccessMarker("License validated.", MarkerMode::InlineText);
+
+        ImGui::Separator();
+
+        ImGui::TextDisabled("Selectable markers:");
+        static std::vector<std::string> presets = {
+            "London Session", "New York Session", "Asia Session", "Custom Range"
+        };
+        static int last_clicked = -1;
+        for (int i = 0; i < (int)presets.size(); ++i) {
+            if (SelectableMarker(presets[i])) {
+                last_clicked = i;
+            }
+        }
+        ImGui::Separator();
+        ImGui::Text("Last clicked: %s", (last_clicked >= 0 ? presets[last_clicked].c_str() : "none"));
+    }
+#endif
 
 } // namespace ImGuiX::Widgets
 #ifdef IMGUIX_HEADER_ONLY

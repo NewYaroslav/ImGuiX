@@ -58,6 +58,16 @@ namespace ImGuiX::Widgets {
             const ListEditorConfig& cfg = {}
         );
 
+#ifdef IMGUIX_DEMO
+    /// \brief Render demo for ListEditor widgets.
+    inline void DemoListEditor() {
+        static std::vector<std::string> names = {"Alice", "Bob"};
+        static std::vector<int> numbers = {1, 2, 3};
+        ListEditor("list.names",   "Names",   names);
+        ListEditor("list.numbers", "Numbers", numbers);
+    }
+#endif
+
 } // namespace ImGuiX::Widgets
 
 #ifdef IMGUIX_HEADER_ONLY

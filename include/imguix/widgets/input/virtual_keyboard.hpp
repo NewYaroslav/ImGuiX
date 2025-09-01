@@ -441,6 +441,28 @@ namespace ImGuiX::Widgets {
         return VirtualKeyboard(id, text, cfg);
     }
 
+#ifdef IMGUIX_DEMO
+    /// \brief Render demo for VirtualKeyboard widget.
+    inline void DemoVirtualKeyboard() {
+        static bool show_email = false;
+        static bool show_pass  = false;
+        static bool show_host  = false;
+        static std::string email;
+        static std::string password;
+        static std::string host;
+        static VirtualKeyboardConfig cfg;
+        ImGui::Checkbox("Email VK",    &show_email); ImGui::SameLine();
+        ImGui::Checkbox("Password VK", &show_pass);  ImGui::SameLine();
+        ImGui::Checkbox("Host VK",     &show_host);
+        if (show_email)
+            VirtualKeyboard("vk.email", email, cfg);
+        if (show_pass)
+            VirtualKeyboard("vk.pass",  password, cfg);
+        if (show_host)
+            VirtualKeyboard("vk.host",  host, cfg);
+    }
+#endif
+
 } // namespace ImGuiX::Widgets
 
 #ifdef IMGUIX_HEADER_ONLY

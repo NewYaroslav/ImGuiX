@@ -105,6 +105,55 @@ bool InputPasswordWithToggleVK(
             ImGuiInputTextFlags extra_flags = 0
         );
 
+#ifdef IMGUIX_DEMO
+    /// \brief Render demo for validated input widgets.
+    inline void DemoValidatedInputs() {
+        static std::string email;
+        static std::string api_key;
+        bool email_valid   = false;
+        bool api_key_valid = false;
+
+        KeyboardToggleConfig kb_cfg;
+        kb_cfg.icon_text           = u8"\uE312";
+        kb_cfg.tooltip_toggle_on   = u8"Show keyboard";
+        kb_cfg.tooltip_toggle_off  = u8"Hide keyboard";
+
+        InputTextWithVKValidated(
+            "email##validated",
+            "email",
+            email,
+            true,
+            InputValidatePolicy::OnTouch,
+            R"(.+@.+\.\w+)",
+            email_valid,
+            kb_cfg
+        );
+
+        InputTextValidated(
+            "apikey##validated",
+            "api key (public)",
+            api_key,
+            true,
+            InputValidatePolicy::OnTouch,
+            R"(^[A-Za-z0-9.\-:]+$)",
+            api_key_valid
+        );
+
+        PasswordToggleConfig toggle_cfg;
+        InputPasswordWithToggleVK(
+            "apikey##togglevk",
+            "api key (public)",
+            api_key,
+            true,
+            InputValidatePolicy::OnTouch,
+            R"(^[A-Za-z0-9.\-:]+$)",
+            api_key_valid,
+            toggle_cfg,
+            kb_cfg
+        );
+    }
+#endif
+
 } // namespace ImGuiX::Widgets
 
 #ifdef IMGUIX_HEADER_ONLY

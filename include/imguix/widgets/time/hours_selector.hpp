@@ -43,6 +43,35 @@ namespace ImGuiX::Widgets {
     /// \return True if selection changed this frame.
     bool HoursSelector(const char* id, std::vector<int>& selected_hours, const HoursSelectorConfig& cfg = {});
 
+#ifdef IMGUIX_DEMO
+    /// \brief Render demo for HoursSelector widget.
+    inline void DemoHoursSelector() {
+        static std::vector<int> hours;
+        static HoursSelectorConfig cfg;
+        if (ImGui::SmallButton("Work 9–18")) {
+            hours.clear();
+            for (int h = 9; h <= 18; ++h) hours.push_back(h);
+        }
+        ImGui::SameLine();
+        if (ImGui::SmallButton("Night 0–6")) {
+            hours.clear();
+            for (int h = 0; h <= 6; ++h) hours.push_back(h);
+        }
+        ImGui::SameLine();
+        if (ImGui::SmallButton("Even hours")) {
+            hours.clear();
+            for (int h = 0; h < 24; h += 2) hours.push_back(h);
+        }
+
+        bool changed = HoursSelector("hours", hours, cfg);
+        ImGui::SameLine();
+        ImGui::TextDisabled("(%d selected)", (int)hours.size());
+        if (changed) {
+            // handle hour changes
+        }
+    }
+#endif
+
 } // namespace ImGuiX::Widgets
 
 #ifdef IMGUIX_HEADER_ONLY

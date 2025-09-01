@@ -49,6 +49,19 @@ namespace ImGuiX::Widgets {
         return LoadingSpinner(id, cfg);
     }
 
+#   ifdef IMGUIX_DEMO
+    /// \brief Render demo for LoadingSpinner widget.
+    /// \param cfg Spinner configuration.
+    inline void DemoLoadingSpinner(LoadingSpinnerConfig& cfg) {
+        LoadingSpinner("spinner", cfg);
+        ImGui::SliderFloat("radius",    &cfg.radius,        2.0f, 48.0f, "%.0f");
+        ImGui::SliderFloat("thickness", &cfg.thickness,     1.0f, 12.0f, "%.1f");
+        ImGui::SliderInt  ("segments",  &cfg.segments,         8, 128);
+        ImGui::SliderFloat("sweep",     &cfg.sweep_ratio,   0.1f, 1.0f, "%.2f");
+        ImGui::SliderFloat("speed",     &cfg.angular_speed, 0.0f, 20.0f, "%.1f");
+    }
+#   endif
+
 } // namespace ImGuiX::Widgets
 #ifdef IMGUIX_HEADER_ONLY
 #   include "loading_spinner.ipp"
