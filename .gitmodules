@@ -40,3 +40,6 @@
 [submodule "libs/ImGuiColorTextEdit"]
 	path = libs/ImGuiColorTextEdit
 	url = https://github.com/NewYaroslav/ImGuiColorTextEdit.git
+[submodule "libs/imgui-command-palette"]
+	path = libs/imgui-command-palette
+	url = https://github.com/pthom/imgui-command-palette
