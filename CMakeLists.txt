@@ -37,7 +37,7 @@ option(IMGUIX_USE_IMGUIFILEDIALOG        "Build and link ImGuiFileDialog" ON)
 option(IMGUIX_IMGUIFILEDIALOG_USE_STD_FS "Use std::filesystem in ImGuiFileDialog" ON)
 
 # ImGui / ImGuiColorTextEdit
-option(IMGUIX_USE_IMTEXTEDITOR "Build and link ImGuiColorTextEdit" OFF)
+option(IMGUIX_USE_IMTEXTEDITOR "Build and link ImGuiColorTextEdit" ON)
 
 # portable-file-dialog
 option(IMGUIX_USE_PFD          "Build and link portable-file-dialogs (header-only)" ON)
@@ -231,8 +231,8 @@ if(IMGUIX_HEADER_ONLY)
     if(IMGUIX_USE_IMGUIFILEDIALOG)
         target_compile_definitions(imguix INTERFACE IMGUI_ENABLE_IMGUIFILEDIALOG)
     endif()
-	
-	if(IMGUIX_USE_IMTEXTEDITOR)
+    
+    if(IMGUIX_USE_IMTEXTEDITOR)
         target_compile_definitions(imguix INTERFACE IMGUI_ENABLE_IMTEXTEDITOR)
     endif()
     
@@ -330,8 +330,8 @@ else()
         target_compile_definitions(imguix PUBLIC IMGUI_ENABLE_IMGUIFILEDIALOG)
         target_link_libraries(imguix PRIVATE ${IGFD_TARGET})
     endif()
-	
-	if(IMGUIX_USE_IMTEXTEDITOR)
+    
+    if(IMGUIX_USE_IMTEXTEDITOR)
         target_compile_definitions(imguix PUBLIC IMGUI_ENABLE_IMTEXTEDITOR)
         target_link_libraries(imguix PRIVATE ${IMTEXTEDITOR_TARGET})
     endif()
@@ -422,10 +422,10 @@ if(IMGUIX_BUILD_TESTS)
             target_link_libraries(${TEST_NAME} PRIVATE imguifiledialog::imguifiledialog)
         endif()
 
-		if(IMGUIX_USE_IMTEXTEDITOR)
-			target_compile_definitions(${TEST_NAME} PRIVATE IMGUI_ENABLE_IMTEXTEDITOR)
-			target_link_libraries(${TEST_NAME} PRIVATE imtexteditor::imtexteditor)
-		endif()
+        if(IMGUIX_USE_IMTEXTEDITOR)
+            target_compile_definitions(${TEST_NAME} PRIVATE IMGUI_ENABLE_IMTEXTEDITOR)
+            target_link_libraries(${TEST_NAME} PRIVATE imtexteditor::imtexteditor)
+        endif()
 
         if(IMGUIX_USE_IMSPINNER)
             target_compile_definitions(${TEST_NAME} PRIVATE IMGUI_ENABLE_IMSPINNER)
@@ -640,13 +640,13 @@ if(IMGUIX_SDK_BUNDLE_DEPS)
             "${PROJECT_SOURCE_DIR}/libs/ImGuiFileDialog/ImGuiFileDialogConfig.h"
             DESTINATION include)
     endif()
-	
-	# --- ImGuiColorTextEdit: headers ---
-	if(EXISTS "${PROJECT_SOURCE_DIR}/libs/ImGuiColorTextEdit/TextEditor.h")
-		install(FILES
-			"${PROJECT_SOURCE_DIR}/libs/ImGuiColorTextEdit/TextEditor.h"
-			DESTINATION include)
-	endif()
+    
+    # --- ImGuiColorTextEdit: headers ---
+    if(EXISTS "${PROJECT_SOURCE_DIR}/libs/ImGuiColorTextEdit/ImGuiColorTextEdit.h")
+        install(FILES
+            "${PROJECT_SOURCE_DIR}/libs/ImGuiColorTextEdit/ImGuiColorTextEdit.h"
+            DESTINATION include)
+    endif()
     
     # --- portable-file-dialogs: headers ---
     if(EXISTS "${PROJECT_SOURCE_DIR}/libs/portable-file-dialogs/portable-file-dialogs.h")

@@ -30,7 +30,7 @@
 #endif
 
 #ifdef IMGUI_ENABLE_IMTEXTEDITOR
-#include <TextEditor.h>
+#include <ImGuiColorTextEdit.h>
 #endif
 
 namespace ImGuiX {
@@ -189,12 +189,12 @@ inline void DemoExternalWidgets() {
     }
 #endif
 #ifdef IMGUI_ENABLE_IMTEXTEDITOR
-    static TextEditor s_editor;
+    static ImTextEdit::TextEditor s_editor;
     if (show_text_editor) {
         static bool init = false;
         if (!init) {
-            s_editor.SetLanguageDefinition(TextEditor::LanguageDefinition::CPlusPlus());
-            s_editor.SetPalette(TextEditor::GetDarkPalette());
+            s_editor.SetLanguageDefinition(ImTextEdit::CPlusPlus());
+            s_editor.SetPalette(ImTextEdit::GetDarkPalette());
             s_editor.SetShowWhitespaces(false);
             s_editor.SetText("// Hello from ImGuiColorTextEdit\nint main(){return 0;}\n");
             init = true;
