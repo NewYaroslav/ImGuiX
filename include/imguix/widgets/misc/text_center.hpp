@@ -41,6 +41,21 @@ namespace ImGuiX::Widgets {
         TextWrappedCentered(s.c_str(), wrap_width);
     }
 
+#ifdef IMGUIX_DEMO
+    /// \brief Render demo for centered text helpers.
+    inline void DemoTextCenter() {
+        static std::string email;
+        TextCenteredFmt(
+            "Welcome, %s!", email.empty() ? "guest" : email.c_str());
+        TextUnformattedCentered("This line is centered.");
+        TextWrappedCentered(
+            "This is a long message that demonstrates how wrapped text can be visually centered "
+            "by placing it inside a centered child region.",
+            420.0f
+        );
+    }
+#endif
+
 } // namespace ImGuiX::Widgets
 #ifdef IMGUIX_HEADER_ONLY
 #   include "text_center.ipp"

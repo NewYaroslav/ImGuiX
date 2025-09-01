@@ -336,47 +336,7 @@ private:
         }
 
         if (ImGui::CollapsingHeader("Validated Inputs")) {
-            bool email_valid   = false;
-            bool api_key_valid = false;
-
-            ImGuiX::Widgets::KeyboardToggleConfig kb_cfg;
-            kb_cfg.icon_text           = u8"\uE312";
-            kb_cfg.tooltip_toggle_on   = u8"Show keyboard";
-            kb_cfg.tooltip_toggle_off  = u8"Hide keyboard";
-
-            ImGuiX::Widgets::InputTextWithVKValidated(
-                "email##validated",
-                "email",
-                m_state.auth_data.email,
-                true,
-                ImGuiX::Widgets::InputValidatePolicy::OnTouch,
-                R"(.+@.+\.\w+)",
-                email_valid,
-                kb_cfg
-            );
-
-            ImGuiX::Widgets::InputTextValidated(
-                "apikey##validated",
-                "api key (public)",
-                m_state.auth_data.api_key,
-                true,
-                ImGuiX::Widgets::InputValidatePolicy::OnTouch,
-                R"(^[A-Za-z0-9.\-:]+$)",
-                api_key_valid
-            );
-
-            ImGuiX::Widgets::PasswordToggleConfig toggle_cfg;
-            ImGuiX::Widgets::InputPasswordWithToggleVK(
-                "apikey##togglevk",
-                "api key (public)",
-                m_state.auth_data.api_key,
-                true,
-                ImGuiX::Widgets::InputValidatePolicy::OnTouch,
-                R"(^[A-Za-z0-9.\-:]+$)",
-                api_key_valid,
-                toggle_cfg,
-                kb_cfg
-            );
+            ImGuiX::Widgets::DemoValidatedInputs();
         }
 
         if (ImGui::CollapsingHeader("Status Info")) {
@@ -387,16 +347,7 @@ private:
         }
 
         if (ImGui::CollapsingHeader("Virtual Keyboards")) {
-            ImGui::Checkbox("Email VK",    &m_state.kbd_email); ImGui::SameLine();
-            ImGui::Checkbox("Password VK", &m_state.kbd_pass);  ImGui::SameLine();
-            ImGui::Checkbox("Host VK",     &m_state.kbd_host);
-
-            if (m_state.kbd_email)
-                ImGuiX::Widgets::VirtualKeyboard("vk.email", m_state.auth_data.email,    m_state.kcfg);
-            if (m_state.kbd_pass)
-                ImGuiX::Widgets::VirtualKeyboard("vk.pass",  m_state.auth_data.password, m_state.kcfg);
-            if (m_state.kbd_host)
-                ImGuiX::Widgets::VirtualKeyboard("vk.host",  m_state.auth_data.host,     m_state.kcfg);
+            ImGuiX::Widgets::DemoVirtualKeyboard();
         }
 
         if (ImGui::CollapsingHeader("Domain Selector")) {
@@ -419,157 +370,37 @@ private:
 
     void demoTime() {
         if (ImGui::CollapsingHeader("Hours Selector")) {
-            if (ImGui::SmallButton("Work 9–18")) {
-                m_state.hours.clear();
-                for (int h = 9; h <= 18; ++h) m_state.hours.push_back(h);
-            }
-            ImGui::SameLine();
-            if (ImGui::SmallButton("Night 0–6")) {
-                m_state.hours.clear();
-                for (int h = 0; h <= 6; ++h) m_state.hours.push_back(h);
-            }
-            ImGui::SameLine();
-            if (ImGui::SmallButton("Even hours")) {
-                m_state.hours.clear();
-                for (int h = 0; h < 24; h += 2) m_state.hours.push_back(h);
-            }
-
-            bool changed = ImGuiX::Widgets::HoursSelector("hours", m_state.hours, m_state.hs_cfg);
-            ImGui::SameLine();
-            ImGui::TextDisabled("(%d selected)", (int)m_state.hours.size());
-            if (changed) {
-                // обработать изменения часов
-            }
+            ImGuiX::Widgets::DemoHoursSelector();
         }
 
         if (ImGui::CollapsingHeader("WeekDays Selector")) {
-            static std::vector<int> selected_days;
-
-            ImGuiX::Widgets::DaysSelectorConfig cfg;
-            cfg.label       = u8"Working days";
-            //cfg.combo_width = 180.0f;
-            cfg.short_names = { u8"Пн", u8"Вт", u8"Ср", u8"Чт", u8"Пт", u8"Сб", u8"Вс" };
-            if (ImGuiX::Widgets::DaysOfWeekSelector("##days_selector", selected_days, cfg)) {
-                // обработать выбранные дни
-            }
+            ImGuiX::Widgets::DemoDaysOfWeekSelector();
         }
 
         if (ImGui::CollapsingHeader("Time & Offset")) {
-            static int h = 14, m = 30, s = 0;
-            ImGuiX::Widgets::TimePickerConfig simple_tp;
-            simple_tp.label = "Time (H/M/S)";
-            ImGuiX::Widgets::TimePicker("simple.time", h, m, s, simple_tp);
-
-            bool t_changed = ImGuiX::Widgets::TimePicker(
-                "time", m_state.time_of_day_sec, m_state.tp_cfg);
-
-            ImGui::SameLine();
-
-            bool tz_changed = ImGuiX::Widgets::TimeOffsetPicker(
-                "offset",
-                m_state.tz_offset_sec,
-                m_state.has_dst_out,
-                m_state.tz_index_io,
-                m_state.to_cfg
-            );
-
-            if (t_changed || tz_changed) {
-                // обработать новое время/смещение
-            }
+            ImGuiX::Widgets::DemoTimePicker();
         }
 
         if (ImGui::CollapsingHeader("Date Picker")) {
-            static int64_t y = 2025;
-            static int     m = 8, d = 25;
-            ImGuiX::Widgets::DatePickerConfig dc;
-            dc.label        = "Date";
-            dc.show_weekday = true;
-            dc.min_year     = 1950;
-            dc.max_year     = 2100;
-            ImGuiX::Widgets::DatePicker("date_struct", y, m, d, dc);
-
-            static int64_t ts = 0;
-            ImGuiX::Widgets::DatePickerConfig dc_ts;
-            dc_ts.label               = "Date (timestamp)";
-            dc_ts.show_weekday        = true;
-            dc_ts.preserve_time_of_day = false;
-            ImGuiX::Widgets::DatePicker("date_ts", ts, dc_ts);
+            ImGuiX::Widgets::DemoDatePicker();
         }
     }
 
     void demoMisc() {
         if (ImGui::CollapsingHeader("Markers")) {
-            ImGui::TextDisabled("Colored markers:");
-            ImGuiX::Widgets::ColoredMarker("OK",          "All good",                  ImVec4(0.10f, 0.75f, 0.30f, 1.0f));
-            ImGui::SameLine();
-            ImGuiX::Widgets::ColoredMarker("WARNING",     "Spread high",               ImVec4(0.95f, 0.75f, 0.10f, 1.0f));
-            ImGui::SameLine();
-            ImGuiX::Widgets::ColoredMarker("ERROR",       "Disconnected",              ImVec4(0.95f, 0.25f, 0.25f, 1.0f));
-            ImGui::SameLine();
-            ImGuiX::Widgets::ColoredMarker("SIMULATION",  "Demo / paper trading",      ImVec4(0.70f, 0.70f, 0.80f, 1.0f));
-
-            ImGui::Separator();
-
-            ImGui::TextDisabled("Message markers:");
-            ImGui::TextUnformatted("Help:");
-            ImGui::SameLine();
-            ImGuiX::Widgets::HelpMarker("Trading server to place real orders.\nUse with care.");
-
-            ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x * 2);
-            ImGui::TextUnformatted("Info:");
-            ImGui::SameLine();
-            ImGuiX::Widgets::InfoMarker("New version available: v1.4.2. Update when idle.");
-
-            ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x * 2);
-            ImGui::TextUnformatted("Warn:");
-            ImGui::SameLine();
-            ImGuiX::Widgets::WarningMarker("Funding API rate-limit almost reached; consider backoff.");
-
-            ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x * 2);
-            ImGui::TextUnformatted("Success:");
-            ImGui::SameLine();
-            ImGuiX::Widgets::SuccessMarker("License validated. All features enabled.");
-            ImGuiX::Widgets::SuccessMarker("License validated.", ImGuiX::Widgets::MarkerMode::InlineText);
-
-            ImGui::Separator();
-
-            ImGui::TextDisabled("Selectable markers:");
-            static std::vector<std::string> presets = {
-                "London Session", "New York Session", "Asia Session", "Custom Range"
-            };
-            static int last_clicked = -1;
-            for (int i = 0; i < (int)presets.size(); ++i) {
-                if (ImGuiX::Widgets::SelectableMarker(presets[i])) {
-                    last_clicked = i;
-                }
-            }
-            ImGui::Separator();
-            ImGui::Text("Last clicked: %s", (last_clicked >= 0 ? presets[last_clicked].c_str() : "none"));
+            ImGuiX::Widgets::DemoMarkers();
         }
 
         if (ImGui::CollapsingHeader("Loading Spinner")) {
-            ImGuiX::Widgets::LoadingSpinner("spinner", m_state.sp_cfg);
-            ImGui::SliderFloat("radius",    &m_state.sp_cfg.radius,        2.0f, 48.0f, "%.0f");
-            ImGui::SliderFloat("thickness", &m_state.sp_cfg.thickness,     1.0f, 12.0f, "%.1f");
-            ImGui::SliderInt  ("segments",  &m_state.sp_cfg.segments,         8, 128);
-            ImGui::SliderFloat("sweep",     &m_state.sp_cfg.sweep_ratio,   0.1f, 1.0f, "%.2f");
-            ImGui::SliderFloat("speed",     &m_state.sp_cfg.angular_speed, 0.0f, 20.0f, "%.1f");
+            ImGuiX::Widgets::DemoLoadingSpinner(m_state.sp_cfg);
         }
 
         if (ImGui::CollapsingHeader("Text Centering")) {
-            ImGuiX::Widgets::TextCenteredFmt(
-                "Welcome, %s!", m_state.auth_data.email.empty() ? "guest" : m_state.auth_data.email.c_str());
-            ImGuiX::Widgets::TextUnformattedCentered("This line is centered.");
-            ImGuiX::Widgets::TextWrappedCentered(
-                "This is a long message that demonstrates how wrapped text can be visually centered "
-                "by placing it inside a centered child region.",
-                420.0f
-            );
+            ImGuiX::Widgets::DemoTextCenter();
         }
 
         if (ImGui::CollapsingHeader("List Editors")) {
-            ImGuiX::Widgets::ListEditor("list.names",   "Names",   m_state.names);
-            ImGuiX::Widgets::ListEditor("list.numbers", "Numbers", m_state.numbers);
+            ImGuiX::Widgets::DemoListEditor();
         }
     }
 

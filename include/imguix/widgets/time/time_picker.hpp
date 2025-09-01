@@ -90,6 +90,35 @@ namespace ImGuiX::Widgets {
             int&     tz_index_io,
             const TimeOffsetPickerConfig& cfg = {});
 
+#ifdef IMGUIX_DEMO
+    /// \brief Render demo for time and offset pickers.
+    inline void DemoTimePicker() {
+        static int h = 14, m = 30, s = 0;
+        TimePickerConfig simple_tp;
+        simple_tp.label = "Time (H/M/S)";
+        TimePicker("simple.time", h, m, s, simple_tp);
+
+        static int      seconds = 18 * 3600;
+        static int64_t  tz_offset_sec = 2 * 3600;
+        static bool     has_dst_out = false;
+        static int      tz_index_io = 0;
+        static TimePickerConfig       tp_cfg;
+        static TimeOffsetPickerConfig to_cfg;
+        bool t_changed = TimePicker("time", seconds, tp_cfg);
+        ImGui::SameLine();
+        bool tz_changed = TimeOffsetPicker(
+            "offset",
+            tz_offset_sec,
+            has_dst_out,
+            tz_index_io,
+            to_cfg
+        );
+        if (t_changed || tz_changed) {
+            // handle new time/offset
+        }
+    }
+#endif
+
 } // namespace ImGuiX::Widgets
 
 #ifdef IMGUIX_HEADER_ONLY

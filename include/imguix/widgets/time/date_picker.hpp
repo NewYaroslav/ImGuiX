@@ -64,6 +64,27 @@ namespace ImGuiX::Widgets {
                     int64_t& ts,
                     const DatePickerConfig& cfg = {});
 
+#ifdef IMGUIX_DEMO
+    /// \brief Render demo for DatePicker widget.
+    inline void DemoDatePicker() {
+        static int64_t y = 2025;
+        static int     m = 8, d = 25;
+        DatePickerConfig dc;
+        dc.label        = "Date";
+        dc.show_weekday = true;
+        dc.min_year     = 1950;
+        dc.max_year     = 2100;
+        DatePicker("date_struct", y, m, d, dc);
+
+        static int64_t ts = 0;
+        DatePickerConfig dc_ts;
+        dc_ts.label               = "Date (timestamp)";
+        dc_ts.show_weekday        = true;
+        dc_ts.preserve_time_of_day = false;
+        DatePicker("date_ts", ts, dc_ts);
+    }
+#endif
+
 } // namespace ImGuiX::Widgets
 
 #ifdef IMGUIX_HEADER_ONLY

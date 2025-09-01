@@ -63,6 +63,19 @@ namespace ImGuiX::Widgets {
             std::vector<int>& selected_days,
             const DaysSelectorConfig& cfg = {});
 
+#ifdef IMGUIX_DEMO
+    /// \brief Render demo for DaysOfWeekSelector widget.
+    inline void DemoDaysOfWeekSelector() {
+        static std::vector<int> selected_days;
+        static DaysSelectorConfig cfg;
+        cfg.label       = u8"Working days";
+        cfg.short_names = { u8"Пн", u8"Вт", u8"Ср", u8"Чт", u8"Пт", u8"Сб", u8"Вс" };
+        if (DaysOfWeekSelector("##days_selector", selected_days, cfg)) {
+            // handle selected days
+        }
+    }
+#endif
+
 } // namespace ImGuiX::Widgets
 
 #ifdef IMGUIX_HEADER_ONLY
