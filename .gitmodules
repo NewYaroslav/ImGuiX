@@ -43,3 +43,6 @@
 [submodule "libs/imgui-command-palette"]
 	path = libs/imgui-command-palette
 	url = https://github.com/pthom/imgui-command-palette
+[submodule "libs/ImCoolBar"]
+	path = libs/ImCoolBar
+	url = https://github.com/aiekick/ImCoolBar
