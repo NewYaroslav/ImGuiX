@@ -56,6 +56,15 @@ namespace ImGuiX::Widgets {
             std::string& host
         );
 
+#   ifdef IMGUIX_DEMO
+    /// \brief Render demo for DomainSelector widget.
+    inline void DemoDomainSelector() {
+        static DomainSelectorConfig cfg{};
+        static std::string host;
+        DomainSelector("domain.selector", cfg, host);
+    }
+#   endif
+
 } // namespace ImGuiX::Widgets
 
 #ifdef IMGUIX_HEADER_ONLY

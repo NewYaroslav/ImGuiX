@@ -62,6 +62,15 @@ namespace ImGuiX::Widgets {
     /// \return True if any field changed this frame.
     bool AuthJsPanel(const char* id, AuthJsPanelConfig& cfg, AuthJsSettings& st);
 
+#   ifdef IMGUIX_DEMO
+    /// \brief Render demo for AuthJsPanel widget.
+    inline void DemoAuthJsPanel() {
+        static AuthJsPanelConfig cfg{};
+        static AuthJsSettings st{};
+        AuthJsPanel("js.panel", cfg, st);
+    }
+#   endif
+
 } // namespace ImGuiX::Widgets
 
 #ifdef IMGUIX_HEADER_ONLY
