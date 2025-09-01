@@ -7,6 +7,7 @@
 
 #include "utils/path_utils.hpp"
 #include "utils/encoding_utils.hpp"
+#include "utils/base64.hpp"
 #include "utils/strip_json_comments.hpp"
 
 #endif // IMGUIX_UTILS_HPP_INCLUDED
