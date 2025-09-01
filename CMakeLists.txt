@@ -42,6 +42,9 @@ option(IMGUIX_USE_IMTEXTEDITOR "Build and link ImGuiColorTextEdit" ON)
 # portable-file-dialog
 option(IMGUIX_USE_PFD          "Build and link portable-file-dialogs (header-only)" ON)
 
+# ImGui / portable-file-dialog
+option(IMGUIX_USE_IMCMD        "Build and link imgui-command-palette" ON)
+
 # ImGui / imspinner
 option(IMGUIX_USE_IMSPINNER    "Build and link imspinner (header-only)" ON)
 
@@ -114,6 +117,7 @@ include(cmake/deps/imnodeflow.cmake)
 include(cmake/deps/imgui_file_dialog.cmake)
 include(cmake/deps/imtexteditor.cmake)
 include(cmake/deps/portable_file_dialogs.cmake)
+include(cmake/deps/imcmd.cmake)
 include(cmake/deps/imspinner.cmake)
 include(cmake/deps/nlohmann_json.cmake)
 include(cmake/deps/assets.cmake)
@@ -175,6 +179,10 @@ endif()
 
 if(IMGUIX_USE_PFD)
     imguix_use_or_fetch_pfd(PFD_TARGET)
+endif()
+
+if(IMGUIX_USE_IMCMD)
+    imguix_use_or_fetch_imcmd(IMCMD_TARGET)
 endif()
 
 if(IMGUIX_USE_IMSPINNER)
@@ -239,6 +247,10 @@ if(IMGUIX_HEADER_ONLY)
     if(IMGUIX_USE_PFD)
         target_compile_definitions(imguix INTERFACE IMGUI_ENABLE_PFD)
         # include-dir пойдёт транзитивно у потребителей, если они залинкуются на pfd::pfd
+    endif()
+    
+    if(IMGUIX_USE_IMCMD)
+        target_compile_definitions(imguix INTERFACE IMGUI_ENABLE_IMCMD)
     endif()
     
     if(IMGUIX_USE_IMSPINNER)
@@ -341,6 +353,11 @@ else()
         target_link_libraries(imguix PRIVATE ${PFD_TARGET})
     endif()
     
+    if(IMGUIX_USE_IMCMD)
+        target_compile_definitions(imguix PUBLIC IMGUI_ENABLE_IMCMD)
+        target_link_libraries(imguix PRIVATE ${IMCMD_TARGET})
+    endif()
+    
     if(IMGUIX_USE_IMSPINNER)
         target_compile_definitions(imguix PUBLIC IMGUI_ENABLE_IMSPINNER)
         target_link_libraries(imguix PRIVATE ${IMSPINNER_TARGET})
@@ -425,6 +442,11 @@ if(IMGUIX_BUILD_TESTS)
         if(IMGUIX_USE_IMTEXTEDITOR)
             target_compile_definitions(${TEST_NAME} PRIVATE IMGUI_ENABLE_IMTEXTEDITOR)
             target_link_libraries(${TEST_NAME} PRIVATE imtexteditor::imtexteditor)
+        endif()
+        
+        if(IMGUIX_USE_IMCMD)
+            target_compile_definitions(${TEST_NAME} PRIVATE IMGUI_ENABLE_IMCMD)
+            target_link_libraries(${TEST_NAME} PRIVATE imcmd::imcmd)
         endif()
 
         if(IMGUIX_USE_IMSPINNER)
@@ -660,6 +682,14 @@ if(IMGUIX_SDK_BUNDLE_DEPS)
     if(EXISTS "${PROJECT_SOURCE_DIR}/libs/imspinner/imspinner.h")
         install(FILES "${PROJECT_SOURCE_DIR}/libs/imspinner/imspinner.h"
                 DESTINATION include)
+    endif()
+    
+    # --- imgui-command-palette: headers ---
+    if(EXISTS "${PROJECT_SOURCE_DIR}/libs/imgui-command-palette/imcmd_command_palette.h")
+        install(FILES
+            "${PROJECT_SOURCE_DIR}/libs/imgui-command-palette/imcmd_command_palette.h"
+            "${PROJECT_SOURCE_DIR}/libs/imgui-command-palette/imcmd_fuzzy_search.h"
+            DESTINATION include)
     endif()
 
 endif()

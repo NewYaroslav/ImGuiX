@@ -25,6 +25,10 @@
 #include <portable-file-dialogs.h>
 #endif
 
+#ifdef IMGUI_ENABLE_IMCMD
+#include <imcmd_command_palette.h>
+#endif
+
 #ifdef IMGUI_ENABLE_IMSPINNER
 #include <imspinner.h>
 #endif
@@ -92,6 +96,10 @@ inline void DemoExternalWidgets() {
     static bool show_text_editor = false;
 #endif
 
+#ifdef IMGUI_ENABLE_IMCMD
+    static bool show_cmd_palette = false;
+#endif
+
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Demo")) {
             if (ImGui::MenuItem("ImGui", nullptr, false, !show_imgui_demo)) show_imgui_demo = true;
@@ -109,6 +117,9 @@ inline void DemoExternalWidgets() {
 #endif
 #ifdef IMGUI_ENABLE_PFD
             if (ImGui::MenuItem("File Dialog (pfd)", nullptr, false, !show_pfd)) show_pfd = true;
+#endif
+#ifdef IMGUI_ENABLE_IMCMD
+            if (ImGui::MenuItem("Command Palette", "Ctrl+Shift+P", false, !show_cmd_palette)) show_cmd_palette = true;
 #endif
 #ifdef IMGUI_ENABLE_IMSPINNER
             if (ImGui::MenuItem("ImSpinner", nullptr, false, !show_imspinner_demo)) show_imspinner_demo = true;
@@ -202,6 +213,15 @@ inline void DemoExternalWidgets() {
         ImGui::Begin("Code Editor", &show_text_editor);
         s_editor.Render("TextEditor");
         ImGui::End();
+    }
+#endif
+#ifdef IMGUI_ENABLE_IMCMD
+    if (show_cmd_palette) {
+        // 1) Создай/держи состояние палитры (объект/синглтон) где-то вне кадра
+        // 2) Зарегистрируй команды (один раз)
+        // 3) Вызови функцию отрисовки палитры внутри окна/поверх всего
+        //    (см. examples/ в репо — там готовая схема регистрации и отображения)
+        // Примерно: palette.OpenOnShortcut(Ctrl+Shift+P); palette.Render(...);
     }
 #endif
 }
