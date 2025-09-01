@@ -53,24 +53,8 @@
 #include <imguix/widgets/plot/PlotOHLCChart.hpp>
 #endif
 
-#ifdef IMGUI_ENABLE_IMNODEFLOW
-#include <ImNodeFlow.h>   // ImFlow::Editor, BaseNode, etc.
-#endif
-
-#ifdef IMGUI_ENABLE_IMGUIFILEDIALOG
-#include <ImGuiFileDialog.h>
-#endif
-
-#ifdef IMGUI_ENABLE_PFD
-#include <portable-file-dialogs.h>
-#endif
-
-#ifdef IMGUI_ENABLE_IMSPINNER
-#include <imspinner.h>
-#endif
-
-#ifdef IMGUI_ENABLE_IMTEXTEDITOR
-#include <TextEditor.h>
+#ifdef IMGUIX_DEMO
+#include <imguix/widgets/external_widgets_demo.hpp>
 #endif
 
 #ifdef IMGUI_ENABLE_IMPLOT
@@ -127,46 +111,6 @@ inline static void GenerateBars(
 }
 #endif
 
-#ifdef IMGUI_ENABLE_IMNODEFLOW
-class SimpleSum final : public ImFlow::BaseNode {
-public:
-    SimpleSum() {
-        setTitle("Simple sum");
-        setStyle(ImFlow::NodeStyle::green());
-
-        // Фильтр ставим на ВХОД
-        addIN<int>("A", 0, ImFlow::ConnectionFilter::SameType());
-
-        // ВЫХОД: во второй параметр передаём стиль пина (или nullptr)
-        addOUT<int>("Result", nullptr)
-            ->behaviour([this]() { return getInVal<int>("A") + b_; });
-    }
-
-    void draw() override {
-        ImGui::SetNextItemWidth(100.0f);
-        ImGui::InputInt("B", &b_);
-    }
-private:
-    int b_ = 0;
-};
-
-// Редактор/хэндлер графа
-static ImFlow::ImNodeFlow g_editor;
-
-void DrawNodeEditorFrame() {
-    static bool inited = false;
-    if (!inited) {
-        // Создаём узел на сцене (позиция в пикселях экранных координат)
-        g_editor.placeNodeAt<SimpleSum>(ImVec2(120, 80));
-        inited = true;
-    }
-
-    // Рисуем редактор внутри окна ImGui
-    ImGui::Begin("Node Editor");
-    g_editor.update();           // <-- вместо g_editor.draw(...)
-    ImGui::End();
-}
-#endif
 
 // Контроллер окна демо-виджетов
 class WidgetsController : public ImGuiX::Controller {
@@ -186,184 +130,15 @@ public:
     void drawUi() override {
         ImGui::PushID(window().id());
         ImGui::PushFont(nullptr, 18.0f); // Размер шрифта (обёртка ImGuiX)
-        static bool show_imgui_demo = false;
-
-#       ifdef IMGUI_ENABLE_IMPLOT
-        static bool show_implot_demo = false;
-#       endif
-
-#       ifdef IMGUI_ENABLE_IMPLOT3D
-        static bool show_implot3d_demo = false;
-#       endif
-
-#       ifdef IMGUI_ENABLE_IMNODEFLOW
-        static bool show_imnodeflow_demo = false;
-#       endif
-
-#       ifdef IMGUI_ENABLE_IMGUIFILEDIALOG
-        static bool show_igfd = false;
-#       endif
-
-#       ifdef IMGUI_ENABLE_PFD
-        static bool show_pfd = false;
-#       endif
-
-#       ifdef IMGUI_ENABLE_IMSPINNER
-        static bool show_imspinner_demo = false;
-#       endif
-
-#       ifdef IMGUI_ENABLE_IMTEXTEDITOR
-        static bool show_text_editor = false;
-#       endif
-
-        if (ImGui::BeginMainMenuBar()) {
-            if (ImGui::BeginMenu("Demo")) {
-                if (ImGui::MenuItem("ImGui", nullptr, false, !show_imgui_demo)) {
-                    show_imgui_demo = true;
-                }
-
-#               ifdef IMGUI_ENABLE_IMPLOT
-                if (ImGui::MenuItem("ImPlot", nullptr, false, !show_implot_demo)) {
-                    show_implot_demo = true;
-                }
-#               endif
-
-#               ifdef IMGUI_ENABLE_IMPLOT3D
-                if (ImGui::MenuItem("ImPlot3D", nullptr, false, !show_implot3d_demo)) {
-                    show_implot3d_demo = true;
-                }
-#               endif
-
-#               ifdef IMGUI_ENABLE_IMNODEFLOW
-                if (ImGui::MenuItem("ImNodeFlow", nullptr, false, !show_imnodeflow_demo)) {
-                    show_imnodeflow_demo = true;
-                }
-#               endif
-
-#               ifdef IMGUI_ENABLE_IMGUIFILEDIALOG
-                if (ImGui::MenuItem("File Dialog", nullptr, false, !show_igfd)) {
-                    show_igfd = true;
-                }
-#               endif
-
-#               ifdef IMGUI_ENABLE_PFD
-                if (ImGui::MenuItem("File Dialog (pfd)", nullptr, false, !show_pfd)) show_pfd = true;
-#               endif
-
-#               ifdef IMGUI_ENABLE_IMSPINNER
-                if (ImGui::MenuItem("ImSpinner", nullptr, false, !show_imspinner_demo)) show_imspinner_demo = true;
-#               endif
-
-#               ifdef IMGUI_ENABLE_IMTEXTEDITOR
-                if (ImGui::MenuItem("Code Editor", nullptr, false, !show_text_editor)) show_text_editor = true;
-#               endif
-                ImGui::EndMenu();
-            }
-            ImGui::EndMainMenuBar();
-        }
+#       ifdef IMGUIX_DEMO
+        ImGuiX::Widgets::DemoExternalWidgets();
         ImGui::Begin("Widgets Demo");
 
         ImGui::Separator();
         drawWidgetsDemo();
 
         ImGui::End();
-        if (show_imgui_demo) ImGui::ShowDemoWindow(&show_imgui_demo);
-
-#       ifdef IMGUI_ENABLE_IMPLOT
-        if (show_implot_demo) ImPlot::ShowDemoWindow(&show_implot_demo);
 #       endif
-
-#       ifdef IMGUI_ENABLE_IMPLOT3D
-        if (show_implot3d_demo) ImPlot3D::ShowDemoWindow(&show_implot3d_demo);
-#       endif
-
-#       ifdef IMGUI_ENABLE_IMNODEFLOW
-        if (show_imnodeflow_demo) {
-            ImGui::Begin("ImNodeFlow Demo", &show_imnodeflow_demo);
-            DrawNodeEditorFrame();              // <- твоя функция с g_editor.draw(...)
-            ImGui::End();
-        }
-#       endif
-
-#       ifdef IMGUI_ENABLE_IMGUIFILEDIALOG
-        if (show_igfd) {
-            ImGui::Begin("ImGuiFileDialog", &show_igfd);
-            if (ImGui::Button("Open...")) {
-                IGFD::FileDialogConfig cfg;   // путь/фильтры см. README
-                cfg.path = ".";
-                ImGuiFileDialog::Instance()->OpenDialog("OpenDlg", "Open File", ".*", cfg);
-            }
-            if (ImGuiFileDialog::Instance()->Display("OpenDlg")) {
-                if (ImGuiFileDialog::Instance()->IsOk()) {
-                    const std::string path = ImGuiFileDialog::Instance()->GetFilePathName();
-                    // TODO: использовать path
-                }
-                ImGuiFileDialog::Instance()->Close();
-            }
-            ImGui::End();
-        }
-#       endif
-
-#       ifdef IMGUI_ENABLE_PFD
-        if (show_pfd) {
-            ImGui::Begin("portable-file-dialogs", &show_pfd);
-
-            static std::string last_open, last_save;
-            if (ImGui::Button("Open...")) {
-                auto sel = pfd::open_file("Open file",
-                                          ".",            // стартовая папка
-                                          { "All files", "*" },
-                                          pfd::opt::multiselect).result();
-                if (!sel.empty()) last_open = sel.front(); // возьми первый, либо перечисли все
-            }
-            ImGui::SameLine();
-            ImGui::TextDisabled("%s", last_open.c_str());
-
-            if (ImGui::Button("Save As...")) {
-                last_save = pfd::save_file("Save file", ".", { "Text", "*.txt", "All files", "*" }).result();
-            }
-            ImGui::SameLine();
-            ImGui::TextDisabled("%s", last_save.c_str());
-
-            if (ImGui::Button("Message box")) {
-                pfd::message("Notice", "Operation finished.", pfd::choice::ok, pfd::icon::info).result();
-            }
-
-            ImGui::End();
-        }
-#       endif
-
-#       ifdef IMGUI_ENABLE_IMSPINNER
-        if (show_imspinner_demo) {
-            ImGui::Begin("ImSpinner Demo", &show_imspinner_demo);
-#           ifdef IMSPINNER_DEMO
-            ImSpinner::demoSpinners();   // демо из README
-#           else
-            ImGui::TextDisabled("Build without IMSPINNER_DEMO");
-#           endif
-            ImGui::End();
-        }
-#       endif
-
-#       ifdef IMGUI_ENABLE_IMTEXTEDITOR
-        static TextEditor s_editor;
-        if (show_text_editor) {
-            // ленивые дефолты
-            static bool init = false;
-            if (!init) {
-                s_editor.SetLanguageDefinition(TextEditor::LanguageDefinition::CPlusPlus());
-                s_editor.SetPalette(TextEditor::GetDarkPalette());
-                s_editor.SetShowWhitespaces(false);
-                s_editor.SetText("// Hello from ImGuiColorTextEdit\nint main(){return 0;}\n");
-                init = true;
-            }
-
-            ImGui::Begin("Code Editor", &show_text_editor);
-            s_editor.Render("TextEditor");    // рисуем виджет редактора
-            ImGui::End();
-        }
-#       endif
-
         ImGui::PopFont();
         ImGui::PopID();
     }
@@ -529,22 +304,18 @@ private:
 
     WidgetsDemoState m_state{};
 
-    // Рендер всей демо-витрины виджетов (сгруппировано под спойлеры)
-    void drawWidgetsDemo() {
-        ImGui::SeparatorText("Widgets Demo");
-
-        // --- Theme Picker ---
+#   ifdef IMGUIX_DEMO
+    void demoTheme() {
         if (ImGui::CollapsingHeader("Theme", ImGuiTreeNodeFlags_DefaultOpen)) {
             ImGuiX::Widgets::ThemePicker("demo.theme", this);
         }
+    }
 
-        // --- Authorization block ---
+    void demoAuthorization() {
         if (ImGui::CollapsingHeader("Authorization", ImGuiTreeNodeFlags_DefaultOpen)) {
-            // Панель логина: email/password/host
             ImGuiX::Widgets::AuthPanel(
                 "login.panel", m_state.auth_cfg, m_state.auth_data);
 
-            // API key/secret — отдельная панель без кнопки connect
             ImGuiX::Widgets::AuthPanelConfig cfg_api{};
             cfg_api.header              = u8"Authorization (API key)";
             cfg_api.show_api_keys       = true;
@@ -564,18 +335,15 @@ private:
             }
         }
 
-        // --- Validated inputs block ---
         if (ImGui::CollapsingHeader("Validated Inputs")) {
             bool email_valid   = false;
             bool api_key_valid = false;
 
-            // Тогглер для экранной клавиатуры в полях ввода
             ImGuiX::Widgets::KeyboardToggleConfig kb_cfg;
             kb_cfg.icon_text           = u8"\uE312";
             kb_cfg.tooltip_toggle_on   = u8"Show keyboard";
             kb_cfg.tooltip_toggle_off  = u8"Hide keyboard";
 
-            // Email с VK и валидацией RegEx
             ImGuiX::Widgets::InputTextWithVKValidated(
                 "email##validated",
                 "email",
@@ -587,7 +355,6 @@ private:
                 kb_cfg
             );
 
-            // API Key (валидируемый)
             ImGuiX::Widgets::InputTextValidated(
                 "apikey##validated",
                 "api key (public)",
@@ -598,7 +365,6 @@ private:
                 api_key_valid
             );
 
-            // Пароль/кей с toggle + VK
             ImGuiX::Widgets::PasswordToggleConfig toggle_cfg;
             ImGuiX::Widgets::InputPasswordWithToggleVK(
                 "apikey##togglevk",
@@ -613,7 +379,6 @@ private:
             );
         }
 
-        // --- Status block ---
         if (ImGui::CollapsingHeader("Status Info")) {
             ImGui::Text("Connection: %s", m_state.auth_cfg.connected ? "connected" : "disconnected");
             ImGui::Text("Email Valid: %s", m_state.auth_data.email_valid ? "yes" : "no");
@@ -621,7 +386,6 @@ private:
             ImGui::Text("API Secret: %s", m_state.auth_data.api_secret.c_str());
         }
 
-        // --- Virtual keyboards ---
         if (ImGui::CollapsingHeader("Virtual Keyboards")) {
             ImGui::Checkbox("Email VK",    &m_state.kbd_email); ImGui::SameLine();
             ImGui::Checkbox("Password VK", &m_state.kbd_pass);  ImGui::SameLine();
@@ -635,27 +399,25 @@ private:
                 ImGuiX::Widgets::VirtualKeyboard("vk.host",  m_state.auth_data.host,     m_state.kcfg);
         }
 
-        // --- Domain selector ---
         if (ImGui::CollapsingHeader("Domain Selector")) {
             if (ImGuiX::Widgets::DomainSelector("domain.selector", m_state.dom_cfg, m_state.auth_data.host)) {
                 // Реакция на изменение хоста при необходимости
             }
         }
 
-        // --- JS Auth panel ---
         if (ImGui::CollapsingHeader("JS Panel")) {
             ImGuiX::Widgets::AuthJsPanelConfig js_cfg{};
             ImGuiX::Widgets::AuthJsPanel("js.panel", js_cfg, m_state.js_st);
         }
 
-        // --- Proxy Settings ---
         if (ImGui::CollapsingHeader("Proxy Settings")) {
             if (ImGuiX::Widgets::ProxyPanel("proxy.panel", m_state.proxy_cfg, m_state.proxy)) {
                 // применить настройки к сетевому слою при необходимости
             }
         }
+    }
 
-        // --- Hours Selector ---
+    void demoTime() {
         if (ImGui::CollapsingHeader("Hours Selector")) {
             if (ImGui::SmallButton("Work 9–18")) {
                 m_state.hours.clear();
@@ -680,9 +442,8 @@ private:
             }
         }
 
-        // --- WeekDays Selector ---
         if (ImGui::CollapsingHeader("WeekDays Selector")) {
-            static std::vector<int> selected_days; // выбранные дни (0=Mon..6=Sun)
+            static std::vector<int> selected_days;
 
             ImGuiX::Widgets::DaysSelectorConfig cfg;
             cfg.label       = u8"Working days";
@@ -693,7 +454,6 @@ private:
             }
         }
 
-        // --- Time & Offset ---
         if (ImGui::CollapsingHeader("Time & Offset")) {
             static int h = 14, m = 30, s = 0;
             ImGuiX::Widgets::TimePickerConfig simple_tp;
@@ -718,9 +478,7 @@ private:
             }
         }
 
-        // --- Date Picker ---
         if (ImGui::CollapsingHeader("Date Picker")) {
-            // Выбор по компонентам (год/месяц/день)
             static int64_t y = 2025;
             static int     m = 8, d = 25;
             ImGuiX::Widgets::DatePickerConfig dc;
@@ -730,18 +488,17 @@ private:
             dc.max_year     = 2100;
             ImGuiX::Widgets::DatePicker("date_struct", y, m, d, dc);
 
-            // Выбор по unix timestamp (UTC)
             static int64_t ts = 0;
             ImGuiX::Widgets::DatePickerConfig dc_ts;
             dc_ts.label               = "Date (timestamp)";
             dc_ts.show_weekday        = true;
-            dc_ts.preserve_time_of_day = false; // привязка к 00:00:00
+            dc_ts.preserve_time_of_day = false;
             ImGuiX::Widgets::DatePicker("date_ts", ts, dc_ts);
         }
+    }
 
-        // --- Markers ---
+    void demoMisc() {
         if (ImGui::CollapsingHeader("Markers")) {
-            // 1) Цветные маркеры (бейджи)
             ImGui::TextDisabled("Colored markers:");
             ImGuiX::Widgets::ColoredMarker("OK",          "All good",                  ImVec4(0.10f, 0.75f, 0.30f, 1.0f));
             ImGui::SameLine();
@@ -753,36 +510,29 @@ private:
 
             ImGui::Separator();
 
-            // 2) Message markers (иконка с тултипом/текстом)
             ImGui::TextDisabled("Message markers:");
-            // Help
-            ImGui::TextUnformatted("Help:"); 
+            ImGui::TextUnformatted("Help:");
             ImGui::SameLine();
             ImGuiX::Widgets::HelpMarker("Trading server to place real orders.\nUse with care.");
 
-            // Info
             ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x * 2);
-            ImGui::TextUnformatted("Info:"); 
+            ImGui::TextUnformatted("Info:");
             ImGui::SameLine();
             ImGuiX::Widgets::InfoMarker("New version available: v1.4.2. Update when idle.");
 
-            // Warning
             ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x * 2);
-            ImGui::TextUnformatted("Warn:"); 
+            ImGui::TextUnformatted("Warn:");
             ImGui::SameLine();
             ImGuiX::Widgets::WarningMarker("Funding API rate-limit almost reached; consider backoff.");
 
-            // Success (иконка + инлайн-вариант)
             ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x * 2);
             ImGui::TextUnformatted("Success:");
             ImGui::SameLine();
             ImGuiX::Widgets::SuccessMarker("License validated. All features enabled.");
-            // Инлайн-текст рядом с иконкой (без тултипа)
             ImGuiX::Widgets::SuccessMarker("License validated.", ImGuiX::Widgets::MarkerMode::InlineText);
 
             ImGui::Separator();
 
-            // (опционально) Пресеты с SelectableMarker
             ImGui::TextDisabled("Selectable markers:");
             static std::vector<std::string> presets = {
                 "London Session", "New York Session", "Asia Session", "Custom Range"
@@ -797,7 +547,6 @@ private:
             ImGui::Text("Last clicked: %s", (last_clicked >= 0 ? presets[last_clicked].c_str() : "none"));
         }
 
-        // --- Spinner ---
         if (ImGui::CollapsingHeader("Loading Spinner")) {
             ImGuiX::Widgets::LoadingSpinner("spinner", m_state.sp_cfg);
             ImGui::SliderFloat("radius",    &m_state.sp_cfg.radius,        2.0f, 48.0f, "%.0f");
@@ -807,7 +556,6 @@ private:
             ImGui::SliderFloat("speed",     &m_state.sp_cfg.angular_speed, 0.0f, 20.0f, "%.1f");
         }
 
-        // --- Centered Text ---
         if (ImGui::CollapsingHeader("Text Centering")) {
             ImGuiX::Widgets::TextCenteredFmt(
                 "Welcome, %s!", m_state.auth_data.email.empty() ? "guest" : m_state.auth_data.email.c_str());
@@ -819,15 +567,14 @@ private:
             );
         }
 
-        // --- List Editors ---
         if (ImGui::CollapsingHeader("List Editors")) {
             ImGuiX::Widgets::ListEditor("list.names",   "Names",   m_state.names);
             ImGuiX::Widgets::ListEditor("list.numbers", "Numbers", m_state.numbers);
         }
-        
-        // --- Notifications ---
+    }
+
+    void demoNotifications() {
         if (ImGui::CollapsingHeader("Notifications", ImGuiTreeNodeFlags_DefaultOpen)) {
-            // Примеры без заголовка (аналог оригинала)
             if (ImGui::Button("Success")) {
                 ImGuiX::Widgets::NotifyFmt(
                     this, ImGuiX::Notify::Type::Success, 0,
@@ -870,14 +617,12 @@ private:
                     ImGuiX::Notify::Type::Error,
                     0,
                     u8"Click me!",
-                    // on_click: постим «успех»
                     [this]() {
                         ImGuiX::Widgets::NotifyFmt(
                             this, ImGuiX::Notify::Type::Success, 0,
                             u8"Thanks for clicking!"
                         );
                     },
-                    // title, content
                     u8"Notification", "Content with action"
                 );
             }
@@ -885,7 +630,6 @@ private:
             ImGui::Separator();
             ImGui::TextDisabled(u8"Do it yourself:");
 
-            // Поля ввода, как в оригинале
             static char title_buf[4096]   = u8"Hello there!";
             static char content_buf[4096] = u8"General Kenobi! \n- Grievous";
             ImGui::InputTextMultiline(u8"Title",   title_buf,   IM_ARRAYSIZE(title_buf));
@@ -920,25 +664,14 @@ private:
                 ImGuiX::Widgets::InsertNotification(this, std::move(toast));
             }
         }
+    }
 
 #       ifdef IMGUI_ENABLE_IMPLOT
-        // --- OHLC Bars / Plot ---
+    void demoOhlcPlot() {
         if (ImGui::CollapsingHeader(u8"OHLC Bars / Plot")) {
-            // ТФы: M1, M30, H1
             static const int TFs[] = {60, 30*60, 60*60};
             static const char* TF_NAMES[] = {"M1", "M30", "H1"};
 
-            // Инициализация данных (разово)
-            /*
-            if (m_state.bars_m1.empty()) {
-                const std::uint64_t start_time = 1700000000ULL;
-                GenerateBars(m_state.bars_m1,  m_state.bars_count, TFs[0], start_time, m_state.start_price, m_state.rng_seed);
-                GenerateBars(m_state.bars_m30, m_state.bars_count, TFs[1], start_time, m_state.start_price, m_state.rng_seed + 1);
-                GenerateBars(m_state.bars_h1,  m_state.bars_count, TFs[2], start_time, m_state.start_price, m_state.rng_seed + 2);
-            }
-            */
-
-            // Панель управления
             ImGui::PushItemWidth(160);
             ImGui::Combo("Timeframe", &m_state.tf_index, TF_NAMES, IM_ARRAYSIZE(TF_NAMES));
             ImGui::SameLine();
@@ -946,7 +679,6 @@ private:
             ImGui::PopItemWidth();
 
             ImGui::SliderInt("Bars", &m_state.bars_count, 50, 2000);
-            //ImGui::SliderFloat("Start Price", &m_state.start_price, 1.0f, 10000.0f, "%.2f");
             double min_price = 1.0, max_price = 10000.0;
             ImGui::SliderScalar("Start Price", ImGuiDataType_Double, &m_state.start_price, &min_price, &max_price, "%.2f");
             ImGui::InputScalar("Seed", ImGuiDataType_U32, &m_state.rng_seed);
@@ -962,21 +694,31 @@ private:
                 m_state.rng_seed = (m_state.rng_seed * 1664525u + 1013904223u);
             }
 
-            // Выбор массива баров по текущему ТФ
             const int tf_sec = TFs[m_state.tf_index];
             const std::vector<ImGuiX::Widgets::OhlcvBar>& bars =
                 (m_state.tf_index == 0 ? m_state.bars_m1
                  : m_state.tf_index == 1 ? m_state.bars_m30
                                          : m_state.bars_h1);
 
-            // Имя серии/окна графика
             std::string title = std::string("Bars (") + TF_NAMES[m_state.tf_index] + ")";
 
-            // Вызов твоего виджета (использует DefaultBarAdapter: &T::open/.../&T::time)
             ImGuiX::Widgets::PlotOHLCChart<ImGuiX::Widgets::OhlcvBar>(title.c_str(), bars, m_state.ohlc_cfg);
         }
+    }
+#       endif
+
+    void drawWidgetsDemo() {
+        ImGui::SeparatorText("Widgets Demo");
+        demoTheme();
+        demoAuthorization();
+        demoTime();
+        demoMisc();
+        demoNotifications();
+#       ifdef IMGUI_ENABLE_IMPLOT
+        demoOhlcPlot();
 #       endif
     }
+#   endif
 
     void postLanguageChange(const std::string& lang, bool apply_to_all = true) {
         notify(ImGuiX::Events::LangChangeEvent(lang, apply_to_all, window().id()));

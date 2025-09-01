@@ -365,6 +365,7 @@ if(IMGUIX_BUILD_TESTS)
         add_executable(${TEST_NAME} "${TEST_FILE}")
 
         target_compile_definitions(${TEST_NAME} PRIVATE IMGUIX_HEADER_ONLY)
+        target_compile_definitions(${TEST_NAME} PRIVATE IMGUIX_DEMO)
 
         if(IMGUIX_USE_SFML_BACKEND)
             target_compile_definitions(${TEST_NAME} PRIVATE IMGUIX_USE_SFML_BACKEND)
