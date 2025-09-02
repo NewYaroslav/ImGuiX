@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.18)
-project(ImGuiX LANGUAGES CXX VERSION 0.1.0)
+project(ImGuiX LANGUAGES C CXX VERSION 0.1.0)
 
 # ===== Root CMakeLists.txt =====
 # Purpose: Configure and build the ImGuiX library and optional SDK.
@@ -50,6 +50,9 @@ option(IMGUIX_USE_IMCOOLBAR    "Build and link ImCoolBar" ON)
 
 # ImGui / imspinner
 option(IMGUIX_USE_IMSPINNER    "Build and link imspinner (header-only)" ON)
+
+# ImGui / imgui_md
+option(IMGUIX_USE_IMGUI_MD      "Build and link imgui_md (Markdown)" ON)
 
 # JSON vendoring (default OFF to prefer system package)
 option(IMGUIX_VENDOR_JSON      "Install vendored nlohmann_json headers with ImGuiX" OFF)
@@ -123,6 +126,7 @@ include(cmake/deps/portable_file_dialogs.cmake)
 include(cmake/deps/imcmd.cmake)
 include(cmake/deps/imcoolbar.cmake)
 include(cmake/deps/imspinner.cmake)
+include(cmake/deps/imgui_md.cmake)
 include(cmake/deps/nlohmann_json.cmake)
 include(cmake/deps/assets.cmake)
 include(cmake/deps/app_icon.cmake)
@@ -197,6 +201,10 @@ if(IMGUIX_USE_IMSPINNER)
     imguix_use_or_fetch_imspinner(IMSPINNER_TARGET)
 endif()
 
+if(IMGUIX_USE_IMGUI_MD)
+    imguix_use_or_fetch_imgui_md(IMGUI_MD_TARGET)
+endif()
+
 # ===== Library / Header-only switch =====
 if(IMGUIX_HEADER_ONLY)
     message(STATUS "ImGuiX: header-only mode ON")
@@ -268,6 +276,10 @@ if(IMGUIX_HEADER_ONLY)
     if(IMGUIX_USE_IMSPINNER)
         target_compile_definitions(imguix INTERFACE IMGUI_ENABLE_IMSPINNER)
         # include-dir пойдёт транзитивно, если потребитель линкуется на imspinner::imspinner
+    endif()
+    
+    if(IMGUIX_USE_IMGUI_MD)
+        target_compile_definitions(imguix INTERFACE IMGUI_ENABLE_IMGUI_MD)
     endif()
 
     # Clean interface to avoid exporting foreign targets
@@ -379,6 +391,11 @@ else()
         target_compile_definitions(imguix PUBLIC IMGUI_ENABLE_IMSPINNER)
         target_link_libraries(imguix PRIVATE ${IMSPINNER_TARGET})
     endif()
+    
+    if(IMGUIX_USE_IMGUI_MD)
+        target_compile_definitions(imguix PUBLIC IMGUI_ENABLE_IMGUI_MD)
+        target_link_libraries(imguix PRIVATE ${IMGUI_MD_TARGET})
+    endif()
 
     # Clean interface to avoid exporting foreign targets
     set_property(TARGET imguix PROPERTY INTERFACE_LINK_LIBRARIES "")
@@ -477,6 +494,11 @@ if(IMGUIX_BUILD_TESTS)
             # Включить встроенную демку из хедера (см. README):
             target_compile_definitions(${TEST_NAME} PRIVATE IMSPINNER_DEMO)
         endif()
+		
+        if(IMGUIX_USE_IMGUI_MD)
+			target_compile_definitions(${TEST_NAME} PRIVATE IMGUI_ENABLE_IMGUI_MD)
+			target_link_libraries(${TEST_NAME} PRIVATE imgui_md::imgui_md)
+		endif()
 
         imguix_add_imgui_demo(${TEST_NAME})
 
@@ -717,6 +739,16 @@ if(IMGUIX_SDK_BUNDLE_DEPS)
     # --- ImCoolBar: headers ---
     if(EXISTS "${PROJECT_SOURCE_DIR}/libs/ImCoolBar/ImCoolBar.h")
         install(FILES "${PROJECT_SOURCE_DIR}/libs/ImCoolBar/ImCoolBar.h"
+                DESTINATION include)
+    endif()
+    
+    # --- imgui_md: headers ---
+    if(EXISTS "${PROJECT_SOURCE_DIR}/libs/imgui_md/imgui_md.h")
+        install(FILES "${PROJECT_SOURCE_DIR}/libs/imgui_md/imgui_md.h"
+                DESTINATION include)
+    endif()
+    if(EXISTS "${PROJECT_SOURCE_DIR}/libs/md4c/md4c.h")
+        install(FILES "${PROJECT_SOURCE_DIR}/libs/md4c/md4c.h"
                 DESTINATION include)
     endif()
 

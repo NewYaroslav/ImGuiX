@@ -41,6 +41,11 @@
 #include <ImGuiColorTextEdit.h>
 #endif
 
+#ifdef IMGUI_ENABLE_IMGUI_MD
+#include <imgui_md.h>
+#endif
+
+
 namespace ImGuiX::Widgets {
 
 #   ifdef IMGUI_ENABLE_IMNODEFLOW
@@ -142,6 +147,24 @@ namespace {
     }
 #   endif
 
+#ifdef IMGUI_ENABLE_IMGUI_MD
+namespace {
+    
+    // Минимальный принтер: один шрифт и открытие ссылок через платформенный вызов при желании
+    struct MarkdownPrinter : imgui_md {
+        ImFont* get_font() const override { return ImGui::GetFont(); }
+        void open_url() const override {
+            // Опционально: открыть m_href. Для SDL2 есть SDL_OpenURL; иначе - по платформе.
+            // ImGuiX окружение: можешь прокинуть свой callback/сервис.
+        }
+    };
+
+    inline bool show_md_demo = false;
+    inline MarkdownPrinter s_md;
+} // namespace
+#endif
+
+
     // --- demo helpers ---
     static bool CoolBarDrawButton(const char* label) {
         // Размер берём из бара — квадрат w×w
@@ -235,6 +258,10 @@ namespace {
 #               ifdef IMGUI_ENABLE_IMCOOLBAR
                 if (ImGui::MenuItem("ImCoolBar", nullptr, false, !show_coolbar_demo)) show_coolbar_demo = true;
 #               endif
+#               ifdef IMGUI_ENABLE_IMGUI_MD
+                if (ImGui::MenuItem("Markdown (imgui_md)", nullptr, false, !show_md_demo)) show_md_demo = true;
+#               endif
+
                 ImGui::EndMenu();
             }
             ImGui::EndMainMenuBar();
@@ -335,36 +362,6 @@ namespace {
         DrawImCmdDemo();
 #       endif
 
-/*
-#       ifdef IMGUI_ENABLE_IMCOOLBAR
-        if (show_coolbar_demo) {
-            ImGui::Begin("ImCoolBar Demo", &show_coolbar_demo);
-
-            auto coolbar_button = [](const char* label) {
-                float w = ImGui::GetCoolBarItemWidth();
-                //auto* font = ImGui::GetIO().Fonts->Fonts[0];
-                //font->Scale = ImGui::GetCoolBarItemScale();
-                //ImGui::PushFont(font);
-                bool pressed = ImGui::Button(label, ImVec2(w, w));
-                //ImGui::PopFont();
-                return pressed;
-            };
-
-            ImCoolBarConfig cfg;
-            cfg.anchor = ImVec2(0.5f, 1.0f);   
-            cfg.mouse_ema_half_life_ms = 80.0f;
-            cfg.anim_ema_half_life_ms = 80.0f;
-            if (ImGui::BeginCoolBar("##CoolBarMain", ImCoolBarFlags_Horizontal, cfg)) {
-                const char* labels = "ABCDEFGHIJKL";
-                for (const char* p = labels; *p; ++p)
-                    if (ImGui::CoolBarItem()) (void)coolbar_button(std::string(1, *p).c_str());
-                ImGui::EndCoolBar();
-            }
-
-            ImGui::End();
-        }
-#       endif
-*/
 #       ifdef IMGUI_ENABLE_IMCOOLBAR
         if (show_coolbar_demo) {
             ImGui::Begin("ImCoolBar Demo", &show_coolbar_demo);
@@ -420,6 +417,21 @@ namespace {
                 }
             }
 
+            ImGui::End();
+        }
+#       endif
+
+#       ifdef IMGUI_ENABLE_IMGUI_MD
+        if (show_md_demo) {
+            ImGui::Begin("Markdown Demo", &show_md_demo);
+            static const char* kText =
+                "# Header 1\n"
+                "Some **bold**, _italic_, ~~strike~~, and a [link](https://example.com).\n"
+                "\n"
+                "| Col1 | Col2 |\n"
+                "| ---  | ---: |\n"
+                "| A    |  42  |\n";
+            s_md.print(kText, kText + strlen(kText));  // print(str, str_end)
             ImGui::End();
         }
 #       endif
