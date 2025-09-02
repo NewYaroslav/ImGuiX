@@ -21,6 +21,7 @@
 #include <imguix/widgets/time/date_picker.hpp>
 #include <imguix/widgets/time/hours_selector.hpp>
 #include <imguix/widgets/time/days_selector.hpp>
+#include <imguix/widgets/time/expiry_picker.hpp>
 
 // === Уведомления ===
 #include <imguix/widgets/notify/notifications.hpp>
@@ -362,6 +363,10 @@ private:
 
         if (ImGui::CollapsingHeader("Date Picker")) {
             ImGuiX::Widgets::DemoDatePicker();
+        }
+
+        if (ImGui::CollapsingHeader("Expiry Picker")) {
+            ImGuiX::Widgets::DemoExpiryPicker();
         }
     }
 
