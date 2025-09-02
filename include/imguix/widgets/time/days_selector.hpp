@@ -43,9 +43,9 @@ namespace ImGuiX::Widgets {
         bool    show_cell_borders        = true;           ///< Draw cell borders.
         float   cell_border_thickness    = 1.0f;           ///< Border thickness.
         ImU32   cell_border_color        = 0;              ///< 0 -> ImGuiCol_Border.
-        ImU32   cell_border_color_hovered= 0;              ///< 0 -> ImGuiCol_HeaderHovered.
-        ImU32   cell_border_color_selected=0;              ///< 0 -> ImGuiCol_Header.
-        float   cell_rounding            = -1.0f;          ///< <0 -> use style.FrameRounding.
+        ImU32   cell_border_color_hovered = 0;             ///< 0 -> ImGuiCol_HeaderHovered.
+        ImU32   cell_border_color_selected =0;             ///< 0 -> ImGuiCol_Header.
+        float   cell_rounding            = 0.0f;           ///< <0 -> use style.FrameRounding.
 
         /// \brief Short day labels indexed 0..6 (Mon..Sun by default).
         std::array<const char*,7> short_names = {
