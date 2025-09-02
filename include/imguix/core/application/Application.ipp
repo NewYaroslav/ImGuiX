@@ -39,6 +39,12 @@ namespace ImGuiX {
         });
     }
 
+    Application::~Application() {
+        if (m_main_thread.joinable()) {
+            m_main_thread.join();
+        }
+    }
+
     void Application::run(bool async) {
 #       ifdef IMGUIX_USE_SFML_BACKEND
         if (!registry().registerResource<DeltaClockSfml>()) {
