@@ -33,9 +33,15 @@ namespace ImGuiX::Utils {
     }
 
     std::string Utf8ToCp866(const std::string& utf8) noexcept {
-        std::string temp = Utf8ToAnsi(utf8);
-        CharToOem((LPSTR)temp.c_str(), temp.data());
-        return temp;
+        std::string ansi = Utf8ToAnsi(utf8);
+        if (ansi.empty()) return {};
+
+        const DWORD len = static_cast<DWORD>(ansi.size() + 1);
+        std::string cp866(len, '\0');
+        // CharToOemBuffA requires distinct source and destination buffers to avoid undefined behavior.
+        CharToOemBuffA(ansi.c_str(), cp866.data(), len);
+        cp866.resize(len - 1);
+        return cp866;
     }
 
     bool IsValidUtf8(const char* message) {
