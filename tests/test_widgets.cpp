@@ -30,6 +30,7 @@
 #include <imguix/widgets/misc/loading_spinner.hpp>
 #include <imguix/widgets/misc/markers.hpp>
 #include <imguix/widgets/misc/theme_picker.hpp>
+#include <imguix/widgets/controls/icon_combo.hpp>
 
 // === Themes ===
 #include <imguix/themes/CorporateGreyTheme.hpp>
@@ -379,6 +380,21 @@ private:
 
         if (ImGui::CollapsingHeader("List Editors")) {
             ImGuiX::Widgets::DemoListEditor();
+        }
+
+        if (ImGui::CollapsingHeader("Icon Combo")) {
+            static int sel_idx = 0;
+            const char* items[] = {u8"One", u8"Two", u8"Three"};
+            const char* icons[] = {u8"☀", u8"🌙", u8"⭐"};
+            if (ImGuiX::Widgets::BeginIconCombo("demo_icon_combo", items[sel_idx], icons[sel_idx])) {
+                for (int i = 0; i < IM_ARRAYSIZE(items); ++i) {
+                    bool selected = (i == sel_idx);
+                    if (ImGui::Selectable(items[i], selected)) {
+                        sel_idx = i;
+                    }
+                }
+                ImGuiX::Widgets::EndIconCombo();
+            }
         }
     }
 
