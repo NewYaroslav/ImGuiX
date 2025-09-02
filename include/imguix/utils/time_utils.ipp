@@ -78,6 +78,17 @@ namespace ImGuiX::Utils {
         return w;                                                 // 0=Sun..6=Sat
     }
 
+    std::string format_hms_u32(int sec) {
+        sec = std::max(0, sec);
+        int h = sec / 3600;
+        sec -= h * 3600;
+        int m = sec / 60;
+        int s = sec - m * 60;
+        char buf[16];
+        std::snprintf(buf, sizeof(buf), u8"%02d:%02d:%02d", h, m, s);
+        return std::string(buf);
+    }
+
     std::string format_hms(int sec) {
         int h, m, s; ImGuiX::Utils::seconds_to_hms(sec, h, m, s);
         char buf[16]; std::snprintf(buf, sizeof(buf), u8"%02d:%02d:%02d", h, m, s);

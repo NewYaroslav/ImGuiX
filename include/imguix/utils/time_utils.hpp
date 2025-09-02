@@ -168,8 +168,13 @@ namespace ImGuiX::Utils {
                                     "Jul","Aug","Sep","Oct","Nov","Dec"};
         return (m>=1 && m<=12) ? k[m-1] : "???";
     }
-    
+
     // ---------- format ----------
+
+    /// \brief Format seconds as HH:MM:SS (no day component).
+    /// \param sec Seconds to format.
+    /// \return Formatted string.
+    std::string format_hms_u32(int sec);
 
     /// \brief Format seconds as "HH:MM:SS".
     /// \param sec Seconds to format.
