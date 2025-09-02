@@ -18,8 +18,8 @@ namespace ImGuiX {
         /// \brief Constructs the application instance.
         Application();
 
-        /// \brief Destructor.
-        ~Application() = default;
+        /// \brief Destructs the application and joins async thread.
+        ~Application();
 
         Application(const Application&) = delete;
         Application& operator=(Application) = delete;
