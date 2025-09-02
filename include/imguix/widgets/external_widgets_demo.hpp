@@ -142,6 +142,40 @@ namespace {
     }
 #   endif
 
+    // --- demo helpers ---
+    static bool CoolBarDrawButton(const char* label) {
+        // Размер берём из бара — квадрат w×w
+        const float w = ImGui::GetCoolBarItemWidth();
+        const ImVec2 size(w, w);
+
+        ImGui::PushID(label);
+        ImGui::InvisibleButton("btn", size);           // лэйаут + инпут (без собственной отрисовки)
+        const bool pressed = ImGui::IsItemClicked();
+
+        // Кастомная отрисовка: без округления координат => субпиксельное движение видно
+        ImDrawList* dl = ImGui::GetWindowDrawList();
+        ImVec2 p0 = ImGui::GetItemRectMin();
+        ImVec2 p1 = ImGui::GetItemRectMax();
+
+        const ImU32 col_bg = ImGui::GetColorU32(ImGui::IsItemActive()   ? ImGuiCol_ButtonActive :
+                                                ImGui::IsItemHovered()  ? ImGuiCol_ButtonHovered :
+                                                                           ImGuiCol_Button);
+        const ImU32 col_bd = ImGui::GetColorU32(ImGuiCol_Border);
+        const float r = ImGui::GetStyle().FrameRounding;
+
+        dl->AddRectFilled(p0, p1, col_bg, r);
+        dl->AddRect(p0, p1, col_bd, r);
+
+        // Текст по центру (шрифт у ImGui обычно снапится к пикселю — это нормально)
+        const ImVec2 ts = ImGui::CalcTextSize(label);
+        const ImVec2 c  = (p0 + p1) * 0.5f;
+        dl->AddText(ImVec2(c.x - ts.x * 0.5f, c.y - ts.y * 0.5f), ImGui::GetColorU32(ImGuiCol_Text), label);
+
+        ImGui::PopID();
+        return pressed;
+    }
+
+
     /// \berif
     inline void DemoExternalWidgets() {
         static bool show_imgui_demo = false;
@@ -301,21 +335,26 @@ namespace {
         DrawImCmdDemo();
 #       endif
 
+/*
 #       ifdef IMGUI_ENABLE_IMCOOLBAR
         if (show_coolbar_demo) {
             ImGui::Begin("ImCoolBar Demo", &show_coolbar_demo);
 
             auto coolbar_button = [](const char* label) {
                 float w = ImGui::GetCoolBarItemWidth();
-                auto* font = ImGui::GetIO().Fonts->Fonts[0];
-                font->Scale = ImGui::GetCoolBarItemScale();
-                ImGui::PushFont(font);
+                //auto* font = ImGui::GetIO().Fonts->Fonts[0];
+                //font->Scale = ImGui::GetCoolBarItemScale();
+                //ImGui::PushFont(font);
                 bool pressed = ImGui::Button(label, ImVec2(w, w));
-                ImGui::PopFont();
+                //ImGui::PopFont();
                 return pressed;
             };
 
-            if (ImGui::BeginCoolBar("##CoolBarMain", ImCoolBar_Horizontal, ImVec2(0.5f, 1.0f))) {
+            ImCoolBarConfig cfg;
+            cfg.anchor = ImVec2(0.5f, 1.0f);   
+            cfg.mouse_ema_half_life_ms = 80.0f;
+            cfg.anim_ema_half_life_ms = 80.0f;
+            if (ImGui::BeginCoolBar("##CoolBarMain", ImCoolBarFlags_Horizontal, cfg)) {
                 const char* labels = "ABCDEFGHIJKL";
                 for (const char* p = labels; *p; ++p)
                     if (ImGui::CoolBarItem()) (void)coolbar_button(std::string(1, *p).c_str());
@@ -325,6 +364,66 @@ namespace {
             ImGui::End();
         }
 #       endif
+*/
+#       ifdef IMGUI_ENABLE_IMCOOLBAR
+        if (show_coolbar_demo) {
+            ImGui::Begin("ImCoolBar Demo", &show_coolbar_demo);
+
+            auto coolbar_button = [] (const char* label) {
+                //float w = ImGui::GetCoolBarItemWidth();
+                //bool pressed = ImGui::Button(label, ImVec2(w, w));
+                bool pressed = CoolBarDrawButton(label);
+                return pressed;
+            };
+
+            // Общие настройки сглаживания
+            ImCoolBarConfig common;
+            //common.mouse_ema_half_life_ms = 40.0f;
+            //common.anim_ema_half_life_ms  = 40.0f;
+
+            // 1) Горизонтальный бар снизу (центр)
+            {
+                ImCoolBarConfig cfg = common;
+                cfg.anchor = ImVec2(0.5f, 1.0f); // bottom-center of viewport
+                if (ImGui::BeginCoolBar("##CoolBarBottom", ImCoolBarFlags_Horizontal, cfg)) {
+                    const char* labels = "ABCDEFGHIJKL";
+                    for (const char* p = labels; *p; ++p)
+                        if (ImGui::CoolBarItem())
+                            (void)coolbar_button(std::string(1, *p).c_str());
+                    ImGui::EndCoolBar();
+                }
+            }
+
+            // 2) Вертикальный бар слева (по центру)
+            {
+                ImCoolBarConfig cfg = common;
+                cfg.anchor = ImVec2(0.0f, 0.5f); // left-center
+                if (ImGui::BeginCoolBar("##CoolBarLeft", ImCoolBarFlags_Vertical, cfg)) {
+                    const char* labels = "123456789";
+                    for (const char* p = labels; *p; ++p)
+                        if (ImGui::CoolBarItem())
+                            (void)coolbar_button(std::string(1, *p).c_str());
+                    ImGui::EndCoolBar();
+                }
+            }
+
+            // 3) Вертикальный бар справа (по центру)
+            {
+                ImCoolBarConfig cfg = common;
+                cfg.anchor = ImVec2(1.0f, 0.5f); // right-center
+                if (ImGui::BeginCoolBar("##CoolBarRight", ImCoolBarFlags_Vertical, cfg)) {
+                    const char* labels = "!@#$%^&*";
+                    for (const char* p = labels; *p; ++p)
+                        if (ImGui::CoolBarItem())
+                            (void)coolbar_button(std::string(1, *p).c_str());
+                    ImGui::EndCoolBar();
+                }
+            }
+
+            ImGui::End();
+        }
+#       endif
+
     } // DemoExternalWidgets()
 
 } // namespace ImGuiX::Widgets
