@@ -12,6 +12,7 @@
 
 #include <imguix/widgets/controls/circle_button.hpp>
 #include <imguix/widgets/controls/icon_button.hpp>
+#include <imguix/widgets/controls/icon_combo.hpp>
 #include <imguix/widgets/controls/system_button.hpp>
 #include <imguix/widgets/controls/toggle_button.hpp>
 
