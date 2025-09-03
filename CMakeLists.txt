@@ -742,15 +742,19 @@ if(IMGUIX_SDK_BUNDLE_DEPS)
                 DESTINATION include)
     endif()
     
-    # --- imgui_md: headers ---
-    if(EXISTS "${PROJECT_SOURCE_DIR}/libs/imgui_md/imgui_md.h")
-        install(FILES "${PROJECT_SOURCE_DIR}/libs/imgui_md/imgui_md.h"
-                DESTINATION include)
-    endif()
-    if(EXISTS "${PROJECT_SOURCE_DIR}/libs/md4c/md4c.h")
-        install(FILES "${PROJECT_SOURCE_DIR}/libs/md4c/md4c.h"
-                DESTINATION include)
-    endif()
+	# --- imgui_md: headers ---
+	if(EXISTS "${PROJECT_SOURCE_DIR}/libs/imgui_md/imgui_md.h")
+		install(FILES "${PROJECT_SOURCE_DIR}/libs/imgui_md/imgui_md.h"
+				DESTINATION include)
+	endif()
+	# md4c header (root or src)
+	if(EXISTS "${PROJECT_SOURCE_DIR}/libs/md4c/src/md4c.h")
+		install(FILES "${PROJECT_SOURCE_DIR}/libs/md4c/src/md4c.h"
+				DESTINATION include)
+	elseif(EXISTS "${PROJECT_SOURCE_DIR}/libs/md4c/md4c.h")
+		install(FILES "${PROJECT_SOURCE_DIR}/libs/md4c/md4c.h"
+				DESTINATION include)
+	endif()
 
 endif()
 

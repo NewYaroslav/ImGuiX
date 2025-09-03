@@ -152,10 +152,17 @@ namespace {
     
     // Минимальный принтер: один шрифт и открытие ссылок через платформенный вызов при желании
     struct MarkdownPrinter : imgui_md {
-        ImFont* get_font() const override { return ImGui::GetFont(); }
+        
+        imgui_md::MdSizedFont get_font() const override {
+            // Возвращаем текущий активный шрифт ImGui и его текущий размер
+            return { ImGui::GetFont(), ImGui::GetFontSize() };
+        }
+        
         void open_url() const override {
-            // Опционально: открыть m_href. Для SDL2 есть SDL_OpenURL; иначе - по платформе.
-            // ImGuiX окружение: можешь прокинуть свой callback/сервис.
+            // Открой ссылку как тебе нужно; временно положим в буфер обмена
+            ImGui::SetClipboardText(m_href.c_str());
+            // Пример для Windows:
+            // ShellExecuteA(nullptr, "open", m_href.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
         }
     };
 

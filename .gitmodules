@@ -51,4 +51,5 @@
 	url = https://github.com/mity/md4c
 [submodule "libs/imgui_md"]
 	path = libs/imgui_md
-	url = https://github.com/pthom/imgui_md.git
+	url = https://github.com/NewYaroslav/imgui_md.git
+	branch = main

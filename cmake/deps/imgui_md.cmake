@@ -1,6 +1,7 @@
 # Provides: imguix_use_or_fetch_imgui_md(<OUT_VAR>)
 # Exports target: imgui_md::imgui_md
 function(imguix_use_or_fetch_imgui_md OUT_VAR)
+    # --- paths ---
     set(_IMGUI_MD_DIR "${IMGUI_MD_DIR}")
     if(NOT _IMGUI_MD_DIR)
         set(_IMGUI_MD_DIR "${PROJECT_SOURCE_DIR}/libs/imgui_md")
@@ -9,23 +10,24 @@ function(imguix_use_or_fetch_imgui_md OUT_VAR)
         message(FATAL_ERROR "imgui_md not found at ${_IMGUI_MD_DIR}.")
     endif()
 
-    # --- resolve md4c ---
+    # --- resolve md4c (system or bundled) ---
     set(MD4C_TGT "")
-    set(_MD4C_INC "")  # NEW: будем хранить путь к заголовкам md4c
+    set(_MD4C_INC "")
 
-    # 1) system md4c (vcpkg и т.п.)
+    # 1) Try system md4c (vcpkg/OS packages)
     find_path(MD4C_INCLUDE_DIR NAMES md4c.h PATH_SUFFIXES include)
     find_library(MD4C_LIBRARY NAMES md4c)
     if(MD4C_INCLUDE_DIR AND MD4C_LIBRARY)
         add_library(md4c_sys UNKNOWN IMPORTED)
         set_target_properties(md4c_sys PROPERTIES
             IMPORTED_LOCATION "${MD4C_LIBRARY}"
-            INTERFACE_INCLUDE_DIRECTORIES "${MD4C_INCLUDE_DIR}")
+            INTERFACE_INCLUDE_DIRECTORIES "${MD4C_INCLUDE_DIR}"
+        )
         set(MD4C_TGT md4c_sys)
-        set(_MD4C_INC "${MD4C_INCLUDE_DIR}")         # NEW
+        set(_MD4C_INC "${MD4C_INCLUDE_DIR}")
     endif()
 
-    # 2) bundled md4c
+    # 2) Bundled md4c (submodule or sources)
     if(NOT MD4C_TGT)
         set(_MD4C_DIR "${MD4C_DIR}")
         if(NOT _MD4C_DIR)
@@ -34,28 +36,30 @@ function(imguix_use_or_fetch_imgui_md OUT_VAR)
 
         if(EXISTS "${_MD4C_DIR}/CMakeLists.txt")
             add_subdirectory("${_MD4C_DIR}" "${CMAKE_BINARY_DIR}/_deps/md4c")
-            if(TARGET md4c)
-                set(MD4C_TGT md4c)
-                # Попытка вытащить include из таргета (на случай, если понадобится)
-                get_target_property(_tmp_inc md4c INTERFACE_INCLUDE_DIRECTORIES)
-                if(_tmp_inc) 
-                    set(_MD4C_INC "${_tmp_inc}") 
-                endif()
-            elseif(TARGET MD4C::MD4C)
+            if(TARGET MD4C::MD4C)
                 set(MD4C_TGT MD4C::MD4C)
-                # Обычно у них правильный include внутри таргета, но подстрахуемся:
-                set(_MD4C_INC "${_MD4C_DIR}/src")
+            elseif(TARGET md4c)
+                set(MD4C_TGT md4c)
             else()
                 message(FATAL_ERROR "md4c target not found after add_subdirectory(${_MD4C_DIR})")
             endif()
-        else()
-            # прямой .c (обычно в src/)
-            if(EXISTS "${_MD4C_DIR}/md4c.c")
-                set(_MD4C_SRC "${_MD4C_DIR}/md4c.c")
+            # try to read include dir from target; else fallback to src/ or root
+            get_target_property(_tmp_inc ${MD4C_TGT} INTERFACE_INCLUDE_DIRECTORIES)
+            if(_tmp_inc)
+                list(GET _tmp_inc 0 _MD4C_INC)
+            elseif(EXISTS "${_MD4C_DIR}/src/md4c.h")
+                set(_MD4C_INC "${_MD4C_DIR}/src")
+            else()
                 set(_MD4C_INC "${_MD4C_DIR}")
-            elseif(EXISTS "${_MD4C_DIR}/src/md4c.c")
+            endif()
+        else()
+            # compile directly from sources (md4c.c in src/ or root)
+            if(EXISTS "${_MD4C_DIR}/src/md4c.c")
                 set(_MD4C_SRC "${_MD4C_DIR}/src/md4c.c")
                 set(_MD4C_INC "${_MD4C_DIR}/src")
+            elseif(EXISTS "${_MD4C_DIR}/md4c.c")
+                set(_MD4C_SRC "${_MD4C_DIR}/md4c.c")
+                set(_MD4C_INC "${_MD4C_DIR}")
             else()
                 message(FATAL_ERROR "md4c.c not found in ${_MD4C_DIR} or ${_MD4C_DIR}/src.")
             endif()
@@ -67,28 +71,20 @@ function(imguix_use_or_fetch_imgui_md OUT_VAR)
         endif()
     endif()
 
-    # --- imgui_md ---
+    # --- imgui_md target ---
     add_library(imgui_md STATIC "${_IMGUI_MD_DIR}/imgui_md.cpp")
     add_library(imgui_md::imgui_md ALIAS imgui_md)
-    target_include_directories(imgui_md PUBLIC "${_IMGUI_MD_DIR}")
 
-    # Fallback: если _MD4C_INC не определён — вычисляем по факту расположения заголовка
-    if(NOT _MD4C_INC)
-        if(DEFINED MD4C_INCLUDE_DIR AND EXISTS "${MD4C_INCLUDE_DIR}/md4c.h")
-            set(_MD4C_INC "${MD4C_INCLUDE_DIR}")
-        elseif(DEFINED _MD4C_DIR AND EXISTS "${_MD4C_DIR}/src/md4c.h")
-            set(_MD4C_INC "${_MD4C_DIR}/src")
-        elseif(DEFINED _MD4C_DIR AND EXISTS "${_MD4C_DIR}/md4c.h")
-            set(_MD4C_INC "${_MD4C_DIR}")
-        else()
-            message(FATAL_ERROR "imgui_md: cannot locate md4c.h; set MD4C_DIR to md4c root (with src/md4c.h).")
-        endif()
-    endif()
+    target_include_directories(imgui_md
+        PUBLIC
+            $<BUILD_INTERFACE:${_IMGUI_MD_DIR}>
+            $<INSTALL_INTERFACE:include>
+    )
+    
+    target_include_directories(imgui_md
+        PRIVATE "${_MD4C_INC}"
+    )
 
-    # чтобы imgui_md.cpp видел "md4c.h"
-    target_include_directories(imgui_md PRIVATE "${_MD4C_INC}")
-
-    # md4c тянем PUBLIC — чтобы у потребителей тоже были его usage-reqs
     target_link_libraries(imgui_md PUBLIC imgui::imgui ${MD4C_TGT})
 
     set_target_properties(imgui_md PROPERTIES
@@ -96,8 +92,8 @@ function(imguix_use_or_fetch_imgui_md OUT_VAR)
         PUBLIC_HEADER "${_IMGUI_MD_DIR}/imgui_md.h"
     )
 
+    message(STATUS "imgui_md: using md4c target: ${MD4C_TGT}")
     message(STATUS "imgui_md: using md4c includes at: ${_MD4C_INC}")
 
     set(${OUT_VAR} imgui_md::imgui_md PARENT_SCOPE)
 endfunction()
-
