@@ -6,6 +6,8 @@
 /// \brief Defines the main application class responsible for window management, event bus, and application loop.
 
 #include <atomic>
+#include <condition_variable>
+#include <mutex>
 #include <thread>
 
 namespace ImGuiX {
@@ -69,6 +71,8 @@ namespace ImGuiX {
         std::atomic<bool> m_is_closing{false};         ///< Indicates shutdown in progress.
         std::atomic<bool> m_is_ini_once{false};        ///< Ensures imgui ini is saved only once.
         std::atomic<bool> m_is_fs_ready{true};         ///< Set when filesystem mount completes.
+        std::condition_variable m_fs_ready_cv;         ///< Signals filesystem readiness.
+        std::mutex m_fs_ready_mutex;                   ///< Guards filesystem readiness state.
 
         std::atomic<int> m_next_window_id{0};          ///< Incremental ID for new windows.
         std::string m_app_name = u8"ImGuiX Application"; ///< Application name string.
