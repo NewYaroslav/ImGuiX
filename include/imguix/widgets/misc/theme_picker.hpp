@@ -45,6 +45,11 @@ namespace ImGuiX::Widgets {
             {IMGUIX_THEME_VS_DARK,        u8"Visual Studio Dark"},
             {IMGUIX_THEME_Y2K,            u8"Y2K"},
             {IMGUIX_THEME_CYBER_Y2K,      u8"Cyber-Y2K"},
+            {IMGUIX_THEME_CYBERPUNK_UI,   u8"Cyberpunk UI"},
+            {IMGUIX_THEME_NIGHT_OWL,      u8"Night Owl"},
+            {IMGUIX_THEME_NORD,           u8"Nord"},
+            {IMGUIX_THEME_TOKYO_NIGHT,    u8"Tokyo Night"},
+            {IMGUIX_THEME_TOKYO_NIGHT_STORM, u8"Tokyo Night Storm"},
         };
         return themes;
     }

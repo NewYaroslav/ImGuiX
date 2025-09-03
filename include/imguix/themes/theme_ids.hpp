@@ -23,6 +23,11 @@
 #define IMGUIX_THEME_VS_DARK        "vs-dark"
 #define IMGUIX_THEME_Y2K            "y2k"
 #define IMGUIX_THEME_CYBER_Y2K      "cyber-y2k"
+#define IMGUIX_THEME_CYBERPUNK_UI    "cyberpunk-ui"
+#define IMGUIX_THEME_NIGHT_OWL       "night-owl"
+#define IMGUIX_THEME_NORD            "nord"
+#define IMGUIX_THEME_TOKYO_NIGHT     "tokyo-night"
+#define IMGUIX_THEME_TOKYO_NIGHT_STORM "tokyo-night-storm"
 
 /// \brief Storage key used to persist theme selection.
 #define IMGUIX_THEME_STORAGE_KEY    "imguix.theme"
