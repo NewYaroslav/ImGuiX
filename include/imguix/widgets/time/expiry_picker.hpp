@@ -18,6 +18,12 @@ namespace ImGuiX::Widgets {
         const char* label;   ///< Display label (e.g. "S5", "M1").
         int         seconds; ///< Value in seconds.
     };
+	
+	/// Inclusive seconds range [from, to].
+    struct SecRange {
+        int from = 0;
+        int to   = 0;
+    };
 
     /// \brief Default presets similar to the screenshot.
     /// \return Reference to built-in presets.
@@ -42,6 +48,12 @@ namespace ImGuiX::Widgets {
 
         int min_seconds = 0;                        ///< Minimum allowed seconds.
         int max_seconds = 24 * 3600 - 1;            ///< Maximum allowed seconds.
+		int step_seconds = 1;                       ///< Minimal step (quantization), e.g. 60
+		
+		// Forbidden inclusive ranges (e.g. {120,120} forbids 120s exactly).
+        // Intervals are interpreted in seconds BEFORE quantization; picker will
+        // snap to the nearest allowed quantized value per direction rules.
+        const std::vector<SecRange>* forbidden = nullptr;
 
         const std::vector<ExpiryPreset>* presets = nullptr; ///< Optional custom presets.
     };
