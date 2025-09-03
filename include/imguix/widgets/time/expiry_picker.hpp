@@ -28,17 +28,20 @@ namespace ImGuiX::Widgets {
         const char* label             = u8"Expiry"; ///< Combo label.
         float       combo_width       = 0.0f;       ///< Preview width (0 -> default).
         float       field_width       = 0.0f;       ///< H/M/S field width (0 -> auto).
+        float       hms_gap           = -1.0f;      ///< Extra horizontal gap around ':' (px). <0 -> use style.ItemInnerSpacing.x
         float       cell_rounding     = 0.0f;       ///< 0 -> square. (<0 -> use style).
         bool        show_cell_borders = true;       ///< Draw cell borders.
         ImVec2      cell_size         = ImVec2(0, 0); ///< Preset cell size (0 -> frame height).
         int         rows              = 3;          ///< Preset grid rows.
         int         cols              = 3;          ///< Preset grid columns.
+        
+        bool        preset_highlight_selected = true; ///< If true, highlight currently selected preset button.
 
-        const char* icon_text       = u8"🕒"; ///< Icon text for combo.
-        float       icon_slot_width = 0.0f; ///< Width reserved for icon (0 -> auto).
+        const char* icon_text         = u8"\ue8b5"; ///< Icon text for combo.
+        float       icon_slot_width   = 0.0f;       ///< Width reserved for icon (0 -> auto).
 
-        int min_seconds = 0;                     ///< Minimum allowed seconds.
-        int max_seconds = 24 * 3600 - 1;        ///< Maximum allowed seconds.
+        int min_seconds = 0;                        ///< Minimum allowed seconds.
+        int max_seconds = 24 * 3600 - 1;            ///< Maximum allowed seconds.
 
         const std::vector<ExpiryPreset>* presets = nullptr; ///< Optional custom presets.
     };
