@@ -99,6 +99,8 @@ namespace ImGuiX::Themes {
         constexpr ImVec4 DragDropTarget         = ImVec4(0.000f, 0.898f, 1.000f, 0.950f);
         constexpr ImVec4 NavHighlight           = HeaderHovered;
         constexpr ImVec4 NavWindowingHighlight  = ImVec4(0.700f, 0.700f, 0.700f, 0.700f);
+        constexpr ImVec4 NavWindowingDimBg      = ImVec4(0.043f, 0.059f, 0.075f, 0.20f);
+        constexpr ImVec4 ModalWindowDimBg       = ImVec4(0.043f, 0.059f, 0.075f, 0.35f);
     } // namespace CyberY2KConstants
 
     /// \class CyberY2KTheme
@@ -169,7 +171,8 @@ namespace ImGuiX::Themes {
 
             colors[ImGuiCol_NavHighlight]          = NavHighlight;
             colors[ImGuiCol_NavWindowingHighlight] = NavWindowingHighlight;
-            // Note: NavWindowingDimBg / ModalWindowDimBg left as defaults.
+            colors[ImGuiCol_NavWindowingDimBg]     = NavWindowingDimBg;
+            colors[ImGuiCol_ModalWindowDimBg]      = ModalWindowDimBg;
 
             // Unify sizes/roundings/paddings/borders from config
             applyDefaultImGuiStyle(style);

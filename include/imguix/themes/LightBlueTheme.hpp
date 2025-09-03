@@ -89,6 +89,8 @@ namespace ImGuiX::Themes {
         constexpr ImVec4 DragDropTarget         = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
         constexpr ImVec4 NavHighlight           = HeaderHovered; // as in the original snippet
         constexpr ImVec4 NavWindowingHighlight  = ImVec4(0.70f, 0.70f, 0.70f, 0.70f);
+        constexpr ImVec4 NavWindowingDimBg      = ImVec4(0.86f, 0.86f, 0.86f, 0.20f);
+        constexpr ImVec4 ModalWindowDimBg       = ImVec4(0.86f, 0.86f, 0.86f, 0.35f);
     }
 
     /// \class LightBlueTheme
@@ -159,7 +161,8 @@ namespace ImGuiX::Themes {
 
             colors[ImGuiCol_NavHighlight]          = NavHighlight;
             colors[ImGuiCol_NavWindowingHighlight] = NavWindowingHighlight;
-            // Note: NavWindowingDimBg / ModalWindowDimBg not set in the original snippet.
+            colors[ImGuiCol_NavWindowingDimBg]     = NavWindowingDimBg;
+            colors[ImGuiCol_ModalWindowDimBg]      = ModalWindowDimBg;
 
             // Unify sizes/roundings/paddings/borders from config
             applyDefaultImGuiStyle(style);

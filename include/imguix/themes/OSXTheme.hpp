@@ -88,6 +88,8 @@ namespace ImGuiX::Themes {
         constexpr ImVec4 TextSelectedBg         = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
         constexpr ImVec4 NavHighlight           = HeaderHovered;
         constexpr ImVec4 NavWindowingHighlight  = ImVec4(0.70f, 0.70f, 0.70f, 0.70f);
+        constexpr ImVec4 NavWindowingDimBg      = ImVec4(0.94f, 0.94f, 0.94f, 0.20f);
+        constexpr ImVec4 ModalWindowDimBg       = ImVec4(0.94f, 0.94f, 0.94f, 0.35f);
     }
 
     /// \class OSXTheme
@@ -150,6 +152,8 @@ namespace ImGuiX::Themes {
             colors[ImGuiCol_TextSelectedBg]        = TextSelectedBg;
             colors[ImGuiCol_NavHighlight]          = NavHighlight;
             colors[ImGuiCol_NavWindowingHighlight] = NavWindowingHighlight;
+            colors[ImGuiCol_NavWindowingDimBg]     = NavWindowingDimBg;
+            colors[ImGuiCol_ModalWindowDimBg]      = ModalWindowDimBg;
 
             // Unified roundings/paddings/borders from config
             applyDefaultImGuiStyle(style);
