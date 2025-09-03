@@ -109,6 +109,7 @@ namespace ImGuiX::Themes {
             // ImGui::StyleColorsDark(&style);
 
             colors[ImGuiCol_Text]                  = Text;
+            colors[ImGuiCol_TextCursor]            = SliderGrabActive;
             colors[ImGuiCol_TextDisabled]          = TextDisabled;
             colors[ImGuiCol_WindowBg]              = WindowBg;
             colors[ImGuiCol_ChildBg]               = ChildBg;

@@ -46,6 +46,7 @@ public:
         ImGuiX::Themes::applyDefaultImGuiStyle(style);
         style.Colors[ImGuiCol_Text] = ImVec4(1.0f, 0.8f, 0.2f, 1.0f);
         // настройте остальные цвета...
+        style.Colors[ImGuiCol_TextCursor] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f); // цвет курсора
     }
 };
 ```
@@ -59,6 +60,8 @@ tm.setTheme("my-theme");
 // вызывать каждый кадр, чтобы применить при изменении
 tm.updateCurrentTheme();
 ```
+
+Все встроенные темы задают полный набор цветов `ImGuiCol_*`.
 
 ## Применение тем
 

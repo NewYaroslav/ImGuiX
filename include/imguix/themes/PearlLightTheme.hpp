@@ -83,6 +83,7 @@ namespace ImGuiX::Themes {
             ImVec4* colors = style.Colors;
 
             colors[ImGuiCol_Text]                  = Text;
+            colors[ImGuiCol_TextCursor]            = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
             colors[ImGuiCol_TextDisabled]          = TextDisabled;
             colors[ImGuiCol_WindowBg]              = WindowBg;
             colors[ImGuiCol_ChildBg]               = ChildBg;
