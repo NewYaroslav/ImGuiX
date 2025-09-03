@@ -20,16 +20,22 @@ namespace ImGuiX {
         progress_lock.unlock();
         
         std::unique_lock resource_lock(m_resources_mutex);
-        if (m_resources.find(type) != m_resources.end()) return false;
+        if (m_resources.find(type) != m_resources.end()) {
+            resource_lock.unlock();
+            progress_lock.lock();
+            m_in_progress.erase(type);
+            progress_lock.unlock();
+            return false;
+        }
         try {
             m_resources[type] = creator();
-			resource_lock.unlock();
+            resource_lock.unlock();
             std::unique_lock lock(m_progress_mutex);
             m_in_progress.erase(type);
             return true;
         } catch (...) {
             resource_lock.unlock();
-			std::unique_lock lock(m_progress_mutex);
+            std::unique_lock lock(m_progress_mutex);
             m_in_progress.erase(type);
             throw;
         }
