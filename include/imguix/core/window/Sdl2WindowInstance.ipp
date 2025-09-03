@@ -128,10 +128,10 @@ namespace ImGuiX {
             if (event.type == SDL_QUIT) {
                 Events::WindowClosedEvent evt(id(), name());
                 notify(evt);
-                SDL_DestroyWindow(m_window);
                 SDL_GL_DeleteContext(m_gl_context);
-                m_window = nullptr;
+                SDL_DestroyWindow(m_window);
                 m_gl_context = nullptr;
+                m_window = nullptr;
                 m_is_open = false;
             }
         }
@@ -192,10 +192,10 @@ namespace ImGuiX {
         if (m_window) {
             Events::WindowClosedEvent evt(id(), name());
             notify(evt);
-            SDL_DestroyWindow(m_window);
             SDL_GL_DeleteContext(m_gl_context);
-            m_window = nullptr;
+            SDL_DestroyWindow(m_window);
             m_gl_context = nullptr;
+            m_window = nullptr;
         }
     }
 
