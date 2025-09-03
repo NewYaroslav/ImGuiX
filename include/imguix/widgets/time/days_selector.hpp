@@ -36,7 +36,7 @@ namespace ImGuiX::Widgets {
         ImVec2      cell_size   = ImVec2(24, 20);          ///< Clickable cell size.
         int         rows        = 1;                       ///< Grid rows.
         int         cols        = 7;                       ///< Grid cols (rows*cols should cover 7).
-        bool        use_header_color_for_selected = true;  ///< Use theme selection colors.
+        bool        use_header_color_for_selected = true;  ///< Use ImGuiCol_TextSelectedBg for selected bg.
 
         // Quick actions toolbar
         bool        show_toolbar_all_none     = true;      ///< Show All/None buttons.

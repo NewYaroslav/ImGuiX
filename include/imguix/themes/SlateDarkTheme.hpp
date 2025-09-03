@@ -67,7 +67,7 @@ namespace ImGuiX::Themes {
         constexpr ImVec4 PlotLinesHover  = ImVec4(1.00f, 0.45f, 0.35f, 1.00f);
         constexpr ImVec4 PlotHistogram   = ImVec4(0.95f, 0.77f, 0.16f, 1.00f);
         constexpr ImVec4 PlotHistogramHv = ImVec4(1.00f, 0.86f, 0.28f, 1.00f);
-        constexpr ImVec4 TextSelectedBg  = ImVec4(0.30f, 0.55f, 0.90f, 0.35f);
+        constexpr ImVec4 TextSelectedBg  = AccentSoft;
         constexpr ImVec4 ModalDimBg      = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
         constexpr ImVec4 DragDropTarget  = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
         constexpr ImVec4 NavDimBg        = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
