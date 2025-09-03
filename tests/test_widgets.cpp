@@ -49,6 +49,11 @@
 #include <imguix/themes/VisualStudioDarkTheme.hpp>
 #include <imguix/themes/Y2KTheme.hpp>
 #include <imguix/themes/CyberY2KTheme.hpp>
+#include <imguix/themes/CyberpunkUITheme.hpp>
+#include <imguix/themes/NightOwlTheme.hpp>
+#include <imguix/themes/NordTheme.hpp>
+#include <imguix/themes/TokyoNightStormTheme.hpp>
+#include <imguix/themes/TokyoNightTheme.hpp>
 
 // === Графики ===
 #ifdef IMGUI_ENABLE_IMPLOT
@@ -499,6 +504,11 @@ public:
         ImGuiX::Themes::registerVisualStudioDarkTheme(tm);
         ImGuiX::Themes::registerY2KTheme(tm);
         ImGuiX::Themes::registerCyberY2KTheme(tm);
+        ImGuiX::Themes::registerCyberpunkUITheme(tm);
+        ImGuiX::Themes::registerNightOwlTheme(tm);
+        ImGuiX::Themes::registerNordTheme(tm);
+        ImGuiX::Themes::registerTokyoNightStormTheme(tm);
+        ImGuiX::Themes::registerTokyoNightTheme(tm);
         ImGuiX::Widgets::ApplyStoredTheme(this);
 
         // Шрифты (ручная сборка)
