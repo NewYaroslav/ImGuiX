@@ -73,7 +73,7 @@ namespace ImGuiX::Themes {
 
         // Tabs
         constexpr ImVec4 Tab                    = ImVec4(0.71f, 0.78f, 0.69f, 0.80f);
-        constexpr ImVec4 TabHovered             = ImVec4(0.71f, 0.78f, 0.69f, 0.80f); // close to HeaderHovered
+        constexpr ImVec4 TabHovered             = ImVec4(0.76f, 0.83f, 0.74f, 0.90f); // slightly lighter when hovered
         constexpr ImVec4 TabActive              = ImVec4(0.71f, 0.78f, 0.69f, 1.00f);
         constexpr ImVec4 TabUnfocused           = ImVec4(0.18f, 0.18f, 0.18f, 1.00f);
         constexpr ImVec4 TabUnfocusedActive     = ImVec4(0.36f, 0.36f, 0.36f, 0.54f);
