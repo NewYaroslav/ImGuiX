@@ -13,29 +13,19 @@ namespace ImGuiX {
     bool ResourceRegistry::registerResource(std::function<std::shared_ptr<T>()> creator) {
         const std::type_index type = typeid(T);
         
-        std::unique_lock progress_lock(m_progress_mutex);
+        std::scoped_lock lock(m_progress_mutex, m_resources_mutex);
         if (!m_in_progress.insert(type).second) {
             return false; // already in progress
         }
-        progress_lock.unlock();
-        
-        std::unique_lock resource_lock(m_resources_mutex);
         if (m_resources.find(type) != m_resources.end()) {
-            resource_lock.unlock();
-            progress_lock.lock();
             m_in_progress.erase(type);
-            progress_lock.unlock();
             return false;
         }
         try {
             m_resources[type] = creator();
-            resource_lock.unlock();
-            std::unique_lock lock(m_progress_mutex);
             m_in_progress.erase(type);
             return true;
         } catch (...) {
-            resource_lock.unlock();
-            std::unique_lock lock(m_progress_mutex);
             m_in_progress.erase(type);
             throw;
         }

@@ -55,32 +55,50 @@ namespace ImGuiX::Pubsub {
                 [owner](const CallbackRecord& rec) {
                     return rec.owner == owner;
                 }), list.end());
+            if (list.empty()) {
+                m_event_callbacks.erase(it_cb);
+            }
         }
 
         auto it_ls = m_event_listeners.find(type);
         if (it_ls != m_event_listeners.end()) {
             auto& list = it_ls->second;
             list.erase(std::remove(list.begin(), list.end(), owner), list.end());
+            if (list.empty()) {
+                m_event_listeners.erase(it_ls);
+            }
         }
     }
-    
+
     inline void EventBus::unsubscribeAll(EventListener* owner) {
         std::lock_guard<std::mutex> lock(m_subscriptions_mutex);
 
-        for (auto& [type, callback_list] : m_event_callbacks) {
+        for (auto it = m_event_callbacks.begin(); it != m_event_callbacks.end(); ) {
+            auto& callback_list = it->second;
             callback_list.erase(std::remove_if(callback_list.begin(), callback_list.end(),
                 [owner](const CallbackRecord& rec) {
                     return rec.owner == owner;
                 }), callback_list.end());
+            if (callback_list.empty()) {
+                it = m_event_callbacks.erase(it);
+            } else {
+                ++it;
+            }
         }
 
-        for (auto& [type, listener_list] : m_event_listeners) {
+        for (auto it = m_event_listeners.begin(); it != m_event_listeners.end(); ) {
+            auto& listener_list = it->second;
             listener_list.erase(std::remove(listener_list.begin(), listener_list.end(), owner), listener_list.end());
+            if (listener_list.empty()) {
+                it = m_event_listeners.erase(it);
+            } else {
+                ++it;
+            }
         }
     }
 
     inline void EventBus::notify(const Event* const event) const {
-        auto type = std::type_index(typeid(*event));
+        auto type = event->type();
         
         callback_list_t callbacks_copy;
         listener_list_t listeners_copy;

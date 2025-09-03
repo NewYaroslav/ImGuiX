@@ -58,12 +58,17 @@ namespace ImGuiX::Utils {
             -1, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
             41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, -1, -1, -1, -1, -1
         };
+        if (input.size() % 4 != 0) {
+            throw std::invalid_argument("Invalid Base64 input length.");
+        }
 
         std::string output;
         uint32_t buffer = 0;
         size_t bits_collected = 0;
 
-        for (unsigned char c : input) {
+        size_t i = 0;
+        for (; i < input.size(); ++i) {
+            unsigned char c = static_cast<unsigned char>(input[i]);
             if (c == '=') {
                 break;
             }
@@ -78,6 +83,32 @@ namespace ImGuiX::Utils {
                 bits_collected -= 8;
                 output.push_back(static_cast<char>((buffer >> bits_collected) & 0xFF));
             }
+        }
+
+        size_t padding_count = input.size() - i;
+        if (padding_count > 2) {
+            throw std::invalid_argument("Invalid Base64 padding.");
+        }
+        for (size_t j = i; j < input.size(); ++j) {
+            if (input[j] != '=') {
+                throw std::invalid_argument("Invalid Base64 padding.");
+            }
+        }
+
+        if (bits_collected != 0) {
+            if (bits_collected == 2) {
+                if (padding_count != 1 || (buffer & 0x3U) != 0) {
+                    throw std::invalid_argument("Invalid Base64 padding.");
+                }
+            } else if (bits_collected == 4) {
+                if (padding_count != 2 || (buffer & 0xFU) != 0) {
+                    throw std::invalid_argument("Invalid Base64 padding.");
+                }
+            } else {
+                throw std::invalid_argument("Invalid Base64 input.");
+            }
+        } else if (padding_count != 0) {
+            throw std::invalid_argument("Invalid Base64 padding.");
         }
 
         return output;
