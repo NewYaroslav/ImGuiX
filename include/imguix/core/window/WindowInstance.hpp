@@ -324,7 +324,6 @@ namespace ImGuiX {
 #elif defined(IMGUIX_USE_SDL2_BACKEND)
         SDL_Window* m_window = nullptr; ///< SDL window handle.
         SDL_GLContext m_gl_context = nullptr; ///< Associated GL context.
-        SDL_Window* m_window = nullptr;
         ImGuiContext* m_imgui_ctx = nullptr;
         const char* selectGlslForSdl(SDL_Window* w) noexcept;
 #endif
