@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <imguix/extensions/sizing.hpp> // ImGuiX::Extensions::CalcTimeComboWidth(), etc.
+#include <imguix/widgets/controls/icon_combo.hpp>
 
 namespace ImGuiX::Widgets {
 
@@ -68,9 +69,17 @@ namespace ImGuiX::Widgets {
         ImGui::PushID(id);
         ImGui::SetNextWindowSizeConstraints(ImVec2(0, 0), ImVec2(FLT_MAX, 300.0f));
         ImGui::SetNextItemWidth(combo_width);
-        if (ImGui::BeginCombo(
-                cfg.label ? cfg.label : u8"Hours", preview.c_str(),
-                ImGuiComboFlags_HeightLargest | ImGuiComboFlags_PopupAlignLeft)) {
+        bool open = cfg.use_icon_combo ?
+            BeginIconCombo(
+                cfg.label ? cfg.label : u8"Hours",
+                preview.c_str(),
+                cfg.icon_text,
+                ImGuiComboFlags_HeightLargest | ImGuiComboFlags_PopupAlignLeft) :
+            ImGui::BeginCombo(
+                cfg.label ? cfg.label : u8"Hours",
+                preview.c_str(),
+                ImGuiComboFlags_HeightLargest | ImGuiComboFlags_PopupAlignLeft);
+        if (open) {
             const ImGuiStyle& st = ImGui::GetStyle();
             ImGui::Indent(st.FramePadding.x);
 

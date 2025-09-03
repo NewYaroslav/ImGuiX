@@ -14,6 +14,7 @@
 #include <cstdio>
 #include <cmath>
 #include <imguix/extensions/sizing.hpp> // ImGuiX::Extensions::CalcWeekdayComboWidth(), etc.
+#include <imguix/config/icons.hpp>
 
 namespace ImGuiX::Widgets {
 
@@ -29,6 +30,8 @@ namespace ImGuiX::Widgets {
         const char* label_weekend  = u8"Weekend";          ///< Weekend button label.
 
         float       combo_width = 0.0f;                    ///< SetNextItemWidth for combo preview.
+        bool        use_icon_combo = true;                 ///< Use BeginIconCombo for the combo.
+        const char* icon_text    = IMGUIX_ICON_CALENDAR_WEEK; ///< Combo icon glyph.
         ImVec2      popup_size  = ImVec2(0, 0);            ///< Scroll area size.
         ImVec2      cell_size   = ImVec2(24, 20);          ///< Clickable cell size.
         int         rows        = 1;                       ///< Grid rows.
