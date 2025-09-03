@@ -29,6 +29,11 @@ This document lists the color themes bundled with ImGuiX and shows how to create
 - **Visual Studio Dark** – Theme inspired by Visual Studio.
 - **Y2K** – Light chrome/silver surfaces with cobalt/purple accents and glassy panels (early-2000s tech vibe).
 - **Cyber-Y2K** – Dark tech base with neon cyan/magenta (plus violet, acid-green highlights); high-contrast with subtle glassy panels.
+- **Cyberpunk UI** – HUD-style blue monochrome with neon cyan accents.
+- **Night Owl** – Deep navy background with cyan/blue primaries.
+- **Nord** – Calm dark scheme based on the Nord palette.
+- **Tokyo Night** – Dark theme with stormy navy base and blue/cyan highlights.
+- **Tokyo Night Storm** – Storm variant of Tokyo Night with the same accent set.
 
 ## Creating a custom theme
 
