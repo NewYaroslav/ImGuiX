@@ -1,6 +1,6 @@
 #pragma once
-#ifndef _IMGUIX_THEMES_STALE_DARK_THEME_HPP_INCLUDED
-#define _IMGUIX_THEMES_STALE_DARK_THEME_HPP_INCLUDED
+#ifndef _IMGUIX_THEMES_SLATE_DARK_THEME_HPP_INCLUDED
+#define _IMGUIX_THEMES_SLATE_DARK_THEME_HPP_INCLUDED
 
 /// \file SlateDarkTheme.hpp
 /// \brief Extra themes (SlateDark) implemented in the same pattern as CorporateGreyTheme.
@@ -212,4 +212,4 @@ namespace ImGuiX::Themes {
 
 } // namespace ImGuiX::Themes
 
-#endif // _IMGUIX_THEMES_STALE_DARK_THEME_HPP_INCLUDED
+#endif // _IMGUIX_THEMES_SLATE_DARK_THEME_HPP_INCLUDED
