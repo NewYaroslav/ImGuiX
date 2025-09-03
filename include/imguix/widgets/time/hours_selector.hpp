@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <imguix/extensions/sizing.hpp> // ImGuiX::Extensions::CalcTimeComboWidth(), etc.
+#include <imguix/config/icons.hpp>
 
 namespace ImGuiX::Widgets {
 
@@ -27,6 +28,8 @@ namespace ImGuiX::Widgets {
         int         rows         = 3;            ///< Grid rows (rows*cols should cover 24).
         int         cols         = 8;            ///< Grid cols.
         float       combo_width  = 0.0f;         ///< SetNextItemWidth for the combo.
+        bool        use_icon_combo = true;       ///< Use BeginIconCombo instead of ImGui combo.
+        const char* icon_text   = IMGUIX_ICON_CLOCK; ///< Combo icon glyph.
         bool        use_header_color_for_selected = true; ///< Use ImGuiCol_Header for selected bg.
         bool    show_cell_borders   = true;      ///< Draw cell borders.
         float   cell_border_thickness = 1.0f;   ///< Border thickness.

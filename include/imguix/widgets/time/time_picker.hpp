@@ -15,6 +15,7 @@
 #include <imguix/widgets/input/arrow_stepper.hpp>
 #include <imguix/utils/time_utils.hpp>  // ImGuiX::Utils::format_hms, etc.
 #include <imguix/extensions/sizing.hpp> // ImGuiX::Extensions::CalcTimeComboWidth(), etc.
+#include <imguix/config/icons.hpp>
 
 namespace ImGuiX::Widgets {
 
@@ -25,6 +26,8 @@ namespace ImGuiX::Widgets {
         const char* label       = u8"Time";      ///< Combo label.
         const char* desc        = u8"HH:MM:SS"; ///< Format description.
         float       combo_width = 0.0f;         ///< Width for combo preview.
+        bool        use_icon_combo = true;      ///< Use BeginIconCombo for combo.
+        const char* icon_text = IMGUIX_ICON_CLOCK; ///< Combo icon glyph.
         bool        show_desc   = true;         ///< Show format description.
         float       field_width = 0.0f;         ///< Width per ArrowStepper field.
     };
@@ -46,6 +49,8 @@ namespace ImGuiX::Widgets {
         const char* label        = u8"Offset";     ///< Combo label.
         const char* desc         = u8"±HH:MM:SS"; ///< Format description.
         float       combo_width  = 0.0f;          ///< Width for combo preview.
+        bool        use_icon_combo = true;       ///< Use BeginIconCombo for combo.
+        const char* icon_text    = IMGUIX_ICON_GLOBE; ///< Combo icon glyph.
         bool        show_desc    = true;          ///< Show format description.
         bool        show_gmt     = true;          ///< Show GMT offset.
         bool        show_tz_list = true;          ///< Show timezone list.

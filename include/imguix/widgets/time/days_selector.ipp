@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <cmath>
 #include <imguix/extensions/sizing.hpp> // ImGuiX::Extensions::CalcWeekdayComboWidth(), etc.
+#include <imguix/widgets/controls/icon_combo.hpp>
 
 namespace ImGuiX::Widgets {
 
@@ -94,10 +95,17 @@ namespace ImGuiX::Widgets {
         ImGui::PushID(id);
         ImGui::SetNextItemWidth(combo_width);
         ImGui::SetNextWindowSizeConstraints(ImVec2(0, 0), ImVec2(FLT_MAX, 300.0f));
-        if (ImGui::BeginCombo(
-                cfg.label ? cfg.label : u8"Days", preview.c_str(),
-                ImGuiComboFlags_HeightLargest | ImGuiComboFlags_PopupAlignLeft)
-            ) {
+        bool open = cfg.use_icon_combo ?
+            BeginIconCombo(
+                cfg.label ? cfg.label : u8"Days",
+                preview.c_str(),
+                cfg.icon_text,
+                ImGuiComboFlags_HeightLargest | ImGuiComboFlags_PopupAlignLeft) :
+            ImGui::BeginCombo(
+                cfg.label ? cfg.label : u8"Days",
+                preview.c_str(),
+                ImGuiComboFlags_HeightLargest | ImGuiComboFlags_PopupAlignLeft);
+        if (open) {
             ImGui::Indent(st.FramePadding.x);
 
             // Toolbar
