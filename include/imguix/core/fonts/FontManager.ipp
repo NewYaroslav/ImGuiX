@@ -22,6 +22,14 @@
 #   include <imgui_impl_opengl3.h>
 #endif
 
+#ifndef IMGUIX_SUPPRESS_EMOJI_CONTROL_GLYPHS
+#define IMGUIX_SUPPRESS_EMOJI_CONTROL_GLYPHS 1
+#endif
+
+#ifndef IMGUIX_SUPPRESS_KEYCAP_COMBINING
+#define IMGUIX_SUPPRESS_KEYCAP_COMBINING 0   // 1, если хотите скрыть 'keycap' U+20E3
+#endif
+
 namespace ImGuiX::Fonts {
     namespace fs = std::filesystem;
 
@@ -222,6 +230,10 @@ namespace ImGuiX::Fonts {
                 // ✂, ✈, ✔, ✖, …
                 static const ImWchar kDingbats[] = { 0x2700, 0x27BF, 0 };
                 b.AddRanges(kDingbats);
+            } else if (tok == u8"MiscTechnical" || tok == u8"MiscTech") {
+                // ←, ↑, →, ↔, …
+                static const ImWchar kArrows[] = { 0x2300, 0x23FF, 0 };
+                b.AddRanges(kArrows);
             } else if (tok == u8"Arrows") {
                 // ←, ↑, →, ↔, …
                 static const ImWchar kArrows[] = { 0x2190, 0x21FF, 0 };
@@ -238,6 +250,86 @@ namespace ImGuiX::Fonts {
             } else if (tok == u8"LatinExtAdditional") { // U+1E00..U+1EFF (редко, но встречается)
                 static const ImWchar kLatinExtAdd[] = { 0x1E00, 0x1EFF, 0 };
                 b.AddRanges(kLatinExtAdd);
+            } else if (tok == u8"EmojiBasic") {           // 🙂😀 …
+                static_assert(sizeof(ImWchar) == 4, "IMGUI_USE_WCHAR32 is not active here");
+                static const ImWchar kEmojiBasic[] = { 0x1F600, 0x1F64F, 0 };
+                b.AddRanges(kEmojiBasic);
+            } else if (tok == u8"EmojiSupp") {          // 🥲🤖 …
+                static_assert(sizeof(ImWchar) == 4, "IMGUI_USE_WCHAR32 is not active here");
+                static const ImWchar kEmojiSupp[]  = { 0x1F900, 0x1F9FF, 0 };
+                b.AddRanges(kEmojiSupp);
+            } else if (tok == u8"EmojiPict") {          // 🎨📦 …
+                static_assert(sizeof(ImWchar) == 4, "IMGUI_USE_WCHAR32 is not active here");
+                static const ImWchar kPict[]       = { 0x1F300, 0x1F5FF, 0 };
+                b.AddRanges(kPict);
+            } else if (tok == u8"EmojiTransport") {     // 🚀🛳 …
+                static_assert(sizeof(ImWchar) == 4, "IMGUI_USE_WCHAR32 is not active here");
+                static const ImWchar kTrans[]      = { 0x1F680, 0x1F6FF, 0 };
+                b.AddRanges(kTrans);
+            } else if (tok == u8"EmojiExtA") {          // 🪓🪙 …
+                static_assert(sizeof(ImWchar) == 4, "IMGUI_USE_WCHAR32 is not active here");
+                static const ImWchar kExtA[]       = { 0x1FA70, 0x1FAFF, 0 };
+                b.AddRanges(kExtA);
+            } else if (tok == u8"EmojiAll") {
+                static_assert(sizeof(ImWchar) == 4, "IMGUI_USE_WCHAR32 is not active here");
+
+                // BMP helpers
+                static const ImWchar kMiscTech[]   = { 0x2300, 0x23FF, 0 };
+                static const ImWchar kMiscSym[]    = { 0x2600, 0x26FF, 0 };
+                static const ImWchar kDingbats[]   = { 0x2700, 0x27BF, 0 };
+                // Core emoji planes (SMP)
+                static const ImWchar kPict[]       = { 0x1F300, 0x1F5FF, 0 };
+                static const ImWchar kEmoticons[]  = { 0x1F600, 0x1F64F, 0 };
+                static const ImWchar kTransport[]  = { 0x1F680, 0x1F6FF, 0 };
+                static const ImWchar kSuppSym[]    = { 0x1F900, 0x1F9FF, 0 };
+                static const ImWchar kExtA[]       = { 0x1FA70, 0x1FAFF, 0 };
+                static const ImWchar kRegional[]   = { 0x1F1E6, 0x1F1FF, 0 };
+                static const ImWchar kSkinTones[]  = { 0x1F3FB, 0x1F3FF, 0 };
+
+                b.AddRanges(kMiscTech);
+                b.AddRanges(kMiscSym);
+                b.AddRanges(kDingbats);
+                b.AddRanges(kPict);
+                b.AddRanges(kEmoticons);
+                b.AddRanges(kTransport);
+                b.AddRanges(kSuppSym);
+                b.AddRanges(kExtA);
+                b.AddRanges(kRegional);
+                b.AddRanges(kSkinTones);
+
+                // Composition helpers
+                //b.AddChar(0x0023); // '#'
+                //b.AddChar(0x002A); // '*'
+
+                for (ImWchar cp = 0x0030; cp <= 0x0039; ++cp) b.AddChar(cp);
+            } else if (tok == u8"EmojiTGCore") {
+                static_assert(sizeof(ImWchar) == 4, "IMGUI_USE_WCHAR32 is not active here");
+
+                // 1) Emoticons
+                static const ImWchar kEmoticons[]  = { 0x1F600, 0x1F64F, 0 };
+                // 2) Hearts/checks/warnings etc.
+                static const ImWchar kDingbats[]   = { 0x2700, 0x27BF, 0 };
+                static const ImWchar kMiscSym[]    = { 0x2600, 0x26FF, 0 };
+                // 3) Timers/clocks
+                static const ImWchar kMiscTech[]   = { 0x2300, 0x23FF, 0 };
+
+                b.AddRanges(kEmoticons);
+                b.AddRanges(kDingbats);
+                b.AddRanges(kMiscSym);
+                b.AddRanges(kMiscTech);
+
+                // 4) Hand-picked frequent pictographs
+                b.AddChar(0x1F389); // 🎉
+                b.AddChar(0x1F38A); // 🎊
+                b.AddChar(0x1F525); // 🔥
+                b.AddChar(0x1F680); // 🚀
+                b.AddChar(0x1F4AF); // 💯
+                b.AddChar(0x1F517); // 🔗
+                b.AddChar(0x1F4CE); // 📎
+
+                // 5) Presentation helpers
+                b.AddChar(0x2764);  // ❤ (heart)
+                b.AddChar(0x2757);  // ❗
             }
             // add more named ranges as needed (Latin, Greek, Thai, etc.)
         }
@@ -356,6 +448,28 @@ namespace ImGuiX::Fonts {
       m_params = params;
       m_dirty = true;
       return true;
+    }
+    
+    
+    static void AddInvisibleEmojiControls(ImFontAtlas* atlas, ImFont* font) {
+        auto add = [&](ImWchar cp){
+            // 1x1 «пустышка», advance=0.0f => символ не виден и не влияет на ширину.
+            atlas->AddCustomRectFontGlyph(font, cp, 1, 1, /*advance_x=*/0.0f, ImVec2(0,0));
+        };
+
+        // Variation Selectors (VS1..VS16) — FE00..FE0F
+        for (ImWchar cp = 0xFE00; cp <= 0xFE0F; ++cp) add(cp);
+
+        // Zero-width & joiners
+        add(0x200D); // ZWJ
+        add(0x200C); // ZWNJ
+        add(0x200B); // Zero Width Space
+        add(0x2060); // Word Joiner
+        add(0x034F); // Combining Grapheme Joiner
+
+#       if IMGUIX_SUPPRESS_KEYCAP_COMBINING
+        add(0x20E3); // Combining Enclosing Keycap (для '1️⃣' и т.п.)
+#       endif
     }
 
     inline BuildResult FontManager::buildNow() {
@@ -593,57 +707,68 @@ namespace ImGuiX::Fonts {
           add_single(FontRole::H3, h);
         }
       } else {
-        // --- MANUAL MODE ---
-        if (m_manual.has_body) {
-          // Body root
-          body = add_single(FontRole::Body, m_manual.body);
+            // --- MANUAL MODE ---
+            if (m_manual.has_body) {
+                // Body root
+                body = add_single(FontRole::Body, m_manual.body);
 
-          auto do_merge_vec = [&](const std::vector<FontFile> &vec) {
-            for (auto ff : vec) {
-              ff.merge = true;
-              (void)addFontFile(ff, m_params, ranges, base_dir_abs, cfg);
+                auto do_merge_vec = [&](const std::vector<FontFile> &vec) {
+                    for (auto ff : vec) {
+                        ff.merge = true;
+                        (void)addFontFile(ff, m_params, ranges, base_dir_abs, cfg);
+                    }
+                };
+
+                // Explicit roles
+                bool merged_icons = !m_manual.merges_icons.empty();
+                bool merged_emoji = !m_manual.merges_emoji.empty();
+                do_merge_vec(m_manual.merges_icons);
+                do_merge_vec(m_manual.merges_emoji);
+
+                // Legacy: if old method used, include both roles
+                if (!m_manual.merges_unknown.empty()) {
+                    do_merge_vec(m_manual.merges_unknown);
+                    merged_icons = true;
+                    merged_emoji = true;
+                }
+
+                if (body) {
+                    if (merged_icons)
+                        m_fonts[FontRole::Icons] = body;
+                    if (merged_emoji)
+                        m_fonts[FontRole::Emoji] = body;
+                }
+
+                // Headlines
+                auto ensure_headline = [&](FontRole role, float px_default) {
+                    auto it = m_manual.headlines.find(role);
+                    if (it != m_manual.headlines.end()) {
+                        add_single(role, it->second);
+                    } else 
+                    if (body) {
+                        // reuse body path as a convenience
+                        FontFile ff = m_manual.body;
+                        ff.size_px = px_default;
+                        add_single(role, ff);
+                    }
+                };
+                ensure_headline(FontRole::H1, m_px_h1);
+                ensure_headline(FontRole::H2, m_px_h2);
+                ensure_headline(FontRole::H3, m_px_h3);
+            } else {
+                br.message = u8"Manual mode: Body font not provided";
             }
-          };
-
-          // Explicit roles
-          bool merged_icons = !m_manual.merges_icons.empty();
-          bool merged_emoji = !m_manual.merges_emoji.empty();
-          do_merge_vec(m_manual.merges_icons);
-          do_merge_vec(m_manual.merges_emoji);
-
-          // Legacy: if old method used, include both roles
-          if (!m_manual.merges_unknown.empty()) {
-            do_merge_vec(m_manual.merges_unknown);
-            merged_icons = true;
-            merged_emoji = true;
-          }
-
-          if (body) {
-            if (merged_icons)
-              m_fonts[FontRole::Icons] = body;
-            if (merged_emoji)
-              m_fonts[FontRole::Emoji] = body;
-          }
-
-          // Headlines
-          auto ensure_headline = [&](FontRole role, float px_default) {
-            auto it = m_manual.headlines.find(role);
-            if (it != m_manual.headlines.end()) {
-              add_single(role, it->second);
-            } else if (body) {
-              // reuse body path as a convenience
-              FontFile ff = m_manual.body;
-              ff.size_px = px_default;
-              add_single(role, ff);
-            }
-          };
-          ensure_headline(FontRole::H1, m_px_h1);
-          ensure_headline(FontRole::H2, m_px_h2);
-          ensure_headline(FontRole::H3, m_px_h3);
-        } else {
-          br.message = u8"Manual mode: Body font not provided";
         }
-      }
+
+#       if IMGUIX_SUPPRESS_EMOJI_CONTROL_GLYPHS
+        {
+            // Важно: ДО Build(). updateBackendTexture() обычно вызывает Build() внутри.
+            ImFontAtlas* atlas = ImGui::GetIO().Fonts;
+            // Можно пройтись по всем шрифтам в атласе
+            for (ImFont* f : atlas->Fonts)
+                AddInvisibleEmojiControls(atlas, f);
+        }
+#       endif
 
         // Update backend texture for active backend
         if (!updateBackendTexture()) {

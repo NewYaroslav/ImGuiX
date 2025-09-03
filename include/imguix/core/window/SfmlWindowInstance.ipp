@@ -20,6 +20,67 @@
 
 namespace ImGuiX {
 
+	// Windows Unicode clipboard for Dear ImGui (UTF-8 <-> UTF-16)
+	// Link with user32.lib
+#	ifdef _WIN32
+	namespace {
+
+		static void SetClipboardText_Win(void*, const char* utf8) {
+			if (!utf8) return;
+			int wlen = MultiByteToWideChar(CP_UTF8, 0, utf8, -1, nullptr, 0);
+			if (wlen <= 0) return;
+
+			HGLOBAL hmem = GlobalAlloc(GMEM_MOVEABLE, wlen * sizeof(wchar_t));
+			if (!hmem) return;
+			wchar_t* wbuf = static_cast<wchar_t*>(GlobalLock(hmem));
+			MultiByteToWideChar(CP_UTF8, 0, utf8, -1, wbuf, wlen);
+			GlobalUnlock(hmem);
+
+			if (OpenClipboard(nullptr)) {
+				EmptyClipboard();
+				SetClipboardData(CF_UNICODETEXT, hmem); // ownership -> system
+				CloseClipboard();
+			} else {
+				GlobalFree(hmem);
+			}
+		}
+
+		static const char* GetClipboardText_Win(void*) {
+			static std::string out; out.clear();
+			if (!OpenClipboard(nullptr)) return "";
+
+			HANDLE h = GetClipboardData(CF_UNICODETEXT);
+			if (h) {
+				const wchar_t* w = static_cast<const wchar_t*>(GlobalLock(h));
+				if (w) {
+					int len = WideCharToMultiByte(CP_UTF8, 0, w, -1, nullptr, 0, nullptr, nullptr);
+					out.resize(len ? len - 1 : 0);
+					if (len) WideCharToMultiByte(CP_UTF8, 0, w, -1, out.data(), len, nullptr, nullptr);
+					GlobalUnlock(h);
+				}
+			} else {
+				// Fallback для старых/ANSI-приложений (если Unicode отсутствует)
+				HANDLE ht = GetClipboardData(CF_TEXT);
+				if (ht) {
+					const char* a = static_cast<const char*>(GlobalLock(ht));
+					if (a) { out.assign(a); GlobalUnlock(ht); }
+				}
+			}
+			CloseClipboard();
+			return out.c_str();
+		}
+
+		static void Platform_SetClipboardText_Win(ImGuiContext*, const char* text) { 
+			SetClipboardText_Win(nullptr, text); 
+		}
+
+		static const char* Platform_GetClipboardText_Win(ImGuiContext*) { 
+			return GetClipboardText_Win(nullptr); 
+		}
+
+	}
+#	endif
+
     WindowInstance::~WindowInstance() noexcept  {
         saveIniNow();
 #       ifdef IMGUI_ENABLE_IMPLOT
@@ -64,6 +125,14 @@ namespace ImGuiX {
             SetFocus(hwnd);
             SetActiveWindow(hwnd);
         }
+		
+        // Put this where you init ImGui (after creating io)
+        ImGuiIO& io = ImGui::GetIO();
+        ImGuiPlatformIO& pio = ImGui::GetPlatformIO();
+        pio.Platform_SetClipboardTextFn = Platform_SetClipboardText_Win;
+        pio.Platform_GetClipboardTextFn = Platform_GetClipboardText_Win;
+        io.SetClipboardTextFn = nullptr;
+        io.GetClipboardTextFn = nullptr;
 #       endif
 
         return m_is_open;

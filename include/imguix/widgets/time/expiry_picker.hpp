@@ -18,8 +18,8 @@ namespace ImGuiX::Widgets {
         const char* label;   ///< Display label (e.g. "S5", "M1").
         int         seconds; ///< Value in seconds.
     };
-	
-	/// Inclusive seconds range [from, to].
+    
+    /// Inclusive seconds range [from, to].
     struct SecRange {
         int from = 0;
         int to   = 0;
@@ -43,14 +43,14 @@ namespace ImGuiX::Widgets {
         
         bool        preset_highlight_selected = true; ///< If true, highlight currently selected preset button.
 
-        const char* icon_text         = u8"\ue8b5"; ///< Icon text for combo.
+        const char* icon_text         = IMGUIX_ICON_TIMER; ///< Icon text for combo.
         float       icon_slot_width   = 0.0f;       ///< Width reserved for icon (0 -> auto).
 
         int min_seconds = 0;                        ///< Minimum allowed seconds.
         int max_seconds = 24 * 3600 - 1;            ///< Maximum allowed seconds.
-		int step_seconds = 1;                       ///< Minimal step (quantization), e.g. 60
-		
-		// Forbidden inclusive ranges (e.g. {120,120} forbids 120s exactly).
+        int step_seconds = 1;                       ///< Minimal step (quantization), e.g. 60
+        
+        // Forbidden inclusive ranges (e.g. {120,120} forbids 120s exactly).
         // Intervals are interpreted in seconds BEFORE quantization; picker will
         // snap to the nearest allowed quantized value per direction rules.
         const std::vector<SecRange>* forbidden = nullptr;

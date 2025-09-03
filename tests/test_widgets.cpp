@@ -59,6 +59,8 @@
 #include <imguix/widgets/external_widgets_demo.hpp>
 #endif
 
+#define IMGUIX_EMOJI_ROCKET u8"\U0001F680"
+
 #ifdef IMGUI_ENABLE_IMPLOT
 /// \brief Generate synthetic OHLCV bars.
 /// \param out Output bar container.
@@ -501,9 +503,11 @@ public:
 
         // Шрифты (ручная сборка)
         fontsBeginManual();
-        fontsSetRangesPreset("Default+Cyrillic+Vietnamese+Punct+PUA+LatinExtA");
+        fontsSetRangesPreset("Default+Cyrillic+Vietnamese+Punct+PUA+EmojiTGCore+LatinExtA");
         fontsAddBody({ "NotoSans-Regular.ttf", 18.0f });
-        fontsAddMerge(ImGuiX::Fonts::FontRole::Icons, { "MaterialIcons-Regular.ttf", 18.0f, 4.0f, true });
+        fontsAddMerge(ImGuiX::Fonts::FontRole::Icons, { "MaterialIcons-Regular.ttf", 18.0f, 3.0f, true });
+        fontsAddMerge(ImGuiX::Fonts::FontRole::Emoji, { "NotoSansSymbols2-Regular.ttf", 18.0f, 0.0f, true });
+        fontsAddMerge(ImGuiX::Fonts::FontRole::Emoji, { "NotoEmoji-Regular.ttf", 18.0f, 0.0f, true });
         fontsAddHeadline(ImGuiX::Fonts::FontRole::H1, { "NotoSans-Bold.ttf", 24.0f });
         fontsBuildNow();
     }
@@ -512,6 +516,9 @@ public:
 int main() {
 #   ifdef IMGUI_ENABLE_IMPLOT
     std::cout << "IMGUI_ENABLE_IMPLOT" << std::endl;
+#   endif
+#   ifdef IMGUI_USE_WCHAR32
+    std::cout << "IMGUI_USE_WCHAR32" << std::endl;
 #   endif
     ImGuiX::Application app;
     app.createWindow<ExampleWindow>("Main Window");

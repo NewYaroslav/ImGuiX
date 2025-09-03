@@ -6,48 +6,51 @@
 /// \brief Default UTF-8 icon literals for ImGuiX widgets.
 
 /// \brief Keyboard toggle button icon (Material: keyboard).
-#define IMGUIX_ICON_KEYBOARD u8"\uE312"
+#define IMGUIX_ICON_KEYBOARD        u8"\uE312"
 
 /// \brief Help marker icon.
-#define IMGUIX_ICON_HELP u8"\uE887"
+#define IMGUIX_ICON_HELP            u8"\uE887"
 
 /// \brief Warning marker icon.
-#define IMGUIX_ICON_WARNING u8"\uE002"
+#define IMGUIX_ICON_WARNING         u8"\uE002"
 
 /// \brief Information marker icon.
-#define IMGUIX_ICON_INFO u8"\uE88E"
+#define IMGUIX_ICON_INFO            u8"\uE88E"
 
 /// \brief Success marker icon.
-#define IMGUIX_ICON_SUCCESS u8"\uE88E"
+#define IMGUIX_ICON_SUCCESS         u8"\uE88E"
 
 /// \brief ListEditor "add" icon.
-#define IMGUIX_ICON_ADD u8"\uE148"
+#define IMGUIX_ICON_ADD             u8"\uE148"
 
 /// \brief ListEditor "remove" icon.
-#define IMGUIX_ICON_REMOVE u8"\uE15D"
+#define IMGUIX_ICON_REMOVE          u8"\uE15D"
 
 /// \brief Password toggle "show" icon.
-#define IMGUIX_ICON_EYE_SHOW u8"\uE8F4"
+#define IMGUIX_ICON_EYE_SHOW        u8"\uE8F4"
 
 /// \brief Password toggle "hide" icon.
-#define IMGUIX_ICON_EYE_HIDE u8"\uE8F5"
+#define IMGUIX_ICON_EYE_HIDE        u8"\uE8F5"
 
 /// \brief Clipboard copy icon.
-#define IMGUIX_ICON_COPY u8"\uE14D"
+#define IMGUIX_ICON_COPY            u8"\uE14D"
 
 /// \brief Clipboard paste icon.
-#define IMGUIX_ICON_PASTE u8"\uE2C8"
+#define IMGUIX_ICON_PASTE           u8"\uE2C8"
+
+/// \brief
+#define IMGUIX_ICON_TIMER           u8"\uE425"
 
 /// \brief Clock icon used for time pickers.
-#define IMGUIX_ICON_CLOCK u8"\uE8B5"
+#define IMGUIX_ICON_CLOCK           u8"\uE8B5"
 
 /// \brief Calendar icon for date pickers.
-#define IMGUIX_ICON_CALENDAR u8"\uE878"
+#define IMGUIX_ICON_CALENDAR        u8"\uE878"
 
 /// \brief Calendar week icon for weekday selectors.
-#define IMGUIX_ICON_CALENDAR_WEEK u8"\uEFE8"
+#define IMGUIX_ICON_CALENDAR_WEEK   u8"\uE616"
 
 /// \brief Globe icon representing timezone selection.
-#define IMGUIX_ICON_GLOBE u8"\uE80B"
+#define IMGUIX_ICON_GLOBE           u8"\uE80B"
 
 #endif // _IMGUIX_CONFIG_ICONS_HPP_INCLUDED

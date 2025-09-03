@@ -497,11 +497,11 @@ if(IMGUIX_BUILD_TESTS)
             # Включить встроенную демку из хедера (см. README):
             target_compile_definitions(${TEST_NAME} PRIVATE IMSPINNER_DEMO)
         endif()
-		
+        
         if(IMGUIX_USE_IMGUI_MD)
-			target_compile_definitions(${TEST_NAME} PRIVATE IMGUI_ENABLE_IMGUI_MD)
-			target_link_libraries(${TEST_NAME} PRIVATE imgui_md::imgui_md)
-		endif()
+            target_compile_definitions(${TEST_NAME} PRIVATE IMGUI_ENABLE_IMGUI_MD)
+            target_link_libraries(${TEST_NAME} PRIVATE imgui_md::imgui_md)
+        endif()
 
         imguix_add_imgui_demo(${TEST_NAME})
 
@@ -749,19 +749,19 @@ if(IMGUIX_SDK_BUNDLE_DEPS)
                 DESTINATION include)
     endif()
     
-	# --- imgui_md: headers ---
-	if(EXISTS "${PROJECT_SOURCE_DIR}/libs/imgui_md/imgui_md.h")
-		install(FILES "${PROJECT_SOURCE_DIR}/libs/imgui_md/imgui_md.h"
-				DESTINATION include)
-	endif()
-	# md4c header (root or src)
-	if(EXISTS "${PROJECT_SOURCE_DIR}/libs/md4c/src/md4c.h")
-		install(FILES "${PROJECT_SOURCE_DIR}/libs/md4c/src/md4c.h"
-				DESTINATION include)
-	elseif(EXISTS "${PROJECT_SOURCE_DIR}/libs/md4c/md4c.h")
-		install(FILES "${PROJECT_SOURCE_DIR}/libs/md4c/md4c.h"
-				DESTINATION include)
-	endif()
+    # --- imgui_md: headers ---
+    if(EXISTS "${PROJECT_SOURCE_DIR}/libs/imgui_md/imgui_md.h")
+        install(FILES "${PROJECT_SOURCE_DIR}/libs/imgui_md/imgui_md.h"
+                DESTINATION include)
+    endif()
+    # md4c header (root or src)
+    if(EXISTS "${PROJECT_SOURCE_DIR}/libs/md4c/src/md4c.h")
+        install(FILES "${PROJECT_SOURCE_DIR}/libs/md4c/src/md4c.h"
+                DESTINATION include)
+    elseif(EXISTS "${PROJECT_SOURCE_DIR}/libs/md4c/md4c.h")
+        install(FILES "${PROJECT_SOURCE_DIR}/libs/md4c/md4c.h"
+                DESTINATION include)
+    endif()
 
 endif()
 

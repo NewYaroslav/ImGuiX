@@ -396,7 +396,7 @@ namespace ImGuiX::Widgets {
 
         ExpiryPickerConfig cfg;
         cfg.label = u8"Expiration";
-        cfg.icon_text = u8"\ue8b5";
+        cfg.icon_text = IMGUIX_ICON_TIMER;
         cfg.combo_width = 180.0f;
         cfg.min_seconds  = 60;
         cfg.step_seconds = 60;     // квантуем по 1 минуте -> секунды отключены
