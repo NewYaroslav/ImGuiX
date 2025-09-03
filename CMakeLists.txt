@@ -16,6 +16,7 @@ endif()
 option(IMGUIX_HEADER_ONLY      "Header-only mode (no .cpp compiled)" OFF)
 option(IMGUIX_BUILD_SHARED     "Build ImGuiX as shared library" OFF)
 option(IMGUIX_BUILD_TESTS      "Build tests in tests/ folder"   ON)
+option(IMGUIX_BUILD_EXAMPLES   "Build examples in examples/ folder" ON)
 
 # Backend selection
 option(IMGUIX_USE_SFML_BACKEND "Use SFML backend via ImGui-SFML" ON)
@@ -525,6 +526,10 @@ if(IMGUIX_BUILD_TESTS)
     endforeach()
 endif()
 
+# ===== Examples =====
+if(IMGUIX_BUILD_EXAMPLES)
+    add_subdirectory(examples/framed_showcase)
+endif()
 
 # ===== Install / Export =====
 include(CMakePackageConfigHelpers)
