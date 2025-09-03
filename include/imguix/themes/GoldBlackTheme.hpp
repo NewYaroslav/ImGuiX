@@ -106,6 +106,7 @@ namespace ImGuiX::Themes {
             ImVec4* colors = style.Colors;
 
             colors[ImGuiCol_Text]                  = Text;
+            colors[ImGuiCol_TextCursor]            = GoldBright;
             colors[ImGuiCol_TextDisabled]          = TextDisabled;
 
             colors[ImGuiCol_WindowBg]              = WindowBg;
