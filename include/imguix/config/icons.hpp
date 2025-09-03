@@ -38,4 +38,16 @@
 /// \brief Clipboard paste icon.
 #define IMGUIX_ICON_PASTE u8"\uE2C8"
 
+/// \brief Clock icon used for time pickers.
+#define IMGUIX_ICON_CLOCK u8"\uE8B5"
+
+/// \brief Calendar icon for date pickers.
+#define IMGUIX_ICON_CALENDAR u8"\uE878"
+
+/// \brief Calendar week icon for weekday selectors.
+#define IMGUIX_ICON_CALENDAR_WEEK u8"\uEFE8"
+
+/// \brief Globe icon representing timezone selection.
+#define IMGUIX_ICON_GLOBE u8"\uE80B"
+
 #endif // _IMGUIX_CONFIG_ICONS_HPP_INCLUDED

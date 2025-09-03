@@ -6,6 +6,7 @@
 #include <imguix/widgets/input/arrow_stepper.hpp>
 #include <imguix/utils/time_utils.hpp>  // days_from_civil, civil_from_days, num_days_in_month, clamp_ymdhms, month_short_name
 #include <imguix/extensions/sizing.hpp> // ImGuiX::Extensions::CalcDateComboWidth(), etc.
+#include <imguix/widgets/controls/icon_combo.hpp>
 
 namespace ImGuiX::Widgets {
 
@@ -37,7 +38,10 @@ namespace ImGuiX::Widgets {
 
         ImGui::PushID(id);
         ImGui::SetNextItemWidth(combo_width);
-        if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Date", preview.c_str())) {
+        bool open = cfg.use_icon_combo ?
+            BeginIconCombo(cfg.label ? cfg.label : u8"Date", preview.c_str(), cfg.icon_text) :
+            ImGui::BeginCombo(cfg.label ? cfg.label : u8"Date", preview.c_str());
+        if (open) {
             if (cfg.show_desc && cfg.desc) ImGui::TextUnformatted(cfg.desc);
 
             // --- direct string edit ------------------------------------------------
@@ -147,7 +151,10 @@ namespace ImGuiX::Widgets {
 
         ImGui::PushID(id);
         ImGui::SetNextItemWidth(combo_width);
-        if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Date", preview.c_str())) {
+        bool open = cfg.use_icon_combo ?
+            BeginIconCombo(cfg.label ? cfg.label : u8"Date", preview.c_str(), cfg.icon_text) :
+            ImGui::BeginCombo(cfg.label ? cfg.label : u8"Date", preview.c_str());
+        if (open) {
             if (cfg.show_desc && cfg.desc)
                 ImGui::TextUnformatted(cfg.desc);
 

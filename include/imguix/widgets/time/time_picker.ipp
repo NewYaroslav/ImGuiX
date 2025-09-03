@@ -7,6 +7,7 @@
 #include <imguix/widgets/input/arrow_stepper.hpp>
 #include <imguix/utils/time_utils.hpp>  // ImGuiX::Utils::format_hms, etc.
 #include <imguix/extensions/sizing.hpp> // ImGuiX::Extensions::CalcTimeComboWidth(), etc.
+#include <imguix/widgets/controls/icon_combo.hpp>
 
 namespace ImGuiX::Widgets {
 
@@ -108,7 +109,10 @@ namespace ImGuiX::Widgets {
         bool changed = false;
         ImGui::PushID(id);
         ImGui::SetNextItemWidth(combo_width);
-        if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Time", preview.c_str())) {
+        bool open = cfg.use_icon_combo ?
+            BeginIconCombo(cfg.label ? cfg.label : u8"Time", preview.c_str(), cfg.icon_text) :
+            ImGui::BeginCombo(cfg.label ? cfg.label : u8"Time", preview.c_str());
+        if (open) {
             if (cfg.show_desc && cfg.desc)
                 ImGui::TextUnformatted(cfg.desc);
 
@@ -153,7 +157,10 @@ namespace ImGuiX::Widgets {
 
         ImGui::PushID(id);
         ImGui::SetNextItemWidth(combo_width);
-        if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Time", preview.c_str())) {
+        bool open = cfg.use_icon_combo ?
+            BeginIconCombo(cfg.label ? cfg.label : u8"Time", preview.c_str(), cfg.icon_text) :
+            ImGui::BeginCombo(cfg.label ? cfg.label : u8"Time", preview.c_str());
+        if (open) {
             if (cfg.show_desc && cfg.desc) ImGui::TextUnformatted(cfg.desc);
 
             int h, m, s;
@@ -209,7 +216,10 @@ namespace ImGuiX::Widgets {
             ImVec2(0, 0),
             ImVec2(FLT_MAX, ImGui::GetTextLineHeightWithSpacing() * 16) // максимум 16 строк
         );
-        if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Offset", preview.c_str())) {
+        bool open = cfg.use_icon_combo ?
+            BeginIconCombo(cfg.label ? cfg.label : u8"Offset", preview.c_str(), cfg.icon_text) :
+            ImGui::BeginCombo(cfg.label ? cfg.label : u8"Offset", preview.c_str());
+        if (open) {
             if (cfg.show_desc && cfg.desc) ImGui::TextUnformatted(cfg.desc);
 
             // Timezone combo

@@ -14,6 +14,7 @@
 #include <imguix/widgets/input/arrow_stepper.hpp>
 #include <imguix/utils/time_utils.hpp>  // days_from_civil, civil_from_days, num_days_in_month, clamp_ymdhms, month_short_name
 #include <imguix/extensions/sizing.hpp> // ImGuiX::Extensions::CalcDateComboWidth(), etc.
+#include <imguix/config/icons.hpp>
 
 namespace ImGuiX::Widgets {
 
@@ -28,6 +29,8 @@ namespace ImGuiX::Widgets {
         const char*     label           = u8"Date";      ///< Combo label.
         const char*     desc            = u8"YYYY-MM-DD";///< Format description.
         float           combo_width     = 0.0f;          ///< Width for combo preview.
+        bool            use_icon_combo  = true;          ///< Use BeginIconCombo for combo.
+        const char*     icon_text       = IMGUIX_ICON_CALENDAR; ///< Combo icon glyph.
         bool            show_desc       = true;          ///< Show format description.
         float           field_width     = 0.0f;          ///< Width per ArrowStepper field.
         int             min_year        = 1970;          ///< Inclusive lower year.
