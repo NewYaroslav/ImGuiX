@@ -57,7 +57,7 @@ namespace ImGuiX::Themes {
             ImVec4* colors = style.Colors;
 
             colors[ImGuiCol_Text]                   = White;
-            colors[ImGuiCol_TextCursor]             = Highlight;
+            colors[ImGuiCol_InputTextCursor]             = Highlight;
             colors[ImGuiCol_TextDisabled]           = TextDisabled;
             colors[ImGuiCol_WindowBg]               = DarkGrey25;
             colors[ImGuiCol_ChildBg]                = DarkGrey25;

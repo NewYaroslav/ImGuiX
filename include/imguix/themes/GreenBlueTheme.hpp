@@ -112,7 +112,7 @@ namespace ImGuiX::Themes {
             ImVec4* colors = style.Colors;
 
             colors[ImGuiCol_Text]                  = Text;
-            colors[ImGuiCol_TextCursor]            = AccentCyan;
+            colors[ImGuiCol_InputTextCursor]            = AccentCyan;
             colors[ImGuiCol_TextDisabled]          = TextDisabled;
 
             colors[ImGuiCol_WindowBg]              = WindowBg;
