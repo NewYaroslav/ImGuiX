@@ -149,17 +149,15 @@ namespace ImGuiX::Widgets {
 
                     bool selected = mark[idx];
                     if (selected && cfg.use_header_color_for_selected) {
-                        ImGui::PushStyleColor(ImGuiCol_Header,
-                            ImGui::GetStyleColorVec4(ImGuiCol_TextSelectedBg));
+                        const ImVec4 sel = ImGui::GetStyleColorVec4(ImGuiCol_TextSelectedBg);
+                        ImGui::PushStyleColor(ImGuiCol_Header, sel);
+                        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, sel);
+                        ImGui::PushStyleColor(ImGuiCol_HeaderActive, sel);
                     }
 
                     if (ImGui::Selectable(txt, selected, ImGuiSelectableFlags_DontClosePopups, cell)) {
                         mark[idx] = !selected;
                         changed = true;
-                    }
-
-                    if (selected && cfg.use_header_color_for_selected) {
-                        ImGui::PopStyleColor();
                     }
 
                     if (cfg.show_cell_borders) {
@@ -174,11 +172,15 @@ namespace ImGuiX::Widgets {
                             selected ? (cfg.cell_border_color_selected ? cfg.cell_border_color_selected
                                                                        : ImGui::GetColorU32(ImGuiCol_Header)) :
                             (ImGui::IsItemHovered() ? (cfg.cell_border_color_hovered ? cfg.cell_border_color_hovered
-                                                                                      : ImGui::GetColorU32(ImGuiCol_HeaderHovered))
+                                                                                       : ImGui::GetColorU32(ImGuiCol_HeaderHovered))
                                                     : (cfg.cell_border_color ? cfg.cell_border_color
                                                                              : ImGui::GetColorU32(ImGuiCol_Border)));
 
                         dl->AddRect(p0, p1, col, rounding, 0, cfg.cell_border_thickness);
+                    }
+
+                    if (selected && cfg.use_header_color_for_selected) {
+                        ImGui::PopStyleColor(3);
                     }
 
                     ImGui::PopID();
