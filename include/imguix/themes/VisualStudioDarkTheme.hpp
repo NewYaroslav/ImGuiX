@@ -49,7 +49,7 @@ namespace ImGuiX::Themes {
         // Buttons / headers / separators
         constexpr ImVec4 Button             = Panel;
         constexpr ImVec4 ButtonHovered      = PanelHover;
-        constexpr ImVec4 ButtonActive       = PanelHover;
+        constexpr ImVec4 ButtonActive       = PanelActive;
 
         constexpr ImVec4 Header             = Panel;
         constexpr ImVec4 HeaderHovered      = PanelHover;
@@ -72,8 +72,11 @@ namespace ImGuiX::Themes {
         constexpr ImVec4 ResizeGripActive   = LightBg;
 
         constexpr ImVec4 TextSelectedBg     = PanelActive;
-        constexpr ImVec4 DragDropTarget     = Bg;
+        constexpr ImVec4 DragDropTarget     = PanelActive;
         constexpr ImVec4 NavHighlight       = Bg;
+        constexpr ImVec4 NavWindowingHighlight = ImVec4(PanelActive.x, PanelActive.y, PanelActive.z, 0.70f);
+        constexpr ImVec4 NavWindowingDimBg  = ImVec4(0.000f, 0.000f, 0.000f, 0.30f);
+        constexpr ImVec4 ModalWindowDimBg   = ImVec4(0.000f, 0.000f, 0.000f, 0.45f);
 
         // Plots
         constexpr ImVec4 PlotLines          = PanelActive;
@@ -144,6 +147,9 @@ namespace ImGuiX::Themes {
 
             colors[ImGuiCol_DragDropTarget]        = DragDropTarget;
             colors[ImGuiCol_NavHighlight]          = NavHighlight;
+            colors[ImGuiCol_NavWindowingHighlight] = NavWindowingHighlight;
+            colors[ImGuiCol_NavWindowingDimBg]     = NavWindowingDimBg;
+            colors[ImGuiCol_ModalWindowDimBg]      = ModalWindowDimBg;
 
             colors[ImGuiCol_Tab]                   = Tab;
             colors[ImGuiCol_TabHovered]            = TabHovered;
