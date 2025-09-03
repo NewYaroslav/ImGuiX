@@ -31,8 +31,9 @@ namespace ImGuiX {
         : m_event_bus(), m_registry(),
           m_window_manager(*static_cast<ApplicationContext*>(this)) {
         initFilesystem();
-        while (!m_is_fs_ready.load()) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        if (!m_is_fs_ready.load()) {
+            std::unique_lock<std::mutex> lock(m_fs_ready_mutex);
+            m_fs_ready_cv.wait(lock, [this] { return m_is_fs_ready.load(); });
         }
         m_registry.registerResource<OptionsStore>([] {
             return std::make_shared<OptionsStore>();
@@ -193,7 +194,11 @@ namespace ImGuiX {
 #ifdef __EMSCRIPTEN__
     void Application::filesystemReady(void* arg) {
         auto* self = static_cast<Application*>(arg);
-        self->m_is_fs_ready = true;
+        {
+            std::lock_guard<std::mutex> lock(self->m_fs_ready_mutex);
+            self->m_is_fs_ready = true;
+        }
+        self->m_fs_ready_cv.notify_all();
     }
 #endif
 
