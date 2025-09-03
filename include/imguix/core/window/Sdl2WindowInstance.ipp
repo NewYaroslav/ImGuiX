@@ -5,8 +5,10 @@
 
 namespace ImGuiX {
 
-    WindowInstance::~WindowInstance() noexcept  {
-        saveIniNow();
+    WindowInstance::~WindowInstance() noexcept {
+        if (m_imgui_ctx) {
+            saveIniNow();
+        }
 
 #       ifdef IMGUI_ENABLE_IMPLOT
         if (m_implot_ctx) {
@@ -32,13 +34,13 @@ namespace ImGuiX {
             m_imgui_ctx = nullptr;
         }
 
-        if (m_gl_context) { 
-            SDL_GL_DeleteContext(m_gl_context); 
-            m_gl_context = nullptr; 
+        if (m_gl_context) {
+            SDL_GL_DeleteContext(m_gl_context);
+            m_gl_context = nullptr;
         }
-        if (m_window)     { 
-            SDL_DestroyWindow(m_window);        
-            m_window = nullptr;     
+        if (m_window) {
+            SDL_DestroyWindow(m_window);
+            m_window = nullptr;
         }
     }
 
@@ -126,13 +128,7 @@ namespace ImGuiX {
         while (SDL_PollEvent(&event)) {
             ImGui_ImplSDL2_ProcessEvent(&event);
             if (event.type == SDL_QUIT) {
-                Events::WindowClosedEvent evt(id(), name());
-                notify(evt);
-                SDL_DestroyWindow(m_window);
-                SDL_GL_DeleteContext(m_gl_context);
-                m_window = nullptr;
-                m_gl_context = nullptr;
-                m_is_open = false;
+                close();
             }
         }
     }
@@ -189,13 +185,46 @@ namespace ImGuiX {
 
     void WindowInstance::close() {
         m_is_open = false;
+
         if (m_window) {
             Events::WindowClosedEvent evt(id(), name());
             notify(evt);
-            SDL_DestroyWindow(m_window);
+        }
+
+        if (m_imgui_ctx) {
+            saveIniNow();
+
+#           ifdef IMGUI_ENABLE_IMPLOT
+            if (m_implot_ctx) {
+                ImPlot::SetCurrentContext(m_implot_ctx);
+                ImPlot::DestroyContext(m_implot_ctx);
+                m_implot_ctx = nullptr;
+            }
+#           endif
+
+#           ifdef IMGUI_ENABLE_IMPLOT3D
+            if (m_implot3d_ctx) {
+                ImPlot3D::SetCurrentContext(m_implot3d_ctx);
+                ImPlot3D::DestroyContext(m_implot3d_ctx);
+                m_implot3d_ctx = nullptr;
+            }
+#           endif
+
+            ImGui::SetCurrentContext(m_imgui_ctx);
+            ImGui_ImplOpenGL3_Shutdown();
+            ImGui_ImplSDL2_Shutdown();
+            ImGui::DestroyContext(m_imgui_ctx);
+            m_imgui_ctx = nullptr;
+        }
+
+        if (m_gl_context) {
             SDL_GL_DeleteContext(m_gl_context);
-            m_window = nullptr;
             m_gl_context = nullptr;
+        }
+
+        if (m_window) {
+            SDL_DestroyWindow(m_window);
+            m_window = nullptr;
         }
     }
 

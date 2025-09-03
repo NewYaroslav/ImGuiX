@@ -17,6 +17,10 @@ function(imguix_use_or_fetch_imnodeflow OUT_VAR)
     add_library(imnodeflow STATIC
         "${_IMNODEFLOW_DIR}/src/ImNodeFlow.cpp"
     )
+    target_compile_options(imnodeflow PRIVATE
+        $<$<CXX_COMPILER_ID:MSVC>:/FIcstdint>
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-include cstdint>
+    )
     add_library(imnodeflow::imnodeflow ALIAS imnodeflow)
 
     # ImNodeFlow depends only on Dear ImGui

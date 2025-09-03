@@ -31,9 +31,15 @@ namespace ImGuiX::Controllers {
                           u8"ControllerType must derive from Controller");
 
             auto ctrl = std::make_unique<ControllerType>(window(), std::forward<Args>(args)...);
-            ControllerType& ref = *ctrl;
-            m_strategies.emplace(static_cast<std::size_t>(key), std::move(ctrl));
-            return ref;
+            auto [it, inserted] = m_strategies.try_emplace(
+                    static_cast<std::size_t>(key),
+                    std::move(ctrl));
+
+            if (!inserted) {
+                return static_cast<ControllerType&>(*it->second);
+            }
+
+            return static_cast<ControllerType&>(*it->second);
         }
 
         /// \brief Select active strategy by index or enum.

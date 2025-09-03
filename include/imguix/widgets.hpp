@@ -12,6 +12,7 @@
 
 #include <imguix/widgets/controls/circle_button.hpp>
 #include <imguix/widgets/controls/icon_button.hpp>
+#include <imguix/widgets/controls/icon_combo.hpp>
 #include <imguix/widgets/controls/system_button.hpp>
 #include <imguix/widgets/controls/toggle_button.hpp>
 
@@ -32,6 +33,7 @@
 #include <imguix/widgets/time/days_selector.hpp>
 #include <imguix/widgets/time/hours_selector.hpp>
 #include <imguix/widgets/time/time_picker.hpp>
+#include <imguix/widgets/time/expiry_picker.hpp>
 
 #ifdef IMGUI_ENABLE_IMPLOT
 #   include <imguix/widgets/plot/PlotOHLCChart.hpp>
