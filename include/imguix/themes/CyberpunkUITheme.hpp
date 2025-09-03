@@ -167,6 +167,9 @@ namespace ImGuiX::Themes {
 
             colors[ImGuiCol_NavHighlight]          = NavHighlight;
             colors[ImGuiCol_NavWindowingHighlight] = NavWindowingHighlight;
+            colors[ImGuiCol_NavWindowingDimBg]     = ImVec4(0.00f, 0.00f, 0.00f, 0.30f);
+            colors[ImGuiCol_ModalWindowDimBg]      = ImVec4(0.00f, 0.00f, 0.00f, 0.40f);
+            // Dimming overlays for windowing and modals.
 
             // Baseline sizes/roundings from config
             applyDefaultImGuiStyle(style);
