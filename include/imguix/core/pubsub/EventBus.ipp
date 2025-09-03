@@ -80,7 +80,7 @@ namespace ImGuiX::Pubsub {
     }
 
     inline void EventBus::notify(const Event* const event) const {
-        auto type = std::type_index(typeid(*event));
+        auto type = event->type();
         
         callback_list_t callbacks_copy;
         listener_list_t listeners_copy;
