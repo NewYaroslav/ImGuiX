@@ -120,7 +120,7 @@ public:
         ImVec4* c = style.Colors;
 
         c[ImGuiCol_Text]                  = Text;
-        c[ImGuiCol_TextCursor]            = AccentCyan;
+        c[ImGuiCol_InputTextCursor]            = AccentCyan;
         c[ImGuiCol_TextDisabled]          = TextDisabled;
         c[ImGuiCol_WindowBg]              = WindowBg;
         c[ImGuiCol_ChildBg]               = ChildBg;

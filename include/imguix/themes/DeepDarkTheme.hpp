@@ -111,7 +111,7 @@ namespace ImGuiX::Themes {
             ImVec4* colors = style.Colors;
 
             colors[ImGuiCol_Text]                  = Text;
-            colors[ImGuiCol_TextCursor]            = CheckMark;
+            colors[ImGuiCol_InputTextCursor]            = CheckMark;
             colors[ImGuiCol_TextDisabled]          = TextDisabled;
 
             colors[ImGuiCol_WindowBg]              = WindowBg;
