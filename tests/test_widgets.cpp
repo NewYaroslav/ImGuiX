@@ -390,8 +390,8 @@ private:
         if (ImGui::CollapsingHeader("Icon Combo")) {
             static int sel_idx = 0;
             const char* items[] = {u8"One", u8"Two", u8"Three"};
-            const char* icons[] = {u8"☀", u8"🌙", u8"⭐"};
-            if (ImGuiX::Widgets::BeginIconCombo("demo_icon_combo", items[sel_idx], icons[sel_idx])) {
+            const char* icons[] = {u8"\ue430", u8"\ue51c", u8"\ue885"};
+            if (ImGuiX::Widgets::BeginIconCombo("demo icon combo", items[sel_idx], icons[sel_idx])) {
                 for (int i = 0; i < IM_ARRAYSIZE(items); ++i) {
                     bool selected = (i == sel_idx);
                     if (ImGui::Selectable(items[i], selected)) {

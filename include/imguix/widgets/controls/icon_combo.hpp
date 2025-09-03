@@ -3,28 +3,26 @@
 #define _IMGUIX_WIDGETS_ICON_COMBO_HPP_INCLUDED
 
 /// \file icon_combo.hpp
-/// \brief Combo widget with custom icon on the right.
+/// \brief Combo widget with a custom right-side icon that replaces the default arrow.
 
 #include <imgui.h>
 
 namespace ImGuiX::Widgets {
 
-    /// \brief Begin combo without arrow and draw overlay icon on the right.
-    /// \param id ImGui identifier.
-    /// \param preview Text preview shown in combo.
-    /// \param icon Icon text (UTF-8).
-    /// \param icon_slot_w Width reserved for icon overlay (0 -> auto from text).
-    /// \param flags ImGuiComboFlags.
-    /// \return True if combo is open.
-    inline bool BeginIconCombo(
-            const char* id,
-            const char* preview,
-            const char* icon,
-            float icon_slot_w = 0.0f,
-            ImGuiComboFlags flags = ImGuiComboFlags_HeightLargest | ImGuiComboFlags_PopupAlignLeft
-    );
+    /// \brief Begin a combo that preserves standard behavior but renders an icon instead of the arrow.
+    /// \param label ImGui label/id.
+    /// \param preview_value Text shown in the preview area.
+    /// \param icon_text UTF-8 icon glyph (e.g., Material Icons PUA).
+    /// \param flags ImGuiComboFlags for BeginCombo.
+    /// \param icon_font Optional font used for the icon (nullptr = current font).
+    /// \return true if the combo popup is open.
+    inline bool BeginIconCombo(const char* label,
+                               const char* preview_value,
+                               const char* icon_text,
+                               ImGuiComboFlags flags = 0,
+                               ImFont* icon_font = nullptr);
 
-    /// \brief End combo started with BeginIconCombo.
+    /// \brief End combo started with BeginIconCombo().
     inline void EndIconCombo();
 
 } // namespace ImGuiX::Widgets
