@@ -81,7 +81,7 @@ namespace ImGuiX::Themes {
         // Tabs
         constexpr ImVec4 Tab                    = ImVec4(0.000f, 0.898f, 1.000f, 0.550f);
         constexpr ImVec4 TabHovered             = ImVec4(0.000f, 0.898f, 1.000f, 0.850f);
-        constexpr ImVec4 TabActive              = ImVec4(0.000f, 0.898f, 1.000f, 0.850f);
+        constexpr ImVec4 TabActive              = ImVec4(0.000f, 0.564f, 1.000f, 0.900f); // #0090FF @ 90%
         constexpr ImVec4 TabUnfocused           = ImVec4(0.055f, 0.078f, 0.110f, 0.900f);
         constexpr ImVec4 TabUnfocusedActive     = ImVec4(0.000f, 0.898f, 1.000f, 0.700f);
 
@@ -153,7 +153,7 @@ namespace ImGuiX::Themes {
 
             colors[ImGuiCol_Tab]                   = Tab;
             colors[ImGuiCol_TabHovered]            = TabHovered;
-            colors[ImGuiCol_TabActive]             = TabActive;
+            colors[ImGuiCol_TabActive]             = TabActive; // deeper cyan for active tabs
             colors[ImGuiCol_TabUnfocused]          = TabUnfocused;
             colors[ImGuiCol_TabUnfocusedActive]    = TabUnfocusedActive;
 
