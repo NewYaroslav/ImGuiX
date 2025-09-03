@@ -1,4 +1,6 @@
 #include <algorithm>
+#include <iterator>
+
 #include <imgui.h>
 
 namespace ImGuiX {
@@ -32,9 +34,11 @@ namespace ImGuiX {
     }
     
     void WindowManager::flushPending() {
-        for (auto& window : m_pending_add) {
-            m_windows.push_back(std::move(window));
-        }
+        m_windows.insert(
+                m_windows.end(),
+                std::make_move_iterator(m_pending_add.begin()),
+                std::make_move_iterator(m_pending_add.end())
+        );
         m_pending_add.clear();
     }
 
