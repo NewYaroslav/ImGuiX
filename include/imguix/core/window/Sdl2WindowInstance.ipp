@@ -128,13 +128,7 @@ namespace ImGuiX {
         while (SDL_PollEvent(&event)) {
             ImGui_ImplSDL2_ProcessEvent(&event);
             if (event.type == SDL_QUIT) {
-                Events::WindowClosedEvent evt(id(), name());
-                notify(evt);
-                SDL_GL_DeleteContext(m_gl_context);
-                SDL_DestroyWindow(m_window);
-                m_gl_context = nullptr;
-                m_window = nullptr;
-                m_is_open = false;
+                close();
             }
         }
     }
