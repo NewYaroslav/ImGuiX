@@ -7,7 +7,7 @@
 ///
 /// Aesthetics:
 ///  - dark tech base (#0B0F13 / #111827)
-///  - neon cyan primary, magenta/violet secondary, acid-green highlights
+///  - neon cyan primary, violet secondary, acid-green highlights
 ///  - high-contrast hover/active with subtle glass panels
 ///
 /// Notes:
@@ -24,7 +24,7 @@ namespace ImGuiX::Themes {
     namespace CyberY2KConstants {
         // Base palette (hex reference):
         // bg0: #0B0F13, bg1: #111827, border: #2A3440
-        // text: #E6F1FF, cyan: #00E5FF, magenta: #FF00E0, lime: #39FF14, violet: #7A00FF
+        // text: #E6F1FF, cyan: #00E5FF, lime: #39FF14, violet: #7A00FF
 
         // Text
         constexpr ImVec4 Text                   = ImVec4(0.902f, 0.945f, 1.000f, 1.000f); // #E6F1FF
@@ -42,7 +42,7 @@ namespace ImGuiX::Themes {
         // Frames
         constexpr ImVec4 FrameBg                = ImVec4(0.067f, 0.094f, 0.153f, 0.900f); // bg1
         constexpr ImVec4 FrameBgHovered         = ImVec4(0.000f, 0.898f, 1.000f, 0.220f); // cyan
-        constexpr ImVec4 FrameBgActive          = ImVec4(1.000f, 0.000f, 0.878f, 0.350f); // magenta
+        constexpr ImVec4 FrameBgActive          = ImVec4(0.478f, 0.000f, 1.000f, 0.350f); // violet
 
         // Titles / Menu
         constexpr ImVec4 TitleBg                = ImVec4(0.067f, 0.094f, 0.153f, 0.950f);
@@ -53,44 +53,43 @@ namespace ImGuiX::Themes {
         // Scrollbar
         constexpr ImVec4 ScrollbarBg            = ImVec4(0.067f, 0.094f, 0.153f, 0.850f);
         constexpr ImVec4 ScrollbarGrab          = ImVec4(0.000f, 0.898f, 1.000f, 0.450f);
-        constexpr ImVec4 ScrollbarGrabHovered   = ImVec4(1.000f, 0.000f, 0.878f, 0.650f);
+        constexpr ImVec4 ScrollbarGrabHovered   = ImVec4(0.478f, 0.000f, 1.000f, 0.650f); // violet
         constexpr ImVec4 ScrollbarGrabActive    = ImVec4(0.478f, 0.000f, 1.000f, 0.800f); // violet
 
         // Accents
         constexpr ImVec4 CheckMark              = ImVec4(0.223f, 1.000f, 0.078f, 1.000f); // lime
         constexpr ImVec4 Cyan                   = ImVec4(0.000f, 0.898f, 1.000f, 1.000f);
-        constexpr ImVec4 Magenta                = ImVec4(1.000f, 0.000f, 0.878f, 1.000f);
         constexpr ImVec4 Lime                   = ImVec4(0.223f, 1.000f, 0.078f, 1.000f);
         constexpr ImVec4 Violet                 = ImVec4(0.478f, 0.000f, 1.000f, 1.000f);
 
         // Buttons / Headers
         constexpr ImVec4 Button                 = ImVec4(0.000f, 0.898f, 1.000f, 0.750f);
-        constexpr ImVec4 ButtonHovered          = ImVec4(1.000f, 0.000f, 0.878f, 0.850f);
+        constexpr ImVec4 ButtonHovered          = ImVec4(0.478f, 0.000f, 1.000f, 0.850f);
         constexpr ImVec4 ButtonActive           = ImVec4(0.223f, 1.000f, 0.078f, 0.900f);
 
         constexpr ImVec4 Header                 = ImVec4(0.000f, 0.898f, 1.000f, 0.500f);
-        constexpr ImVec4 HeaderHovered          = ImVec4(1.000f, 0.000f, 0.878f, 0.650f);
+        constexpr ImVec4 HeaderHovered          = ImVec4(0.478f, 0.000f, 1.000f, 0.650f);
         constexpr ImVec4 HeaderActive           = ImVec4(0.478f, 0.000f, 1.000f, 0.800f);
 
         // Separators / grips
         constexpr ImVec4 Separator              = ImVec4(0.000f, 0.898f, 1.000f, 0.350f);
-        constexpr ImVec4 SeparatorHovered       = ImVec4(1.000f, 0.000f, 0.878f, 0.780f);
+        constexpr ImVec4 SeparatorHovered       = ImVec4(0.478f, 0.000f, 1.000f, 0.780f);
         constexpr ImVec4 SeparatorActive        = ImVec4(0.478f, 0.000f, 1.000f, 1.000f);
 
         constexpr ImVec4 ResizeGrip             = ImVec4(0.000f, 0.898f, 1.000f, 0.400f);
-        constexpr ImVec4 ResizeGripHovered      = ImVec4(1.000f, 0.000f, 0.878f, 0.700f);
+        constexpr ImVec4 ResizeGripHovered      = ImVec4(0.478f, 0.000f, 1.000f, 0.700f);
         constexpr ImVec4 ResizeGripActive       = ImVec4(0.478f, 0.000f, 1.000f, 0.900f);
 
         // Tabs
         constexpr ImVec4 Tab                    = ImVec4(0.000f, 0.898f, 1.000f, 0.550f);
-        constexpr ImVec4 TabHovered             = ImVec4(1.000f, 0.000f, 0.878f, 0.850f);
+        constexpr ImVec4 TabHovered             = ImVec4(0.478f, 0.000f, 1.000f, 0.850f);
         constexpr ImVec4 TabActive              = ImVec4(0.000f, 0.898f, 1.000f, 0.850f);
         constexpr ImVec4 TabUnfocused           = ImVec4(0.067f, 0.094f, 0.153f, 0.900f);
         constexpr ImVec4 TabUnfocusedActive     = ImVec4(0.000f, 0.898f, 1.000f, 0.700f);
 
         // Plots
         constexpr ImVec4 PlotLines              = ImVec4(0.000f, 0.898f, 1.000f, 1.000f);
-        constexpr ImVec4 PlotLinesHovered       = ImVec4(1.000f, 0.000f, 0.878f, 1.000f);
+        constexpr ImVec4 PlotLinesHovered       = ImVec4(0.478f, 0.000f, 1.000f, 1.000f);
         constexpr ImVec4 PlotHistogram          = ImVec4(0.223f, 1.000f, 0.078f, 1.000f);
         constexpr ImVec4 PlotHistogramHovered   = ImVec4(0.478f, 0.000f, 1.000f, 1.000f);
 
@@ -104,7 +103,7 @@ namespace ImGuiX::Themes {
     } // namespace CyberY2KConstants
 
     /// \class CyberY2KTheme
-    /// \brief Dark neon Cyber-Y2K theme with cyan/magenta accents.
+    /// \brief Dark neon Cyber-Y2K theme with cyan/violet accents.
     class CyberY2KTheme final : public Theme {
     public:
         void apply(ImGuiStyle& style) const override {
@@ -137,7 +136,7 @@ namespace ImGuiX::Themes {
 
             colors[ImGuiCol_CheckMark]             = CheckMark;
             colors[ImGuiCol_SliderGrab]            = CyberY2KConstants::Cyan;
-            colors[ImGuiCol_SliderGrabActive]      = CyberY2KConstants::Magenta;
+            colors[ImGuiCol_SliderGrabActive]      = CyberY2KConstants::Violet;
 
             colors[ImGuiCol_Button]                = Button;
             colors[ImGuiCol_ButtonHovered]         = ButtonHovered;
