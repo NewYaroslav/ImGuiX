@@ -5,6 +5,8 @@
 
 #include <imgui.h>
 
+#include <imguix/widgets/controls/icon_combo.hpp>
+
 namespace ImGuiX::Widgets {
 
     bool ListEditor(
@@ -101,7 +103,12 @@ namespace ImGuiX::Widgets {
         ImGui::PushID(id);
         ImGui::SetNextItemWidth(combo_width);
         const std::string preview = build_preview_px(items, text_max_px);
-        if (!ImGui::BeginCombo(label, preview.c_str(), ImGuiComboFlags_HeightLargest)) {
+        
+        bool open = cfg.use_icon_combo ?
+            BeginIconCombo(label, preview.c_str(), cfg.icon_combo, ImGuiComboFlags_HeightLargest) :
+            ImGui::BeginCombo(label, preview.c_str(), ImGuiComboFlags_HeightLargest);
+
+        if (!open) {
             ImGui::PopID();
             return false;
         }
@@ -222,7 +229,12 @@ namespace ImGuiX::Widgets {
 
         ImGui::SetNextItemWidth(combo_width);
         const std::string preview = build_preview(text_max_px);
-        if (!ImGui::BeginCombo(label, preview.c_str(), ImGuiComboFlags_HeightLargest)) {
+        
+        bool open = cfg.use_icon_combo ?
+            BeginIconCombo(label, preview.c_str(), cfg.icon_combo, ImGuiComboFlags_HeightLargest) :
+            ImGui::BeginCombo(label, preview.c_str(), ImGuiComboFlags_HeightLargest);
+
+        if (!open) {
             ImGui::PopID();
             return false;
         }

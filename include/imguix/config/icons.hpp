@@ -39,6 +39,9 @@
 #define IMGUIX_ICON_PASTE           u8"\uE2C8"
 
 /// \brief
+#define IMGUIX_ICON_FILTER_LIST     u8"\uE152"
+
+/// \brief
 #define IMGUIX_ICON_TIMER           u8"\uE425"
 
 /// \brief Clock icon used for time pickers.
