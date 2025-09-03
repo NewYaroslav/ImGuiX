@@ -34,7 +34,7 @@ function(imguix_use_or_fetch_imgui_md OUT_VAR)
             set(_MD4C_DIR "${PROJECT_SOURCE_DIR}/libs/md4c")
         endif()
 
-        if(EXISTS "${_MD4C_DIR}/CMakeLists.txt")
+        if(IMGUIX_MD4C_USE_SUBDIR AND EXISTS "${_MD4C_DIR}/CMakeLists.txt")
             add_subdirectory("${_MD4C_DIR}" "${CMAKE_BINARY_DIR}/_deps/md4c")
             if(TARGET MD4C::MD4C)
                 set(MD4C_TGT MD4C::MD4C)

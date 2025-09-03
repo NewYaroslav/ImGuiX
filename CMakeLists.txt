@@ -53,6 +53,8 @@ option(IMGUIX_USE_IMSPINNER    "Build and link imspinner (header-only)" ON)
 
 # ImGui / imgui_md
 option(IMGUIX_USE_IMGUI_MD      "Build and link imgui_md (Markdown)" ON)
+# Собирать md4c через add_subdirectory (их CMake), или напрямую из md4c.c
+option(IMGUIX_MD4C_USE_SUBDIR   "Use md4c's own CMake (add_subdirectory) instead of compiling md4c.c directly" OFF)
 
 # JSON vendoring (default OFF to prefer system package)
 option(IMGUIX_VENDOR_JSON      "Install vendored nlohmann_json headers with ImGuiX" OFF)
