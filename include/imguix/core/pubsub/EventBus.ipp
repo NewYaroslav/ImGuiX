@@ -126,9 +126,9 @@ namespace ImGuiX::Pubsub {
             std::lock_guard<std::mutex> lk(m_awaiters_mutex);
             auto& v = m_awaiters;
             v.erase(std::remove_if(v.begin(), v.end(), [](const std::weak_ptr<IAwaiterEx>& w){
-                if (w.expired()) return true;
-                if (auto sp = w.lock()) return !sp->isActive();
-                return true;
+                auto sp = w.lock();
+                if (!sp) return true;
+                return !sp->isActive();
             }), v.end());
             live.reserve(v.size());
             for (auto& w : v) {
