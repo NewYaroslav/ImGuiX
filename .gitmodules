@@ -53,3 +53,6 @@
 	path = libs/imgui_md
 	url = https://github.com/NewYaroslav/imgui_md.git
 	branch = main
+[submodule "libs/aescpp"]
+	path = libs/aescpp
+	url = https://github.com/NewYaroslav/aescpp.git
