@@ -28,7 +28,7 @@ namespace ImGuiX::Themes {
         constexpr ImVec4 PopupBg                = ImVec4(0.19f, 0.19f, 0.19f, 0.92f);
 
         // Borders
-        constexpr ImVec4 Border                 = ImVec4(0.19f, 0.19f, 0.19f, 0.29f);
+        constexpr ImVec4 Border                 = ImVec4(0.33f, 0.33f, 0.33f, 0.60f);
         constexpr ImVec4 BorderShadow           = ImVec4(0.00f, 0.00f, 0.00f, 0.24f);
 
         // Frames
@@ -93,8 +93,9 @@ namespace ImGuiX::Themes {
         constexpr ImVec4 PlotHistogramHovered   = ImVec4(1.00f, 0.00f, 0.00f, 1.00f);
 
         // Misc / Navigation
-        constexpr ImVec4 TextSelectedBg         = ImVec4(0.20f, 0.22f, 0.23f, 1.00f);
-        constexpr ImVec4 DragDropTarget         = ImVec4(0.33f, 0.67f, 0.86f, 1.00f);
+        constexpr ImVec4 TextSelectedBg         = CheckMark;
+        constexpr ImVec4 InputTextCursor        = ImVec4(0.80f, 0.80f, 0.80f, 1.00f);
+        constexpr ImVec4 DragDropTarget         = CheckMark;
 
         constexpr ImVec4 NavHighlight           = ImVec4(1.00f, 0.00f, 0.00f, 1.00f);
         constexpr ImVec4 NavWindowingHighlight  = ImVec4(1.00f, 0.00f, 0.00f, 0.70f);
@@ -111,7 +112,7 @@ namespace ImGuiX::Themes {
             ImVec4* colors = style.Colors;
 
             colors[ImGuiCol_Text]                  = Text;
-            colors[ImGuiCol_InputTextCursor]            = CheckMark;
+            colors[ImGuiCol_InputTextCursor]       = InputTextCursor;
             colors[ImGuiCol_TextDisabled]          = TextDisabled;
 
             colors[ImGuiCol_WindowBg]              = WindowBg;
