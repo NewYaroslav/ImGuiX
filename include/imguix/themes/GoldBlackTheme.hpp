@@ -86,9 +86,9 @@ namespace ImGuiX::Themes {
         constexpr ImVec4 PlotHistogramHovered   = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
 
         // Misc / Navigation
-        constexpr ImVec4 TextSelectedBg         = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
+        constexpr ImVec4 TextSelectedBg         = ImVec4(GoldBright.x, GoldBright.y, GoldBright.z, 0.35f); // semi-transparent GoldBright
         constexpr ImVec4 DragDropTarget         = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
-        constexpr ImVec4 NavHighlight           = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+        constexpr ImVec4 NavHighlight           = GoldBright;
         constexpr ImVec4 NavWindowingHighlight  = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
         constexpr ImVec4 NavWindowingDimBg      = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
         constexpr ImVec4 ModalWindowDimBg       = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
