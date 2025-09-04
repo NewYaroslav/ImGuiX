@@ -38,6 +38,8 @@ English version: [THEMES.md](THEMES.md).
 
 Реализуйте интерфейс `ImGuiX::Themes::Theme` и переопределите методы `apply`.
 Используйте `applyDefaultImGuiStyle`, чтобы задать общие значения отступов и скруглений.
+Не вызывайте `ImGui::GetColorU32` вне активного контекста ImGui.
+В конфигурациях храните «сырые» значения `ImVec4` или `ImU32` и переводите их в цвета при отрисовке.
 
 ```cpp
 class MyTheme final : public ImGuiX::Themes::Theme {
