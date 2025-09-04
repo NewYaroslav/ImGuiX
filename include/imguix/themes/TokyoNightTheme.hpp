@@ -3,10 +3,10 @@
 #define _IMGUIX_THEMES_TOKYO_NIGHT_THEME_HPP_INCLUDED
 
 /// \file TokyoNightTheme.hpp
-/// \brief Tokyo Night (Storm) inspired dark theme for ImGui/ImPlot.
+/// \brief Tokyo Night inspired dark theme (Night variant) for ImGui/ImPlot.
 ///
 /// Aesthetics:
-///  - stormy navy background (#24283B)
+///  - deep midnight background (#1A1B26)
 ///  - soft light text (#C0CAF5)
 ///  - blue/cyan primaries (#7AA2F7 / #7DCFFF), purple/orange/yellow accents
 ///
@@ -20,16 +20,16 @@
 namespace ImGuiX::Themes {
 
     /// \namespace TokyoNightConstants
-    /// \brief Color constants for the Tokyo Night theme (Storm variant).
+    /// \brief Color constants for the Tokyo Night theme (Night variant).
     namespace TokyoNightConstants {
         // Text
         constexpr ImVec4 Text                   = ImVec4(0.753f, 0.792f, 0.961f, 1.000f); // #C0CAF5
         constexpr ImVec4 TextDisabled           = ImVec4(0.337f, 0.373f, 0.537f, 1.000f); // #565F89
 
         // Backgrounds
-        constexpr ImVec4 WindowBg               = ImVec4(0.141f, 0.157f, 0.231f, 1.000f); // #24283B
-        constexpr ImVec4 ChildBg                = ImVec4(0.122f, 0.137f, 0.208f, 0.980f); // #1F2335 @98%
-        constexpr ImVec4 PopupBg                = ImVec4(0.102f, 0.106f, 0.149f, 0.980f); // #1A1B26 @98%
+        constexpr ImVec4 WindowBg               = ImVec4(0.102f, 0.106f, 0.149f, 1.000f); // #1A1B26
+        constexpr ImVec4 ChildBg                = ImVec4(0.086f, 0.086f, 0.118f, 0.980f); // #16161E @98%
+        constexpr ImVec4 PopupBg                = ImVec4(0.047f, 0.055f, 0.078f, 0.980f); // #0C0E14 @98%
 
         // Borders / separators
         constexpr ImVec4 Border                 = ImVec4(0.231f, 0.259f, 0.380f, 0.90f);  // #3B4261
@@ -39,10 +39,10 @@ namespace ImGuiX::Themes {
         constexpr ImVec4 SeparatorActive        = ImVec4(0.490f, 0.812f, 1.000f, 0.70f);  // #7DCFFF @70%
 
         // Titles / Menu
-        constexpr ImVec4 TitleBg                = ImVec4(0.122f, 0.137f, 0.208f, 1.000f); // #1F2335
-        constexpr ImVec4 TitleBgCollapsed       = ImVec4(0.122f, 0.137f, 0.208f, 1.000f);
+        constexpr ImVec4 TitleBg                = ImVec4(0.086f, 0.086f, 0.118f, 1.000f); // #16161E
+        constexpr ImVec4 TitleBgCollapsed       = TitleBg;
         constexpr ImVec4 TitleBgActive          = ImVec4(0.231f, 0.259f, 0.380f, 1.000f); // #3B4261
-        constexpr ImVec4 MenuBarBg              = ImVec4(0.122f, 0.137f, 0.208f, 1.000f);
+        constexpr ImVec4 MenuBarBg              = TitleBg;
 
         // Accents
         constexpr ImVec4 AccentPrimary          = ImVec4(0.478f, 0.635f, 0.969f, 1.000f); // #7AA2F7
@@ -78,11 +78,11 @@ namespace ImGuiX::Themes {
         constexpr ImVec4 Tab                    = ImVec4(0.114f, 0.160f, 0.267f, 0.90f);
         constexpr ImVec4 TabHovered             = AccentPrimaryHover;
         constexpr ImVec4 TabActive              = ImVec4(0.478f, 0.635f, 0.969f, 0.60f);
-        constexpr ImVec4 TabUnfocused           = ImVec4(0.122f, 0.137f, 0.208f, 0.80f);
+        constexpr ImVec4 TabUnfocused           = ImVec4(0.086f, 0.086f, 0.118f, 0.80f);
         constexpr ImVec4 TabUnfocusedActive     = ImVec4(0.478f, 0.635f, 0.969f, 0.45f);
 
         // Scrollbar
-        constexpr ImVec4 ScrollbarBg            = ImVec4(0.141f, 0.157f, 0.231f, 0.85f);
+        constexpr ImVec4 ScrollbarBg            = ImVec4(0.102f, 0.106f, 0.149f, 0.85f);
         constexpr ImVec4 ScrollbarGrab          = ImVec4(0.231f, 0.259f, 0.380f, 0.85f);
         constexpr ImVec4 ScrollbarGrabHovered   = ImVec4(0.231f, 0.259f, 0.380f, 1.00f);
         constexpr ImVec4 ScrollbarGrabActive    = ImVec4(0.380f, 0.560f, 0.980f, 1.00f);
@@ -119,7 +119,7 @@ namespace ImGuiX::Themes {
     } // namespace TokyoNightConstants
 
     /// \class TokyoNightTheme
-    /// \brief Tokyo Night (Storm) theme with blue/cyan primaries and balanced contrast.
+    /// \brief Tokyo Night theme with blue/cyan primaries and deeper contrast.
     class TokyoNightTheme final : public Theme {
     public:
         void apply(ImGuiStyle& style) const override {
