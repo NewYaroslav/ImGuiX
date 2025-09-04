@@ -15,6 +15,7 @@
 #include <imguix/widgets/auth/auth_js_panel.hpp>
 #include <imguix/widgets/auth/domain_selector.hpp>
 #include <imguix/widgets/input/virtual_keyboard.hpp>
+#include <imguix/widgets/input/InputTextWithIconToggle.hpp>
 
 // === Время, дата, часы ===
 #include <imguix/widgets/time/time_picker.hpp>
@@ -323,10 +324,11 @@ private:
     void demoAuthorization() {
         if (ImGui::CollapsingHeader("Authorization", ImGuiTreeNodeFlags_DefaultOpen)) {
             ImGuiX::Widgets::DemoAuthPanel(this);
+            ImGuiX::Widgets::DemoInputTextWithIconToggle();
         }
 
         if (ImGui::CollapsingHeader("Validated Inputs")) {
-            ImGuiX::Widgets::DemoValidatedInputs();
+            ImGuiX::Widgets::DemoValidatedPasswordInputs();
         }
 
         if (ImGui::CollapsingHeader("Status Info")) {
@@ -416,7 +418,7 @@ private:
         }
     }
 
-#       ifdef IMGUI_ENABLE_IMPLOT
+#   ifdef IMGUI_ENABLE_IMPLOT
     void demoOhlcPlot() {
         if (ImGui::CollapsingHeader(u8"OHLC Bars / Plot")) {
             static const int TFs[] = {60, 30*60, 60*60};
@@ -455,7 +457,7 @@ private:
             ImGuiX::Widgets::PlotOHLCChart<ImGuiX::Widgets::OhlcvBar>(title.c_str(), bars, m_state.ohlc_cfg);
         }
     }
-#       endif
+#   endif
 
     void drawWidgetsDemo() {
         ImGui::SeparatorText("Widgets Demo");

@@ -11,46 +11,64 @@
 namespace ImGuiX::Extensions {
 
     /// \brief Safe regex match. Returns true if matches or if regex is invalid (fail-open).
-    /// \param s       Input string to validate.
-    /// \param pattern Regex pattern. If empty or invalid, returns true.
-    /// \return True if pattern matches or validation is skipped.
     inline bool RegexMatchSafe(const std::string& s, const std::string& pattern);
 
-    /// \brief Begin invalid styling if condition is true.
-    /// \param is_invalid Whether to push error color.
-    /// \param color      Color to use when invalid.
-    /// \param target     ImGuiCol to tint (default: Text).
+    /// \brief Tint mode for invalid state.
+    enum class InvalidTintMode {
+        Frame,  ///< Tint FrameBg/FrameBgHovered/FrameBgActive (и опционально Border).
+        Text    ///< Tint Text.
+    };
+
+    // --- Functional helpers ---
+
+    /// \brief Begin invalid styling (mode-based). Returns number of pushed colors.
+    /// \param is_invalid   Whether to push.
+    /// \param color        Tint color.
+    /// \param mode         Frame (default) or Text.
+    /// \param include_border Add Border tint for Frame mode (default: false).
+    /// \return Count of colors pushed (pass to EndInvalid).
+    inline int BeginInvalid(bool is_invalid,
+                            ImVec4 color = ImVec4(0.9f, 0.5f, 0.5f, 1.0f),
+                            InvalidTintMode mode = InvalidTintMode::Frame,
+                            bool include_border = false);
+
+    /// \brief Legacy variant: tint a single ImGuiCol (kept for compatibility).
     inline void BeginInvalid(bool is_invalid,
-                             ImVec4 color = ImVec4(0.9f, 0.5f, 0.5f, 1.0f),
-                             ImGuiCol target = ImGuiCol_Text);
+                             ImVec4 color,
+                             ImGuiCol target);
 
-    /// \brief End invalid styling if condition is true.
-    /// \param is_invalid Whether BeginInvalid was used.
-    /// \param count      Number of colors to pop (usually 1).
-    inline void EndInvalid(bool is_invalid, int count = 1);
+    /// \brief End invalid styling with given count (from BeginInvalid).
+    inline void EndInvalid(bool is_invalid, int count);
 
-    /// \brief RAII scope for invalid styling (push on ctor, pop on dtor).
+    /// \brief Legacy variant: end with fixed count=1 (kept for compatibility).
+    inline void EndInvalid(bool is_invalid);
+
+    // --- RAII helper ---
+
     class ScopedInvalid {
     public:
-        /// \brief Construct and optionally push error color.
-        /// \param is_invalid If true, pushes style color.
-        /// \param color      Color to use (default: red-ish).
-        /// \param target     ImGuiCol to affect (default: Text).
+        /// \brief Construct and push styling in \p mode if \p is_invalid.
         explicit ScopedInvalid(bool is_invalid,
                                ImVec4 color = ImVec4(0.9f, 0.5f, 0.5f, 1.0f),
-                               ImGuiCol target = ImGuiCol_Text);
+                               InvalidTintMode mode = InvalidTintMode::Frame,
+                               bool include_border = false);
 
-        /// \brief Pop style color if still active.
+        /// \brief Legacy ctor: tint a single ImGuiCol (compatibility).
+        explicit ScopedInvalid(bool is_invalid,
+                               ImVec4 color,
+                               ImGuiCol target);
+
         ~ScopedInvalid();
 
         ScopedInvalid(const ScopedInvalid&) = delete;
         ScopedInvalid& operator=(const ScopedInvalid&) = delete;
 
         /// \brief End invalid tinting early (idempotent).
-        /// \details Useful to stop tinting before drawing adjacent widgets (e.g., buttons).
         void end();
+
     private:
         bool m_active = false;
+        int  m_count  = 0;   // how many colors were pushed
     };
 
 } // namespace ImGuiX::Extensions

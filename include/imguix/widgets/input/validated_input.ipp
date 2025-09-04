@@ -1,4 +1,9 @@
+#include <algorithm>
+#include <vector>
+#include <cstring>
+
 #include <imguix/extensions/validation.hpp>
+#include "InputTextWithIconToggle.hpp"
 
 namespace ImGuiX::Widgets {
 
@@ -13,7 +18,11 @@ namespace ImGuiX::Widgets {
             ImVec4 error_color,
             ImGuiInputTextFlags flags,
             ImGuiInputTextCallback callback,
-            void* user_data
+            void* user_data,
+            const char* eye_on,
+            const char* eye_off,
+            ImFont* eye_icon_font,
+            bool show_trailing_label
         ) {
         using ImGuiX::Extensions::RegexMatchSafe;
         using ImGuiX::Extensions::ScopedInvalid;
@@ -23,6 +32,7 @@ namespace ImGuiX::Widgets {
 
         const ImGuiID key_touched   = ImGui::GetID("##validated_touched");
         const ImGuiID key_prev_hash = ImGui::GetID("##validated_prev32");
+        const ImGuiID key_reveal    = ImGui::GetID("##pwd_reveal");
 
         // simple FNV-1a 32-bit
         auto hash32 = [](const std::string& s)->uint32_t {
@@ -53,11 +63,55 @@ namespace ImGuiX::Widgets {
         }
 
         bool valid_now = match(value);
-        ScopedInvalid tint(pre_tint && !valid_now, error_color);
+        const bool error_active = (pre_tint && !valid_now);
+        ScopedInvalid tint(error_active, error_color);
 
-        bool changed = ImGui::InputTextWithHint(
-            "##input_text", hint, &value, flags, callback, user_data
-        );
+        // --- draw input
+        bool changed = false;
+
+        const bool is_password = (flags & ImGuiInputTextFlags_Password) != 0;
+        if (is_password) {
+            // Persist reveal state per-ID
+            bool reveal = st->GetBool(key_reveal, false);
+
+            // Temporary buffer for std::string (allow some headroom)
+            const size_t headroom = 64;
+            size_t buf_cap = std::max<size_t>(value.size() + headroom, 256);
+            std::vector<char> tmp(buf_cap + 1, 0);
+            if (!value.empty())
+                std::memcpy(tmp.data(), value.c_str(), std::min(value.size(), buf_cap));
+
+            // Important: strip Password flag; toggle widget manages it itself
+            ImGuiInputTextFlags eff = flags & ~ImGuiInputTextFlags_Password;
+
+            const char* eye_on_eff  = eye_on  ? eye_on  : IMGUIX_ICON_EYE_SHOW;
+            const char* eye_off_eff = eye_off ? eye_off : IMGUIX_ICON_EYE_HIDE;
+    
+            changed = ImGuiX::Widgets::InputTextWithIconToggle(
+                "##input_text",
+                hint,
+                tmp.data(),
+                static_cast<int>(tmp.size()),
+                &reveal,
+                eff,
+                eye_on_eff,
+                eye_off_eff,
+                eye_icon_font,
+                callback,
+                user_data
+            );
+
+            if (changed) {
+                value.assign(tmp.data());
+            }
+            // store reveal state
+            st->SetBool(key_reveal, reveal);
+        } else {
+            // Regular std::string path with optional callback
+            changed = ImGui::InputTextWithHint(
+                "##input_text", hint, &value, flags, callback, user_data
+            );
+        }
 
         tint.end();
 
@@ -78,9 +132,20 @@ namespace ImGuiX::Widgets {
 
         // update hash after input
         st->SetInt(key_prev_hash, static_cast<int>(hash32(value)));
+        
+        if (show_trailing_label) {
+            const char* label_end = label;
+            while (*label_end != '\0' && !(label_end[0] == '#' && label_end[1] == '#'))
+                ++label_end;
+
+            if (label_end > label) {
+                ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
+                ImGui::TextUnformatted(label, label_end);
+            }
+        }
 
         ImGui::PopID();
-        return changed | external_changed;
+        return changed || external_changed;
     }
 
     bool InputTextWithVKValidated(
@@ -122,7 +187,8 @@ namespace ImGuiX::Widgets {
         ImGui::SetNextItemWidth(input_w);
         bool changed = ImGuiX::Widgets::InputTextValidated(
             "##input", hint, value, validate, policy, pattern,
-            out_valid, error_color, extra_flags, callback, user_data
+            out_valid, error_color, extra_flags, callback, user_data,
+            kb_cfg.icon_eye_on, kb_cfg.icon_eye_off, kb_cfg.icon_font, false
         );
 
         // --- VK trigger button
@@ -204,4 +270,3 @@ namespace ImGuiX::Widgets {
     }
 
 } // namespace ImGuiX::Widgets
-

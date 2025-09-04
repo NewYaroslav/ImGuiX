@@ -181,11 +181,24 @@ namespace ImGuiX::Widgets {
     inline void DemoAuthPanel(ImGuiX::Controller* ctrl) {
         static AuthPanelConfig auth_cfg{};
         static AuthData auth_data{};
+        static bool is_once = false;
+        
+        if (!is_once) {
+            is_once = true;
+            auth_data.host     = ctrl->options().getStrOr("host", "demo.local");
+            auth_data.email    = ctrl->options().getStrOr("email", "guest@example.com");
+            auth_data.password = ctrl->options().getStrOr("password", "");
+        }
+        
+        auth_cfg.vk_email            = true;
+        auth_cfg.vk_password         = true;
         AuthPanel("login.panel", auth_cfg, auth_data);
 
         AuthPanelConfig cfg_api{};
         cfg_api.header              = u8"Authorization (API key)";
         cfg_api.show_api_keys       = true;
+        cfg_api.vk_email            = true;
+        cfg_api.vk_password         = true;
         cfg_api.vk_api_key          = true;
         cfg_api.vk_api_secret       = true;
         cfg_api.show_connect_button = false;

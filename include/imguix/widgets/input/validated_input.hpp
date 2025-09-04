@@ -5,10 +5,12 @@
 /// \file validated_input.hpp
 /// \brief InputTextWithHint for std::string with regex validation and error tinting.
 
+#include <imgui.h>
 #include <imgui_stdlib.h>
 
 #include <imguix/config/icons.hpp>
 #include <imguix/config/colors.hpp>
+
 #include "virtual_keyboard_overlay.hpp"
 
 namespace ImGuiX::Widgets {
@@ -25,14 +27,16 @@ namespace ImGuiX::Widgets {
     struct KeyboardToggleConfig {
         bool        use_icon           = true;                  ///< icon or text
         const char* icon_text          = IMGUIX_ICON_KEYBOARD;  ///< PUA 'keyboard' (e.g. Material)
+        const char* icon_eye_on        = IMGUIX_ICON_EYE_SHOW;	///<
+        const char* icon_eye_off       = IMGUIX_ICON_EYE_HIDE;	///<
+        const char* tooltip_toggle_on  = u8"Show keyboard";		///<
+        const char* tooltip_toggle_off = u8"Hide keyboard";		///<
         const char* text               = u8"[KB]";              ///< text if use_icon==false
         ImFont*     icon_font          = nullptr;               ///< icon font (nullptr => current)
         ImVec2      button_size        = ImVec2(0,0);           ///< (0,0) => square by frame height
         float       same_line_w        = 0.0f;                  ///< SameLine(offset) before button
         float       icon_baseline      = 0.0f;                  ///< Y offset for baseline tuning
         float       icon_rounding      = -1.0f;                 ///< bg rounding override; -1 => keep style
-        const char* tooltip_toggle_on  = u8"Show keyboard";
-        const char* tooltip_toggle_off = u8"Hide keyboard";
         ImVec2      overlay_size       = ImVec2(0,0);           ///< 0,0 => auto
     };
 
@@ -60,7 +64,11 @@ namespace ImGuiX::Widgets {
             ImVec4 error_color = IMGUIX_COLOR_ERROR,
             ImGuiInputTextFlags flags = 0,
             ImGuiInputTextCallback callback = nullptr,
-            void* user_data = nullptr
+            void* user_data = nullptr,
+            const char* eye_on  = IMGUIX_ICON_EYE_SHOW,
+            const char* eye_off = IMGUIX_ICON_EYE_HIDE,
+            ImFont* eye_icon_font = nullptr,
+            bool show_trailing_label = true
         );
     
     /// \brief InputTextWithHint wrapper with validation and optional VK trigger.
@@ -110,7 +118,7 @@ namespace ImGuiX::Widgets {
     /// \param vk_cfg Behavior/visual config for the on-screen keyboard overlay.
     /// \param error_color Tint applied while invalid (frame/text).
     /// \return true if the value changed this frame (via input or VK).
-inline bool InputTextWithVKValidated(
+	inline bool InputTextWithVKValidated(
             const char* label,
             const char* hint,
             std::string& value,
@@ -120,7 +128,7 @@ inline bool InputTextWithVKValidated(
             bool& out_valid,
             const KeyboardToggleConfig& kb_cfg = {},
             VirtualKeyboardConfig vk_cfg = {},
-            ImVec4 error_color = ImVec4(0.9f,0.5f,0.5f,1.0f)
+            ImVec4 error_color = IMGUIX_COLOR_ERROR
         ) {
         return InputTextWithVKValidated(
             label,

@@ -56,3 +56,6 @@
 [submodule "libs/aescpp"]
 	path = libs/aescpp
 	url = https://github.com/NewYaroslav/aescpp.git
+[submodule "libs/hmac-cpp"]
+	path = libs/hmac-cpp
+	url = https://github.com/NewYaroslav/hmac-cpp.git
