@@ -61,6 +61,9 @@ namespace ImGuiX::Themes {
         constexpr ImVec4 SliderGrab            = ImVec4(0.28f, 0.56f, 1.00f, 1.00f);
         constexpr ImVec4 SliderGrabActive      = ImVec4(0.37f, 0.61f, 1.00f, 1.00f);
 
+        // Input cursor
+        constexpr ImVec4 InputCursor           = ImVec4(0.55f, 0.65f, 0.70f, 1.00f);
+
         // Buttons / Headers
         constexpr ImVec4 Button                = ImVec4(0.20f, 0.25f, 0.29f, 1.00f);
         constexpr ImVec4 ButtonHovered         = ImVec4(0.28f, 0.56f, 1.00f, 1.00f);
@@ -111,7 +114,7 @@ namespace ImGuiX::Themes {
             ImVec4* colors = style.Colors;
 
             colors[ImGuiCol_Text]                  = Text;
-            colors[ImGuiCol_InputTextCursor]            = AccentBase;
+            colors[ImGuiCol_InputTextCursor]            = InputCursor;
             colors[ImGuiCol_TextDisabled]          = TextDisabled;
 
             colors[ImGuiCol_WindowBg]              = WindowBg;

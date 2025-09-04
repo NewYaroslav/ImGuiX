@@ -94,10 +94,7 @@ namespace ImGuiX::Themes {
         constexpr ImVec4 CheckMark              = ImVec4(0.13f, 0.75f, 0.55f, 0.80f);
         constexpr ImVec4 SliderGrab             = ImVec4(0.13f, 0.75f, 0.75f, 0.80f);
         constexpr ImVec4 SliderGrabActive       = ImVec4(0.13f, 0.75f, 1.00f, 0.80f);
-
-        constexpr ImVec4 TextSelectedBg         = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
         constexpr ImVec4 DragDropTarget         = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
-        constexpr ImVec4 NavHighlight           = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
         constexpr ImVec4 NavWindowingHighlight  = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
         constexpr ImVec4 NavWindowingDimBg      = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
         constexpr ImVec4 ModalWindowDimBg       = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
@@ -176,10 +173,10 @@ namespace ImGuiX::Themes {
             colors[ImGuiCol_PlotHistogramHovered]  = PlotHistogramHovered;
 
             // Misc / Navigation
-            colors[ImGuiCol_TextSelectedBg]        = TextSelectedBg;
+            colors[ImGuiCol_TextSelectedBg]        = AccentTeal;
             colors[ImGuiCol_DragDropTarget]        = DragDropTarget;
 
-            colors[ImGuiCol_NavHighlight]          = NavHighlight;
+            colors[ImGuiCol_NavHighlight]          = AccentCyan;
             colors[ImGuiCol_NavWindowingHighlight] = NavWindowingHighlight;
             colors[ImGuiCol_NavWindowingDimBg]     = NavWindowingDimBg;
             colors[ImGuiCol_ModalWindowDimBg]      = ModalWindowDimBg;

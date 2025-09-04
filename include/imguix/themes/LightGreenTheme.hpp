@@ -28,7 +28,7 @@ namespace ImGuiX::Themes {
         constexpr ImVec4 PopupBg                = ImVec4(0.93f, 0.93f, 0.93f, 0.98f);
 
         // Borders
-        constexpr ImVec4 Border                 = ImVec4(0.71f, 0.71f, 0.71f, 0.08f);
+        constexpr ImVec4 Border                 = ImVec4(0.71f, 0.71f, 0.71f, 0.40f);
         constexpr ImVec4 BorderShadow           = ImVec4(0.00f, 0.00f, 0.00f, 0.04f);
 
         // Frames
