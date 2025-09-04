@@ -88,9 +88,9 @@ namespace ImGuiX::Themes {
         constexpr ImVec4 PlotHistogramHovered  = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
 
         // Misc / Navigation
-        constexpr ImVec4 TextSelectedBg        = AccentBlueSoft;
+        constexpr ImVec4 TextSelectedBg        = CyanBase;
         constexpr ImVec4 DragDropTarget        = CyanBase;
-        constexpr ImVec4 NavHighlight          = AccentBlue;
+        constexpr ImVec4 NavHighlight          = CyanBase;
         constexpr ImVec4 NavWindowingHighlight = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
         constexpr ImVec4 NavWindowingDimBg     = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
         constexpr ImVec4 ModalWindowDimBg      = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
@@ -105,7 +105,7 @@ namespace ImGuiX::Themes {
             ImVec4* colors = style.Colors;
 
             colors[ImGuiCol_Text]                  = Text;
-            colors[ImGuiCol_InputTextCursor]            = AccentBlue;
+            colors[ImGuiCol_InputTextCursor]            = CyanBase;
             colors[ImGuiCol_TextDisabled]          = TextDisabled;
 
             colors[ImGuiCol_WindowBg]              = WindowBg;
