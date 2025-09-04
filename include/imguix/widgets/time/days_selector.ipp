@@ -75,13 +75,14 @@ namespace ImGuiX::Widgets {
             cell = ImVec2(h, h);
         }
 
-        const ImGuiStyle& st = ImGui::GetStyle();
+        const ImGuiStyle& style = ImGui::GetStyle();
+
         ImVec2 popup_size = cfg.popup_size;
         if (popup_size.x <= 0.0f) {
-            popup_size.x = ((cell.x + st.ItemInnerSpacing.x) * (1.0f + cfg.cols)) + 2.0f * st.FramePadding.x;
+            popup_size.x = ((cell.x + style.ItemInnerSpacing.x) * (1.0f + cfg.cols)) + 2.0f * style.FramePadding.x;
         }
         if (popup_size.y <= 0.0f) {
-            popup_size.y = ImGui::GetFrameHeightWithSpacing() + cell.y * cfg.rows + 2.0f * ImGui::GetStyle().FramePadding.y;
+            popup_size.y = ImGui::GetFrameHeightWithSpacing() + cell.y * cfg.rows + 2.0f * style.FramePadding.y;
         }
 
         std::string preview = build_preview(ImGuiX::Extensions::CalcComboPreviewTextMax(combo_width));
@@ -106,9 +107,42 @@ namespace ImGuiX::Widgets {
                 preview.c_str(),
                 ImGuiComboFlags_HeightLargest | ImGuiComboFlags_PopupAlignLeft);
         if (open) {
-            ImGui::Indent(st.FramePadding.x);
+            ImGui::Indent(style.FramePadding.x);
+            const float cur_x = ImGui::GetCursorPosX();
+            // доступная ширина внутри попапа (после Indent)
+            const float avail_w = ImGui::GetContentRegionAvail().x;
 
-            // Toolbar
+            // Сетка
+            const int rows = std::max(1, cfg.rows);
+            const int cols = std::max(1, cfg.cols);
+            const ImVec2 cell = cfg.cell_size;
+            const int total = std::max(rows * cols, 7); 
+
+            ImDrawList* dl = ImGui::GetWindowDrawList();
+            const float rounding = (cfg.cell_rounding < 0.0f)
+                ? style.FrameRounding
+                : cfg.cell_rounding;
+            
+            // ширина сетки (ячейки + межколоночные отступы)
+            const float grid_w =
+                cols * cfg.cell_size.x + (cols - 1) * style.ItemSpacing.x;
+                
+            // ширина тулбара (SmallButton по тексту + паддинги)
+            auto small_btn_w = [&](const char* txt) {
+                return ImGui::CalcTextSize(txt, nullptr, true).x + style.FramePadding.x * 2.0f;
+            };
+
+            const float toolbar_w =
+                small_btn_w("All")      + style.ItemSpacing.x +
+                small_btn_w("None")     + style.ItemSpacing.x +
+                small_btn_w("Workdays") + style.ItemSpacing.x +
+                small_btn_w("Weekend");
+
+            const float toolbar_start_x = cur_x + ImMax(0.0f, (avail_w - toolbar_w) * 0.5f);
+
+            // --- toolbar ---
+            ImGui::SetCursorPosX(toolbar_start_x);
+            
             if (cfg.show_toolbar_all_none) {
                 if (ImGui::SmallButton(cfg.label_all))  { for (int i=0;i<7;++i) mark[i]=true;  changed = true; }
                 ImGui::SameLine();
@@ -127,18 +161,13 @@ namespace ImGuiX::Widgets {
                 }
             }
 
-            // Сетка
-            const int rows = std::max(1, cfg.rows);
-            const int cols = std::max(1, cfg.cols);
-            const ImVec2 cell = cfg.cell_size;
-            const int total = std::max(rows * cols, 7);
-
-            ImDrawList* dl = ImGui::GetWindowDrawList();
-            const float rounding = (cfg.cell_rounding < 0.0f)
-                ? ImGui::GetStyle().FrameRounding
-                : cfg.cell_rounding;
+            // половина свободного пространства
+            const float pad_x = ImMax(0.0f, (avail_w - grid_w) * 0.5f);
+            // запомним целевую X-позицию начала строки
+            const float row_start_x = ImGui::GetCursorPosX() + pad_x;
 
             for (int r = 0; r < rows; ++r) {
+                ImGui::SetCursorPosX(row_start_x);
                 for (int c = 0; c < cols; ++c) {
                     const int idx = r * cols + c;
                     if (c) ImGui::SameLine();
@@ -188,9 +217,9 @@ namespace ImGuiX::Widgets {
             }
 
             ImGui::SameLine(0, 0);
-            ImGui::Dummy(ImVec2(st.FramePadding.x, 0));
+            ImGui::Dummy(ImVec2(style.FramePadding.x, 0));
 
-            ImGui::Unindent(st.FramePadding.x);
+            ImGui::Unindent(style.FramePadding.x);
             ImGui::EndCombo();
 
             if (changed) {

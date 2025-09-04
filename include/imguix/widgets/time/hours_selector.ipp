@@ -80,8 +80,10 @@ namespace ImGuiX::Widgets {
                 preview.c_str(),
                 ImGuiComboFlags_HeightLargest | ImGuiComboFlags_PopupAlignLeft);
         if (open) {
-            const ImGuiStyle& st = ImGui::GetStyle();
-            ImGui::Indent(st.FramePadding.x);
+            const ImGuiStyle& style = ImGui::GetStyle();
+            ImGui::Indent(style.FramePadding.x);
+            // доступная ширина внутри попапа (после Indent)
+            const float avail_w = ImGui::GetContentRegionAvail().x;
 
             // Grid layout
             const int rows = std::max(1, cfg.rows);
@@ -89,8 +91,18 @@ namespace ImGuiX::Widgets {
 
             // Safety: ensure we can cover all 24 hours even if rows*cols < 24
             const int total = std::max(rows * cols, 24);
+            
+            // ширина сетки (ячейки + межколоночные отступы)
+            const float grid_w =
+                cols * cell.x + (cols - 1) * style.ItemSpacing.x;
+
+            // половина свободного пространства
+            const float pad_x = ImMax(0.0f, (avail_w - grid_w) * 0.5f);
+            // запомним целевую X-позицию начала строки
+            const float row_start_x = ImGui::GetCursorPosX() + pad_x;
 
             // Small toolbar (optional): Select All / Clear
+            ImGui::SetCursorPosX(row_start_x);
             if (ImGui::SmallButton(cfg.label_all)) {
                 for (int i = 0; i < 24; ++i) mark[i] = true;
                 changed = true;
@@ -103,11 +115,12 @@ namespace ImGuiX::Widgets {
 
             ImDrawList* dl = ImGui::GetWindowDrawList();
             float cell_rounding = (cfg.cell_rounding < 0.0f)
-                ? ImGui::GetStyle().FrameRounding
+                ? style.FrameRounding
                 : cfg.cell_rounding;
 
             // Grid of Selectable cells
             for (int r = 0; r < rows; ++r) {
+                ImGui::SetCursorPosX(row_start_x);
                 for (int c = 0; c < cols; ++c) {
                     const int idx = r * cols + c;
                     if (c) ImGui::SameLine();
@@ -161,9 +174,9 @@ namespace ImGuiX::Widgets {
             }
 
             ImGui::SameLine(0, 0);
-            ImGui::Dummy(ImVec2(st.FramePadding.x, 0));
+            ImGui::Dummy(ImVec2(style.FramePadding.x, 0));
 
-            ImGui::Unindent(st.FramePadding.x);
+            ImGui::Unindent(style.FramePadding.x);
             ImGui::EndCombo();
 
             if (changed) {
