@@ -303,6 +303,7 @@ if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Days", preview.c_str(),
 | Content sticks to popup edges | No inner padding | Inside popup: `Indent(style.FramePadding.x)` on the left and `SameLine(0,0); Dummy({style.FramePadding.x,0})` on the right; then `Unindent` |
 | Popup closes when clicking a cell | `Selectable` missing flag | Use `ImGuiSelectableFlags_DontClosePopups` for multi-select |
 | Hardcoded width factors | `GetWindowWidth()*k` | Use `SetNextItemWidth(Calc*ComboWidth)`/`CalcItemWidth()` |
+| Crash before window created | Config default calls `ImGui::GetColorU32` | Store `0`/`IM_COL32` in config and convert at draw-time |
 
 Quick grep patterns:
 

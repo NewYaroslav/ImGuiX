@@ -38,6 +38,8 @@ This document lists the color themes bundled with ImGuiX and shows how to create
 ## Creating a custom theme
 
 Implement the `ImGuiX::Themes::Theme` interface and override the `apply` methods. Use `applyDefaultImGuiStyle` to set common spacing and rounding values.
+Do not call `ImGui::GetColorU32` outside an active ImGui frame.
+Store raw `ImVec4` or `ImU32` values in configuration structs and convert during rendering.
 
 ```cpp
 class MyTheme final : public ImGuiX::Themes::Theme {

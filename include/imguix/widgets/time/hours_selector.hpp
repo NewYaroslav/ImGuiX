@@ -33,7 +33,7 @@ namespace ImGuiX::Widgets {
         bool        use_header_color_for_selected = true; ///< Use ImGuiCol_Header for selected bg.
         bool    show_cell_borders   = true;      ///< Draw cell borders.
         float   cell_border_thickness = 1.0f;   ///< Border thickness.
-        ImU32   cell_border_color   = ImGui::GetColorU32(ImGuiCol_Separator); ///< Cell border color (default ImGuiCol_Separator).
+        ImU32   cell_border_color   = 0;           ///< 0 -> ImGuiCol_Separator.
         ImU32   cell_border_color_hovered = 0;   ///< 0 -> ImGuiCol_HeaderHovered.
         ImU32   cell_border_color_selected = 0;  ///< 0 -> ImGuiCol_Header.
         float   cell_rounding = 0.0f;            ///< Cell rounding radius.
