@@ -107,7 +107,6 @@ namespace ImGuiX::Widgets {
                 preview.c_str(),
                 ImGuiComboFlags_HeightLargest | ImGuiComboFlags_PopupAlignLeft);
         if (open) {
-            ImGui::Indent(style.FramePadding.x);
             const float cur_x = ImGui::GetCursorPosX();
             // доступная ширина внутри попапа (после Indent)
             const float avail_w = ImGui::GetContentRegionAvail().x;
@@ -219,7 +218,6 @@ namespace ImGuiX::Widgets {
             ImGui::SameLine(0, 0);
             ImGui::Dummy(ImVec2(style.FramePadding.x, 0));
 
-            ImGui::Unindent(style.FramePadding.x);
             ImGui::EndCombo();
 
             if (changed) {

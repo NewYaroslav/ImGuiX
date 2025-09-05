@@ -198,8 +198,8 @@ namespace ImGuiX::Themes {
             ImPlot::StyleColorsDark(&style);
 
             ImVec4 frame = FrameBg; frame.w = 1.0f;
-            style.Colors[ImPlotCol_FrameBg]      = frame;
-            style.Colors[ImPlotCol_PlotBg]       = WindowBg;
+            style.Colors[ImPlotCol_FrameBg]       = frame;
+            style.Colors[ImPlotCol_PlotBg]        = WindowBg;
             style.Colors[ImPlotCol_PlotBorder]    = Border;
             style.Colors[ImPlotCol_LegendBg]      = PopupBg;
             style.Colors[ImPlotCol_LegendBorder]  = Border;

@@ -59,6 +59,7 @@
 // === Графики ===
 #ifdef IMGUI_ENABLE_IMPLOT
 #include <imguix/widgets/plot/PlotOHLCChart.hpp>
+#include <imguix/widgets/plot/MetricsPlot.hpp>
 #endif
 
 #ifdef IMGUIX_DEMO
@@ -419,7 +420,7 @@ private:
     }
 
 #   ifdef IMGUI_ENABLE_IMPLOT
-    void demoOhlcPlot() {
+    void demoPlot() {
         if (ImGui::CollapsingHeader(u8"OHLC Bars / Plot")) {
             static const int TFs[] = {60, 30*60, 60*60};
             static const char* TF_NAMES[] = {"M1", "M30", "H1"};
@@ -456,19 +457,22 @@ private:
 
             ImGuiX::Widgets::PlotOHLCChart<ImGuiX::Widgets::OhlcvBar>(title.c_str(), bars, m_state.ohlc_cfg);
         }
+        if (ImGui::CollapsingHeader(u8"Metrics / Plot")) {
+            ImGuiX::Widgets::DemoMetricsPlot();
+        }
     }
 #   endif
 
     void drawWidgetsDemo() {
         ImGui::SeparatorText("Widgets Demo");
         demoTheme();
+#       ifdef IMGUI_ENABLE_IMPLOT
+        demoPlot();
+#       endif
         demoAuthorization();
         demoTime();
         demoMisc();
         demoNotifications();
-#       ifdef IMGUI_ENABLE_IMPLOT
-        demoOhlcPlot();
-#       endif
     }
 #   endif
 
