@@ -1,7 +1,7 @@
 # Widgets Overview
 
 ImGuiX provides a collection of widgets grouped by domain. The examples below are
-trimmed snippets taken from `tests/test_widgets.cpp` unless noted otherwise.
+trimmed snippets taken from `examples/smoke/widgets_demo.cpp` unless noted otherwise.
 
 For the Russian version, see [WIDGETS-RU.md](WIDGETS-RU.md).
 
