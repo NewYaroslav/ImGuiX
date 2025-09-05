@@ -206,7 +206,7 @@ if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Days", preview.c_str(),
 
 * **Unit tests**: event system, resource registry, application loop (`tests/*`).
 * **Property tests**: recommended for EventBus ordering and resource uniqueness.
-* **Integration**: build `tests/test_core_application.cpp` for backend-specific flows.
+* **Integration**: build `examples/smoke/core_application_demo.cpp` for backend-specific flows.
 * Oracles: event receipt, resource retrieval, frame rendering.
 * Fixtures: use minimal controllers/models with deterministic behaviour.
 * When adding a module, test table:
