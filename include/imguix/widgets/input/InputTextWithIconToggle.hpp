@@ -14,17 +14,30 @@
 namespace ImGuiX::Widgets {
 
     /// \brief Single-line InputText with integrated right-side eye toggle (show/hide).
-    /// \param label   Visible label (also used to build a stable PushID scope).
-    /// \param hint    Optional gray hint (nullptr = no hint).
-    /// \param buf     User buffer (zero-terminated).
-    /// \param buf_sz  Size of user buffer (including terminator).
-    /// \param reveal  IN/OUT: true = plain text; false = password bullets.
-    /// \param flags   Base flags for InputText (Password flag managed internally).
-    /// \param eye_on  UTF-8 icon for "visible" (e.g. u8"\uE8F4").
-    /// \param eye_off UTF-8 icon for "hidden"  (e.g. u8"\uE8F5").
-    /// \param icon_font Optional font for icon (nullptr = current font).
-    /// \return True if text changed this frame.
-    bool InputTextWithIconToggle(
+    /// \param label     Visible label and ID scope.
+    /// \param hint      Gray placeholder; nullptr for none.
+    /// \param buf       Mutable UTF-8 buffer.
+    /// \param buf_sz    Buffer size including terminator.
+    /// \param reveal    IN/OUT toggle state; true shows text.
+    /// \param flags     Base InputText flags; Password managed internally.
+    /// \param eye_on    UTF-8 icon when text visible.
+    /// \param eye_off   UTF-8 icon when text hidden.
+    /// \param icon_font Font for icons; nullptr uses current.
+    /// \param callback  Optional input callback.
+    /// \param user_data User context for callback.
+    /// \param eye_text_col_override Override icon color; 0 uses style.
+    /// \param eye_bg_col_override Override background color; 0 uses style.
+    /// \return true if text changed.
+    /// \pre label && buf && reveal are not nullptr.
+    /// \pre buf_sz > 0.
+    /// \pre (flags & ImGuiInputTextFlags_Multiline) == 0.
+    /// \thread_safety Not thread-safe.
+    /// \code{.cpp}
+    /// bool reveal = false;
+    /// char buf[128]{};
+    /// ImGuiX::Widgets::InputTextWithIconToggle("Password", nullptr, buf, IM_ARRAYSIZE(buf), &reveal);
+    /// \endcode
+    inline bool InputTextWithIconToggle(
             const char* label,
             const char* hint,
             char*       buf,
@@ -41,7 +54,7 @@ namespace ImGuiX::Widgets {
         );
 
 #   ifdef IMGUIX_DEMO
-    /// \brief Minimal demo: two fields, one plain validated, one password with VK.
+    /// \brief Show demo with password toggle and virtual keyboard.
     void DemoInputTextWithIconToggle();
 #   endif
 
