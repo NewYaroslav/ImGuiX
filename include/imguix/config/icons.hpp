@@ -38,10 +38,10 @@
 /// \brief Clipboard paste icon.
 #define IMGUIX_ICON_PASTE           u8"\uE2C8"
 
-/// \brief
+/// \brief Filter list icon.
 #define IMGUIX_ICON_FILTER_LIST     u8"\uE152"
 
-/// \brief
+/// \brief Timer icon.
 #define IMGUIX_ICON_TIMER           u8"\uE425"
 
 /// \brief Clock icon used for time pickers.
