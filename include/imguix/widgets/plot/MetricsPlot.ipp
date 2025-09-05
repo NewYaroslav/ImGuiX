@@ -58,7 +58,8 @@ namespace ImGuiX::Widgets {
                 ImPlot::GetStyle().PlotDefaultSize.y;
             h = ImMax(h, auto_height_min);
             if (cfg.auto_height_max > 0.0f) h = ImMin(h, cfg.auto_height_max);
-            return h;
+			if (cfg.cap_by_avail_y && avail_y > 0.0f) h = ImMin(h, avail_y);
+            return ImRound(h);
         };
         
         auto IsSeriesVisible = [&](const char* label)->bool {

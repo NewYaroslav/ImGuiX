@@ -30,8 +30,8 @@ namespace ImGuiX::Widgets {
         bool list_bordered       = false;           ///< внутренняя рамка скролл-списка
         bool y_axis_right        = true;            ///< выводить шкалу/тик-лейблы Y справа (East)
         bool left_panel_bordered = true;            ///< рамка/фон у левой панели с чекбоксами
-        bool cap_by_avail_y      = true;            ///< ограничивать доступной высото
-        bool  show_tooltip            = true;       ///< включить тултипы
+        bool cap_by_avail_y      = false;           ///< ограничивать доступной высоту
+        bool show_tooltip        = true;            ///< включить тултипы
         float bar_tooltip_snap_factor = 0.55f;      ///< Bars: допуск по оси X как доля ширины бара (0..1). 0.5 == половина ширины.
         float line_tooltip_snap_px    = 18.0f;      ///< Lines: допуск в пикселях до ближайшей точки
         float plot_height     = 0.0f;               ///< Height of the plot area.
