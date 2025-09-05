@@ -9,7 +9,6 @@
 /// \note Multiline is not supported here.
 
 #include <imgui.h>
-#include <imgui_internal.h> // ButtonBehavior, RenderFrameBorder, etc.
 
 namespace ImGuiX::Widgets {
 
