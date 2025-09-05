@@ -1,3 +1,4 @@
+#include <cassert>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -74,18 +75,16 @@ int main() {
     MyEvent event("Hello world!");
     listener.notify(event);
 
-    if (!listener.received || !callback_received) {
-        std::cerr << "Test failed: not all listeners received event\n";
-        std::cin.get();
-        return 1;
-    }
+    bool success = listener.received && callback_received;
+    assert(success && "Test failed: not all listeners received event");
 
     // Test asynchronous queue
+    listener.received = false;
     auto async_event = std::make_unique<MyEvent>("From async queue");
     listener.notifyAsync(std::move(async_event));
     bus.process();
+    assert(listener.received && "Async event not processed");
 
     std::cout << "Test passed\n";
-    std::cin.get();
-    return 0;
+    return success ? 0 : 1;
 }
