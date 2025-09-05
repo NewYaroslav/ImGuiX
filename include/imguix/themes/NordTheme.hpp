@@ -2,8 +2,8 @@
 #ifndef _IMGUIX_THEMES_NORD_THEME_HPP_INCLUDED
 #define _IMGUIX_THEMES_NORD_THEME_HPP_INCLUDED
 
-/// @file NordTheme.hpp
-/// @brief Nord palette (Arctic Ice Studio) for ImGui/ImPlot.
+/// \file NordTheme.hpp
+/// \brief Nord palette (Arctic Ice Studio) for ImGui/ImPlot.
 ///
 /// Palette:
 ///  - Polar Night:  nord0 #2E3440, nord1 #3B4252, nord2 #434C5E, nord3 #4C566A
@@ -120,6 +120,8 @@ namespace NordConstants {
 
 class NordTheme final : public Theme {
 public:
+    /// \brief Apply theme colors to ImGui style.
+    /// \param style Target style.
     void apply(ImGuiStyle& style) const override {
         using namespace NordConstants;
         ImVec4* c = style.Colors;
@@ -204,6 +206,8 @@ public:
     }
 
 #ifdef IMGUI_ENABLE_IMPLOT
+    /// \brief Apply theme colors to ImPlot style.
+    /// \param style Target style.
     void apply(ImPlotStyle& style) const override {
         using namespace NordConstants;
         ImPlot::StyleColorsDark(&style);
@@ -234,6 +238,8 @@ public:
 #endif
 
 #ifdef IMGUI_ENABLE_IMPLOT3D
+    /// \brief Apply theme colors to ImPlot3D style.
+    /// \param style Target style.
     void apply(ImPlot3DStyle& style) const override {
         using namespace NordConstants;
         ImPlot3D::StyleColorsDark(&style);
@@ -258,9 +264,9 @@ public:
 #endif
 };
 
-/// @brief Register Nord in ThemeManager.
-/// @param tm Theme manager.
-/// @param id Unique id (defaults to "nord").
+/// \brief Register Nord in ThemeManager.
+/// \param tm Theme manager.
+/// \param id Unique id (defaults to "nord").
 inline void registerNordTheme(ThemeManager& tm, std::string id = "nord") {
     tm.registerTheme(std::move(id), std::make_unique<NordTheme>());
 }

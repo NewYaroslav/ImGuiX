@@ -104,6 +104,8 @@ namespace ImGuiX::Themes {
     /// \brief Green & Blue theme with tri-tone accent (green/teal/cyan), unified with default layout config.
     class GreenBlueTheme final : public Theme {
     public:
+        /// \brief Apply theme colors to ImGui style.
+        /// \param style Target style.
         void apply(ImGuiStyle& style) const override {
             using namespace GreenBlueConstants;
             ImVec4* colors = style.Colors;
@@ -197,6 +199,8 @@ namespace ImGuiX::Themes {
         }
 
 #ifdef IMGUI_ENABLE_IMPLOT
+        /// \brief Apply theme colors to ImPlot style.
+        /// \param style Target style.
         void apply(ImPlotStyle& style) const override {
             using namespace GreenBlueConstants;
 
@@ -228,6 +232,8 @@ namespace ImGuiX::Themes {
         }
 #endif
 #ifdef IMGUI_ENABLE_IMPLOT3D
+        /// \brief Apply theme colors to ImPlot3D style.
+        /// \param style Target style.
         void apply(ImPlot3DStyle& style) const override {
             using namespace GreenBlueConstants;
 
