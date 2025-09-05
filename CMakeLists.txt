@@ -528,6 +528,119 @@ endif()
 
 # ===== Examples =====
 if(IMGUIX_BUILD_EXAMPLES)
+    file(GLOB SMOKE_EXAMPLES CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/examples/smoke/*.cpp")
+
+    set(_IMGUI_DIR "${IMGUI_DIR}")
+    if(NOT _IMGUI_DIR)
+        set(_IMGUI_DIR "${PROJECT_SOURCE_DIR}/libs/imgui")
+    endif()
+
+    foreach(EXAMPLE_FILE ${SMOKE_EXAMPLES})
+        get_filename_component(EXAMPLE_NAME "${EXAMPLE_FILE}" NAME_WE)
+        add_executable(${EXAMPLE_NAME} "${EXAMPLE_FILE}")
+
+        target_compile_definitions(${EXAMPLE_NAME} PRIVATE IMGUIX_HEADER_ONLY)
+        target_compile_definitions(${EXAMPLE_NAME} PRIVATE IMGUIX_DEMO)
+
+        if(IMGUIX_USE_SFML_BACKEND)
+            target_compile_definitions(${EXAMPLE_NAME} PRIVATE IMGUIX_USE_SFML_BACKEND)
+        elseif(IMGUIX_USE_GLFW_BACKEND)
+            target_compile_definitions(${EXAMPLE_NAME} PRIVATE IMGUIX_USE_GLFW_BACKEND)
+        elseif(IMGUIX_USE_SDL2_BACKEND)
+            target_compile_definitions(${EXAMPLE_NAME} PRIVATE IMGUIX_USE_SDL2_BACKEND)
+        endif()
+
+        target_include_directories(${EXAMPLE_NAME} PRIVATE
+            "${CMAKE_CURRENT_LIST_DIR}/include"
+        )
+        target_include_directories(${EXAMPLE_NAME} PRIVATE
+            "${_IMGUI_DIR}/misc/cpp"
+        )
+
+        if(IMGUIX_IMGUI_FREETYPE)
+            target_compile_definitions(${EXAMPLE_NAME} PRIVATE IMGUI_ENABLE_FREETYPE)
+            target_include_directories(${EXAMPLE_NAME} PRIVATE
+                "${_IMGUI_DIR}/misc/freetype"
+            )
+            imguix_use_or_find_freetype(FREETYPE_TARGET)
+            target_link_libraries(${EXAMPLE_NAME} PRIVATE ${FREETYPE_TARGET})
+        endif()
+
+        target_link_libraries(${EXAMPLE_NAME} PRIVATE ${IMGUI_LIB} ${BACKEND_LIBS})
+        target_link_libraries(${EXAMPLE_NAME} PRIVATE fmt::fmt nlohmann_json::nlohmann_json)
+
+        if(IMGUIX_USE_IMPLOT)
+            target_compile_definitions(${EXAMPLE_NAME} PRIVATE IMGUI_ENABLE_IMPLOT)
+            target_link_libraries(${EXAMPLE_NAME} PRIVATE implot::implot)
+            imguix_add_implot_demo(${EXAMPLE_NAME})
+        endif()
+
+        if(IMGUIX_USE_IMPLOT3D)
+            target_compile_definitions(${EXAMPLE_NAME} PRIVATE IMGUI_ENABLE_IMPLOT3D)
+            target_link_libraries(${EXAMPLE_NAME} PRIVATE implot3d::implot3d)
+            imguix_add_implot3d_demo(${EXAMPLE_NAME})
+        endif()
+
+        if(IMGUIX_USE_IMNODEFLOW)
+            target_compile_definitions(${EXAMPLE_NAME} PRIVATE IMGUI_ENABLE_IMNODEFLOW)
+            target_link_libraries(${EXAMPLE_NAME} PRIVATE imnodeflow::imnodeflow)
+        endif()
+
+        if(IMGUIX_USE_PFD)
+            target_compile_definitions(${EXAMPLE_NAME} PRIVATE IMGUI_ENABLE_PFD)
+            target_link_libraries(${EXAMPLE_NAME} PRIVATE pfd::pfd)
+        endif()
+
+        if(IMGUIX_USE_IMGUIFILEDIALOG)
+            target_compile_definitions(${EXAMPLE_NAME} PRIVATE IMGUI_ENABLE_IMGUIFILEDIALOG)
+            target_link_libraries(${EXAMPLE_NAME} PRIVATE imguifiledialog::imguifiledialog)
+        endif()
+
+        if(IMGUIX_USE_IMTEXTEDITOR)
+            target_compile_definitions(${EXAMPLE_NAME} PRIVATE IMGUI_ENABLE_IMTEXTEDITOR)
+            target_link_libraries(${EXAMPLE_NAME} PRIVATE imtexteditor::imtexteditor)
+        endif()
+
+        if(IMGUIX_USE_IMCMD)
+            target_compile_definitions(${EXAMPLE_NAME} PRIVATE IMGUI_ENABLE_IMCMD)
+            target_link_libraries(${EXAMPLE_NAME} PRIVATE imcmd::imcmd)
+        endif()
+
+        if(IMGUIX_USE_IMCOOLBAR)
+            target_compile_definitions(${EXAMPLE_NAME} PRIVATE IMGUI_ENABLE_IMCOOLBAR)
+            target_link_libraries(${EXAMPLE_NAME} PRIVATE imcoolbar::imcoolbar)
+        endif()
+
+        if(IMGUIX_USE_IMSPINNER)
+            target_compile_definitions(${EXAMPLE_NAME} PRIVATE IMGUI_ENABLE_IMSPINNER)
+            target_link_libraries(${EXAMPLE_NAME} PRIVATE imspinner::imspinner)
+            target_compile_definitions(${EXAMPLE_NAME} PRIVATE IMSPINNER_DEMO)
+        endif()
+
+        if(IMGUIX_USE_IMGUI_MD)
+            target_compile_definitions(${EXAMPLE_NAME} PRIVATE IMGUI_ENABLE_IMGUI_MD)
+            target_link_libraries(${EXAMPLE_NAME} PRIVATE imgui_md::imgui_md)
+        endif()
+
+        imguix_add_imgui_demo(${EXAMPLE_NAME})
+
+        if(WIN32)
+            target_link_libraries(${EXAMPLE_NAME} PRIVATE gdi32 user32 comctl32 dwmapi)
+        endif()
+
+        imguix_add_assets(${EXAMPLE_NAME}
+            DEST_RUNTIME data
+            DIRS ${PROJECT_SOURCE_DIR}/assets/data
+            EXCLUDE_DIRS web
+        )
+
+        imguix_copy_and_embed_app_icon(${EXAMPLE_NAME})
+
+        set_target_properties(${EXAMPLE_NAME} PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/examples"
+        )
+    endforeach()
+
     add_subdirectory(examples/framed_showcase)
 endif()
 
