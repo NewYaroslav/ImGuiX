@@ -5,7 +5,8 @@ It provides a modular architecture for building **complex, multi-window UIs** wi
 
 - **MVC-inspired design** — windows, controllers, and models are clearly separated.
 - **Event-driven communication** — components interact through an internal event bus.
-- **Feature-local models** — controllers host lightweight models managed via a type-safe registry.
+- **Feature-local models** — define small `FeatureModel` classes per controller via
+  `FeatureAccessMixin`. See [Feature Models](docs/ARCHITECTURE.md#feature-models).
 - **Extensibility** — themes, fonts, widgets, and controllers can be registered and reused.
 - **Cross-backend support** — SFML, GLFW, SDL2, and Web/Emscripten.
 
@@ -82,6 +83,7 @@ int main() {
 
 - 💡 MVC-inspired architecture: controllers, model, view
 - 🔔 Built-in EventBus for communication between components
+- 🧩 Feature-local models via `FeatureModel` and `FeatureAccessMixin`
 - 📦 Ready-made controllers: SplashScreen, StartupMenu and others
 - 🌐 Multilingual support through JSON files
 - ⚙️ Settings storage (files or a database)

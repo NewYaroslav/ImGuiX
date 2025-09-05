@@ -78,6 +78,42 @@ maintainable.
   `notifyAsync` outside `process()`. Inside `process()` models can use the
   provided `SyncNotifier`.
 
+## Feature Models
+`FeatureModel` provides tiny state objects tied to a single controller.
+Use it when a controller needs persistent data or a helper task but a
+global model would be excessive.
+
+- Stored in a type-safe registry owned by the controller.
+- `process()` runs each frame on the UI thread.
+- Avoid direct ImGui calls; communicate via events if needed.
+
+Controllers inherit `FeatureAccessMixin` to manage feature models:
+
+```cpp
+struct Counter : model::FeatureModel {
+    using FeatureModel::FeatureModel;
+    int value = 0;
+    void process(Pubsub::SyncNotifier&) override { ++value; }
+};
+
+class DemoController : public Controller {
+public:
+    using Controller::Controller;
+
+    void drawContent() override {
+        const auto& c = feature<Counter>(
+            [&]{ return std::make_unique<Counter>(eventBus()); });
+        ImGui::Text("Frames %d", c.value);
+        withFeature<Counter>(
+            [&]{ return std::make_unique<Counter>(eventBus()); },
+            [](Counter& c){ if(ImGui::Button("Reset")) c.value = 0; });
+    }
+};
+```
+
+Call `requestClose()` to stop background work and
+`resetFeature<Counter>()` to remove a model.
+
 ## System Overview
 ```mermaid
 graph TD
