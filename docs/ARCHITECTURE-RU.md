@@ -80,6 +80,42 @@ ImGuiX сочетает подход **Immediate Mode GUI** из Dear ImGui с �
   `process()` используйте `notifyAsync`. Внутри `process()` доступен переданный
   `SyncNotifier`.
 
+## Локальные модели (FeatureModel)
+`FeatureModel` — компактная модель, принадлежащая одному контроллеру.
+Используйте её, когда контроллеру нужно хранить собственное состояние или
+выполнять фоновую задачу, а глобальная модель избыточна.
+
+- Хранится в типобезопасном реестре контроллера.
+- `process()` выполняется каждый кадр в UI-потоке.
+- Избегает прямых вызовов ImGui; при необходимости обменивается событиями.
+
+Контроллеры наследуют `FeatureAccessMixin` для управления моделями-фичами:
+
+```cpp
+struct Counter : model::FeatureModel {
+    using FeatureModel::FeatureModel;
+    int value = 0;
+    void process(Pubsub::SyncNotifier&) override { ++value; }
+};
+
+class DemoController : public Controller {
+public:
+    using Controller::Controller;
+
+    void drawContent() override {
+        const auto& c = feature<Counter>(
+            [&]{ return std::make_unique<Counter>(eventBus()); });
+        ImGui::Text("Frames %d", c.value);
+        withFeature<Counter>(
+            [&]{ return std::make_unique<Counter>(eventBus()); },
+            [](Counter& c){ if(ImGui::Button("Reset")) c.value = 0; });
+    }
+};
+```
+
+Для остановки фоновой работы вызовите `requestClose()`,
+а для удаления модели — `resetFeature<Counter>()`.
+
 ## Обзор системы
 ```mermaid
 graph TD
