@@ -23,21 +23,21 @@ namespace ImGuiX::Widgets {
         const char *legend_checkbox = u8"Legend";   ///< Legend checkbox label.
         const char *button_show_all = u8"Show all"; ///< Select all button label.
         const char *button_reset = u8"Reset";       ///< Reset selection button label.
-        const char* left_list_header = nullptr;     ///< e.g. "Series" (nullptr => просто линия)
-        const char* settings_header = u8"Chart settings"; ///<
+        const char* left_list_header = nullptr;     ///< e.g. "Series"; nullptr shows plain line.
+        const char* settings_header = u8"Chart settings"; ///< Settings section header.
         const char *value_fmt = "%+.2f";            ///< Format for values.
         const char *label_value_fmt = "%s = %+.2f"; ///< Annotation format.
-        bool list_bordered       = false;           ///< внутренняя рамка скролл-списка
-        bool y_axis_right        = true;            ///< выводить шкалу/тик-лейблы Y справа (East)
-        bool left_panel_bordered = true;            ///< рамка/фон у левой панели с чекбоксами
-        bool cap_by_avail_y      = false;           ///< ограничивать доступной высоту
-        bool show_tooltip        = true;            ///< включить тултипы
-        float bar_tooltip_snap_factor = 0.55f;      ///< Bars: допуск по оси X как доля ширины бара (0..1). 0.5 == половина ширины.
-        float line_tooltip_snap_px    = 18.0f;      ///< Lines: допуск в пикселях до ближайшей точки
+        bool list_bordered       = false;           ///< Inner border for scroll list.
+        bool y_axis_right        = true;            ///< Draw Y axis labels on the right.
+        bool left_panel_bordered = true;            ///< Border or background for left checkbox panel.
+        bool cap_by_avail_y      = false;           ///< Limit height by available space.
+        bool show_tooltip        = true;            ///< Enable tooltips.
+        float bar_tooltip_snap_factor = 0.55f;      ///< Bars: X tolerance as fraction of bar width (0..1). 0.5 equals half width.
+        float line_tooltip_snap_px    = 18.0f;      ///< Lines: tolerance in pixels to nearest point.
         float plot_height     = 0.0f;               ///< Height of the plot area.
-        float aspect_w_over_h = 2.0f;               ///< ширина / высота (2:1 по умолчанию)
-        float auto_height_min = 0.0f;               ///< нижняя граница для авто
-        float auto_height_max = 0.0f;               ///< 0 = без верхней грани
+        float aspect_w_over_h = 2.0f;               ///< Width to height ratio (2:1 default).
+        float auto_height_min = 0.0f;               ///< Lower bound for auto height.
+        float auto_height_max = 0.0f;               ///< 0 disables upper bound.
         float dnd_width       = 0.0f;               ///< Width of DND list (0 = auto).
         ImVec2 fit_padding{0.3f, 0.5f};             ///< Fit padding for auto-fit.
         int max_visible = 8; ///< Max items before legend disabled.
@@ -84,9 +84,9 @@ namespace ImGuiX::Widgets {
     void MetricsPlot(const MetricsPlotData &data, MetricsPlotState &state,
                      const MetricsPlotConfig &cfg = {});
                      
-    /// Simple engineering demo for MetricsPlot.
-    /// Shows: (1) categorical bars; (2) time-series lines.
-    /// Uses persistent static state to keep selections between frames.
+    /// \brief Engineering demo for MetricsPlot.
+    /// \details Shows: (1) categorical bars; (2) time-series lines.
+    /// \note Uses static state to persist selections between frames.
     inline void DemoMetricsPlot() {
         // ---------- 1) Bars: subsystem latency ----------
         ImGui::TextUnformatted("MetricsPlot / Bars: Subsystem latency");
@@ -96,13 +96,13 @@ namespace ImGuiX::Widgets {
             static bool init = false;
 
             if (!init) {
-                // Категории (инженерные подсистемы)
+                // Categories (subsystems)
                 const char* kLabels[] = {
                     "ADC","DSP","IO","CTRL","UI","NET","LOG","FS","DB","PHY","RF","PMU"
                 };
                 data.labels.assign(std::begin(kLabels), std::end(kLabels));
                 data.values.resize(data.labels.size());
-                // Синтетические значения (мс), частично отрицательные для демонстрации
+                // Synthetic values in ms; some negative for demo
                 for (size_t i = 0; i < data.values.size(); ++i)
                     data.values[i] = (i % 2 ? +1.0 : -1.0) * (5.0 + 3.0 * std::sin(0.45 * double(i)));
                 init = true;
@@ -114,7 +114,7 @@ namespace ImGuiX::Widgets {
             cfg.left_list_header = "Series";
             cfg.y_label      = "Latency, ms";
             cfg.plot_height  = 0.0f;
-            cfg.max_visible  = 8;            // >8 — легенду выключим
+            cfg.max_visible  = 8;            // >8 disables legend
             cfg.value_fmt    = "%+.2f";
             cfg.label_value_fmt = "%s = %+.2f";
 
@@ -129,17 +129,17 @@ namespace ImGuiX::Widgets {
             static bool init = false;
 
             if (!init) {
-                const int series = 3;  // три датчика
+                const int series = 3;  // three sensors
                 data.labels = { "Temp A", "Temp B", "Temp C" };
                 data.line_x.resize(series);
                 data.line_y.resize(series);
 
-                const int N = 120; // ~120 сэмплов времени
+                const int N = 120; // ~120 time samples
                 for (int s = 0; s < series; ++s) {
                     data.line_x[s].resize(N);
                     data.line_y[s].resize(N);
                     for (int i = 0; i < N; ++i) {
-                        data.line_x[s][i] = double(i); // время (условные секунды)
+                        data.line_x[s][i] = double(i); // time in seconds
                         data.line_y[s][i] = 25.0 + 2.0 * s + 5.0 * std::sin(0.08 * i + 0.6 * s);
                     }
                 }
@@ -154,7 +154,7 @@ namespace ImGuiX::Widgets {
             cfg.max_visible  = 8;
             cfg.value_fmt    = "%.1f";
 
-            // Линейный режим включается автоматически, когда data.values пустой
+            // Line mode enabled when data.values is empty
             data.values.clear();
             MetricsPlot(data, state, cfg);
         }

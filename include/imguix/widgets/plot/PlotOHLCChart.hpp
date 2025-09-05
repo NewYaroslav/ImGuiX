@@ -27,9 +27,9 @@ namespace ImGuiX::Widgets {
         ImVec4 bear_color = IMGUIX_COLOR_OHLC_BEAR; ///< Color for bearish candles.
         ImVec4 no_data_color = ImVec4(0.5f, 0.5f, 0.5f, 0.8f); ///< Color for no-data message.
         ImVec2 plot_size  = ImVec2(-1, 0);          ///< Plot size; (-1,0) uses full width.
-        ImVec2 overlay_padding = ImVec2(-1, -1);    ///< (-1,-1) => авто из стиля
-        
-        int price_decimals = 3; // Сколько знаков после запятой для цены
+        ImVec2 overlay_padding = ImVec2(-1, -1);    ///< (-1,-1) uses style values.
+
+        int price_decimals = 3; ///< Decimal precision for prices.
 
         bool enable_timeframes = true; ///< Show timeframe combo.
         std::vector<int> timeframes_seconds = {
@@ -56,15 +56,15 @@ namespace ImGuiX::Widgets {
         };
         std::vector<Line> user_lines; ///< User lines to draw over chart.
         
-        bool  follow_latest          = true;   ///< включать авто-фолловинг при появлении/обновлении данных
-        int   follow_bars            = 100;    ///< сколько последних баров держать в видимой области
-        float follow_right_pad_bars  = 5.0f;   ///< сколько "пустых" баров показывать справа (запас)
-        bool  follow_unlock_on_input = true;   ///< отключить фолловинг при ручном зуме/скролле/перетаскивании
+        bool  follow_latest          = true;   ///< Enable auto-follow on data update.
+        int   follow_bars            = 100;    ///< Number of recent bars kept visible.
+        float follow_right_pad_bars  = 5.0f;   ///< Extra empty bars on the right.
+        bool  follow_unlock_on_input = true;   ///< Disable follow on user input.
 
         bool show_tooltip = true; ///< Display tooltip on bar hover.
-        ImFont* no_data_font = nullptr;
+        ImFont* no_data_font = nullptr; ///< Font for no-data message.
         const char* no_data_text   = u8"No data available"; ///< Text shown when no bars.
-        const char* icon_last_page = u8"\uE5DD";
+        const char* icon_last_page = u8"\uE5DD"; ///< Icon for jump-to-last button.
     };
 
     /// \brief Render an OHLC chart.
@@ -93,8 +93,8 @@ namespace ImGuiX::Widgets {
         
         struct YAutoFitState {
             bool   pending = false;
-            double y_min = 0.0, y_max = 0.0; // то, что применим в СЛЕДУЮЩЕМ кадре
-            double last_vx0 = NAN, last_vx1 = NAN; // для дебага/фильтрации
+            double y_min = 0.0, y_max = 0.0; // values applied on next frame
+            double last_vx0 = NAN, last_vx1 = NAN; // for debugging/filtering
         };
         static YAutoFitState YF;
         
@@ -102,12 +102,12 @@ namespace ImGuiX::Widgets {
             size_t last_count = 0;
             double last_back_t = 0.0;
             bool   follow_active = true;
-            bool   need_jump_now = true; // чтобы один раз выставить окно при первом показе
+            bool   need_jump_now = true; // set initial window once on first show
         };
         static FollowState F;
         if (!config.follow_latest) F.follow_active = false;
         
-        // Выбрать формат даты/времени для тултипа по таймфрейму (в секундах)
+        // Select date/time format for tooltip based on timeframe in seconds
         auto PickDateTimeSpec = [](int tf_sec, bool use24h, bool use_iso) -> ImPlotDateTimeSpec {
             using namespace ImPlot;
             
@@ -205,7 +205,7 @@ namespace ImGuiX::Widgets {
         char price_fmt[16];
         std::snprintf(price_fmt, sizeof(price_fmt), "%%.%df", dec);
 
-        // --- X-лимиты и базовая ширина тела свечи ---
+        // X limits and base candle body width
         const double x0 = Adapter::getTime(bars.front());
         const double x1 = Adapter::getTime(bars.back());
 
@@ -216,7 +216,7 @@ namespace ImGuiX::Widgets {
         }
         const double half_w = tf_sec * kBarHalfWidthFactor;
 
-        // --- начальный общий диапазон Y (на всю историю) ---
+        // Initial Y range over entire history
         double y_min = Adapter::getLow (bars.front());
         double y_max = Adapter::getHigh(bars.front());
 
@@ -233,13 +233,13 @@ namespace ImGuiX::Widgets {
 
         double ypad0 = pad(y_min, y_max);
 
-        // --- событие: данные обновились (новые бары или сдвиг последнего бара) ---
+        // Event: data updated (new bars or last bar shift)
         const bool data_changed = (F.last_count != bars.size()) || (F.last_back_t != x1);
         if (data_changed) {
             F.last_count = bars.size();
             F.last_back_t = x1;
             if (config.follow_latest)
-                F.need_jump_now = true; // в следующем кадре перепрыгнем
+                F.need_jump_now = true; // jump in next frame
         }
         
         const double right = x1 + tf_sec * config.follow_right_pad_bars;
@@ -264,22 +264,22 @@ namespace ImGuiX::Widgets {
                 YF.pending = false;
             }
 
-            // --- авто-прыжок к последним N барам (только если Follow активен) ---
+        // Auto-jump to last N bars when follow active
             if (F.follow_active && (F.need_jump_now || data_changed)) {
                 ImPlot::SetupAxisLimits(ImAxis_X1, left, right, ImPlotCond_Always);
-                F.need_jump_now = false; // больше не прыгать, пока новые данные не придут
+                F.need_jump_now = false; // no more jumps until new data arrives
             }
 
             ImPlot::SetupAxesLimits(x0, x1, y_min - ypad0, y_max + ypad0, ImPlotCond_Once);
 
-            // --- если пользователь зумит/скроллит/таскает — разблокируем follow ---
+        // Unlock follow when user zooms, scrolls or drags
             if (config.follow_unlock_on_input && F.follow_active) {
                 bool user_nav =
                     (ImPlot::IsPlotHovered() &&
                      (ImGui::IsMouseDragging(ImGuiMouseButton_Left) ||
                       ImGui::IsMouseDragging(ImGuiMouseButton_Right) ||
                       ImGui::GetIO().MouseWheel != 0.0f)) ||
-                    ImPlot::IsAxisHovered(ImAxis_X1); // перетаскивание по оси
+                    ImPlot::IsAxisHovered(ImAxis_X1); // axis drag
                 if (user_nav) F.follow_active = false;
             }
 
@@ -291,7 +291,7 @@ namespace ImGuiX::Widgets {
                 ImPlotPoint mouse = ImPlot::GetPlotMousePos();
                 mouse.x = ImPlot::RoundTime(ImPlotTime::FromDouble(mouse.x), ImPlotTimeUnit_S).ToDouble();
 
-                const double tol = 0.45 * tf_sec; // допуск на привязку к бару по X
+                const double tol = 0.45 * tf_sec; // X snap tolerance to bar
                 auto it = std::find_if(bars.begin(), bars.end(), [&](const T& bar){
                     return std::abs(Adapter::getTime(bar) - mouse.x) < tol;
                 });
@@ -304,7 +304,7 @@ namespace ImGuiX::Widgets {
                     
                     auto PrintPrice = [&](const char* label, double v) {
                         char fmt[32];
-                        std::snprintf(fmt, sizeof(fmt), "%s  %s", label, price_fmt); // например "Open:  %.5f"
+                        std::snprintf(fmt, sizeof(fmt), "%s  %s", label, price_fmt); // e.g. "Open:  %.5f"
                         ImGui::Text(fmt, v);
                     };
 
@@ -318,18 +318,18 @@ namespace ImGuiX::Widgets {
                 }
             }
             
-            // --- рисуем бары ---
-            
-            // helpers для пиксель-перфекта
+            // Render bars
+
+            // Helpers for pixel-perfect rendering
             auto SnapHalf = [](float x) -> float { return std::floor(x) + 0.5f; };
             auto PxX = [](double tx) -> float { return ImPlot::PlotToPixels(tx, 0.0).x; };
             auto PxY = [](double ty) -> float { return ImPlot::PlotToPixels(0.0, ty).y; };
 
-            // параметры (можете вынести в config)
-            const float kMinBodyPx       = 1.0f;  // минимальная ширина тела в пикселях
-            const float kThinThresholdPx = 2.0f;  // ниже — рисуем «тонким режимом»
-            const float kWickThickness   = 1.0f;  // толщина фитиля в пикселях
-            const float kBodyLineThick   = 1.0f;  // толщина тела в тонком режиме
+            // Parameters (could move to config)
+            const float kMinBodyPx       = 1.0f;  // minimum body width in pixels
+            const float kThinThresholdPx = 2.0f;  // below this draw in thin mode
+            const float kWickThickness   = 1.0f;  // wick thickness in pixels
+            const float kBodyLineThick   = 1.0f;  // body thickness in thin mode
 
             for (const auto& bar : bars) {
                 const double t = Adapter::getTime(bar);
@@ -340,41 +340,41 @@ namespace ImGuiX::Widgets {
 
                 const ImU32 col = ImGui::GetColorU32(c >= o ? config.bull_color : config.bear_color);
 
-                // центр и ширина тела в ПИКСЕЛЯХ (из времени)
+                // Body center and width in pixels (from time)
                 float xL = PxX(t - half_w);
                 float xR = PxX(t + half_w);
                 if (xL > xR) std::swap(xL, xR);
-                float cx = 0.5f * (xL + xR);        // центр тела (до снэпа)
-                float wpx = ImMax(kMinBodyPx, xR - xL); // ширина тела в пикселях (не меньше 1px)
+                float cx = 0.5f * (xL + xR);        // body center before snapping
+                float wpx = ImMax(kMinBodyPx, xR - xL); // body width in pixels, at least 1px
 
-                // снэпим к half-pixel, чтобы 1px-линии были чёткими
+                // Snap to half-pixel for crisp 1px lines
                 cx = SnapHalf(cx);
                 float half = 0.5f * wpx;
                 float left  = SnapHalf(cx - half);
                 float right = SnapHalf(cx + half);
-                if (right - left < kMinBodyPx) { // гарантируем минимум 1px
+                if (right - left < kMinBodyPx) { // ensure at least 1px
                     left = cx - 0.5f; right = cx + 0.5f;
                 }
 
-                // Y-координаты в пикселях
+                // Y coordinates in pixels
                 float yO = PxY(o);
                 float yH = PxY(h);
                 float yL = PxY(l);
                 float yC = PxY(c);
 
-                // фитиль строго по центру тела
+                // Wick centered on body
                 ImVec2 wickTop (cx, yH);
                 ImVec2 wickBot (cx, yL);
 
-                // (опционально) локально отключить AA для линий — ещё чуть чётче
+                // Optionally disable AA for lines for extra sharpness
                 const ImDrawListFlags old_flags = draw->Flags;
                 draw->Flags &= ~ImDrawListFlags_AntiAliasedLines;
 
                 draw->AddLine(wickBot, wickTop, col, kWickThickness);
 
-                // тело
+                // Body
                 if ((right - left) <= kThinThresholdPx) {
-                    // тонкий режим: просто вертикальная «свеча» между open/close
+                    // Thin mode: vertical candle between open and close
                     draw->AddLine(ImVec2(cx, yO), ImVec2(cx, yC), col, kBodyLineThick);
                 } else {
                     ImVec2 p0(left,  ImMin(yO, yC));
@@ -382,10 +382,10 @@ namespace ImGuiX::Widgets {
                     draw->AddRectFilled(p0, p1, col);
                 }
 
-                draw->Flags = old_flags; // восстановить AA
+                draw->Flags = old_flags; // restore AA
             }
             
-            // пользовательские линии
+            // User lines
             if (config.enable_lines) {
                 for (const auto& line : config.user_lines) {
                     draw->AddLine(ImPlot::PlotToPixels(line.x1, line.y1),
@@ -395,7 +395,7 @@ namespace ImGuiX::Widgets {
                 }
             }
             
-            // === Кнопка "к последним барам" внутри плота ===
+            // Button jump to latest bars inside plot
             {
                 const ImVec2 plot_pos  = ImPlot::GetPlotPos();
                 const ImVec2 plot_size = ImPlot::GetPlotSize();
@@ -406,25 +406,25 @@ namespace ImGuiX::Widgets {
                     pad = s.ItemInnerSpacing;
                 }
 
-                // Квадратная кнопка размером с высоту текущего фрейма
+                // Square button sized by current frame height
                 const float btn_w = ImGui::GetFrameHeight();
 
-                // Позиция: правый верхний угол плота с паддингом
+                // Position: top-right corner with padding
                 const ImVec2 btn_pos(plot_pos.x + plot_size.x - pad.x - btn_w,
                                      plot_pos.y + pad.y);
 
-                // Клипим в область плота (для ImGui-виджетов используем ImGui::PushClipRect)
+                // Clip to plot area (use ImGui::PushClipRect for ImGui widgets)
                 ImGui::PushClipRect(plot_pos,
                                     ImVec2(plot_pos.x + plot_size.x, plot_pos.y + plot_size.y),
                                     true);
 
-                // Абсолютно ставим курсор и рисуем твою кнопку
+                // Set cursor absolutely and draw button
                 ImGui::SetCursorScreenPos(btn_pos);
 
                 ImGuiX::Widgets::IconButtonConfig ibc;
                 ibc.appear_on_hover = true;
 
-                // Material Icons: "last_page" ▶|   (U+E5DD). Можно fast_forward: U+E01F
+                // Material Icons: "last_page" ▶| (U+E5DD). Alt: fast_forward U+E01F
                 constexpr const char* ICON_LAST_PAGE = u8"\uE5DD";
 
                 if (ImGuiX::Widgets::IconButtonCentered("jump_last_inplot", config.icon_last_page, ibc)) {
@@ -437,7 +437,7 @@ namespace ImGuiX::Widgets {
                 ImGui::PopClipRect();
             }
             
-            // контекст-попап по ПКМ
+            // Context popup via right mouse button
             if (ImPlot::IsPlotHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
                 ImGui::OpenPopup("##ohlc_custom_menu");
             }
@@ -445,27 +445,27 @@ namespace ImGuiX::Widgets {
                 ImGui::TextUnformatted("Chart settings");
                 ImGui::Separator();
 
-                // пример: управление фолловингом — это ваш runtime-state
+                // Example: manage follow state via runtime data
                 ImGui::Checkbox("Follow latest", &F.follow_active);
                 if (ImGui::MenuItem("Jump to latest")) { F.follow_active = true; F.need_jump_now = true; }
 
-                // static bool show_tt = config.show_tooltip; // и используйте show_tt вместо config.show_tooltip
+                // static bool show_tt = config.show_tooltip; use show_tt instead of config.show_tooltip
                 // ImGui::Checkbox("Tooltip", &show_tt);
 
                 ImGui::EndPopup();
             }
             
-            // --- захват видимого X и подготовка Y на СЛЕДУЮЩИЙ кадр ---
+            // Capture visible X and prepare Y for next frame
             {
-                // если пользователь сейчас тянет Y-ось — не вмешиваемся
+                // Skip if user drags Y axis
                 bool user_drag_y = ImPlot::IsAxisHovered(ImAxis_Y1) &&
                                    (ImGui::IsMouseDown(ImGuiMouseButton_Left) || ImGui::IsMouseDown(ImGuiMouseButton_Right));
                 if (!user_drag_y) {
-                    ImPlotRect view = ImPlot::GetPlotLimits(); // актуальные видимые лимиты в координатах осей
+                    ImPlotRect view = ImPlot::GetPlotLimits(); // current visible limits in axis coordinates
                     double vx0 = std::max(view.X.Min, Adapter::getTime(bars.front()));
                     double vx1 = std::min(view.X.Max, Adapter::getTime(bars.back()));
                     if (vx1 > vx0) {
-                        // быстрый поиск диапазона (bars отсортированы по времени)
+                        // Fast range search (bars sorted by time)
                         auto it0 = std::lower_bound(bars.begin(), bars.end(), vx0,
                             [](const T& b, double x){ return Adapter::getTime(b) < x; });
                         auto it1 = std::upper_bound(bars.begin(), bars.end(), vx1,
@@ -485,7 +485,7 @@ namespace ImGuiX::Widgets {
                             };
                             const double p = pad(yf_min, yf_max);
 
-                            // запомним — применим в начале следующего кадра
+                            // Store and apply at start of next frame
                             YF.y_min   = yf_min - p;
                             YF.y_max   = yf_max + p;
                             YF.pending = true;

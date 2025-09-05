@@ -42,28 +42,46 @@ namespace ImGuiX::Widgets {
 
         static_assert(scale_num <= scale_den,
                       "TimeScaleRatio must be <= 1 second (e.g. sec/ms/us).");
-        
+
+        /// \brief Return bar open price.
+        /// \param bar Source bar.
+        /// \return Open price.
         static double getOpen(const T& bar) {
             return static_cast<double>(std::invoke(Open, bar));
         }
-        
+
+        /// \brief Return bar high price.
+        /// \param bar Source bar.
+        /// \return High price.
         static double getHigh(const T& bar) {
             return static_cast<double>(std::invoke(High, bar));
         }
-        
+
+        /// \brief Return bar low price.
+        /// \param bar Source bar.
+        /// \return Low price.
         static double getLow(const T& bar) {
             return static_cast<double>(std::invoke(Low, bar));
         }
-        
+
+        /// \brief Return bar close price.
+        /// \param bar Source bar.
+        /// \return Close price.
         static double getClose(const T& bar) {
             return static_cast<double>(std::invoke(Close, bar));
         }
-        
+
+        /// \brief Return time scaled to seconds.
+        /// \param bar Source bar.
+        /// \return Time in seconds.
         static double getTime(const T& bar) {
             constexpr double scale = static_cast<double>(scale_num) / static_cast<double>(scale_den);
             return static_cast<double>(std::invoke(Time, bar)) * scale;
         }
 
+        /// \brief Convert time to ImPlotTime.
+        /// \param bar Source bar.
+        /// \return Precise timestamp.
         static ImPlotTime getTimeExact(const T& bar) {
             const auto raw = std::invoke(Time, bar);
             if constexpr (scale_num == 1 && scale_den == 1) {
@@ -85,6 +103,9 @@ namespace ImGuiX::Widgets {
             }
         }
 
+        /// \brief Return traded volume or 0 if unavailable.
+        /// \param bar Source bar.
+        /// \return Traded volume.
         static double getVolume(const T& bar) {
             if constexpr (Volume != nullptr) {
                 return static_cast<double>(std::invoke(Volume, bar));
@@ -94,6 +115,7 @@ namespace ImGuiX::Widgets {
     };
 
     /// \brief Default adapter for bars with members: open, high, low, close, time (ms).
+    /// \tparam T Bar type.
     template<typename T>
     using DefaultBarAdapter = BarAdapter<
         T,
