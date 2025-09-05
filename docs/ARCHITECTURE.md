@@ -46,6 +46,7 @@ maintainable.
 - **WindowManager** – creates and tracks windows.
 - **WindowInstance** – represents a single window and its rendering context.
 - **Controller** – combines per-frame logic and view rendering.
+- **FeatureModel** – lightweight controller-local model stored in a registry.
 - **Model** – user data or backends such as `OptionsStore`.
 - **EventBus** – asynchronous Publisher–Subscriber hub for decoupled messaging.
 - **ResourceRegistry** – thread-safe access to shared resources (fonts, themes,
@@ -56,6 +57,8 @@ maintainable.
   subclasses merge controller and view logic, and models hold persistent state.
 - **Event-driven communication**: components post events to `EventBus`; listeners
   are notified during `EventBus::process()`.
+- **Controller-local models**: controllers may host small feature models via a
+  type-safe registry; each runs on the UI thread and avoids direct ImGui calls.
 - **Lifecycle / Template Method**: windows and controllers expose hooks such as
   `onInit`, `drawContent`, and `drawUi` which the application loop invokes in a
   fixed order.

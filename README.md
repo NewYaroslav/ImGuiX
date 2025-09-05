@@ -5,6 +5,7 @@ It provides a modular architecture for building **complex, multi-window UIs** wi
 
 - **MVC-inspired design** — windows, controllers, and models are clearly separated.
 - **Event-driven communication** — components interact through an internal event bus.
+- **Feature-local models** — controllers host lightweight models managed via a type-safe registry.
 - **Extensibility** — themes, fonts, widgets, and controllers can be registered and reused.
 - **Cross-backend support** — SFML, GLFW, SDL2, and Web/Emscripten.
 

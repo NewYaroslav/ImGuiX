@@ -4,6 +4,7 @@
 
 /// \file Controller.hpp
 /// \brief Base class for window-attached logic/rendering controllers.
+/// \note Hosts lightweight feature models via FeatureAccessMixin.
 
 namespace ImGuiX {
 
@@ -12,7 +13,9 @@ namespace ImGuiX {
     /// \brief Base class for controllers that attach to a window.
     /// \note Provides access to window-level context, including event bus and resources.
     /// \note Override `drawContent()` and `drawUi()` to render content and interface.
-    class Controller : public Pubsub::EventMediator {
+    class Controller :
+        public Pubsub::EventMediator,
+        protected model::FeatureAccessMixin {
     public:
         /// \brief Constructs a controller bound to a window.
         /// \param window Reference to associated window control.
@@ -35,6 +38,12 @@ namespace ImGuiX {
 
         /// \brief Renders UI overlay (widgets, HUDs, debug).
         virtual void drawUi() = 0;
+
+        /// \brief Process all attached feature models.
+        /// \param sync Synchronous notifier bound to the event bus.
+        void processFeatures(Pubsub::SyncNotifier& sync) {
+            FeatureAccessMixin::processFeatures(sync);
+        }
 
         /// \brief Access the global event bus.
         /// \return Event bus.

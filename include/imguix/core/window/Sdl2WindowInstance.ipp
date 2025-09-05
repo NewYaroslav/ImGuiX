@@ -140,6 +140,10 @@ namespace ImGuiX {
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
         updateCurrentTheme();
+        Pubsub::SyncNotifier notifier{eventBus()};
+        for (auto& ctrl : m_controllers) {
+            ctrl->processFeatures(notifier);
+        }
     }
 
     void WindowInstance::present() {

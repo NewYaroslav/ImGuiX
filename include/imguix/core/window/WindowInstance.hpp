@@ -79,6 +79,7 @@ namespace ImGuiX {
         virtual void handleEvents();
 
         /// \brief Update logic for the current frame.
+        /// \note Invokes feature models of all attached controllers.
         virtual void tick();
 
         /// \brief Render scene content (e.g., world, game objects).
