@@ -120,6 +120,9 @@ namespace ImGuiX::Widgets {
     }
 
     /// \brief Convenience helper: Success (plain C-string).
+    /// \param ctrl Controller with a NotificationManager.
+    /// \param content Message text.
+    /// \param dismiss_ms Auto-dismiss delay in milliseconds.
     inline void NotifySuccess(Controller* ctrl, const char* content, int dismiss_ms = 0) {
         if (!ctrl || !content) return;
         Notify::Notification n(Notify::Type::Success, dismiss_ms);
@@ -128,6 +131,9 @@ namespace ImGuiX::Widgets {
     }
 
     /// \brief Convenience helper: Warning (plain C-string).
+    /// \param ctrl Controller with a NotificationManager.
+    /// \param content Message text.
+    /// \param dismiss_ms Auto-dismiss delay in milliseconds.
     inline void NotifyWarning(Controller* ctrl, const char* content, int dismiss_ms = 0) {
         if (!ctrl || !content) return;
         Notify::Notification n(Notify::Type::Warning, dismiss_ms);
@@ -136,6 +142,9 @@ namespace ImGuiX::Widgets {
     }
 
     /// \brief Convenience helper: Error (plain C-string).
+    /// \param ctrl Controller with a NotificationManager.
+    /// \param content Message text.
+    /// \param dismiss_ms Auto-dismiss delay in milliseconds.
     inline void NotifyError(Controller* ctrl, const char* content, int dismiss_ms = 0) {
         if (!ctrl || !content) return;
         Notify::Notification n(Notify::Type::Error, dismiss_ms);
@@ -144,6 +153,9 @@ namespace ImGuiX::Widgets {
     }
 
     /// \brief Convenience helper: Info (plain C-string).
+    /// \param ctrl Controller with a NotificationManager.
+    /// \param content Message text.
+    /// \param dismiss_ms Auto-dismiss delay in milliseconds.
     inline void NotifyInfo(Controller* ctrl, const char* content, int dismiss_ms = 0) {
         if (!ctrl || !content) return;
         Notify::Notification n(Notify::Type::Info, dismiss_ms);
