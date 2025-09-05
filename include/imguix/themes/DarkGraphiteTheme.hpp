@@ -100,6 +100,8 @@ namespace ImGuiX::Themes {
     /// \brief Dark graphite theme with blue/cyan accents, unified with default layout config.
     class DarkGraphiteTheme final : public Theme {
     public:
+        /// \brief Apply theme colors to ImGui style.
+        /// \param style Target style.
         void apply(ImGuiStyle& style) const override {
             using namespace DarkGraphiteConstants;
             ImVec4* colors = style.Colors;
@@ -183,6 +185,8 @@ namespace ImGuiX::Themes {
         }
 
 #ifdef IMGUI_ENABLE_IMPLOT
+        /// \brief Apply theme colors to ImPlot style.
+        /// \param style Target style.
         void apply(ImPlotStyle& style) const override {
             using namespace DarkGraphiteConstants;
 
@@ -212,6 +216,8 @@ namespace ImGuiX::Themes {
         }
 #endif
 #ifdef IMGUI_ENABLE_IMPLOT3D
+        /// \brief Apply theme colors to ImPlot3D style.
+        /// \param style Target style.
         void apply(ImPlot3DStyle& style) const override {
             using namespace DarkGraphiteConstants;
 

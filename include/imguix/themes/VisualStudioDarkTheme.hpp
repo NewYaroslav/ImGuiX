@@ -89,6 +89,8 @@ namespace ImGuiX::Themes {
     /// \brief Visual Studio-like dark theme, unified with default layout config.
     class VisualStudioDarkTheme final : public Theme {
     public:
+        /// \brief Apply theme colors to ImGui style.
+        /// \param style Target style.
         void apply(ImGuiStyle& style) const override {
             using namespace VisualStudioDarkConstants;
             ImVec4* colors = style.Colors;
@@ -172,6 +174,8 @@ namespace ImGuiX::Themes {
         }
 
 #ifdef IMGUI_ENABLE_IMPLOT
+        /// \brief Apply theme colors to ImPlot style.
+        /// \param style Target style.
         void apply(ImPlotStyle& style) const override {
             using namespace VisualStudioDarkConstants;
 
@@ -202,6 +206,8 @@ namespace ImGuiX::Themes {
         }
 #endif
 #ifdef IMGUI_ENABLE_IMPLOT3D
+        /// \brief Apply theme colors to ImPlot3D style.
+        /// \param style Target style.
         void apply(ImPlot3DStyle& style) const override {
             using namespace VisualStudioDarkConstants;
 

@@ -2,8 +2,8 @@
 #ifndef _IMGUIX_THEMES_TOKYO_NIGHT_STORM_THEME_HPP_INCLUDED
 #define _IMGUIX_THEMES_TOKYO_NIGHT_STORM_THEME_HPP_INCLUDED
 
-/// @file TokyoNightStormTheme.hpp
-/// @brief Tokyo Night — Storm variant for ImGui/ImPlot.
+/// \file TokyoNightStormTheme.hpp
+/// \brief Tokyo Night — Storm variant for ImGui/ImPlot.
 ///
 /// Aesthetics:
 ///  - stormy navy bg (#24283B), panels #1F2335, popups #1A1B26
@@ -115,6 +115,8 @@ namespace TokyoNightStormConstants {
 
 class TokyoNightStormTheme final : public Theme {
 public:
+    /// \brief Apply theme colors to ImGui style.
+    /// \param style Target style.
     void apply(ImGuiStyle& style) const override {
         using namespace TokyoNightStormConstants;
         ImVec4* c = style.Colors;
@@ -198,6 +200,8 @@ public:
     }
 
 #ifdef IMGUI_ENABLE_IMPLOT
+    /// \brief Apply theme colors to ImPlot style.
+    /// \param style Target style.
     void apply(ImPlotStyle& style) const override {
         using namespace TokyoNightStormConstants;
         ImPlot::StyleColorsDark(&style);
@@ -228,6 +232,8 @@ public:
 #endif
 
 #ifdef IMGUI_ENABLE_IMPLOT3D
+    /// \brief Apply theme colors to ImPlot3D style.
+    /// \param style Target style.
     void apply(ImPlot3DStyle& style) const override {
         using namespace TokyoNightStormConstants;
         ImPlot3D::StyleColorsDark(&style);
@@ -252,9 +258,9 @@ public:
 #endif
 };
 
-/// @brief Register Tokyo Night Storm in ThemeManager.
-/// @param tm Theme manager.
-/// @param id Unique id (defaults to "tokyo-night-storm").
+/// \brief Register Tokyo Night Storm in ThemeManager.
+/// \param tm Theme manager.
+/// \param id Unique id (defaults to "tokyo-night-storm").
 inline void registerTokyoNightStormTheme(ThemeManager& tm, std::string id = "tokyo-night-storm") {
     tm.registerTheme(std::move(id), std::make_unique<TokyoNightStormTheme>());
 }

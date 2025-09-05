@@ -107,6 +107,8 @@ namespace ImGuiX::Themes {
     /// \brief Deep dark theme with cyan and red accents, unified with default layout config.
     class DeepDarkTheme final : public Theme {
     public:
+        /// \brief Apply theme colors to ImGui style.
+        /// \param style Target style.
         void apply(ImGuiStyle& style) const override {
             using namespace DeepDarkConstants;
             ImVec4* colors = style.Colors;
@@ -200,6 +202,8 @@ namespace ImGuiX::Themes {
         }
 
 #ifdef IMGUI_ENABLE_IMPLOT
+        /// \brief Apply theme colors to ImPlot style.
+        /// \param style Target style.
         void apply(ImPlotStyle& style) const override {
             using namespace DeepDarkConstants;
 
@@ -231,6 +235,8 @@ namespace ImGuiX::Themes {
         }
 #endif
 #ifdef IMGUI_ENABLE_IMPLOT3D
+        /// \brief Apply theme colors to ImPlot3D style.
+        /// \param style Target style.
         void apply(ImPlot3DStyle& style) const override {
             using namespace DeepDarkConstants;
 

@@ -78,6 +78,8 @@ namespace ImGuiX::Themes {
     /// \brief Soft light theme with gentle grays and a blue accent, unified with default layout constants.
     class PearlLightTheme final : public Theme {
     public:
+        /// \brief Apply theme colors to ImGui style.
+        /// \param style Target style.
         void apply(ImGuiStyle& style) const override {
             using namespace PearlLightConstants;
             ImVec4* colors = style.Colors;
@@ -158,6 +160,8 @@ namespace ImGuiX::Themes {
         }
 
 #ifdef IMGUI_ENABLE_IMPLOT
+        /// \brief Apply theme colors to ImPlot style.
+        /// \param style Target style.
         void apply(ImPlotStyle& style) const override {
             using namespace PearlLightConstants;
 
@@ -183,6 +187,8 @@ namespace ImGuiX::Themes {
         }
 #endif
 #ifdef IMGUI_ENABLE_IMPLOT3D
+        /// \brief Apply theme colors to ImPlot3D style.
+        /// \param style Target style.
         void apply(ImPlot3DStyle& style) const override {
             using namespace PearlLightConstants;
 
