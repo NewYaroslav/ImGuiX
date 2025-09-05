@@ -105,6 +105,10 @@ namespace ImGuiX::Windows {
             m_window.clear(Extensions::ColorToSfml(m_config.clear_color));
         }
         updateCurrentTheme();
+        Pubsub::SyncNotifier notifier{eventBus()};
+        for (auto& ctrl : m_controllers) {
+            ctrl->processFeatures(notifier);
+        }
     }
 
     void ImGuiFramedWindow::drawUi() {

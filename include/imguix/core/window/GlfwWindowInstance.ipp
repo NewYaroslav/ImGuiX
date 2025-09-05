@@ -124,6 +124,10 @@ namespace ImGuiX {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         updateCurrentTheme();
+        Pubsub::SyncNotifier notifier{eventBus()};
+        for (auto& ctrl : m_controllers) {
+            ctrl->processFeatures(notifier);
+        }
     }
 
     void WindowInstance::present() {

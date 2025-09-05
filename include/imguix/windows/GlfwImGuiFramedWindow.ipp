@@ -46,6 +46,10 @@ namespace ImGuiX::Windows {
         }
         glClear(GL_COLOR_BUFFER_BIT);
         updateCurrentTheme();
+        Pubsub::SyncNotifier notifier{eventBus()};
+        for (auto& ctrl : m_controllers) {
+            ctrl->processFeatures(notifier);
+        }
     }
 
     void ImGuiFramedWindow::drawUi() {

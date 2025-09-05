@@ -171,6 +171,10 @@ namespace ImGuiX {
         ImGui::SFML::Update(m_window, res.delta());
         m_window.clear();
         updateCurrentTheme();
+        Pubsub::SyncNotifier notifier{eventBus()};
+        for (auto& ctrl : m_controllers) {
+            ctrl->processFeatures(notifier);
+        }
     }
     
     void WindowInstance::present() {

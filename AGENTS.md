@@ -107,6 +107,8 @@ graph LR
 * **Model Restrictions**: direct synchronous `notify` functions are deleted to avoid race conditions.
   Use `notifyAsync` outside of `process()`. Models may emit events synchronously via the
   `SyncNotifier` parameter passed into `process()`.
+* **Feature-local models**: controllers may own lightweight `FeatureModel` instances via
+  `FeatureAccessMixin`. They run on the UI thread and must avoid ImGui calls.
 
 ### UI Sizing & Combo Patterns
 

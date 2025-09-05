@@ -61,8 +61,10 @@
 // --- Controller and model interfaces ---
 #include "core/application/ApplicationContext.hpp" ///< Interface for application access
 #include "core/window/WindowInterface.hpp"         ///< Interface for window control
+#include "core/model/FeatureAccess.hpp"            ///< Controller feature model access
 #include "core/controller/Controller.hpp"          ///< Base interface for controllers
 #include "core/model/Model.hpp"                    ///< Base interface for models
+#include "core/model/FeatureModel.hpp"             ///< Base class for feature models
 
 // --- Windowing system ---
 #include "core/window/WindowInstance.hpp"          ///< Abstract window interface
