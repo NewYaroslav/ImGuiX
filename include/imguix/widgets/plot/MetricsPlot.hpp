@@ -46,6 +46,7 @@ namespace ImGuiX::Widgets {
     };
 
     /// \brief Data for MetricsPlot.
+    /// \invariant labels.size() equals values.size() when values not empty.
     struct MetricsPlotData {
         std::vector<std::string_view> labels;    ///< Category labels.
         std::vector<double> values;              ///< Bar values per category.
@@ -54,7 +55,9 @@ namespace ImGuiX::Widgets {
     };
 
     /// \brief Runtime state for MetricsPlot.
+    /// \invariant dnd.size() matches data.labels.size().
     struct MetricsPlotState {
+        /// \brief Drag-and-drop list item.
         struct DndItem {
             size_t index = 0;       ///< Index in data arrays.
             bool is_plot = false;   ///< True if item plotted.
@@ -70,23 +73,34 @@ namespace ImGuiX::Widgets {
 
     /// \brief Calculate default DND list width.
     /// \return Recommended width in pixels.
+    /// \thread_safety Not thread-safe.
     float CalcMetricsDndWidth();
 
     /// \brief Calculate button width inside DND list.
     /// \param dnd_width Width of the DND list.
+    /// \pre dnd_width > 0.0f.
     /// \return Button width.
+    /// \thread_safety Not thread-safe.
     float CalcMetricsDndButtonWidth(float dnd_width);
 
     /// \brief Render metrics plot with drag-and-drop selection.
     /// \param data Input data arrays.
     /// \param state Runtime state (modified in-place).
     /// \param cfg Widget configuration.
+    /// \thread_safety Not thread-safe.
+    /// \complexity O(m + n) where m is categories and n is total points.
+    /// \code{.cpp}
+    /// MetricsPlotData data;
+    /// MetricsPlotState state;
+    /// MetricsPlot(data, state);
+    /// \endcode
     void MetricsPlot(const MetricsPlotData &data, MetricsPlotState &state,
                      const MetricsPlotConfig &cfg = {});
                      
     /// \brief Engineering demo for MetricsPlot.
     /// \details Shows: (1) categorical bars; (2) time-series lines.
     /// \note Uses static state to persist selections between frames.
+    /// \thread_safety Not thread-safe.
     inline void DemoMetricsPlot() {
         // ---------- 1) Bars: subsystem latency ----------
         ImGui::TextUnformatted("MetricsPlot / Bars: Subsystem latency");
