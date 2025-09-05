@@ -41,6 +41,18 @@ namespace ImGuiX::Widgets {
                 item.label = c.data.labels[i];
                 item.color = ImPlot::GetColormapColor(static_cast<int>(i));
             }
+            // Force show-all mode: plot every series
+            if (c.cfg.force_all_visible) {
+                for (auto& it : c.state.dnd) it.is_plot = true;
+                
+                const int series = (int)c.state.dnd.size();
+                if (series >= c.cfg.max_visible) {
+                    if (c.state.show_legend) {
+                        c.state.show_legend = false;
+                        c.state.update_counter = kUpdateCounterMax;
+                    }
+                }
+            }
         }
 
         inline float calc_plot_height(const MetricsPlotConfig& cfg) {
@@ -55,7 +67,7 @@ namespace ImGuiX::Widgets {
             h = ImMax(h, auto_height_min);
             if (cfg.auto_height_max > 0.0f) h = ImMin(h, cfg.auto_height_max);
             if (cfg.cap_by_avail_y && avail_y > 0.0f) h = ImMin(h, avail_y);
-            return ImRound(h);
+            return IM_ROUND(h);
         }
 
         inline bool is_series_visible(const char* label) {
@@ -71,14 +83,18 @@ namespace ImGuiX::Widgets {
                     c.state.update_counter = kUpdateCounterMax;
                 }
             }
-
-            if (!c.state.show_legend && c.plotted >= c.cfg.max_visible) {
-                ImGui::BeginDisabled(true);
-                ImGui::Checkbox(c.cfg.legend_checkbox, &c.state.show_legend);
-                ImGui::EndDisabled();
-            } else {
-                ImGui::Checkbox(c.cfg.legend_checkbox, &c.state.show_legend);
+            
+            if (!c.cfg.legend_force_off) {
+                if (!c.state.show_legend && c.plotted >= c.cfg.max_visible) {
+                    ImGui::BeginDisabled(true);
+                    ImGui::Checkbox(c.cfg.legend_checkbox, &c.state.show_legend);
+                    ImGui::EndDisabled();
+                } else {
+                    ImGui::Checkbox(c.cfg.legend_checkbox, &c.state.show_legend);
+                }
             }
+
+            if (c.cfg.force_all_visible) return;
 
             if (ImGui::Button(c.cfg.button_show_all, ImVec2(c.btn_w, 0))) {
                 if (c.state.dnd.size() >= static_cast<size_t>(c.cfg.max_visible)) {
@@ -95,6 +111,12 @@ namespace ImGuiX::Widgets {
 
         inline void draw_left_panel(Ctx& c) {
             // Left panel with selectable series and DND source.
+            
+            c.plotted = 0;
+            for (const auto& it : c.state.dnd) {
+                if (it.is_plot) ++c.plotted;
+            }
+
             if (c.cfg.left_panel_bordered) {
                 const ImGuiStyle& st = ImGui::GetStyle();
                 ImGui::PushStyleColor(ImGuiCol_ChildBg, st.Colors[ImGuiCol_FrameBg]); // child bg
@@ -102,12 +124,8 @@ namespace ImGuiX::Widgets {
                 ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, st.FrameBorderSize); // child border
             }
 
-            c.plotted = 0;
             ImGui::BeginChild("##child_left", ImVec2(c.dnd_w, c.plot_h), ImGuiChildFlags_Borders);
             {
-                for (const auto& it : c.state.dnd) {
-                    if (it.is_plot) ++c.plotted;
-                }
 
                 draw_controls(c);
 
@@ -141,7 +159,7 @@ namespace ImGuiX::Widgets {
                             ImGui::EndTooltip();
                         }
 
-                        if (!c.state.show_legend || c.plotted < c.cfg.max_visible) {
+                        //if (!c.state.show_legend || c.plotted < c.cfg.max_visible) {
                             if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
                                 ImGui::SetDragDropPayload(c.cfg.dnd_payload, &k, sizeof(int));
                                 ImPlot::ItemIcon(it.color);
@@ -149,7 +167,7 @@ namespace ImGuiX::Widgets {
                                 ImGui::TextUnformatted(it.label.data());
                                 ImGui::EndDragDropSource();
                             }
-                        }
+                        //}
                     }
 
                     if (ImGui::BeginDragDropTarget()) {
@@ -276,12 +294,34 @@ namespace ImGuiX::Widgets {
         inline void draw_bars(Ctx& c) {
             // Plot bar series with annotation and tooltip.
             ImPlotAxisFlags y_flags = c.cfg.y_axis_right ? ImPlotAxisFlags_Opposite : ImPlotAxisFlags_None;
+            ImPlotAxisFlags x_flags = c.data.tick_labels_x.empty() ? ImPlotAxisFlags_NoTickLabels : ImPlotAxisFlags_None;
+
             ImPlot::SetupAxis(ImAxis_Y1, c.cfg.y_label, y_flags);
-            ImPlot::SetupAxis(ImAxis_X1, c.cfg.x_label);
+            ImPlot::SetupAxis(ImAxis_X1, c.cfg.x_label, x_flags);
             ImPlot::SetupAxisFormat(ImAxis_Y1, c.cfg.value_fmt);
             ImPlot::SetupAxisFormat(ImAxis_X1, "");
-
+            
             const double bar_w = 0.67;
+
+            if (!c.data.tick_labels_x.empty()) {
+                std::vector<double> xs; 
+                xs.reserve(c.state.dnd.size());
+                std::vector<const char*> lbls; lbls.reserve(c.state.dnd.size());
+                for (size_t k = 0, i = 0; k < c.state.dnd.size(); ++k) {
+                    const auto& it = c.state.dnd[k];
+                    if (!it.is_plot) continue;
+                    xs.push_back((double)i);
+                    lbls.push_back((it.index < c.data.tick_labels_x.size()) ? 
+                        c.data.tick_labels_x[it.index].c_str() : 
+                        it.label.data()); // fallback
+                    ++i;
+                }
+                if (!xs.empty()) {
+                    ImPlot::SetupAxisTicks(ImAxis_X1, xs.data(), (int)xs.size(), lbls.data(), /*keep_auto=*/false);
+                }
+                const int m = (int)xs.size();
+                ImPlot::SetupAxisLimits(ImAxis_X1, -bar_w, (m - 1.0) + bar_w, ImGuiCond_Always);
+            }
 
             std::vector<char*> labels_ptr(c.state.dnd.size());
             for (size_t k = 0; k < c.state.dnd.size(); ++k) {
@@ -371,8 +411,12 @@ namespace ImGuiX::Widgets {
 
         inline void draw_plot(Ctx& c) {
             // Plot area with drag-drop, crosshair and context popup.
+            
+            const bool left_panel_hidden = c.cfg.force_all_visible;  // или другая ваша логика
+            bool want_legend = !c.cfg.legend_force_off && c.state.show_legend;
+
             int flags = ImPlotFlags_None | ImPlotFlags_NoMenus | ImPlotFlags_NoFrame;
-            flags |= c.state.show_legend ? ImPlotFlags_None : ImPlotFlags_NoLegend;
+            flags |= want_legend ? ImPlotFlags_None : ImPlotFlags_NoLegend;
 
             if (c.state.update_counter > 0) {
                 if (c.state.update_counter == kUpdateCounterMax || c.state.update_counter == 1) {
@@ -384,7 +428,12 @@ namespace ImGuiX::Widgets {
 
             ImPlot::PushStyleVar(ImPlotStyleVar_FitPadding, c.cfg.fit_padding); // FitPadding
             if (ImPlot::BeginPlot(c.cfg.id, ImVec2(-1, c.plot_h), flags)) {
-                ImPlot::SetupLegend(ImPlotLocation_West);
+                //ImPlot::SetupLegend(ImPlotLocation_West);
+                {
+                    const ImPlotLocation    loc  = left_panel_hidden ? c.cfg.legend_loc_compact  : c.cfg.legend_loc;
+                    const ImPlotLegendFlags lflg = left_panel_hidden ? c.cfg.legend_flags_compact: c.cfg.legend_flags;
+                    ImPlot::SetupLegend(loc, lflg);
+                }
 
                 if (c.data.values.empty()) {
                     draw_lines(c);
@@ -397,6 +446,18 @@ namespace ImGuiX::Widgets {
                             ImGui::AcceptDragDropPayload(c.cfg.dnd_payload)) {
                         int i = *static_cast<const int*>(payload->Data);
                         if (i >= 0 && static_cast<size_t>(i) < c.state.dnd.size()) {
+                            const bool was_plot = c.state.dnd[i].is_plot;
+                            if (!was_plot) {
+                                int cnt = 0;
+                                for (const auto& d : c.state.dnd) { 
+                                    if (d.is_plot) ++cnt;
+                                }
+                                ++cnt;
+                                if (c.state.show_legend && cnt > c.cfg.max_visible) {
+                                    c.state.show_legend = false;
+                                }
+                            }
+                            
                             c.state.dnd[i].is_plot = true;
                             c.state.update_counter = kUpdateCounterMax;
                         }
@@ -409,6 +470,18 @@ namespace ImGuiX::Widgets {
                             ImGui::AcceptDragDropPayload(c.cfg.dnd_payload)) {
                         int i = *static_cast<const int*>(payload->Data);
                         if (i >= 0 && static_cast<size_t>(i) < c.state.dnd.size()) {
+                            const bool was_plot = c.state.dnd[i].is_plot;
+                            if (!was_plot) {
+                                int cnt = 0;
+                                for (const auto& d : c.state.dnd) { 
+                                    if (d.is_plot) ++cnt;
+                                }
+                                ++cnt;
+                                if (c.state.show_legend && cnt > c.cfg.max_visible) {
+                                    c.state.show_legend = false;
+                                }
+                            }
+
                             c.state.dnd[i].is_plot = true;
                             c.state.update_counter = kUpdateCounterMax;
                         }
@@ -446,10 +519,42 @@ namespace ImGuiX::Widgets {
         c.plot_h = IM_TRUNC(detail::calc_plot_height(cfg));
 
         detail::sync_dnd(c);
+        
+        if (!c.state.initialized) {
+            auto mark_plot = [&](int idx) {
+                if (idx >= 0 && idx < (int)state.dnd.size())
+                    state.dnd[idx].is_plot = true;
+            };
+            
+            if (!c.cfg.default_show_indices.empty()) {
+                for (int idx : c.cfg.default_show_indices) mark_plot(idx);
+                c.state.update_counter = detail::kUpdateCounterMax;
+            } else 
+            if (c.cfg.default_show_index >= 0) {
+                mark_plot(c.cfg.default_show_index);
+                c.state.update_counter = detail::kUpdateCounterMax;
+            }
+            
+            int cnt = 0; 
+            for (auto& it : c.state.dnd) if (it.is_plot) ++cnt;
+            if (c.state.show_legend && cnt > c.cfg.max_visible) {
+                c.state.show_legend = false;
+            }
+
+            c.state.show_annotation = c.cfg.annotations_default_on;
+            c.state.initialized     = true;
+        }
 
         ImGui::BeginGroup();
-        detail::draw_left_panel(c);
-        ImGui::SameLine();
+        if (!c.cfg.force_all_visible) {
+            detail::draw_left_panel(c);
+            ImGui::SameLine();
+        } else {
+            c.plotted = 0;
+            for (const auto& it : c.state.dnd) {
+                if (it.is_plot) ++c.plotted;
+            }
+        }
         detail::begin_right_child(c);
         detail::draw_plot(c);
         detail::end_right_child();

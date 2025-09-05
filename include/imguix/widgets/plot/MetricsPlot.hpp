@@ -27,13 +27,22 @@ namespace ImGuiX::Widgets {
         const char* settings_header = u8"Chart settings"; ///< Settings section header.
         const char *value_fmt = "%+.2f";            ///< Format for values.
         const char *label_value_fmt = "%s = %+.2f"; ///< Annotation format.
+        bool annotations_default_on = true;         ///< дефолтный показ аннотаций (только для bars)
         bool list_bordered       = false;           ///< Inner border for scroll list.
         bool y_axis_right        = true;            ///< Draw Y axis labels on the right.
         bool left_panel_bordered = true;            ///< Border or background for left checkbox panel.
         bool cap_by_avail_y      = false;           ///< Limit height by available space.
         bool show_tooltip        = true;            ///< Enable tooltips.
-        float bar_tooltip_snap_factor = 0.55f;      ///< Bars: X tolerance as fraction of bar width (0..1). 0.5 equals half width.
-        float line_tooltip_snap_px    = 18.0f;      ///< Lines: tolerance in pixels to nearest point.
+        bool force_all_visible  = false;            ///< If true: all series are always plotted; left panel is hidden; menu shows only annotations.
+        bool legend_force_off = false;              ///< Жёстко отключить легенду (игнорирует state.show_legend)
+        ImPlotLocation    legend_loc    = ImPlotLocation_West;
+        ImPlotLegendFlags legend_flags  = ImPlotLegendFlags_None;
+        ImPlotLocation    legend_loc_compact   = ImPlotLocation_West;
+        ImPlotLegendFlags legend_flags_compact = ImPlotLegendFlags_Outside;
+        int default_show_index = -1;                ///< Одна серия по умолчанию; -1 = нет
+        std::vector<int> default_show_indices;      ///< несколько серий; пусто = нет
+        float bar_tooltip_snap_factor = 0.7f;       ///< Bars: X tolerance as fraction of bar width (0..1). 0.5 equals half width.
+        float line_tooltip_snap_px    = 8.0f;       ///< Lines: tolerance in pixels to nearest point.
         float plot_height     = 0.0f;               ///< Height of the plot area.
         float aspect_w_over_h = 2.0f;               ///< Width to height ratio (2:1 default).
         float auto_height_min = 0.0f;               ///< Lower bound for auto height.
@@ -52,6 +61,7 @@ namespace ImGuiX::Widgets {
         std::vector<double> values;              ///< Bar values per category.
         std::vector<std::vector<double>> line_x; ///< Line X coordinates.
         std::vector<std::vector<double>> line_y; ///< Line Y coordinates.
+        std::vector<std::string> tick_labels_x;  ///<
     };
 
     /// \brief Runtime state for MetricsPlot.
@@ -69,6 +79,7 @@ namespace ImGuiX::Widgets {
         bool show_annotation = true; ///< Show value annotations.
         bool show_legend = true;     ///< Show legend.
         int update_counter = 0;      ///< Auto-fit counter.
+        bool initialized = false;
     };
 
     /// \brief Calculate default DND list width.
@@ -97,6 +108,7 @@ namespace ImGuiX::Widgets {
     void MetricsPlot(const MetricsPlotData &data, MetricsPlotState &state,
                      const MetricsPlotConfig &cfg = {});
                      
+#   ifdef IMGUIX_DEMO
     /// \brief Engineering demo for MetricsPlot.
     /// \details Shows: (1) categorical bars; (2) time-series lines.
     /// \note Uses static state to persist selections between frames.
@@ -134,8 +146,41 @@ namespace ImGuiX::Widgets {
 
             MetricsPlot(data, state, cfg);
         }
+        
+        // ---------- 2) Bars: Weekday metric (with X tick labels) ----------
+        ImGui::TextUnformatted("MetricsPlot / Bars: Weekday metric (with X tick labels)");
+        {
+            static MetricsPlotData  data;
+            static MetricsPlotState state;
+            static bool init = false;
 
-        // ---------- 2) Lines: temperatures over time ----------
+            if (!init) {
+                // 7 категорий — дни недели
+                const char* kDays[] = { "Mon","Tue","Wed","Thu","Fri","Sat","Sun" };
+                data.labels.assign(std::begin(kDays), std::end(kDays));
+
+                // Значения метрики (пример)
+                data.values = { 12.5, 9.8, 11.2, 10.7, 13.3, 7.4, 6.1 };
+
+                // ВКЛ подписи оси X: заданы в данных (декорации X появятся автоматически)
+                data.tick_labels_x = { "Mon","Tue","Wed","Thu","Fri","Sat","Sun" };
+
+                init = true;
+            }
+
+            MetricsPlotConfig cfg;
+            cfg.id              = "MetricsPlot_Bars_Weekday";
+            cfg.x_label         = "Weekday";
+            cfg.y_label         = "Metric";
+            cfg.value_fmt       = "%.1f";
+            cfg.label_value_fmt = "%s: %.1f";
+            cfg.max_visible     = 8;  // запас на будущее
+
+            // Бар-режим активен, т.к. values не пустой
+            MetricsPlot(data, state, cfg);
+        }
+
+        // ---------- 3) Lines: temperatures over time ----------
         ImGui::TextUnformatted("MetricsPlot / Lines: Sensor temperatures");
         {
             static MetricsPlotData  data;
@@ -167,12 +212,87 @@ namespace ImGuiX::Widgets {
             cfg.plot_height  = 0.0f;
             cfg.max_visible  = 8;
             cfg.value_fmt    = "%.1f";
+            cfg.default_show_index = 1;
 
             // Line mode enabled when data.values is empty
             data.values.clear();
             MetricsPlot(data, state, cfg);
         }
+        // ---------- 4) Compact: Bars, all series, no left panel ----------
+        ImGui::TextUnformatted("MetricsPlot / Compact: All series (no left panel)");
+        {
+            static MetricsPlotData  data;
+            static MetricsPlotState state;
+            static bool init = false;
+
+            if (!init) {
+                // Каналы CH0..CH9
+                const char* kLabels[] = { "CH0","CH1","CH2","CH3","CH4","CH5","CH6","CH7","CH8","CH9" };
+                data.labels.assign(std::begin(kLabels), std::end(kLabels));
+                data.values.resize(data.labels.size());
+                // Синтетический throughput (MB/s)
+                for (size_t i = 0; i < data.values.size(); ++i)
+                    data.values[i] = 120.0 + 35.0 * std::sin(0.4 * double(i));
+                init = true;
+            }
+
+            MetricsPlotConfig cfg;
+            cfg.id              = "MetricsPlot_CompactAll";
+            cfg.x_label         = "Channel";
+            cfg.y_label         = "Throughput, MB/s";
+            cfg.value_fmt       = "%.1f";
+            cfg.label_value_fmt = "%s: %.1f MB/s";
+            cfg.max_visible     = 16;                 // при >=6 легенда авто-скроется
+            cfg.force_all_visible = true;            // <-- ключ: без левого чилда, все серии на плоте
+
+            // Бар-режим (values не пустой), аннотации можно включать из контекст-меню
+            MetricsPlot(data, state, cfg);
+        }
+        // ---------- 5) Compact: Bars with X ticks (24h), legend forced off ----------
+        ImGui::TextUnformatted("MetricsPlot / Compact: Hourly metric (bars with X ticks, no legend)");
+        {
+            static MetricsPlotData  data;
+            static MetricsPlotState state;
+            static bool init = false;
+
+            if (!init) {
+                // 24 часа
+                static const char* kHours[] = {
+                    "00","01","02","03","04","05","06","07","08","09","10","11",
+                    "12","13","14","15","16","17","18","19","20","21","22","23"
+                };
+                // метки серий (для DnD/легенды; легенда будет выключена)
+                data.labels.assign(std::begin(kHours), std::end(kHours));
+                // тики X — показываем подписи часов на оси X
+                data.tick_labels_x.assign(std::begin(kHours), std::end(kHours));
+
+                // синтетическая почасовая метрика (диурнальный профиль)
+                data.values.resize(24);
+                for (int h = 0; h < 24; ++h) {
+                    double t = (2.0 * 3.14159265358979323846 * h) / 24.0;
+                    data.values[h] = 60.0
+                                   + 25.0 * std::sin(t - 3.14159265358979323846 * 0.5)
+                                   + 8.0  * std::sin(2.0 * t);
+                }
+                init = true;
+            }
+
+            MetricsPlotConfig cfg;
+            cfg.id                = "MetricsPlot_CompactAll_24h";
+            cfg.x_label           = "Hour";
+            cfg.y_label           = "Metric";
+            cfg.value_fmt         = "%.1f";
+            cfg.label_value_fmt   = "%s: %.1f";
+            cfg.max_visible       = 32;          // не критично: легенда всё равно офф
+            cfg.force_all_visible = true;        // без левой панели, все серии
+            cfg.legend_force_off  = true;        // легенда принудительно отключена
+            cfg.annotations_default_on = false;
+
+            // Бар-режим (values не пустой); тики X появятся из data.tick_labels_x
+            MetricsPlot(data, state, cfg);
+        }
     }
+#   endif
 
 } // namespace ImGuiX::Widgets
 
