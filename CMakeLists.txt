@@ -245,10 +245,12 @@ if(IMGUIX_HEADER_ONLY)
 
     if(IMGUIX_USE_IMPLOT)
         target_compile_definitions(imguix INTERFACE IMGUI_ENABLE_IMPLOT)
+        target_link_libraries(imguix INTERFACE ${IMPLOT_TARGET})
     endif()
 
     if(IMGUIX_USE_IMPLOT3D)
         target_compile_definitions(imguix INTERFACE IMGUI_ENABLE_IMPLOT3D)
+        target_link_libraries(imguix INTERFACE ${IMPLOT3D_TARGET})
     endif()
     
     if(IMGUIX_USE_IMNODEFLOW)
@@ -285,8 +287,6 @@ if(IMGUIX_HEADER_ONLY)
         target_compile_definitions(imguix INTERFACE IMGUI_ENABLE_IMGUI_MD)
     endif()
 
-    # Clean interface to avoid exporting foreign targets
-    set_property(TARGET imguix PROPERTY INTERFACE_LINK_LIBRARIES "")
 
 else()
     set(_imguix_type STATIC)
@@ -360,12 +360,12 @@ else()
 
     if(IMGUIX_USE_IMPLOT)
         target_compile_definitions(imguix PUBLIC IMGUI_ENABLE_IMPLOT)
-        target_link_libraries(imguix PRIVATE ${IMPLOT_TARGET})
+        target_link_libraries(imguix PUBLIC ${IMPLOT_TARGET})
     endif()
-    
+
     if(IMGUIX_USE_IMPLOT3D)
         target_compile_definitions(imguix PUBLIC IMGUI_ENABLE_IMPLOT3D)
-        target_link_libraries(imguix PRIVATE ${IMPLOT3D_TARGET})
+        target_link_libraries(imguix PUBLIC ${IMPLOT3D_TARGET})
     endif()
     
     if(IMGUIX_USE_IMNODEFLOW)
@@ -408,8 +408,6 @@ else()
         target_link_libraries(imguix PRIVATE ${IMGUI_MD_TARGET})
     endif()
 
-    # Clean interface to avoid exporting foreign targets
-    set_property(TARGET imguix PROPERTY INTERFACE_LINK_LIBRARIES "")
 endif()
 
 # ===== Tests =====
