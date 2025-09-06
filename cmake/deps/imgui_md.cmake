@@ -65,7 +65,10 @@ function(imguix_use_or_fetch_imgui_md OUT_VAR)
             endif()
             enable_language(C)
             add_library(md4c STATIC "${_MD4C_SRC}")
-            target_include_directories(md4c PUBLIC "${_MD4C_INC}")
+            target_include_directories(md4c PUBLIC
+                $<BUILD_INTERFACE:${_MD4C_INC}>
+                $<INSTALL_INTERFACE:include>
+            )
             set_target_properties(md4c PROPERTIES POSITION_INDEPENDENT_CODE ON)
             set(MD4C_TGT md4c)
         endif()

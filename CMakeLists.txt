@@ -701,6 +701,11 @@ function(imguix_install_target_with_headers tgt)
     endif()
     get_target_property(_type ${tgt} TYPE)
     get_target_property(_pub ${tgt} PUBLIC_HEADER)
+    get_target_property(_imported ${tgt} IMPORTED)
+    if(_imported)
+        return()
+    endif()
+
     if(_type STREQUAL "INTERFACE_LIBRARY")
         if(_pub)
             install(TARGETS ${tgt}
@@ -772,6 +777,8 @@ if(IMGUIX_SDK_BUNDLE_DEPS)
             endif()
         endif()
     endif()
+
+    imguix_install_target_with_headers(imgui)
 
 
     # --- ImGui-SFML: static library and headers ---
