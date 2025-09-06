@@ -328,7 +328,11 @@ else()
         if(NOT _IMGUI_DIR_LOCAL)
             set(_IMGUI_DIR_LOCAL "${PROJECT_SOURCE_DIR}/libs/imgui")
         endif()
-        target_include_directories(imguix PRIVATE "${_IMGUI_DIR_LOCAL}/misc/freetype")
+        target_include_directories(imguix
+            PUBLIC
+                $<BUILD_INTERFACE:${_IMGUI_DIR_LOCAL}/misc/freetype>
+                $<INSTALL_INTERFACE:include>
+        )
 
         # Resolve Dear ImGui root (same approach as for FreeType)
         set(_IMGUI_DIR_LOCAL "${IMGUI_DIR}")
@@ -337,7 +341,11 @@ else()
         endif()
 
         # Require include path for imgui_stdlib.h (misc/cpp)
-        target_include_directories(imguix PRIVATE "${_IMGUI_DIR_LOCAL}/misc/cpp")
+        target_include_directories(imguix
+            PUBLIC
+                $<BUILD_INTERFACE:${_IMGUI_DIR_LOCAL}/misc/cpp>
+                $<INSTALL_INTERFACE:include>
+        )
 
         imguix_use_or_find_freetype(FREETYPE_TARGET)
         target_link_libraries(imguix PRIVATE ${FREETYPE_TARGET})
