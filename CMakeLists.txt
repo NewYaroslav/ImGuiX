@@ -705,6 +705,7 @@ function(imguix_install_target_with_headers tgt)
     if(_imported)
         return()
     endif()
+
     if(_type STREQUAL "INTERFACE_LIBRARY")
         if(_pub)
             install(TARGETS ${tgt}
