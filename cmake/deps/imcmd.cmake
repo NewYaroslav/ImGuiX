@@ -16,7 +16,10 @@ function(imguix_use_or_fetch_imcmd OUT_VAR)
     )
     add_library(imcmd::imcmd ALIAS imcmd)
 
-    target_include_directories(imcmd PUBLIC "${_DIR}")
+    target_include_directories(imcmd PUBLIC
+        $<BUILD_INTERFACE:${_DIR}>
+        $<INSTALL_INTERFACE:include>
+    )
     target_link_libraries(imcmd PUBLIC imgui::imgui)
 
     set_target_properties(imcmd PROPERTIES
