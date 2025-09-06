@@ -34,7 +34,10 @@ function(imguix_use_or_fetch_imspinner OUT_VAR)
 
     add_library(imspinner INTERFACE)
     add_library(imspinner::imspinner ALIAS imspinner)
-    target_include_directories(imspinner INTERFACE "${_IMSPIN_DIR}")
+    target_include_directories(imspinner INTERFACE
+        $<BUILD_INTERFACE:${_IMSPIN_DIR}>
+        $<INSTALL_INTERFACE:include>
+    )
     target_link_libraries(imspinner INTERFACE imgui::imgui) # для imgui_internal.h
     # Опц.: включить демо-функции через макрос IMSPINNER_DEMO на нужных таргетах
     set(${OUT_VAR} imspinner::imspinner PARENT_SCOPE)

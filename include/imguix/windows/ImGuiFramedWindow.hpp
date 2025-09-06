@@ -5,8 +5,13 @@
 /// \file ImGuiFramedWindow.hpp
 /// \brief Window implementation with custom title bar and control buttons.
 
-#include "window_flags.hpp"
+#ifdef _WIN32
+#   include <windows.h>
+#endif
+
 #include <imgui.h>
+
+#include "window_flags.hpp"
 
 namespace ImGuiX::Windows {
 

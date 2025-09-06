@@ -15,7 +15,10 @@ function(imguix_use_or_fetch_imguifiledialog OUT_VAR)
     )
     add_library(imguifiledialog::imguifiledialog ALIAS imguifiledialog)
 
-    target_include_directories(imguifiledialog PUBLIC "${_DIR}")
+    target_include_directories(imguifiledialog PUBLIC
+        $<BUILD_INTERFACE:${_DIR}>
+        $<INSTALL_INTERFACE:include>
+    )
     target_link_libraries(imguifiledialog PUBLIC imgui::imgui)
 
     # Опционально: переключить на std::filesystem (иначе используется dirent)

@@ -1,4 +1,10 @@
-// demo_framed_showcase.cpp
+#define IMGUIX_HEADER_ONLY
+#define IMGUIX_DEMO
+
+#include <algorithm>
+#include <cmath>
+#include <random>
+
 #include <imguix/core.hpp>
 #include <imguix/windows/ImGuiFramedWindow.hpp>
 #include <imguix/controllers/ExtendedController.hpp>
@@ -81,15 +87,15 @@ public:
             }
             ImGui::SameLine();
             if (ImGui::Button("Send Info Notification")) {
-                ImGuiX::Widgets::NotifyInfo("Hello", "This is a demo notification.");
+                ImGuiX::Widgets::NotifyInfo(this, "Hello: This is a demo notification.");
             }
             ImGui::SameLine();
             if (ImGui::Button("Send Warning")) {
-                ImGuiX::Widgets::NotifyWarn("Watch out", "Something to keep an eye on.");
+                ImGuiX::Widgets::NotifyWarning(this, "Watch out: Something to keep an eye on.");
             }
             ImGui::SameLine();
             if (ImGui::Button("Send Error")) {
-                ImGuiX::Widgets::NotifyError("Oops", "Something went wrong.");
+                ImGuiX::Widgets::NotifyError(this, "Oops: Something went wrong.");
             }
             ImGui::SeparatorText("Theme");
             // Theme picker integrated with this controller/window
@@ -236,13 +242,7 @@ private:
 
         const auto& bars = (tf_index == 0 ? bars_m1 : tf_index == 1 ? bars_m30 : bars_h1);
         ImGuiX::Widgets::OHLCChartConfig cfg{};
-        ImGuiX::Widgets::PlotOHLCChart<Bar>("Synthetic OHLC", bars, cfg,
-            [](const Bar& b){ return b.time;  },
-            [](const Bar& b){ return b.open;  },
-            [](const Bar& b){ return b.high;  },
-            [](const Bar& b){ return b.low;   },
-            [](const Bar& b){ return b.close; },
-            [](const Bar& b){ return b.volume;});
+        ImGuiX::Widgets::PlotOHLCChart<Bar>("Synthetic OHLC", bars, cfg);
     }
 #endif
 };
