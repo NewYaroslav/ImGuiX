@@ -662,8 +662,6 @@ if(IMGUIX_BUILD_EXAMPLES)
         )
     endforeach()
 
-    set(ImGuiX_DIR "${CMAKE_BINARY_DIR}")
-    add_subdirectory(examples/framed_showcase)
 endif()
 
 # ===== Install / Export =====

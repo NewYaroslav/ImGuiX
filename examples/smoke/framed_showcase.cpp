@@ -1,6 +1,3 @@
-#define IMGUIX_HEADER_ONLY
-#define IMGUIX_DEMO
-
 #include <algorithm>
 #include <cmath>
 #include <random>
