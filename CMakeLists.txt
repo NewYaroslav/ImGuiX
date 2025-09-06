@@ -699,20 +699,36 @@ function(imguix_install_target_with_headers tgt)
     if(NOT TARGET ${tgt})
         return()
     endif()
+    get_target_property(_type ${tgt} TYPE)
     get_target_property(_pub ${tgt} PUBLIC_HEADER)
-    if(_pub)
-        install(TARGETS ${tgt}
-            ARCHIVE DESTINATION lib
-            LIBRARY DESTINATION lib
-            RUNTIME DESTINATION bin
-            PUBLIC_HEADER DESTINATION include
-        )
+    if(_type STREQUAL "INTERFACE_LIBRARY")
+        if(_pub)
+            install(TARGETS ${tgt}
+                EXPORT ImGuiXTargets
+                PUBLIC_HEADER DESTINATION include
+            )
+        else()
+            install(TARGETS ${tgt}
+                EXPORT ImGuiXTargets
+            )
+        endif()
     else()
-        install(TARGETS ${tgt}
-            ARCHIVE DESTINATION lib
-            LIBRARY DESTINATION lib
-            RUNTIME DESTINATION bin
-        )
+        if(_pub)
+            install(TARGETS ${tgt}
+                EXPORT ImGuiXTargets
+                ARCHIVE DESTINATION lib
+                LIBRARY DESTINATION lib
+                RUNTIME DESTINATION bin
+                PUBLIC_HEADER DESTINATION include
+            )
+        else()
+            install(TARGETS ${tgt}
+                EXPORT ImGuiXTargets
+                ARCHIVE DESTINATION lib
+                LIBRARY DESTINATION lib
+                RUNTIME DESTINATION bin
+            )
+        endif()
     endif()
 endfunction()
 
@@ -787,6 +803,7 @@ if(IMGUIX_SDK_BUNDLE_DEPS)
 
     # --- nlohmann-json (header-only) when vendored ---
     if(IMGUIX_VENDOR_JSON)
+        imguix_install_target_with_headers(nlohmann_json)
         if(EXISTS "${PROJECT_SOURCE_DIR}/libs/json/include/nlohmann")
             install(DIRECTORY "${PROJECT_SOURCE_DIR}/libs/json/include/nlohmann"
                     DESTINATION include)
@@ -794,6 +811,7 @@ if(IMGUIX_SDK_BUNDLE_DEPS)
     endif()
 
     # --- ImPlot: headers ---
+    imguix_install_target_with_headers(implot)
     if(EXISTS "${PROJECT_SOURCE_DIR}/libs/implot/implot.h")
         install(FILES
             "${PROJECT_SOURCE_DIR}/libs/implot/implot.h"
@@ -801,8 +819,9 @@ if(IMGUIX_SDK_BUNDLE_DEPS)
             DESTINATION include
         )
     endif()
-    
+
     # --- ImPlot3D: headers ---
+    imguix_install_target_with_headers(implot3d)
     if(EXISTS "${PROJECT_SOURCE_DIR}/libs/implot3d/implot3d.h")
         install(FILES
             "${PROJECT_SOURCE_DIR}/libs/implot3d/implot3d.h"
@@ -813,22 +832,25 @@ if(IMGUIX_SDK_BUNDLE_DEPS)
     
     
     # --- ImNodeFlow: headers ---
+    imguix_install_target_with_headers(imnodeflow)
     if(EXISTS "${PROJECT_SOURCE_DIR}/libs/ImNodeFlow/include/ImNodeFlow.h")
         install(FILES
             "${PROJECT_SOURCE_DIR}/libs/ImNodeFlow/include/ImNodeFlow.h"
             DESTINATION include
         )
     endif()
-    
+
     # --- ImGuiFileDialog: headers ---
+    imguix_install_target_with_headers(imguifiledialog)
     if(EXISTS "${PROJECT_SOURCE_DIR}/libs/ImGuiFileDialog/ImGuiFileDialog.h")
         install(FILES
             "${PROJECT_SOURCE_DIR}/libs/ImGuiFileDialog/ImGuiFileDialog.h"
             "${PROJECT_SOURCE_DIR}/libs/ImGuiFileDialog/ImGuiFileDialogConfig.h"
             DESTINATION include)
     endif()
-    
+
     # --- ImGuiColorTextEdit: headers ---
+    imguix_install_target_with_headers(imtexteditor)
     if(EXISTS "${PROJECT_SOURCE_DIR}/libs/ImGuiColorTextEdit/ImGuiColorTextEdit.h")
         install(FILES
             "${PROJECT_SOURCE_DIR}/libs/ImGuiColorTextEdit/ImGuiColorTextEdit.h"
@@ -836,34 +858,40 @@ if(IMGUIX_SDK_BUNDLE_DEPS)
     endif()
     
     # --- portable-file-dialogs: headers ---
+    imguix_install_target_with_headers(pfd)
     if(EXISTS "${PROJECT_SOURCE_DIR}/libs/portable-file-dialogs/portable-file-dialogs.h")
         install(FILES
             "${PROJECT_SOURCE_DIR}/libs/portable-file-dialogs/portable-file-dialogs.h"
             DESTINATION include
         )
     endif()
-    
+
     # --- imspinner: headers ---
+    imguix_install_target_with_headers(imspinner)
     if(EXISTS "${PROJECT_SOURCE_DIR}/libs/imspinner/imspinner.h")
         install(FILES "${PROJECT_SOURCE_DIR}/libs/imspinner/imspinner.h"
                 DESTINATION include)
     endif()
-    
+
     # --- imgui-command-palette: headers ---
+    imguix_install_target_with_headers(imcmd)
     if(EXISTS "${PROJECT_SOURCE_DIR}/libs/imgui-command-palette/imcmd_command_palette.h")
         install(FILES
             "${PROJECT_SOURCE_DIR}/libs/imgui-command-palette/imcmd_command_palette.h"
             "${PROJECT_SOURCE_DIR}/libs/imgui-command-palette/imcmd_fuzzy_search.h"
             DESTINATION include)
     endif()
-    
+
     # --- ImCoolBar: headers ---
+    imguix_install_target_with_headers(imcoolbar)
     if(EXISTS "${PROJECT_SOURCE_DIR}/libs/ImCoolBar/ImCoolBar.h")
         install(FILES "${PROJECT_SOURCE_DIR}/libs/ImCoolBar/ImCoolBar.h"
                 DESTINATION include)
     endif()
-    
+
     # --- imgui_md: headers ---
+    imguix_install_target_with_headers(imgui_md)
+    imguix_install_target_with_headers(md4c)
     if(EXISTS "${PROJECT_SOURCE_DIR}/libs/imgui_md/imgui_md.h")
         install(FILES "${PROJECT_SOURCE_DIR}/libs/imgui_md/imgui_md.h"
                 DESTINATION include)
