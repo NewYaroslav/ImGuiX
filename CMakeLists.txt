@@ -309,9 +309,9 @@ else()
         set_target_properties(imguix PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
     endif()
 
-    # Link external dependencies as PRIVATE to keep export minimal
+    # Link external dependencies; expose fmt and json for public headers
     target_link_libraries(imguix
-        PRIVATE fmt::fmt nlohmann_json::nlohmann_json
+        PUBLIC fmt::fmt nlohmann_json::nlohmann_json
         PRIVATE ${IMGUI_LIB} ${BACKEND_LIBS}
     )
 
