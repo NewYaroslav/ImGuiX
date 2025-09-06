@@ -36,7 +36,10 @@ function(imguix_use_or_fetch_pfd OUT_VAR)
 
     add_library(pfd INTERFACE)
     add_library(pfd::pfd ALIAS pfd)
-    target_include_directories(pfd INTERFACE "${_PFD_DIR}")
+    target_include_directories(pfd INTERFACE
+        $<BUILD_INTERFACE:${_PFD_DIR}>
+        $<INSTALL_INTERFACE:include>
+    )
 
     # header-only: никаких линковок
     set(${OUT_VAR} pfd::pfd PARENT_SCOPE)

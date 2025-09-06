@@ -14,7 +14,10 @@ function(imguix_use_or_fetch_imcoolbar OUT_VAR)
     add_library(imcoolbar STATIC "${_DIR}/ImCoolBar.cpp")
     add_library(imcoolbar::imcoolbar ALIAS imcoolbar)
 
-    target_include_directories(imcoolbar PUBLIC "${_DIR}")
+    target_include_directories(imcoolbar PUBLIC
+        $<BUILD_INTERFACE:${_DIR}>
+        $<INSTALL_INTERFACE:include>
+    )
     target_link_libraries(imcoolbar PUBLIC imgui::imgui)
 
     set_target_properties(imcoolbar PROPERTIES

@@ -57,7 +57,10 @@ function(imguix_use_or_fetch_implot3d OUT_VAR)
 
     # ImPlot3D depends only on Dear ImGui
     target_link_libraries(implot3d PUBLIC imgui::imgui)
-    target_include_directories(implot3d PUBLIC "${_IMPLOT3D_DIR}")
+    target_include_directories(implot3d PUBLIC
+        $<BUILD_INTERFACE:${_IMPLOT3D_DIR}>
+        $<INSTALL_INTERFACE:include>
+    )
 
     # Optionally expose public header for SDK installers
     set_target_properties(implot3d PROPERTIES

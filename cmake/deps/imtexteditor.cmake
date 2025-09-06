@@ -16,7 +16,10 @@ function(imguix_use_or_fetch_imtexteditor OUT_VAR)
     )
     add_library(imtexteditor::imtexteditor ALIAS imtexteditor)
 
-    target_include_directories(imtexteditor PUBLIC "${_DIR}")
+    target_include_directories(imtexteditor PUBLIC
+        $<BUILD_INTERFACE:${_DIR}>
+        $<INSTALL_INTERFACE:include>
+    )
     target_link_libraries(imtexteditor PUBLIC imgui::imgui)
 
     set_target_properties(imtexteditor PROPERTIES
