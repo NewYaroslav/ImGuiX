@@ -27,8 +27,8 @@ namespace ImGuiX::Widgets {
         const ImVec2 label_size = ImGui::CalcTextSize(label, NULL, true);
         const float preview_width = ((flags & ImGuiComboFlags_WidthFitPreview) && (preview_value != NULL)) ? ImGui::CalcTextSize(preview_value, NULL, true).x : 0.0f;
         const float w = (flags & ImGuiComboFlags_NoPreview) ? arrow_size : ((flags & ImGuiComboFlags_WidthFitPreview) ? (arrow_size + preview_width + style.FramePadding.x * 2.0f) : ImGui::CalcItemWidth());
-        const ImRect bb(window->DC.CursorPos, window->DC.CursorPos + ImVec2(w, label_size.y + style.FramePadding.y * 2.0f));
-        const ImRect total_bb(bb.Min, bb.Max + ImVec2(label_size.x > 0.0f ? style.ItemInnerSpacing.x + label_size.x : 0.0f, 0.0f));
+        const ImRect bb(window->DC.CursorPos, ImVec2(window->DC.CursorPos.x + w, window->DC.CursorPos.y + (label_size.y + style.FramePadding.y * 2.0f)));
+        const ImRect total_bb(bb.Min, ImVec2(bb.Max.x + (label_size.x > 0.0f ? style.ItemInnerSpacing.x + label_size.x : 0.0f), bb.Max.y + 0.0f));
         ImGui::ItemSize(total_bb, style.FramePadding.y);
         if (!ImGui::ItemAdd(total_bb, id, &bb))
             return false;
@@ -91,7 +91,7 @@ namespace ImGuiX::Widgets {
         if (preview_value != NULL && !(flags & ImGuiComboFlags_NoPreview)) {
             if (g.LogEnabled)
                 ImGui::LogSetNextTextDecoration("{", "}");
-            ImGui::RenderTextClipped(bb.Min + style.FramePadding, ImVec2(value_x2, bb.Max.y), preview_value, NULL, NULL);
+            ImGui::RenderTextClipped(ImVec2(bb.Min.x + style.FramePadding.x, bb.Min.y + style.FramePadding.y), ImVec2(value_x2, bb.Max.y), preview_value, NULL, NULL);
         }
         if (label_size.x > 0)
             ImGui::RenderText(ImVec2(bb.Max.x + style.ItemInnerSpacing.x, bb.Min.y + style.FramePadding.y), label);
