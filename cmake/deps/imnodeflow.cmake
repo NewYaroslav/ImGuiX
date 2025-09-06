@@ -27,7 +27,8 @@ function(imguix_use_or_fetch_imnodeflow OUT_VAR)
     target_link_libraries(imnodeflow PUBLIC imgui::imgui)
 
     target_include_directories(imnodeflow PUBLIC
-        "${_IMNODEFLOW_DIR}/include"
+        $<BUILD_INTERFACE:${_IMNODEFLOW_DIR}/include>
+        $<INSTALL_INTERFACE:include>
     )
 
     # Recommended by upstream sample: enable ImGui math operators
