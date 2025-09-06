@@ -526,6 +526,21 @@ if(IMGUIX_BUILD_TESTS)
     endforeach()
 endif()
 
+# ===== Package Config (build tree) =====
+include(CMakePackageConfigHelpers)
+configure_package_config_file(
+    cmake/ImGuiXConfig.cmake.in
+    ${CMAKE_BINARY_DIR}/ImGuiXConfig.cmake
+    INSTALL_DESTINATION lib/cmake/ImGuiX
+)
+install(TARGETS imguix
+    EXPORT ImGuiXTargets
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin
+    INCLUDES DESTINATION include
+)
+
 # ===== Examples =====
 if(IMGUIX_BUILD_EXAMPLES)
     file(GLOB SMOKE_EXAMPLES CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/examples/smoke/*.cpp")
@@ -641,20 +656,11 @@ if(IMGUIX_BUILD_EXAMPLES)
         )
     endforeach()
 
+    set(ImGuiX_DIR "${CMAKE_BINARY_DIR}")
     add_subdirectory(examples/framed_showcase)
 endif()
 
 # ===== Install / Export =====
-include(CMakePackageConfigHelpers)
-
-install(TARGETS imguix
-    EXPORT ImGuiXTargets
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION bin
-    INCLUDES DESTINATION include
-)
-
 # Public headers of ImGuiX
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/imguix
         DESTINATION include)
@@ -670,19 +676,8 @@ install(EXPORT ImGuiXTargets
     NAMESPACE ImGuiX::
     DESTINATION lib/cmake/ImGuiX
 )
-
-configure_package_config_file(
-    cmake/ImGuiXConfig.cmake.in
-    ${CMAKE_BINARY_DIR}/ImGuiXConfig.cmake
-    INSTALL_DESTINATION lib/cmake/ImGuiX
-)
 install(FILES ${CMAKE_BINARY_DIR}/ImGuiXConfig.cmake
         DESTINATION lib/cmake/ImGuiX)
-
-# Export from build tree for local find_package()
-export(EXPORT ImGuiXTargets
-    NAMESPACE ImGuiX::
-    FILE "${CMAKE_BINARY_DIR}/ImGuiXTargets.cmake")
 
 # ===== SDK bundle of 3rd-party deps =====
 
