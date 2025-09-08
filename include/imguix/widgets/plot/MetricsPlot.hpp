@@ -12,6 +12,9 @@
 #include <imgui.h>
 #include <implot.h>
 
+#include <imguix/widgets/plot/MetricsPlotData.hpp>
+#include <imguix/events/MetricsPlotUpdateEvent.hpp>
+
 namespace ImGuiX::Widgets {
 
     /// \brief Configuration for MetricsPlot.
@@ -53,17 +56,6 @@ namespace ImGuiX::Widgets {
         int max_visible = 8; ///< Max items before legend disabled.
         ImVec4 drag_line_color{1.0f, 1.0f, 1.0f, 0.5f}; ///< Crosshair color.
         ImVec4 plot_color{0.012f, 0.66f, 0.95f, 1.0f};  ///< Default bar fill color.
-    };
-
-    /// \brief Data for MetricsPlot.
-    /// \invariant labels.size() equals values.size() when values not empty.
-    /// \invariant line_x[k].size() equals line_y[k].size() for all k; mismatched series are skipped.
-    struct MetricsPlotData {
-        std::vector<std::string> labels;         ///< Category labels.
-        std::vector<double> values;              ///< Bar values per category.
-        std::vector<std::vector<double>> line_x; ///< Line X coordinates.
-        std::vector<std::vector<double>> line_y; ///< Line Y coordinates.
-        std::vector<std::string> tick_labels_x;  ///<
     };
 
     /// \brief Runtime state for MetricsPlot.
