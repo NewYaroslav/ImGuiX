@@ -149,6 +149,18 @@ sequenceDiagram
     EventBus->>Controller: notify(Event)
 ```
 
+### Example: MetricsPlot update
+```cpp
+// Model publishes new metrics
+auto data = std::make_shared<ImGuiX::Widgets::MetricsPlotData>(collect());
+bus.notifyAsync(ImGuiX::Events::MetricsPlotUpdateEvent{data});
+
+// Controller updates its plot state
+eventBus().subscribe<ImGuiX::Events::MetricsPlotUpdateEvent>(
+    [this](const auto& e){ plot_data = *e.data; });
+ImGuiX::Widgets::MetricsPlot(plot_data, plot_state);
+```
+
 ## Module Layout
 ```mermaid
 graph LR

@@ -176,3 +176,20 @@ Grid widget for choosing weekdays with quick presets.
 ImGuiX::Widgets::DaysOfWeekSelector("days", days, ds_cfg);
 ```
 
+## Plots
+
+### MetricsPlot
+Categorical bar/line chart with drag-and-drop selection. A model can push new
+measurements via `MetricsPlotUpdateEvent`, and controllers update their local
+`MetricsPlotData` and `MetricsPlotState`.
+```cpp
+// Model
+auto data = std::make_shared<ImGuiX::Widgets::MetricsPlotData>(collect());
+bus.notifyAsync(ImGuiX::Events::MetricsPlotUpdateEvent{data});
+
+// Controller
+eventBus().subscribe<ImGuiX::Events::MetricsPlotUpdateEvent>(
+    [this](const auto& e){ plot_data = *e.data; });
+ImGuiX::Widgets::MetricsPlot(plot_data, plot_state);
+```
+
