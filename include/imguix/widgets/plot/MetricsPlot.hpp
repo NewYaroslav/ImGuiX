@@ -12,8 +12,8 @@
 #include <imgui.h>
 #include <implot.h>
 
-#include "imguix/widgets/plot/MetricsPlotData.hpp"
-#include "imguix/events/MetricsPlotUpdateEvent.hpp"
+#include <imguix/widgets/plot/MetricsPlotData.hpp>
+#include <imguix/events/MetricsPlotUpdateEvent.hpp>
 
 namespace ImGuiX::Widgets {
 
