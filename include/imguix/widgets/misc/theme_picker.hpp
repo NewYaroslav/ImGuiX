@@ -122,7 +122,7 @@ namespace ImGuiX::Widgets {
     /// \param win Window to update.
     inline void ApplyStoredTheme(WindowInstance* win) {
         if (!win) return;
-        const auto id = win->options().getStrOr(IMGUIX_THEME_STORAGE_KEY, "");
+        const auto id = win->options().getStrOr(IMGUIX_THEME_STORAGE_KEY, "classic");
         if (!id.empty()) win->setTheme(id);
     }
 
@@ -130,7 +130,7 @@ namespace ImGuiX::Widgets {
     /// \param ctrl Controller to update.
     inline void ApplyStoredTheme(Controller* ctrl) {
         if (!ctrl) return;
-        const auto id = ctrl->options().getStrOr(IMGUIX_THEME_STORAGE_KEY, "");
+        const auto id = ctrl->options().getStrOr(IMGUIX_THEME_STORAGE_KEY, "classic");
         if (!id.empty()) ctrl->setTheme(id);
     }
 

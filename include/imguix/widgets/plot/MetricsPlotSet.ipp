@@ -74,6 +74,7 @@ namespace ImGuiX::Widgets {
 
         if (!data.sets.empty()) {
             MetricsPlotConfig inner_cfg = cfg;
+            inner_cfg.plot_height = plot_h;
             inner_cfg.force_all_visible = true;
             const MetricsPlotData& sel = data.sets[state.selected];
             MetricsPlot(sel, state.plot_state, inner_cfg);

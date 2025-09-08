@@ -61,7 +61,7 @@ namespace ImGuiX::Themes {
         constexpr ImVec4 ButtonActive          = ImVec4(0.67f, 0.67f, 0.67f, 0.39f);
 
         constexpr ImVec4 Header                = ImVec4(0.22f, 0.22f, 0.22f, 1.00f);
-        constexpr ImVec4 HeaderHovered         = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
+        constexpr ImVec4 HeaderHovered         = ImVec4(0.67f, 0.67f, 0.67f, 1.00f);
         constexpr ImVec4 HeaderActive          = ImVec4(0.67f, 0.67f, 0.67f, 0.39f);
 
         // Separators

@@ -73,7 +73,7 @@ namespace NordConstants {
 
     // Headers / Tabs
     constexpr ImVec4 Header               = ImVec4(0.263f, 0.298f, 0.369f, 0.70f);
-    constexpr ImVec4 HeaderHovered        = ImVec4(0.263f, 0.298f, 0.369f, 0.95f);
+    constexpr ImVec4 HeaderHovered        = ImVec4(0.231f, 0.259f, 0.322f, 0.95f);
     constexpr ImVec4 HeaderActive         = ImVec4(0.231f, 0.259f, 0.322f, 1.000f);
 
     constexpr ImVec4 Tab                  = ImVec4(0.263f, 0.298f, 0.369f, 0.90f);

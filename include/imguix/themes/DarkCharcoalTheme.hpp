@@ -64,7 +64,7 @@ namespace ImGuiX::Themes {
         // Headers / Tables
         constexpr ImVec4 Header               = ImVec4(0.313f, 0.313f, 0.313f, 1.000f);
         constexpr ImVec4 HeaderHovered        = ImVec4(0.469f, 0.469f, 0.469f, 1.000f);
-        constexpr ImVec4 HeaderActive         = ImVec4(0.469f, 0.469f, 0.469f, 1.000f);
+        constexpr ImVec4 HeaderActive         = ImVec4(0.469f, 0.469f, 0.469f, 0.39f);
 
         // Separators
         constexpr ImVec4 SeparatorHovered     = ImVec4(0.391f, 0.391f, 0.391f, 1.000f);
@@ -114,7 +114,7 @@ namespace ImGuiX::Themes {
             // ImGui::StyleColorsDark(&style);
 
             colors[ImGuiCol_Text]                  = Text;
-            colors[ImGuiCol_InputTextCursor]            = InputTextCursor;
+            colors[ImGuiCol_InputTextCursor]       = InputTextCursor;
             colors[ImGuiCol_TextDisabled]          = TextDisabled;
             colors[ImGuiCol_WindowBg]              = WindowBg;
             colors[ImGuiCol_ChildBg]               = ChildBg;
@@ -201,8 +201,7 @@ namespace ImGuiX::Themes {
             // Start from ImPlot's dark defaults, then apply our colors.
             ImPlot::StyleColorsDark(&style);
 
-            ImVec4 frame = FrameBg; frame.w = 1.0f;
-            style.Colors[ImPlotCol_FrameBg]       = frame;
+            style.Colors[ImPlotCol_FrameBg]       = FrameBg;
             style.Colors[ImPlotCol_PlotBg]        = WindowBg;
             style.Colors[ImPlotCol_PlotBorder]    = Border;
             style.Colors[ImPlotCol_LegendBg]      = PopupBg;

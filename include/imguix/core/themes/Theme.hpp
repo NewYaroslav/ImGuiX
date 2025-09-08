@@ -106,6 +106,32 @@ namespace ImGuiX::Themes {
         style.PlotDefaultSize = PLOT_DEFAULT_SIZE;
         style.PlotMinSize     = PLOT_MIN_SIZE;
     }
+    
+    // вызывайте каждый раз после смены темы ImGui
+    inline void SyncImPlotWithImGui() {
+        ImGuiStyle& s = ImGui::GetStyle();
+        ImPlotStyle& p = ImPlot::GetStyle();
+
+        const ImVec4 child = s.Colors[ImGuiCol_ChildBg];
+        const ImVec4 win   = s.Colors[ImGuiCol_WindowBg];
+        const ImVec4 frame = s.Colors[ImGuiCol_FrameBg];
+        const ImVec4 text  = s.Colors[ImGuiCol_Text];
+        const ImVec4 border= s.Colors[ImGuiCol_Border];
+
+        // Главное — увести чёрный фон графика
+        p.Colors[ImPlotCol_PlotBg]        = child; // внутренняя область
+        p.Colors[ImPlotCol_FrameBg]       = frame; // рамка вокруг графика
+        p.Colors[ImPlotCol_AxisBgHovered] = child;
+        p.Colors[ImPlotCol_AxisBgActive]  = child;
+        p.Colors[ImPlotCol_LegendBg]      = win;
+        p.Colors[ImPlotCol_LegendBorder]  = border;
+
+        // (опционально) сетка/оси в тон теме
+        ImVec4 grid = ImVec4(text.x, text.y, text.z, 0.25f);
+        p.Colors[ImPlotCol_AxisGrid] = grid;
+        p.Colors[ImPlotCol_AxisTick] = text;
+    }
+
 #   endif
 
 #   ifdef IMGUI_ENABLE_IMPLOT3D
@@ -147,6 +173,7 @@ namespace ImGuiX::Themes {
         void apply(ImPlotStyle& style) const override {
             ImPlot::StyleColorsClassic(&style);
             applyDefaultImPlotStyle(style);
+            SyncImPlotWithImGui();
         }
 #       endif
 
@@ -173,6 +200,7 @@ namespace ImGuiX::Themes {
         void apply(ImPlotStyle& style) const override {
             ImPlot::StyleColorsLight(&style);
             applyDefaultImPlotStyle(style);
+            SyncImPlotWithImGui();
         }
 #       endif
 
@@ -200,6 +228,7 @@ namespace ImGuiX::Themes {
         void apply(ImPlotStyle& style) const override {
             ImPlot::StyleColorsDark(&style);
             applyDefaultImPlotStyle(style);
+            SyncImPlotWithImGui();
         }
 #       endif
 

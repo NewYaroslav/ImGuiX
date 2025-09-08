@@ -24,7 +24,7 @@ namespace ImGuiX::Themes {
     /// \namespace CorporateGreyConstants
     /// \brief Common color constants used by the Corporate Grey theme.
     namespace CorporateGreyConstants {
-        constexpr ImVec4 White             = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+        constexpr ImVec4 White            = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
         constexpr ImVec4 MediumGrey       = ImVec4(0.42f, 0.42f, 0.42f, 0.54f);
         constexpr ImVec4 HoverGrey        = ImVec4(0.42f, 0.42f, 0.42f, 0.40f);
         constexpr ImVec4 ActiveGrey       = ImVec4(0.56f, 0.56f, 0.56f, 0.67f);
@@ -59,7 +59,7 @@ namespace ImGuiX::Themes {
             ImVec4* colors = style.Colors;
 
             colors[ImGuiCol_Text]                   = White;
-            colors[ImGuiCol_InputTextCursor]             = Highlight;
+            colors[ImGuiCol_InputTextCursor]        = Highlight;
             colors[ImGuiCol_TextDisabled]           = TextDisabled;
             colors[ImGuiCol_WindowBg]               = DarkGrey25;
             colors[ImGuiCol_ChildBg]                = DarkGrey25;
@@ -129,11 +129,11 @@ namespace ImGuiX::Themes {
             ImPlot::StyleColorsDark(&style);
 
             using namespace CorporateGreyConstants;
-            ImVec4 frame = MediumGrey; frame.w = 1.0f;
-            style.Colors[ImPlotCol_FrameBg]      = frame;
-            style.Colors[ImPlotCol_PlotBg]       = DarkGrey25;
+            //ImVec4 frame = MediumGrey; frame.w = 1.0f;
+            style.Colors[ImPlotCol_FrameBg]       = MediumGrey;
+            style.Colors[ImPlotCol_PlotBg]        = DarkGrey25;
             style.Colors[ImPlotCol_PlotBorder]    = ImVec4(0.15f, 0.15f, 0.15f, 1.0f);
-            style.Colors[ImPlotCol_LegendBg]      = DarkGrey25;
+            style.Colors[ImPlotCol_LegendBg]      = MediumGrey;
             style.Colors[ImPlotCol_LegendBorder]  = ImVec4(0.12f, 0.12f, 0.12f, 0.71f);
             style.Colors[ImPlotCol_LegendText]    = White;
             style.Colors[ImPlotCol_TitleText]     = White;
