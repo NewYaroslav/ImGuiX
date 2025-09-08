@@ -60,6 +60,7 @@
 #ifdef IMGUI_ENABLE_IMPLOT
 #include <imguix/widgets/plot/PlotOHLCChart.hpp>
 #include <imguix/widgets/plot/MetricsPlot.hpp>
+#include <imguix/widgets/plot/MetricsPlotSet.hpp>
 #endif
 
 #ifdef IMGUIX_DEMO
@@ -459,6 +460,7 @@ private:
         }
         if (ImGui::CollapsingHeader(u8"Metrics / Plot")) {
             ImGuiX::Widgets::DemoMetricsPlot();
+            ImGuiX::Widgets::DemoMetricsPlotSet();
         }
     }
 #   endif
