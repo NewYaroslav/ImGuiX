@@ -56,6 +56,7 @@ namespace ImGuiX::Widgets {
 
     /// \brief Data for MetricsPlot.
     /// \invariant labels.size() equals values.size() when values not empty.
+    /// \invariant line_x[k].size() equals line_y[k].size() for all k; mismatched series are skipped.
     struct MetricsPlotData {
         std::vector<std::string_view> labels;    ///< Category labels.
         std::vector<double> values;              ///< Bar values per category.
