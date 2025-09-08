@@ -213,7 +213,18 @@ namespace ImGuiX::Widgets {
             ImPlot::SetupAxisScale(ImAxis_X1, ImPlotScale_Time);
             ImPlot::SetupAxisFormat(ImAxis_Y1, c.cfg.value_fmt);
 
+            // Validate that each line series has matching X/Y array lengths.
+            std::vector<bool> skip(c.state.dnd.size(), false);
             for (size_t k = 0; k < c.state.dnd.size(); ++k) {
+                if (c.data.line_x[k].size() != c.data.line_y[k].size()) {
+                    IM_ASSERT(c.data.line_x[k].size() == c.data.line_y[k].size() &&
+                              "MetricsPlot: line_x and line_y size mismatch");
+                    skip[k] = true;
+                }
+            }
+
+            for (size_t k = 0; k < c.state.dnd.size(); ++k) {
+                if (skip[k]) continue;
                 auto& it = c.state.dnd[k];
                 if (!it.is_plot) continue;
                 ImPlot::SetAxis(ImAxis_Y1);
