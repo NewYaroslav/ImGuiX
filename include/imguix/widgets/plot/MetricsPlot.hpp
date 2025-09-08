@@ -5,6 +5,7 @@
 /// \file MetricsPlot.hpp
 /// \brief Plot categorical metrics as bars or lines with drag-and-drop.
 
+#include <string>
 #include <string_view>
 #include <vector>
 
@@ -58,7 +59,7 @@ namespace ImGuiX::Widgets {
     /// \invariant labels.size() equals values.size() when values not empty.
     /// \invariant line_x[k].size() equals line_y[k].size() for all k; mismatched series are skipped.
     struct MetricsPlotData {
-        std::vector<std::string_view> labels;    ///< Category labels.
+        std::vector<std::string> labels;         ///< Category labels.
         std::vector<double> values;              ///< Bar values per category.
         std::vector<std::vector<double>> line_x; ///< Line X coordinates.
         std::vector<std::vector<double>> line_y; ///< Line Y coordinates.
