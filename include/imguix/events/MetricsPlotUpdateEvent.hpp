@@ -10,8 +10,8 @@
 #include <memory>
 #include <typeindex>
 
-#include "imguix/core/pubsub/Event.hpp"
-#include "imguix/widgets/plot/MetricsPlotData.hpp"
+#include <imguix/core/pubsub/Event.hpp>
+#include <imguix/widgets/plot/MetricsPlotData.hpp>
 
 namespace ImGuiX::Events {
 
