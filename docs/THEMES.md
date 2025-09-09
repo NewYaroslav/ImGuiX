@@ -37,7 +37,7 @@ This document lists the color themes bundled with ImGuiX and shows how to create
 
 ## Creating a custom theme
 
-Implement the `ImGuiX::Themes::Theme` interface and override the `apply` methods. Use `applyDefaultImGuiStyle` to set common spacing and rounding values.
+Implement the `ImGuiX::Themes::Theme` interface and override the `apply` methods. Use `ApplyDefaultImGuiStyle` to set common spacing and rounding values.
 Do not call `ImGui::GetColorU32` outside an active ImGui frame.
 Store raw `ImVec4` or `ImU32` values in configuration structs and convert during rendering.
 
@@ -45,7 +45,7 @@ Store raw `ImVec4` or `ImU32` values in configuration structs and convert during
 class MyTheme final : public ImGuiX::Themes::Theme {
 public:
     void apply(ImGuiStyle& style) const override {
-        ImGuiX::Themes::applyDefaultImGuiStyle(style);
+        ImGuiX::Themes::ApplyDefaultImGuiStyle(style);
         style.Colors[ImGuiCol_Text] = ImVec4(1.0f, 0.8f, 0.2f, 1.0f);
         // set other colors...
         style.Colors[ImGuiCol_InputTextCursor] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f); // cursor color

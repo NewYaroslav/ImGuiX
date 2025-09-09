@@ -12,7 +12,7 @@
 ///
 /// Notes:
 ///  - constants grouped in TokyoNightStormConstants
-///  - sizing unified via applyDefaultImGuiStyle/ImPlot/ImPlot3D
+///  - sizing unified via ApplyDefaultImGuiStyle/ImPlot/ImPlot3D
 
 #include <imguix/core/themes/Theme.hpp>
 
@@ -196,7 +196,7 @@ public:
         c[ImGuiCol_DockingEmptyBg] = ImVec4(WindowBg.x, WindowBg.y, WindowBg.z, 1.0f);
 #endif
 
-        applyDefaultImGuiStyle(style);
+        ApplyDefaultImGuiStyle(style);
     }
 
 #ifdef IMGUI_ENABLE_IMPLOT
@@ -227,7 +227,7 @@ public:
         style.Colors[ImPlotCol_Selection]    = PlotSelection;
         style.Colors[ImPlotCol_Crosshairs]   = PlotCrosshairs;
 
-        applyDefaultImPlotStyle(style);
+        ApplyDefaultImPlotStyle(style);
     }
 #endif
 
@@ -253,7 +253,7 @@ public:
         style.Colors[ImPlot3DCol_AxisGrid]     = PlotAxisGrid;
         style.Colors[ImPlot3DCol_AxisTick]     = PlotAxisTick;
 
-        applyDefaultImPlot3DStyle(style);
+        ApplyDefaultImPlot3DStyle(style);
     }
 #endif
 };

@@ -7,10 +7,10 @@
 ///
 /// Each theme:
 ///  - uses named color constants in its own namespace
-///  - calls applyDefaultImGuiStyle(style) to unify paddings/roundings/etc
+///  - calls ApplyDefaultImGuiStyle(style) to unify paddings/roundings/etc
 ///  - defines ImPlot colors to match the palette
 
-#include <imguix/core/themes/Theme.hpp> // Theme base + applyDefaultImGuiStyle
+#include <imguix/core/themes/Theme.hpp> // Theme base + ApplyDefaultImGuiStyle
 
 namespace ImGuiX::Themes {
 
@@ -141,7 +141,7 @@ namespace ImGuiX::Themes {
             colors[ImGuiCol_NavWindowingDimBg]     = NavDimBg;
 
             // Unify sizes/roundings from theme_config.hpp
-            applyDefaultImGuiStyle(style);
+            ApplyDefaultImGuiStyle(style);
 
 #ifdef IMGUIX_HAS_DOCKING
             colors[ImGuiCol_DockingEmptyBg]        = ChildBg;
@@ -183,7 +183,7 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlotCol_Selection]    = AccentBase;
             style.Colors[ImPlotCol_Crosshairs]   = AccentBase;
 
-            applyDefaultImPlotStyle(style);
+            ApplyDefaultImPlotStyle(style);
         }
 #endif
 #ifdef IMGUI_ENABLE_IMPLOT3D
@@ -207,7 +207,7 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlot3DCol_AxisGrid]     = ImVec4(0.75f, 0.75f, 0.75f, 0.60f);
             style.Colors[ImPlot3DCol_AxisTick]     = ImVec4(0.40f, 0.40f, 0.40f, 0.90f);
 
-            applyDefaultImPlot3DStyle(style);
+            ApplyDefaultImPlot3DStyle(style);
         }
 #endif
     };

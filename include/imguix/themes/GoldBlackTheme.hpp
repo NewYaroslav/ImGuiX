@@ -8,10 +8,10 @@
 /// Based on palette ideas from: https://github.com/ocornut/imgui/issues/707
 /// Adaptations:
 ///  - repeated colors moved to named constants
-///  - unified layout via applyDefaultImGuiStyle
+///  - unified layout via ApplyDefaultImGuiStyle
 ///  - added matching ImPlot styling
 
-#include <imguix/core/themes/Theme.hpp> // Theme + applyDefaultImGuiStyle
+#include <imguix/core/themes/Theme.hpp> // Theme + ApplyDefaultImGuiStyle
 
 namespace ImGuiX::Themes {
 
@@ -172,7 +172,7 @@ namespace ImGuiX::Themes {
             colors[ImGuiCol_ModalWindowDimBg]      = ModalWindowDimBg;
 
             // Unify sizes/roundings/paddings/borders from config
-            applyDefaultImGuiStyle(style);
+            ApplyDefaultImGuiStyle(style);
 
 #ifdef IMGUIX_HAS_DOCKING
             colors[ImGuiCol_DockingEmptyBg]        = WindowBg;
@@ -215,7 +215,7 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlotCol_Selection]     = ImVec4(GoldBright.x, GoldBright.y, GoldBright.z, 0.65f);
             style.Colors[ImPlotCol_Crosshairs]    = GoldBright;
 
-            applyDefaultImPlotStyle(style);
+            ApplyDefaultImPlotStyle(style);
         }
 #endif
 #ifdef IMGUI_ENABLE_IMPLOT3D
@@ -239,7 +239,7 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlot3DCol_AxisGrid]     = ImVec4(0.40f, 0.32f, 0.18f, 0.45f);
             style.Colors[ImPlot3DCol_AxisTick]     = ImVec4(0.75f, 0.60f, 0.30f, 0.85f);
 
-            applyDefaultImPlot3DStyle(style);
+            ApplyDefaultImPlot3DStyle(style);
         }
 #endif
     };

@@ -8,10 +8,10 @@
 /// Based on palette from: https://github.com/ocornut/imgui/issues/707 (dark variants),
 /// adapted to:
 ///  - use named color constants
-///  - unify paddings/roundings via applyDefaultImGuiStyle
+///  - unify paddings/roundings via ApplyDefaultImGuiStyle
 ///  - provide matching ImPlot styling
 
-#include <imguix/core/themes/Theme.hpp> // Theme + applyDefaultImGuiStyle
+#include <imguix/core/themes/Theme.hpp> // Theme + ApplyDefaultImGuiStyle
 
 namespace ImGuiX::Themes {
 
@@ -180,7 +180,7 @@ namespace ImGuiX::Themes {
             colors[ImGuiCol_ModalWindowDimBg]      = ModalWindowDimBg;
 
             // Unify sizes/roundings from config
-            applyDefaultImGuiStyle(style);
+            ApplyDefaultImGuiStyle(style);
 
 #ifdef IMGUIX_HAS_DOCKING
             colors[ImGuiCol_DockingEmptyBg]        = WindowBg;
@@ -223,7 +223,7 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlotCol_Selection]     = ImVec4(0.26f, 0.59f, 0.98f, 0.65f);
             style.Colors[ImPlotCol_Crosshairs]    = AccentBase;
 
-            applyDefaultImPlotStyle(style);
+            ApplyDefaultImPlotStyle(style);
         }
 #endif
 #ifdef IMGUI_ENABLE_IMPLOT3D
@@ -247,7 +247,7 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlot3DCol_AxisGrid]     = ImVec4(0.25f, 0.35f, 0.42f, 0.50f);
             style.Colors[ImPlot3DCol_AxisTick]     = ImVec4(0.55f, 0.65f, 0.70f, 0.85f);
 
-            applyDefaultImPlot3DStyle(style);
+            ApplyDefaultImPlot3DStyle(style);
         }
 #endif
     };

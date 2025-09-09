@@ -12,10 +12,10 @@
 ///
 /// Notes:
 ///  - repeated colors are grouped in CyberpunkUIConstants
-///  - layout/rounding is unified via applyDefaultImGuiStyle
+///  - layout/rounding is unified via ApplyDefaultImGuiStyle
 ///  - includes optional ImPlot/ImPlot3D styling
 
-#include <imguix/core/themes/Theme.hpp> // Theme + applyDefaultImGuiStyle
+#include <imguix/core/themes/Theme.hpp> // Theme + ApplyDefaultImGuiStyle
 
 namespace ImGuiX::Themes {
 
@@ -174,7 +174,7 @@ namespace ImGuiX::Themes {
             // Dimming overlays for windowing and modals.
 
             // Baseline sizes/roundings from config
-            applyDefaultImGuiStyle(style);
+            ApplyDefaultImGuiStyle(style);
 
 #if IMGUIX_HAS_DOCKING
             colors[ImGuiCol_DockingPreview] = Cyan;
@@ -214,7 +214,7 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlotCol_Selection]      = ImVec4(0.000f, 0.898f, 1.000f, 0.55f);
             style.Colors[ImPlotCol_Crosshairs]     = ImVec4(0.000f, 0.898f, 1.000f, 1.00f);
 
-            applyDefaultImPlotStyle(style);
+            ApplyDefaultImPlotStyle(style);
         }
 #endif
 
@@ -241,7 +241,7 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlot3DCol_AxisGrid]     = ImVec4(0.164f, 0.204f, 0.251f, 0.60f);
             style.Colors[ImPlot3DCol_AxisTick]     = ImVec4(0.902f, 0.945f, 1.000f, 0.90f);
 
-            applyDefaultImPlot3DStyle(style);
+            ApplyDefaultImPlot3DStyle(style);
         }
 #endif
     };

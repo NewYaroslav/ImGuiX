@@ -12,10 +12,10 @@
 ///
 /// Notes:
 ///  - repeated colors are grouped in Y2KConstants
-///  - layout/rounding is unified via applyDefaultImGuiStyle
+///  - layout/rounding is unified via ApplyDefaultImGuiStyle
 ///  - includes optional ImPlot/ImPlot3D styling
 
-#include <imguix/core/themes/Theme.hpp> // Theme + applyDefaultImGuiStyle
+#include <imguix/core/themes/Theme.hpp> // Theme + ApplyDefaultImGuiStyle
 
 namespace ImGuiX::Themes {
 
@@ -208,7 +208,7 @@ namespace ImGuiX::Themes {
 #endif
 
             // Unify sizes/roundings/paddings/borders from config
-            applyDefaultImGuiStyle(style);
+            ApplyDefaultImGuiStyle(style);
         }
 
 #ifdef IMGUI_ENABLE_IMPLOT
@@ -241,7 +241,7 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlotCol_Selection]      = PlotSelection;
             style.Colors[ImPlotCol_Crosshairs]     = PlotCrosshairs;
 
-            applyDefaultImPlotStyle(style);
+            ApplyDefaultImPlotStyle(style);
         }
 #endif
 
@@ -266,7 +266,7 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlot3DCol_AxisGrid]     = PlotAxisGrid;
             style.Colors[ImPlot3DCol_AxisTick]     = PlotAxisTick;
 
-            applyDefaultImPlot3DStyle(style);
+            ApplyDefaultImPlot3DStyle(style);
         }
 #endif
     };
