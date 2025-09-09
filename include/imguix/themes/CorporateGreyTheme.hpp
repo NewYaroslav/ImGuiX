@@ -17,7 +17,7 @@
 /// \author NewYaroslav
 /// \date 2025
 
-#include <imguix/core/themes/Theme.hpp> // Theme base + applyDefaultImGuiStyle
+#include <imguix/core/themes/Theme.hpp> // Theme base + ApplyDefaultImGuiStyle
 
 namespace ImGuiX::Themes {
 
@@ -103,7 +103,7 @@ namespace ImGuiX::Themes {
             colors[ImGuiCol_NavWindowingHighlight]  = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
             colors[ImGuiCol_NavWindowingDimBg]      = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
 
-            applyDefaultImGuiStyle(style);
+            ApplyDefaultImGuiStyle(style);
             style.DisabledAlpha = 0.75f;
 
 #ifdef IMGUIX_HAS_DOCKING
@@ -146,7 +146,7 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlotCol_Selection]     = Highlight;
             style.Colors[ImPlotCol_Crosshairs]    = Highlight;
 
-            applyDefaultImPlotStyle(style);
+            ApplyDefaultImPlotStyle(style);
         }
 #endif
 #ifdef IMGUI_ENABLE_IMPLOT3D
@@ -168,7 +168,7 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlot3DCol_AxisGrid]     = ImVec4(0.25f, 0.25f, 0.25f, 0.45f);
             style.Colors[ImPlot3DCol_AxisTick]     = ImVec4(0.45f, 0.45f, 0.45f, 0.70f);
 
-            applyDefaultImPlot3DStyle(style);
+            ApplyDefaultImPlot3DStyle(style);
         }
 #endif
     };

@@ -37,7 +37,7 @@ English version: [THEMES.md](THEMES.md).
 ## Создание собственной темы
 
 Реализуйте интерфейс `ImGuiX::Themes::Theme` и переопределите методы `apply`.
-Используйте `applyDefaultImGuiStyle`, чтобы задать общие значения отступов и скруглений.
+Используйте `ApplyDefaultImGuiStyle`, чтобы задать общие значения отступов и скруглений.
 Не вызывайте `ImGui::GetColorU32` вне активного контекста ImGui.
 В конфигурациях храните «сырые» значения `ImVec4` или `ImU32` и переводите их в цвета при отрисовке.
 
@@ -45,7 +45,7 @@ English version: [THEMES.md](THEMES.md).
 class MyTheme final : public ImGuiX::Themes::Theme {
 public:
     void apply(ImGuiStyle& style) const override {
-        ImGuiX::Themes::applyDefaultImGuiStyle(style);
+        ImGuiX::Themes::ApplyDefaultImGuiStyle(style);
         style.Colors[ImGuiCol_Text] = ImVec4(1.0f, 0.8f, 0.2f, 1.0f);
         // настройте остальные цвета...
         style.Colors[ImGuiCol_InputTextCursor] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f); // цвет курсора

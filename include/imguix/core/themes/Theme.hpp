@@ -43,7 +43,7 @@ namespace ImGuiX::Themes {
     /// \brief Set baseline ImGui style parameters.
     /// \param style Style to modify.
     /// \details Used by all themes before applying color scheme.
-    inline void applyDefaultImGuiStyle(ImGuiStyle& style) {
+    inline void ApplyDefaultImGuiStyle(ImGuiStyle& style) {
         using namespace ImGuiX::Config;
 
         style.ChildRounding     = CHILD_ROUNDING;
@@ -72,7 +72,7 @@ namespace ImGuiX::Themes {
     /// \brief Set baseline ImPlot style parameters.
     /// \param style Style to modify.
     /// \details Used by all themes before applying color scheme.
-    inline void applyDefaultImPlotStyle(ImPlotStyle& style) {
+    inline void ApplyDefaultImPlotStyle(ImPlotStyle& style) {
         using namespace ImGuiX::Config;
         const ImGuiStyle& ig = ImGui::GetStyle();
 
@@ -138,7 +138,7 @@ namespace ImGuiX::Themes {
     /// \brief Set baseline ImPlot3D style parameters.
     /// \param style Style to modify.
     /// \details Used by all themes before applying color scheme.
-    inline void applyDefaultImPlot3DStyle(ImPlot3DStyle& style) {
+    inline void ApplyDefaultImPlot3DStyle(ImPlot3DStyle& style) {
         using namespace ImGuiX::Config;
 
         const ImGuiStyle& ig = ImGui::GetStyle();
@@ -157,6 +157,32 @@ namespace ImGuiX::Themes {
         style.PlotDefaultSize = PLOT_DEFAULT_SIZE;
         style.PlotMinSize     = PLOT_MIN_SIZE;
     }
+
+    // вызывайте каждый раз после смены темы ImGui
+    inline void SyncImPlot3DWithImGui() {
+        ImGuiStyle& s      = ImGui::GetStyle();
+        ImPlot3DStyle& p   = ImPlot3D::GetStyle();
+
+        const ImVec4 win   = s.Colors[ImGuiCol_WindowBg];
+        const ImVec4 frame = s.Colors[ImGuiCol_FrameBg];
+        const ImVec4 text  = s.Colors[ImGuiCol_Text];
+        const ImVec4 border= s.Colors[ImGuiCol_Border];
+        const ImVec4 popup = s.Colors[ImGuiCol_PopupBg];
+
+        p.Colors[ImPlot3DCol_FrameBg]      = frame;
+        p.Colors[ImPlot3DCol_PlotBg]       = win;
+        p.Colors[ImPlot3DCol_PlotBorder]   = border;
+        p.Colors[ImPlot3DCol_LegendBg]     = popup;
+        p.Colors[ImPlot3DCol_LegendBorder] = border;
+        p.Colors[ImPlot3DCol_LegendText]   = text;
+        p.Colors[ImPlot3DCol_TitleText]    = text;
+        p.Colors[ImPlot3DCol_InlayText]    = text;
+        p.Colors[ImPlot3DCol_AxisText]     = text;
+
+        ImVec4 grid = ImVec4(text.x, text.y, text.z, 0.25f);
+        p.Colors[ImPlot3DCol_AxisGrid] = grid;
+        p.Colors[ImPlot3DCol_AxisTick] = text;
+    }
 #   endif
     
     /// \brief Classic ImGui theme.
@@ -165,14 +191,14 @@ namespace ImGuiX::Themes {
         /// \copydoc Theme::apply
         void apply(ImGuiStyle& style) const override {
             ImGui::StyleColorsClassic(&style);
-            applyDefaultImGuiStyle(style);
+            ApplyDefaultImGuiStyle(style);
         }
 
 #       ifdef IMGUI_ENABLE_IMPLOT
         /// \copydoc Theme::apply
         void apply(ImPlotStyle& style) const override {
             ImPlot::StyleColorsClassic(&style);
-            applyDefaultImPlotStyle(style);
+            ApplyDefaultImPlotStyle(style);
             SyncImPlotWithImGui();
         }
 #       endif
@@ -181,7 +207,8 @@ namespace ImGuiX::Themes {
         /// \copydoc Theme::apply
         void apply(ImPlot3DStyle& style) const override {
             ImPlot3D::StyleColorsClassic(&style);
-            applyDefaultImPlot3DStyle(style);
+            ApplyDefaultImPlot3DStyle(style);
+            SyncImPlot3DWithImGui();
         }
 #       endif
     };
@@ -192,14 +219,14 @@ namespace ImGuiX::Themes {
         /// \copydoc Theme::apply
         void apply(ImGuiStyle& style) const override {
             ImGui::StyleColorsLight(&style);
-            applyDefaultImGuiStyle(style);
+            ApplyDefaultImGuiStyle(style);
         }
 
 #       ifdef IMGUI_ENABLE_IMPLOT
         /// \copydoc Theme::apply
         void apply(ImPlotStyle& style) const override {
             ImPlot::StyleColorsLight(&style);
-            applyDefaultImPlotStyle(style);
+            ApplyDefaultImPlotStyle(style);
             SyncImPlotWithImGui();
         }
 #       endif
@@ -208,7 +235,8 @@ namespace ImGuiX::Themes {
         /// \copydoc Theme::apply
         void apply(ImPlot3DStyle& style) const override {
             ImPlot3D::StyleColorsLight(&style);
-            applyDefaultImPlot3DStyle(style);
+            ApplyDefaultImPlot3DStyle(style);
+            SyncImPlot3DWithImGui();
         }
 #       endif
     };
@@ -220,14 +248,14 @@ namespace ImGuiX::Themes {
         /// \copydoc Theme::apply
         void apply(ImGuiStyle& style) const override {
             ImGui::StyleColorsDark(&style);
-            applyDefaultImGuiStyle(style);
+            ApplyDefaultImGuiStyle(style);
         }
 
 #       ifdef IMGUI_ENABLE_IMPLOT
         /// \copydoc Theme::apply
         void apply(ImPlotStyle& style) const override {
             ImPlot::StyleColorsDark(&style);
-            applyDefaultImPlotStyle(style);
+            ApplyDefaultImPlotStyle(style);
             SyncImPlotWithImGui();
         }
 #       endif
@@ -236,7 +264,8 @@ namespace ImGuiX::Themes {
         /// \copydoc Theme::apply
         void apply(ImPlot3DStyle& style) const override {
             ImPlot3D::StyleColorsDark(&style);
-            applyDefaultImPlot3DStyle(style);
+            ApplyDefaultImPlot3DStyle(style);
+            SyncImPlot3DWithImGui();
         }
 #       endif
     };

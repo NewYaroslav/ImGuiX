@@ -12,7 +12,7 @@
 ///
 /// Notes:
 ///  - repeated colors are grouped in TokyoNightConstants
-///  - layout/rounding is unified via applyDefaultImGuiStyle
+///  - layout/rounding is unified via ApplyDefaultImGuiStyle
 ///  - includes optional ImPlot/ImPlot3D styling
 
 #include <imguix/core/themes/Theme.hpp>
@@ -204,7 +204,7 @@ namespace ImGuiX::Themes {
             colors[ImGuiCol_DockingPreview] = AccentCyan;
             colors[ImGuiCol_DockingEmptyBg] = ImVec4(WindowBg.x, WindowBg.y, WindowBg.z, 1.0f);
 #endif
-            applyDefaultImGuiStyle(style);
+            ApplyDefaultImGuiStyle(style);
         }
 
 #ifdef IMGUI_ENABLE_IMPLOT
@@ -236,7 +236,7 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlotCol_Selection]      = PlotSelection;
             style.Colors[ImPlotCol_Crosshairs]     = PlotCrosshairs;
 
-            applyDefaultImPlotStyle(style);
+            ApplyDefaultImPlotStyle(style);
         }
 #endif
 
@@ -263,7 +263,7 @@ namespace ImGuiX::Themes {
             style.Colors[ImPlot3DCol_AxisGrid]     = PlotAxisGrid;
             style.Colors[ImPlot3DCol_AxisTick]     = PlotAxisTick;
 
-            applyDefaultImPlot3DStyle(style);
+            ApplyDefaultImPlot3DStyle(style);
         }
 #endif
     };
