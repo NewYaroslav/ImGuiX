@@ -23,12 +23,12 @@ namespace ImGuiX::Widgets {
         {
             ImGui::BeginChild("##left", ImVec2(list_w, 200), ImGuiChildFlags_Borders);
             if (ImGui::Button("Select All")) {
-                for (bool& b : state.selected) b = true;
+                for (auto& b : state.selected) b = true;
                 state.plot_state.update_counter = 0;
             }
             ImGui::SameLine();
             if (ImGui::Button("Reset")) {
-                for (bool& b : state.selected) b = false;
+                for (auto& b : state.selected) b = false;
                 state.plot_state.update_counter = 0;
             }
             ImGui::Separator();

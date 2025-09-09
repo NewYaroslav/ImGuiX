@@ -82,15 +82,25 @@ namespace ImGuiX::Widgets {
                     double px = positions[i];
                     if (show1) {
                         std::snprintf(buf, sizeof buf, fmt1, data.metric1[i]);
-                        ImPlot::Annotation(px + off1, data.metric1[i],
-                                           ImPlotTextFlags_None, buf,
-                                           ImVec2(-5,-5));
+                        ImPlot::Annotation(
+                                px + off1,
+                                data.metric1[i],
+                                ImGui::GetStyleColorVec4(ImGuiCol_Text),
+                                ImVec2(-5, -5),
+                                false,
+                                "%s",
+                                buf);
                     }
                     if (show2) {
                         std::snprintf(buf, sizeof buf, fmt2, data.metric2[i]);
-                        ImPlot::Annotation(px + off2, data.metric2[i],
-                                           ImPlotTextFlags_None, buf,
-                                           ImVec2(5,-5));
+                        ImPlot::Annotation(
+                                px + off2,
+                                data.metric2[i],
+                                ImGui::GetStyleColorVec4(ImGuiCol_Text),
+                                ImVec2(5, -5),
+                                false,
+                                "%s",
+                                buf);
                     }
                 }
             }
