@@ -61,6 +61,8 @@
 #include <imguix/widgets/plot/PlotOHLCChart.hpp>
 #include <imguix/widgets/plot/MetricsPlot.hpp>
 #include <imguix/widgets/plot/MetricsPlotSet.hpp>
+#include <imguix/widgets/plot/DualMetricBarsPlot.hpp>
+#include <imguix/widgets/plot/DualMetricBarsSet.hpp>
 #endif
 
 #ifdef IMGUIX_DEMO
@@ -461,6 +463,8 @@ private:
         if (ImGui::CollapsingHeader(u8"Metrics / Plot")) {
             ImGuiX::Widgets::DemoMetricsPlot();
             ImGuiX::Widgets::DemoMetricsPlotSet();
+            ImGuiX::Widgets::DemoDualMetricBarsPlot();
+            ImGuiX::Widgets::DemoDualMetricBarsPlotSet();
         }
     }
 #   endif
