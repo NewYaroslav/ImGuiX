@@ -2,6 +2,8 @@
 #ifndef _IMGUIX_WIDGETS_PLOT_DUAL_METRIC_BARS_SET_IPP_INCLUDED
 #define _IMGUIX_WIDGETS_PLOT_DUAL_METRIC_BARS_SET_IPP_INCLUDED
 
+#include <algorithm>
+
 namespace ImGuiX::Widgets {
 
     inline void DualMetricBarsPlotSet(
@@ -23,12 +25,12 @@ namespace ImGuiX::Widgets {
         {
             ImGui::BeginChild("##left", ImVec2(list_w, 200), ImGuiChildFlags_Borders);
             if (ImGui::Button("Select All")) {
-                for (auto& b : state.selected) b = true;
+                std::fill(state.selected.begin(), state.selected.end(), true);
                 state.plot_state.update_counter = 0;
             }
             ImGui::SameLine();
             if (ImGui::Button("Reset")) {
-                for (auto& b : state.selected) b = false;
+                std::fill(state.selected.begin(), state.selected.end(), false);
                 state.plot_state.update_counter = 0;
             }
             ImGui::Separator();
