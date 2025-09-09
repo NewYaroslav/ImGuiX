@@ -38,6 +38,7 @@ namespace ImGuiX::Widgets {
         bool cap_by_avail_y      = false;           ///< Limit height by available space.
         bool show_tooltip        = true;            ///< Enable tooltips.
         bool force_all_visible  = false;            ///< If true: all series are always plotted; left panel is hidden; menu shows only annotations.
+        bool use_sticky_select  = false;            ///< Click list items to toggle instead of drag-and-drop.
         bool legend_force_off = false;              ///< Жёстко отключить легенду (игнорирует state.show_legend)
         ImPlotLocation    legend_loc    = ImPlotLocation_West;
         ImPlotLegendFlags legend_flags  = ImPlotLegendFlags_None;
@@ -283,6 +284,27 @@ namespace ImGuiX::Widgets {
             cfg.annotations_default_on = false;
 
             // Бар-режим (values не пустой); тики X появятся из data.tick_labels_x
+            MetricsPlot(data, state, cfg);
+        }
+
+        // ---------- 6) Sticky select: toggle series by click ----------
+        ImGui::TextUnformatted("MetricsPlot / Sticky select demo");
+        {
+            static MetricsPlotData  data;
+            static MetricsPlotState state;
+            static bool init = false;
+
+            if (!init) {
+                const char* kLabels[] = {"A","B","C"};
+                data.labels.assign(std::begin(kLabels), std::end(kLabels));
+                data.values = {1.0, 2.0, 3.0};
+                init = true;
+            }
+
+            MetricsPlotConfig cfg;
+            cfg.id              = "MetricsPlot_Sticky";
+            cfg.left_list_header = "Series";
+            cfg.use_sticky_select = true;
             MetricsPlot(data, state, cfg);
         }
     }
