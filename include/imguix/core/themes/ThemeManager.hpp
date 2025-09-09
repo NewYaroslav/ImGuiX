@@ -11,10 +11,10 @@
 #include <string_view>
 #include <unordered_map>
 #include <utility>
-#ifdef IMGUI_ENABLE_IMPLOT
+#ifdef IMGUIX_ENABLE_IMPLOT
   #include <implot.h>
 #endif
-#ifdef IMGUI_ENABLE_IMPLOT3D
+#ifdef IMGUIX_ENABLE_IMPLOT3D
   #include <implot3d.h>
 #endif
 
@@ -75,10 +75,10 @@ namespace ImGuiX::Themes {
             if (!m_dirty || m_current.empty()) return;
             if (auto it = m_themes.find(m_current); it != m_themes.end() && it->second) {
                 it->second->apply(ImGui::GetStyle());
-#               ifdef IMGUI_ENABLE_IMPLOT
+#               ifdef IMGUIX_ENABLE_IMPLOT
                 it->second->apply(ImPlot::GetStyle());
 #               endif
-#               ifdef IMGUI_ENABLE_IMPLOT3D
+#               ifdef IMGUIX_ENABLE_IMPLOT3D
                 it->second->apply(ImPlot3D::GetStyle());
 #               endif
             }

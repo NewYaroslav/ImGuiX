@@ -305,8 +305,8 @@ After building, open `http://localhost:8081/index.html` in your browser.
 ImGuiX checks several macros to toggle optional integrations. They are defined automatically when corresponding CMake options are enabled.
 
 - `IMGUI_ENABLE_FREETYPE` — use FreeType for font rasterization (`IMGUIX_IMGUI_FREETYPE`).
-- `IMGUI_ENABLE_IMPLOT` — integrate [ImPlot](https://github.com/epezent/implot) (`IMGUIX_USE_IMPLOT`).
-- `IMGUI_ENABLE_IMPLOT3D` — integrate [ImPlot3D](https://github.com/jimgries/implot3d) (`IMGUIX_USE_IMPLOT3D`).
+- `IMGUIX_ENABLE_IMPLOT` — integrate [ImPlot](https://github.com/epezent/implot) (`IMGUIX_USE_IMPLOT`).
+- `IMGUIX_ENABLE_IMPLOT3D` — integrate [ImPlot3D](https://github.com/jimgries/implot3d) (`IMGUIX_USE_IMPLOT3D`).
 
 See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for other configuration macros.
 

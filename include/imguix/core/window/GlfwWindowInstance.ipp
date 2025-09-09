@@ -10,7 +10,7 @@ namespace ImGuiX {
     WindowInstance::~WindowInstance() noexcept  {
         saveIniNow();
 
-#       ifdef IMGUI_ENABLE_IMPLOT
+#       ifdef IMGUIX_ENABLE_IMPLOT
         if (m_implot_ctx) {
             ImPlot::SetCurrentContext(m_implot_ctx);
             ImPlot::DestroyContext(m_implot_ctx);
@@ -18,7 +18,7 @@ namespace ImGuiX {
         }
 #       endif
 
-#       ifdef IMGUI_ENABLE_IMPLOT3D
+#       ifdef IMGUIX_ENABLE_IMPLOT3D
         if (m_implot3d_ctx) {
             ImPlot3D::SetCurrentContext(m_implot3d_ctx);
             ImPlot3D::DestroyContext(m_implot3d_ctx);
@@ -53,12 +53,12 @@ namespace ImGuiX {
         m_imgui_ctx = ImGui::CreateContext();
         ImGui::SetCurrentContext(m_imgui_ctx);
         
-#       ifdef IMGUI_ENABLE_IMPLOT
+#       ifdef IMGUIX_ENABLE_IMPLOT
         m_implot_ctx = ImPlot::CreateContext();
         ImPlot::SetCurrentContext(m_implot_ctx);
 #       endif
 
-#       ifdef IMGUI_ENABLE_IMPLOT3D
+#       ifdef IMGUIX_ENABLE_IMPLOT3D
         m_implot3d_ctx = ImPlot3D::CreateContext();
         ImPlot3D::SetCurrentContext(m_implot3d_ctx);
 #       endif
@@ -211,18 +211,18 @@ namespace ImGuiX {
     
     void WindowInstance::setCurrentWindow() {
         if (!m_window || !m_imgui_ctx) return;
-#       ifdef IMGUI_ENABLE_IMPLOT
+#       ifdef IMGUIX_ENABLE_IMPLOT
         if (!m_implot_ctx) return;
 #       endif
-#       ifdef IMGUI_ENABLE_IMPLOT3D
+#       ifdef IMGUIX_ENABLE_IMPLOT3D
         if (!m_implot3d_ctx) return;
 #       endif
         glfwMakeContextCurrent(m_window);
         ImGui::SetCurrentContext(m_imgui_ctx);
-#       ifdef IMGUI_ENABLE_IMPLOT
+#       ifdef IMGUIX_ENABLE_IMPLOT
         ImPlot::SetCurrentContext(m_implot_ctx);
 #       endif
-#       ifdef IMGUI_ENABLE_IMPLOT3D
+#       ifdef IMGUIX_ENABLE_IMPLOT3D
         ImPlot3D::SetCurrentContext(m_implot3d_ctx);
 #       endif
     }

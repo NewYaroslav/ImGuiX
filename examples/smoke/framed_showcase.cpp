@@ -37,7 +37,7 @@
 #include <imguix/themes/Y2KTheme.hpp>
 #include <imguix/themes/CyberY2KTheme.hpp>
 
-#if defined(IMGUI_ENABLE_IMPLOT)
+#if defined(IMGUIX_ENABLE_IMPLOT)
 #include <imguix/widgets/plot/PlotOHLCChart.hpp>
 #endif
 
@@ -153,7 +153,7 @@ public:
                 ImGuiX::Widgets::DemoNotifications(this);
                 ImGui::EndTabItem();
             }
-#if defined(IMGUI_ENABLE_IMPLOT)
+#if defined(IMGUIX_ENABLE_IMPLOT)
             if (ImGui::BeginTabItem("OHLC Plot")) {
                 drawOhlcDemo();
                 ImGui::EndTabItem();
@@ -172,7 +172,7 @@ private:
     bool m_background_off = false;
     bool m_show_imgui_demo = false;
 
-#if defined(IMGUI_ENABLE_IMPLOT)
+#if defined(IMGUIX_ENABLE_IMPLOT)
     // --- Simple OHLC demo with synthetic bars -------------------------------
     struct Bar { double open{}, high{}, low{}, close{}, volume{}; std::uint64_t time{}; };
 

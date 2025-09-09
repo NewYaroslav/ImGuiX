@@ -6,10 +6,10 @@
 /// \brief Theme definitions and helpers.
 
 #include <imgui.h>
-#ifdef IMGUI_ENABLE_IMPLOT
+#ifdef IMGUIX_ENABLE_IMPLOT
 #   include <implot.h>
 #endif
-#ifdef IMGUI_ENABLE_IMPLOT3D
+#ifdef IMGUIX_ENABLE_IMPLOT3D
 #   include <implot3d.h>
 #endif
 
@@ -26,13 +26,13 @@ namespace ImGuiX::Themes {
         /// \param style Style to modify.
         virtual void apply(ImGuiStyle& style) const = 0;
 
-#       ifdef IMGUI_ENABLE_IMPLOT
+#       ifdef IMGUIX_ENABLE_IMPLOT
         /// \brief Apply theme to ImPlot style.
         /// \param style Style to modify.
         virtual void apply(ImPlotStyle& style) const = 0;
 #       endif
 
-#       ifdef IMGUI_ENABLE_IMPLOT3D
+#       ifdef IMGUIX_ENABLE_IMPLOT3D
         /// \brief Apply theme to ImPlot3D style.
         /// \param style Style to modify.
         virtual void apply(ImPlot3DStyle& style) const = 0;
@@ -68,7 +68,7 @@ namespace ImGuiX::Themes {
 #       endif
     }
 
-#   ifdef IMGUI_ENABLE_IMPLOT
+#   ifdef IMGUIX_ENABLE_IMPLOT
     /// \brief Set baseline ImPlot style parameters.
     /// \param style Style to modify.
     /// \details Used by all themes before applying color scheme.
@@ -134,7 +134,7 @@ namespace ImGuiX::Themes {
 
 #   endif
 
-#   ifdef IMGUI_ENABLE_IMPLOT3D
+#   ifdef IMGUIX_ENABLE_IMPLOT3D
     /// \brief Set baseline ImPlot3D style parameters.
     /// \param style Style to modify.
     /// \details Used by all themes before applying color scheme.
@@ -194,7 +194,7 @@ namespace ImGuiX::Themes {
             ApplyDefaultImGuiStyle(style);
         }
 
-#       ifdef IMGUI_ENABLE_IMPLOT
+#       ifdef IMGUIX_ENABLE_IMPLOT
         /// \copydoc Theme::apply
         void apply(ImPlotStyle& style) const override {
             ImPlot::StyleColorsClassic(&style);
@@ -203,7 +203,7 @@ namespace ImGuiX::Themes {
         }
 #       endif
 
-#       ifdef IMGUI_ENABLE_IMPLOT3D
+#       ifdef IMGUIX_ENABLE_IMPLOT3D
         /// \copydoc Theme::apply
         void apply(ImPlot3DStyle& style) const override {
             ImPlot3D::StyleColorsClassic(&style);
@@ -222,7 +222,7 @@ namespace ImGuiX::Themes {
             ApplyDefaultImGuiStyle(style);
         }
 
-#       ifdef IMGUI_ENABLE_IMPLOT
+#       ifdef IMGUIX_ENABLE_IMPLOT
         /// \copydoc Theme::apply
         void apply(ImPlotStyle& style) const override {
             ImPlot::StyleColorsLight(&style);
@@ -231,7 +231,7 @@ namespace ImGuiX::Themes {
         }
 #       endif
 
-#       ifdef IMGUI_ENABLE_IMPLOT3D
+#       ifdef IMGUIX_ENABLE_IMPLOT3D
         /// \copydoc Theme::apply
         void apply(ImPlot3DStyle& style) const override {
             ImPlot3D::StyleColorsLight(&style);
@@ -251,7 +251,7 @@ namespace ImGuiX::Themes {
             ApplyDefaultImGuiStyle(style);
         }
 
-#       ifdef IMGUI_ENABLE_IMPLOT
+#       ifdef IMGUIX_ENABLE_IMPLOT
         /// \copydoc Theme::apply
         void apply(ImPlotStyle& style) const override {
             ImPlot::StyleColorsDark(&style);
@@ -260,7 +260,7 @@ namespace ImGuiX::Themes {
         }
 #       endif
 
-#       ifdef IMGUI_ENABLE_IMPLOT3D
+#       ifdef IMGUIX_ENABLE_IMPLOT3D
         /// \copydoc Theme::apply
         void apply(ImPlot3DStyle& style) const override {
             ImPlot3D::StyleColorsDark(&style);

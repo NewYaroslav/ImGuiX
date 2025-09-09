@@ -5,7 +5,7 @@
 /// \file MetricsPlotUpdateEvent.hpp
 /// \brief Emitted when metrics plot data is updated.
 
-#ifdef IMGUI_ENABLE_IMPLOT
+#ifdef IMGUIX_ENABLE_IMPLOT
 
 #include <memory>
 #include <typeindex>
@@ -43,6 +43,6 @@ namespace ImGuiX::Events {
 
 } // namespace ImGuiX::Events
 
-#endif // IMGUI_ENABLE_IMPLOT
+#endif // IMGUIX_ENABLE_IMPLOT
 
 #endif // _IMGUIX_EVENTS_METRICS_PLOT_UPDATE_EVENT_HPP_INCLUDED

@@ -25,11 +25,11 @@
 #    include "imgui_glsl_version.hpp"
 #endif
 
-#ifdef IMGUI_ENABLE_IMPLOT
+#ifdef IMGUIX_ENABLE_IMPLOT
 #include <implot.h>
 #endif
 
-#ifdef IMGUI_ENABLE_IMPLOT3D
+#ifdef IMGUIX_ENABLE_IMPLOT3D
 #include <implot3d.h>
 #endif
 
@@ -328,10 +328,10 @@ namespace ImGuiX {
         ImGuiContext* m_imgui_ctx = nullptr;
         const char* selectGlslForSdl(SDL_Window* w) noexcept;
 #endif
-#ifdef IMGUI_ENABLE_IMPLOT
+#ifdef IMGUIX_ENABLE_IMPLOT
         ImPlotContext* m_implot_ctx = nullptr; ///< ImPlot context.
 #endif
-#ifdef IMGUI_ENABLE_IMPLOT3D
+#ifdef IMGUIX_ENABLE_IMPLOT3D
         ImPlot3DContext* m_implot3d_ctx = nullptr; ///< ImPlot3D context.
 #endif
         int m_window_id;                    ///< Unique window identifier.
