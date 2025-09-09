@@ -139,7 +139,7 @@ namespace ImGuiX::Widgets {
                 {
                     for (size_t k = 0; k < c.state.dnd.size(); ++k) {
                         auto& it = c.state.dnd[k];
-                        if (it.is_plot) continue;
+                        if (!c.cfg.use_sticky_select && it.is_plot) continue;
 
                         ImPlot::ItemIcon(it.color);
                         if (ImGui::IsItemHovered()) {
@@ -151,7 +151,24 @@ namespace ImGuiX::Widgets {
                         }
 
                         ImGui::SameLine();
-                        ImGui::Selectable(it.label.data(), false, 0, ImVec2(c.dnd_w, 0));
+                        if (c.cfg.use_sticky_select) {
+                            bool selected = it.is_plot;
+                            if (ImGui::Selectable(it.label.data(), selected, 0, ImVec2(c.dnd_w, 0))) {
+                                it.is_plot = !it.is_plot;
+                                if (it.is_plot) {
+                                    ++c.plotted;
+                                    if (c.state.show_legend && c.plotted >= c.cfg.max_visible) {
+                                        c.state.show_legend = false;
+                                        c.state.update_counter = kUpdateCounterMax;
+                                    }
+                                } else {
+                                    --c.plotted;
+                                }
+                                c.state.update_counter = kUpdateCounterMax;
+                            }
+                        } else {
+                            ImGui::Selectable(it.label.data(), false, 0, ImVec2(c.dnd_w, 0));
+                        }
                         if (ImGui::IsItemHovered()) {
                             ImGui::BeginTooltip();
                             ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
@@ -160,7 +177,7 @@ namespace ImGuiX::Widgets {
                             ImGui::EndTooltip();
                         }
 
-                        //if (!c.state.show_legend || c.plotted < c.cfg.max_visible) {
+                        if (!c.cfg.use_sticky_select) {
                             if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
                                 ImGui::SetDragDropPayload(c.cfg.dnd_payload, &k, sizeof(int));
                                 ImPlot::ItemIcon(it.color);
@@ -168,17 +185,19 @@ namespace ImGuiX::Widgets {
                                 ImGui::TextUnformatted(it.label.data());
                                 ImGui::EndDragDropSource();
                             }
-                        //}
+                        }
                     }
 
-                    if (ImGui::BeginDragDropTarget()) {
-                        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(c.cfg.dnd_payload)) {
-                            int i = *static_cast<const int*>(payload->Data);
-                            if (i >= 0 && static_cast<size_t>(i) < c.state.dnd.size()) {
-                                c.state.dnd[i].is_plot = false;
+                    if (!c.cfg.use_sticky_select) {
+                        if (ImGui::BeginDragDropTarget()) {
+                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(c.cfg.dnd_payload)) {
+                                int i = *static_cast<const int*>(payload->Data);
+                                if (i >= 0 && static_cast<size_t>(i) < c.state.dnd.size()) {
+                                    c.state.dnd[i].is_plot = false;
+                                }
                             }
+                            ImGui::EndDragDropTarget();
                         }
-                        ImGui::EndDragDropTarget();
                     }
                 }
                 ImGui::EndChild();
@@ -236,7 +255,7 @@ namespace ImGuiX::Widgets {
                         c.data.line_y[k].data(),
                         static_cast<int>(c.data.line_y[k].size())
                 );
-                if (ImPlot::BeginDragDropSourceItem(it.label.data())) {
+                if (!c.cfg.use_sticky_select && ImPlot::BeginDragDropSourceItem(it.label.data())) {
                     ImGui::SetDragDropPayload(c.cfg.dnd_payload, &k, sizeof(int));
                     ImPlot::ItemIcon(it.color);
                     ImGui::SameLine();
@@ -356,7 +375,7 @@ namespace ImGuiX::Widgets {
                     );
                 }
 
-                if (ImPlot::BeginDragDropSourceItem(it.label.data())) {
+                if (!c.cfg.use_sticky_select && ImPlot::BeginDragDropSourceItem(it.label.data())) {
                     ImGui::SetDragDropPayload(c.cfg.dnd_payload, &k, sizeof(int));
                     ImPlot::ItemIcon(it.color);
                     ImGui::SameLine();
@@ -453,7 +472,7 @@ namespace ImGuiX::Widgets {
                     draw_bars(c);
                 }
 
-                if (ImPlot::BeginDragDropTargetPlot()) {
+                if (!c.cfg.use_sticky_select && ImPlot::BeginDragDropTargetPlot()) {
                     if (const ImGuiPayload* payload =
                             ImGui::AcceptDragDropPayload(c.cfg.dnd_payload)) {
                         int i = *static_cast<const int*>(payload->Data);
@@ -461,7 +480,7 @@ namespace ImGuiX::Widgets {
                             const bool was_plot = c.state.dnd[i].is_plot;
                             if (!was_plot) {
                                 int cnt = 0;
-                                for (const auto& d : c.state.dnd) { 
+                                for (const auto& d : c.state.dnd) {
                                     if (d.is_plot) ++cnt;
                                 }
                                 ++cnt;
@@ -469,7 +488,7 @@ namespace ImGuiX::Widgets {
                                     c.state.show_legend = false;
                                 }
                             }
-                            
+
                             c.state.dnd[i].is_plot = true;
                             c.state.update_counter = kUpdateCounterMax;
                         }
@@ -477,7 +496,7 @@ namespace ImGuiX::Widgets {
                     ImPlot::EndDragDropTarget();
                 }
 
-                if (ImPlot::BeginDragDropTargetLegend()) {
+                if (!c.cfg.use_sticky_select && ImPlot::BeginDragDropTargetLegend()) {
                     if (const ImGuiPayload* payload =
                             ImGui::AcceptDragDropPayload(c.cfg.dnd_payload)) {
                         int i = *static_cast<const int*>(payload->Data);
@@ -485,7 +504,7 @@ namespace ImGuiX::Widgets {
                             const bool was_plot = c.state.dnd[i].is_plot;
                             if (!was_plot) {
                                 int cnt = 0;
-                                for (const auto& d : c.state.dnd) { 
+                                for (const auto& d : c.state.dnd) {
                                     if (d.is_plot) ++cnt;
                                 }
                                 ++cnt;
