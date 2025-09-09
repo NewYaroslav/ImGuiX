@@ -207,7 +207,7 @@ namespace ImGuiX::Themes {
             ApplyDefaultImGuiStyle(style);
         }
 
-#ifdef IMGUI_ENABLE_IMPLOT
+#ifdef IMGUIX_ENABLE_IMPLOT
         /// \brief Apply theme colors to ImPlot style.
         /// \param style Target style.
         void apply(ImPlotStyle& style) const override {
@@ -245,7 +245,7 @@ namespace ImGuiX::Themes {
         }
 #endif
 
-#ifdef IMGUI_ENABLE_IMPLOT3D
+#ifdef IMGUIX_ENABLE_IMPLOT3D
         /// \brief Apply theme colors to ImPlot3D style.
         /// \param style Target style.
         void apply(ImPlot3DStyle& style) const override {

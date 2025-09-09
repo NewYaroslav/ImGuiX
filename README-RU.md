@@ -304,8 +304,8 @@ run-test-sdl2-ems.bat     :: запускает emrun на локальном с
 ImGuiX проверяет набор макросов для подключения дополнительных модулей. Они задаются автоматически при включении соответствующих опций CMake.
 
 - `IMGUI_ENABLE_FREETYPE` — использование FreeType для растеризации шрифтов (`IMGUIX_IMGUI_FREETYPE`).
-- `IMGUI_ENABLE_IMPLOT` — интеграция [ImPlot](https://github.com/epezent/implot) (`IMGUIX_USE_IMPLOT`).
-- `IMGUI_ENABLE_IMPLOT3D` — интеграция [ImPlot3D](https://github.com/jimgries/implot3d) (`IMGUIX_USE_IMPLOT3D`).
+- `IMGUIX_ENABLE_IMPLOT` — интеграция [ImPlot](https://github.com/epezent/implot) (`IMGUIX_USE_IMPLOT`).
+- `IMGUIX_ENABLE_IMPLOT3D` — интеграция [ImPlot3D](https://github.com/jimgries/implot3d) (`IMGUIX_USE_IMPLOT3D`).
 
 Полный список конфигурационных макросов см. в [docs/CONFIGURATION-RU.md](docs/CONFIGURATION-RU.md).
 

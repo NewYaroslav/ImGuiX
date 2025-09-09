@@ -5,50 +5,50 @@
 
 #include <imgui.h>
 
-#ifdef IMGUI_ENABLE_IMPLOT
+#ifdef IMGUIX_ENABLE_IMPLOT
 #include <implot.h>
 #endif
 
-#ifdef IMGUI_ENABLE_IMPLOT3D
+#ifdef IMGUIX_ENABLE_IMPLOT3D
 #include <implot3d.h>
 #endif
 
-#ifdef IMGUI_ENABLE_IMNODEFLOW
+#ifdef IMGUIX_ENABLE_IMNODEFLOW
 #include <ImNodeFlow.h>
 #endif
 
-#ifdef IMGUI_ENABLE_IMGUIFILEDIALOG
+#ifdef IMGUIX_ENABLE_IMGUIFILEDIALOG
 #include <ImGuiFileDialog.h>
 #endif
 
-#ifdef IMGUI_ENABLE_PFD
+#ifdef IMGUIX_ENABLE_PFD
 #include <portable-file-dialogs.h>
 #endif
 
-#ifdef IMGUI_ENABLE_IMCMD
+#ifdef IMGUIX_ENABLE_IMCMD
 #include <imcmd_command_palette.h>
 #endif
 
-#ifdef IMGUI_ENABLE_IMCOOLBAR
+#ifdef IMGUIX_ENABLE_IMCOOLBAR
 #include <ImCoolBar.h>
 #endif
 
-#ifdef IMGUI_ENABLE_IMSPINNER
+#ifdef IMGUIX_ENABLE_IMSPINNER
 #include <imspinner.h>
 #endif
 
-#ifdef IMGUI_ENABLE_IMTEXTEDITOR
+#ifdef IMGUIX_ENABLE_IMTEXTEDITOR
 #include <ImGuiColorTextEdit.h>
 #endif
 
-#ifdef IMGUI_ENABLE_IMGUI_MD
+#ifdef IMGUIX_ENABLE_IMGUI_MD
 #include <imgui_md.h>
 #endif
 
 
 namespace ImGuiX::Widgets {
 
-#   ifdef IMGUI_ENABLE_IMNODEFLOW
+#   ifdef IMGUIX_ENABLE_IMNODEFLOW
     class SimpleSum final : public ImFlow::BaseNode {
     public:
         SimpleSum() {
@@ -80,7 +80,7 @@ namespace ImGuiX::Widgets {
     }
 #   endif
 
-#   ifdef IMGUI_ENABLE_IMCMD
+#   ifdef IMGUIX_ENABLE_IMCMD
 namespace {
     inline bool show_cmd_palette = false;
     // Ensure context exists (CreateContext also binds it as current if none)
@@ -147,7 +147,7 @@ namespace {
     }
 #   endif
 
-#ifdef IMGUI_ENABLE_IMGUI_MD
+#ifdef IMGUIX_ENABLE_IMGUI_MD
 namespace {
     
     // Минимальный принтер: один шрифт и открытие ссылок через платформенный вызов при желании
@@ -209,63 +209,63 @@ namespace {
     /// \berif
     inline void DemoExternalWidgets() {
         static bool show_imgui_demo = false;
-#   ifdef IMGUI_ENABLE_IMPLOT
+#   ifdef IMGUIX_ENABLE_IMPLOT
         static bool show_implot_demo = false;
 #   endif
-#   ifdef IMGUI_ENABLE_IMPLOT3D
+#   ifdef IMGUIX_ENABLE_IMPLOT3D
         static bool show_implot3d_demo = false;
 #   endif
-#   ifdef IMGUI_ENABLE_IMNODEFLOW
+#   ifdef IMGUIX_ENABLE_IMNODEFLOW
         static bool show_imnodeflow_demo = false;
 #   endif
-#   ifdef IMGUI_ENABLE_IMGUIFILEDIALOG
+#   ifdef IMGUIX_ENABLE_IMGUIFILEDIALOG
         static bool show_igfd = false;
 #   endif
-#   ifdef IMGUI_ENABLE_PFD
+#   ifdef IMGUIX_ENABLE_PFD
         static bool show_pfd = false;
 #   endif
-#   ifdef IMGUI_ENABLE_IMSPINNER
+#   ifdef IMGUIX_ENABLE_IMSPINNER
         static bool show_imspinner_demo = false;
 #   endif
-#   ifdef IMGUI_ENABLE_IMTEXTEDITOR
+#   ifdef IMGUIX_ENABLE_IMTEXTEDITOR
         static bool show_text_editor = false;
 #   endif
 
-#   ifdef IMGUI_ENABLE_IMCOOLBAR
+#   ifdef IMGUIX_ENABLE_IMCOOLBAR
         static bool show_coolbar_demo = false;
 #   endif
 
         if (ImGui::BeginMainMenuBar()) {
             if (ImGui::BeginMenu("Demo")) {
                 if (ImGui::MenuItem("ImGui", nullptr, false, !show_imgui_demo)) show_imgui_demo = true;
-#               ifdef IMGUI_ENABLE_IMPLOT
+#               ifdef IMGUIX_ENABLE_IMPLOT
                 if (ImGui::MenuItem("ImPlot", nullptr, false, !show_implot_demo)) show_implot_demo = true;
 #               endif
-#               ifdef IMGUI_ENABLE_IMPLOT3D
+#               ifdef IMGUIX_ENABLE_IMPLOT3D
                 if (ImGui::MenuItem("ImPlot3D", nullptr, false, !show_implot3d_demo)) show_implot3d_demo = true;
 #               endif
-#               ifdef IMGUI_ENABLE_IMNODEFLOW
+#               ifdef IMGUIX_ENABLE_IMNODEFLOW
                 if (ImGui::MenuItem("ImNodeFlow", nullptr, false, !show_imnodeflow_demo)) show_imnodeflow_demo = true;
 #               endif
-#               ifdef IMGUI_ENABLE_IMGUIFILEDIALOG
+#               ifdef IMGUIX_ENABLE_IMGUIFILEDIALOG
                 if (ImGui::MenuItem("File Dialog", nullptr, false, !show_igfd)) show_igfd = true;
 #               endif
-#               ifdef IMGUI_ENABLE_PFD
+#               ifdef IMGUIX_ENABLE_PFD
                 if (ImGui::MenuItem("File Dialog (pfd)", nullptr, false, !show_pfd)) show_pfd = true;
 #               endif
-#               ifdef IMGUI_ENABLE_IMCMD
+#               ifdef IMGUIX_ENABLE_IMCMD
                 if (ImGui::MenuItem("Command Palette", "Ctrl+Shift+P", false, !show_cmd_palette)) show_cmd_palette = true;
 #               endif
-#               ifdef IMGUI_ENABLE_IMSPINNER
+#               ifdef IMGUIX_ENABLE_IMSPINNER
                 if (ImGui::MenuItem("ImSpinner", nullptr, false, !show_imspinner_demo)) show_imspinner_demo = true;
 #               endif
-#               ifdef IMGUI_ENABLE_IMTEXTEDITOR
+#               ifdef IMGUIX_ENABLE_IMTEXTEDITOR
                 if (ImGui::MenuItem("Code Editor", nullptr, false, !show_text_editor)) show_text_editor = true;
 #               endif
-#               ifdef IMGUI_ENABLE_IMCOOLBAR
+#               ifdef IMGUIX_ENABLE_IMCOOLBAR
                 if (ImGui::MenuItem("ImCoolBar", nullptr, false, !show_coolbar_demo)) show_coolbar_demo = true;
 #               endif
-#               ifdef IMGUI_ENABLE_IMGUI_MD
+#               ifdef IMGUIX_ENABLE_IMGUI_MD
                 if (ImGui::MenuItem("Markdown (imgui_md)", nullptr, false, !show_md_demo)) show_md_demo = true;
 #               endif
 
@@ -276,15 +276,15 @@ namespace {
 
         if (show_imgui_demo) ImGui::ShowDemoWindow(&show_imgui_demo);
 
-#       ifdef IMGUI_ENABLE_IMPLOT
+#       ifdef IMGUIX_ENABLE_IMPLOT
         if (show_implot_demo) ImPlot::ShowDemoWindow(&show_implot_demo);
 #       endif
 
-#       ifdef IMGUI_ENABLE_IMPLOT3D
+#       ifdef IMGUIX_ENABLE_IMPLOT3D
         if (show_implot3d_demo) ImPlot3D::ShowDemoWindow(&show_implot3d_demo);
 #       endif
 
-#       ifdef IMGUI_ENABLE_IMNODEFLOW
+#       ifdef IMGUIX_ENABLE_IMNODEFLOW
         if (show_imnodeflow_demo) {
             ImGui::Begin("ImNodeFlow Demo", &show_imnodeflow_demo);
             DrawNodeEditorFrame();
@@ -292,7 +292,7 @@ namespace {
         }
 #       endif
 
-#       ifdef IMGUI_ENABLE_IMGUIFILEDIALOG
+#       ifdef IMGUIX_ENABLE_IMGUIFILEDIALOG
         if (show_igfd) {
             ImGui::Begin("ImGuiFileDialog", &show_igfd);
             if (ImGui::Button("Open...")) {
@@ -311,7 +311,7 @@ namespace {
         }
 #       endif
 
-#       ifdef IMGUI_ENABLE_PFD
+#       ifdef IMGUIX_ENABLE_PFD
         if (show_pfd) {
             ImGui::Begin("portable-file-dialogs", &show_pfd);
             static std::string last_open, last_save;
@@ -336,7 +336,7 @@ namespace {
         }
 #       endif
 
-#       ifdef IMGUI_ENABLE_IMSPINNER
+#       ifdef IMGUIX_ENABLE_IMSPINNER
         if (show_imspinner_demo) {
             ImGui::Begin("ImSpinner Demo", &show_imspinner_demo);
 #           ifdef IMSPINNER_DEMO
@@ -348,7 +348,7 @@ namespace {
         }
 #       endif
 
-#       ifdef IMGUI_ENABLE_IMTEXTEDITOR
+#       ifdef IMGUIX_ENABLE_IMTEXTEDITOR
         static ImTextEdit::TextEditor s_editor;
         if (show_text_editor) {
             static bool init = false;
@@ -365,11 +365,11 @@ namespace {
         }
 #       endif
 
-#       ifdef IMGUI_ENABLE_IMCMD
+#       ifdef IMGUIX_ENABLE_IMCMD
         DrawImCmdDemo();
 #       endif
 
-#       ifdef IMGUI_ENABLE_IMCOOLBAR
+#       ifdef IMGUIX_ENABLE_IMCOOLBAR
         if (show_coolbar_demo) {
             ImGui::Begin("ImCoolBar Demo", &show_coolbar_demo);
 
@@ -428,7 +428,7 @@ namespace {
         }
 #       endif
 
-#       ifdef IMGUI_ENABLE_IMGUI_MD
+#       ifdef IMGUIX_ENABLE_IMGUI_MD
         if (show_md_demo) {
             ImGui::Begin("Markdown Demo", &show_md_demo);
             static const char* kText =

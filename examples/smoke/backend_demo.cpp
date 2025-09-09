@@ -1,10 +1,10 @@
 #if defined(IMGUIX_USE_SFML_BACKEND)
 
 #include <imgui.h> // necessary for ImGui::*, imgui-SFML.h doesn't include imgui.h
-#ifdef IMGUI_ENABLE_IMPLOT
+#ifdef IMGUIX_ENABLE_IMPLOT
 #include <implot.h>
 #endif
-#ifdef IMGUI_ENABLE_IMPLOT3D
+#ifdef IMGUIX_ENABLE_IMPLOT3D
 #include <implot3d.h>
 #endif
 #include <imgui-SFML.h> // for ImGui::SFML::* functions and SFML-specific overloads
@@ -64,10 +64,10 @@ int main() {
     window.setFramerateLimit(60);
     
     if (!ImGui::SFML::Init(window)) return -1;
-#ifdef IMGUI_ENABLE_IMPLOT
+#ifdef IMGUIX_ENABLE_IMPLOT
     ImPlot::CreateContext();
 #endif
-#ifdef IMGUI_ENABLE_IMPLOT3D
+#ifdef IMGUIX_ENABLE_IMPLOT3D
     ImPlot3D::CreateContext();
 #endif
     
@@ -82,8 +82,8 @@ int main() {
 
     std::printf("Fonts count: %d\n", io.Fonts->Fonts.Size);
     std::printf("ImTextureID: %d\n", sizeof(ImTextureID));
-#   ifdef IMGUI_ENABLE_IMPLOT
-    std::printf("IMGUI_ENABLE_IMPLOT\n");
+#   ifdef IMGUIX_ENABLE_IMPLOT
+    std::printf("IMGUIX_ENABLE_IMPLOT\n");
 #   endif
 
     sf::CircleShape shape(100.f);
@@ -102,11 +102,11 @@ int main() {
         ImGui::SFML::Update(window, deltaClock.restart());
 
         ImGui::ShowDemoWindow();
-#ifdef IMGUI_ENABLE_IMPLOT
+#ifdef IMGUIX_ENABLE_IMPLOT
         static bool show_implot_demo = true;
         if (show_implot_demo) ImPlot::ShowDemoWindow(&show_implot_demo);
 #endif
-#ifdef IMGUI_ENABLE_IMPLOT3D
+#ifdef IMGUIX_ENABLE_IMPLOT3D
         static bool show_implot3d_demo = true;
         if (show_implot3d_demo) ImPlot3D::ShowDemoWindow(&show_implot3d_demo);
 #endif
@@ -124,10 +124,10 @@ int main() {
         window.display();
     }
 
-#ifdef IMGUI_ENABLE_IMPLOT
+#ifdef IMGUIX_ENABLE_IMPLOT
     ImPlot::DestroyContext();
 #endif
-#ifdef IMGUI_ENABLE_IMPLOT3D
+#ifdef IMGUIX_ENABLE_IMPLOT3D
     ImPlot3D::DestroyContext();
 #endif
     ImGui::SFML::Shutdown();

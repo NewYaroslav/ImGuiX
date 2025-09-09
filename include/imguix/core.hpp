@@ -28,11 +28,11 @@
 #include <imgui_freetype.h>
 #endif
 
-#ifdef IMGUI_ENABLE_IMPLOT
+#ifdef IMGUIX_ENABLE_IMPLOT
 #include <implot.h>
 #endif
 
-#ifdef IMGUI_ENABLE_IMPLOT3D
+#ifdef IMGUIX_ENABLE_IMPLOT3D
 #include <implot3d.h>
 #endif
 

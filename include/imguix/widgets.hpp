@@ -35,7 +35,7 @@
 #include <imguix/widgets/time/time_picker.hpp>
 #include <imguix/widgets/time/expiry_picker.hpp>
 
-#ifdef IMGUI_ENABLE_IMPLOT
+#ifdef IMGUIX_ENABLE_IMPLOT
 #   include <imguix/widgets/plot/PlotOHLCChart.hpp>
 #endif
 

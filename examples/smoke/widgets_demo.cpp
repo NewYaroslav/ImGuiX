@@ -57,7 +57,7 @@
 #include <imguix/themes/TokyoNightTheme.hpp>
 
 // === Графики ===
-#ifdef IMGUI_ENABLE_IMPLOT
+#ifdef IMGUIX_ENABLE_IMPLOT
 #include <imguix/widgets/plot/PlotOHLCChart.hpp>
 #include <imguix/widgets/plot/MetricsPlot.hpp>
 #include <imguix/widgets/plot/MetricsPlotSet.hpp>
@@ -69,7 +69,7 @@
 
 #define IMGUIX_EMOJI_ROCKET u8"\U0001F680"
 
-#ifdef IMGUI_ENABLE_IMPLOT
+#ifdef IMGUIX_ENABLE_IMPLOT
 /// \brief Generate synthetic OHLCV bars.
 /// \param out Output bar container.
 /// \param count Number of bars to produce.
@@ -201,7 +201,7 @@ private:
         std::vector<std::string>              names{"Alice", "Bob"};
         std::vector<int>                      numbers{1, 2, 3};
         
-#       ifdef IMGUI_ENABLE_IMPLOT
+#       ifdef IMGUIX_ENABLE_IMPLOT
         // ------------------ 8) OHLC Bars Plot (demo) ------------------
         int  tf_index = 0;            // 0=M1, 1=M30, 2=H1
         int  bars_count = 300;        // сколько баров генерить
@@ -420,7 +420,7 @@ private:
         }
     }
 
-#   ifdef IMGUI_ENABLE_IMPLOT
+#   ifdef IMGUIX_ENABLE_IMPLOT
     void demoPlot() {
         if (ImGui::CollapsingHeader(u8"OHLC Bars / Plot")) {
             static const int TFs[] = {60, 30*60, 60*60};
@@ -468,7 +468,7 @@ private:
     void drawWidgetsDemo() {
         ImGui::SeparatorText("Widgets Demo");
         demoTheme();
-#       ifdef IMGUI_ENABLE_IMPLOT
+#       ifdef IMGUIX_ENABLE_IMPLOT
         demoPlot();
 #       endif
         demoAuthorization();
@@ -532,8 +532,8 @@ public:
 };
 
 int main() {
-#   ifdef IMGUI_ENABLE_IMPLOT
-    std::cout << "IMGUI_ENABLE_IMPLOT" << std::endl;
+#   ifdef IMGUIX_ENABLE_IMPLOT
+    std::cout << "IMGUIX_ENABLE_IMPLOT" << std::endl;
 #   endif
 #   ifdef IMGUI_USE_WCHAR32
     std::cout << "IMGUI_USE_WCHAR32" << std::endl;
