@@ -40,41 +40,41 @@ For the Russian version, see [README-RU.md](README-RU.md).
 
 ## Quick Start
 
+Minimal ImGuiX application with a single framed window and controller:
+
 ```cpp
-#include <SFML/Graphics.hpp>
-#include <imgui.h>
-#include <imgui-SFML.h>
+#define IMGUIX_HEADER_ONLY
+#define IMGUIX_DEMO
 
-int main() {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "ImGuiX SDK template");
-    window.setFramerateLimit(60);
+#include <imguix/core.hpp>
+#include <imguix/windows/ImGuiFramedWindow.hpp>
+#include <imguix/controllers/ExtendedController.hpp>
 
-    ImGui::CreateContext();
-    ImGui::StyleColorsDark();
-    ImGui::SFML::Init(window);
+class HelloController : public ImGuiX::Controllers::ExtendedController {
+public:
+    using ExtendedController::ExtendedController;
 
-    bool show_demo = true;
-    sf::Clock clk;
-
-    while (window.isOpen()) {
-        sf::Event ev;
-        while (window.pollEvent(ev)) {
-            ImGui::SFML::ProcessEvent(window, ev);
-            if (ev.type == sf::Event::Closed) window.close();
-        }
-
-        ImGui::SFML::Update(window, clk.restart());
-
-        if (show_demo) ImGui::ShowDemoWindow(&show_demo);
+    void drawUi() override {
         ImGui::Begin("Hello");
         ImGui::Text("It works!");
         ImGui::End();
-
-        window.clear();
-        ImGui::SFML::Render(window);
-        window.display();
     }
-    ImGui::SFML::Shutdown();
+};
+
+class HelloWindow : public ImGuiX::Windows::ImGuiFramedWindow {
+public:
+    using ImGuiFramedWindow::ImGuiFramedWindow;
+
+    void onInit() override {
+        createController<HelloController>();
+        create(800, 600);
+    }
+};
+
+int main() {
+    ImGuiX::Application app;
+    app.createWindow<HelloWindow>("main", "ImGuiX Quick Start");
+    app.run();
     return 0;
 }
 ```
