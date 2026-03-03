@@ -123,6 +123,7 @@ namespace ImGuiX::Windows {
         ImVec2 char_size = ImGui::CalcTextSize(u8"W");
         ImVec2 padding = style.WindowPadding;
         float title_padding_x = padding.x + char_size.x * 2.0f;
+        const float menu_bar_height = ImGui::GetFrameHeight();
 
         const ImGuiWindowFlags flags = 
             ImGuiWindowFlags_NoDecoration |
@@ -181,20 +182,28 @@ namespace ImGuiX::Windows {
         if (hasFlag(m_flags, WindowFlags::HasMenuBar)) {
             ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 0.0f);
             ImGui::SetCursorPosY(m_config.title_bar_height + inset);
-            ImGui::BeginChild(u8"##imguix_menu_bar", ImVec2(0, 0), false,
-                              ImGuiWindowFlags_MenuBar | 
-                              ImGuiWindowFlags_NoScrollbar | 
-                              ImGuiWindowFlags_NoDecoration |
-                              ImGuiWindowFlags_AlwaysAutoResize);
-            ImGui::PopStyleVar();
-            drawMenuBar();
+            if (ImGui::BeginChild(u8"##imguix_menu_bar",
+                                  ImVec2(0.0f, menu_bar_height),
+                                  ImGuiChildFlags_None,
+                                  ImGuiWindowFlags_MenuBar |
+                                      ImGuiWindowFlags_NoScrollbar |
+                                      ImGuiWindowFlags_NoDecoration)) {
+                drawMenuBar();
+            }
             ImGui::EndChild();
+            ImGui::PopStyleVar();
         }
 
         // --- Main content
-        for (auto& ctrl : m_controllers) {
-            ctrl->drawUi();
+        if (ImGui::BeginChild(u8"##imguix_content",
+                              ImVec2(0.0f, 0.0f),
+                              ImGuiChildFlags_None,
+                              ImGuiWindowFlags_NoDecoration)) {
+            for (auto& ctrl : m_controllers) {
+                ctrl->drawUi();
+            }
         }
+        ImGui::EndChild();
 
         ImGui::End();
         
