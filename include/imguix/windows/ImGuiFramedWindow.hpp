@@ -97,7 +97,7 @@ namespace ImGuiX::Windows {
 #       endif
     
     protected:
-        /// \brief Draws the title bar text. Can be overridden to add icons or change alignment.
+        /// \brief Draws title bar content and controls its own local cursor layout.
         virtual void drawTitleBarText();
 
         /// \brief Draw control buttons in the title bar.

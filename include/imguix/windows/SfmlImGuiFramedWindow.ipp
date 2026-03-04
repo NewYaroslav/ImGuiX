@@ -120,9 +120,7 @@ namespace ImGuiX::Windows {
         ImGui::SetNextWindowPos({0, 0});
         ImGui::SetNextWindowSize(ImVec2((float)m_window.getSize().x, (float)m_window.getSize().y));
 
-        ImVec2 char_size = ImGui::CalcTextSize(u8"W");
-        ImVec2 padding = style.WindowPadding;
-        float title_padding_x = padding.x + char_size.x * 2.0f;
+        const float title_padding_x = 0.0f;
         const float menu_bar_height = ImGui::GetFrameHeight();
 
         const ImGuiWindowFlags flags = 
@@ -162,7 +160,6 @@ namespace ImGuiX::Windows {
             ImGui::GetWindowDrawList()->AddRectFilled(p_min, p_max, ImGui::GetColorU32(ImGuiCol_TitleBgActive));
         }
 
-        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + title_padding_x);
         drawTitleBarText();
         
         if (hasFlag(m_flags, WindowFlags::ShowControlButtons)) {
