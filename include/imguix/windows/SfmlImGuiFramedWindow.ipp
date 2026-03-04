@@ -162,7 +162,6 @@ namespace ImGuiX::Windows {
             ImGui::GetWindowDrawList()->AddRectFilled(p_min, p_max, ImGui::GetColorU32(ImGuiCol_TitleBgActive));
         }
 
-        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + title_padding_x);
         drawTitleBarText();
         
         if (hasFlag(m_flags, WindowFlags::ShowControlButtons)) {
