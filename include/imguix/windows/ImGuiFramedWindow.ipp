@@ -29,7 +29,7 @@ namespace ImGuiX::Windows {
     void ImGuiFramedWindow::drawTitleBarText() {
         const ImGuiStyle& style = ImGui::GetStyle();
         const ImVec2 char_size = ImGui::CalcTextSize(u8"W");
-        const float title_padding_x = style.WindowPadding.x + char_size.x * 2.0f;
+        const float title_padding_x = style.WindowPadding.x * 2.0f + char_size.x;
         float padding_y = (m_config.title_bar_height - ImGui::GetTextLineHeight()) * 0.5f;
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + title_padding_x);
         ImGui::SetCursorPosY(padding_y);
