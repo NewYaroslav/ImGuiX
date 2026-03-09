@@ -91,7 +91,9 @@ namespace ImGuiX::Pubsub {
 
 } // namespace ImGuiX::Pubsub
 
-#if defined(IMGUIX_HEADER_ONLY)
+#include "EventBus.tpp"
+
+#ifdef IMGUIX_HEADER_ONLY
 #   include "EventBus.ipp"
 #endif
 
