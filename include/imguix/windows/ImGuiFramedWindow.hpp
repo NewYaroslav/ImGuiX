@@ -22,6 +22,7 @@ namespace ImGuiX::Windows {
         int frame_corner_radius = 8;   ///< Radius of the outer window corners.
         int resize_border = 8;         ///< Thickness of the manual resize border.
         int title_bar_height = 32 ;    ///< Height of the custom title bar.
+        int side_panel_width = 0;      ///< Width of optional left side panel in pixels (<= 0 disables).
         const char* close_button_text = u8"X##imguix_btn_close"; ///< Label for the close button.
         const char* minimize_button_text = u8"_##imguix_btn_minimize"; ///< Label for the minimize button.
         const char* maximize_button_text = u8"[]##imguix_btn_maximize"; ///< Label for the maximize button.
@@ -99,6 +100,9 @@ namespace ImGuiX::Windows {
     protected:
         /// \brief Draws title bar content and controls its own local cursor layout.
         virtual void drawTitleBarText();
+
+        /// \brief Draw optional left side panel content.
+        virtual void drawSidePanel() {}
 
         /// \brief Draw control buttons in the title bar.
         /// \param title_padding_x Horizontal title padding.

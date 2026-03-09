@@ -174,27 +174,77 @@ namespace ImGuiX::Windows {
         }
 
         ImGui::EndChild();
-        ImGui::SetCursorPos(ImVec2(padded_start.x, padded_start.y + m_config.title_bar_height));
-        
-        // --- Menu Bar
-        if (hasFlag(m_flags, WindowFlags::HasMenuBar)) {
-            ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 0.0f);
-            ImGui::SetCursorPosY(padded_start.y + m_config.title_bar_height);
-            if (ImGui::BeginChild(u8"##imguix_menu_bar",
-                                  ImVec2(0.0f, menu_bar_height),
+
+        const ImVec2 body_start(inset, padded_start.y + m_config.title_bar_height);
+        const float body_width = ImMax(0.0f, ImGui::GetWindowSize().x - 2.0f * inset);
+        const float requested_side_panel_width =
+            m_config.side_panel_width > 0 ? static_cast<float>(m_config.side_panel_width) : 0.0f;
+        const float side_panel_width = ImMin(requested_side_panel_width, body_width);
+        const float main_region_width = ImMax(0.0f, body_width - side_panel_width);
+
+        if (side_panel_width <= 0.0f) {
+            ImGui::SetCursorPos(ImVec2(padded_start.x, padded_start.y + m_config.title_bar_height));
+
+            // --- Menu Bar
+            if (hasFlag(m_flags, WindowFlags::HasMenuBar)) {
+                ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 0.0f);
+                ImGui::SetCursorPosY(padded_start.y + m_config.title_bar_height);
+                if (ImGui::BeginChild(u8"##imguix_menu_bar",
+                                      ImVec2(0.0f, menu_bar_height),
+                                      ImGuiChildFlags_None,
+                                      ImGuiWindowFlags_MenuBar |
+                                          ImGuiWindowFlags_NoScrollbar |
+                                          ImGuiWindowFlags_NoDecoration)) {
+                    drawMenuBar();
+                }
+                ImGui::EndChild();
+                ImGui::PopStyleVar();
+            }
+
+            // --- Main content
+            for (auto& ctrl : m_controllers) {
+                ctrl->drawUi();
+            }
+        } else {
+            ImGui::SetCursorPos(body_start);
+            if (ImGui::BeginChild(u8"##imguix_side_panel",
+                                  ImVec2(side_panel_width, 0.0f),
                                   ImGuiChildFlags_None,
-                                  ImGuiWindowFlags_MenuBar |
-                                      ImGuiWindowFlags_NoScrollbar |
-                                      ImGuiWindowFlags_NoDecoration)) {
-                drawMenuBar();
+                                  ImGuiWindowFlags_NoScrollbar |
+                                      ImGuiWindowFlags_NoDecoration |
+                                      ImGuiWindowFlags_NoBackground)) {
+                drawSidePanel();
             }
             ImGui::EndChild();
-            ImGui::PopStyleVar();
-        }
+            ImGui::SameLine(0.0f, 0.0f);
 
-        // --- Main content
-        for (auto& ctrl : m_controllers) {
-            ctrl->drawUi();
+            if (ImGui::BeginChild(u8"##imguix_main_region",
+                                  ImVec2(main_region_width, 0.0f),
+                                  ImGuiChildFlags_AlwaysUseWindowPadding,
+                                  ImGuiWindowFlags_NoScrollbar |
+                                  ImGuiWindowFlags_NoDecoration |
+                                  ImGuiWindowFlags_NoBackground)) {
+                // --- Menu Bar
+                if (hasFlag(m_flags, WindowFlags::HasMenuBar)) {
+                    ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 0.0f);
+                    if (ImGui::BeginChild(u8"##imguix_menu_bar",
+                                          ImVec2(0.0f, menu_bar_height),
+                                          ImGuiChildFlags_None,
+                                          ImGuiWindowFlags_MenuBar |
+                                              ImGuiWindowFlags_NoScrollbar |
+                                              ImGuiWindowFlags_NoDecoration)) {
+                        drawMenuBar();
+                    }
+                    ImGui::EndChild();
+                    ImGui::PopStyleVar();
+                }
+
+                // --- Main content
+                for (auto& ctrl : m_controllers) {
+                    ctrl->drawUi();
+                }
+            }
+            ImGui::EndChild();
         }
 
         ImGui::End();
