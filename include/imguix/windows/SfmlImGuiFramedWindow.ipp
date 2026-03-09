@@ -189,12 +189,14 @@ namespace ImGuiX::Windows {
             if (hasFlag(m_flags, WindowFlags::HasMenuBar)) {
                 ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 0.0f);
                 ImGui::SetCursorPosY(padded_start.y + m_config.title_bar_height);
-                if (ImGui::BeginChild(u8"##imguix_menu_bar",
-                                      ImVec2(0.0f, menu_bar_height),
-                                      ImGuiChildFlags_None,
-                                      ImGuiWindowFlags_MenuBar |
-                                          ImGuiWindowFlags_NoScrollbar |
-                                          ImGuiWindowFlags_NoDecoration)) {
+                if (ImGui::BeginChild(
+                        u8"##imguix_menu_bar",
+                        ImVec2(0.0f, menu_bar_height),
+                        ImGuiChildFlags_None,
+                        ImGuiWindowFlags_MenuBar |
+                        ImGuiWindowFlags_NoScrollbar |
+                        ImGuiWindowFlags_NoDecoration
+                    )) {
                     drawMenuBar();
                 }
                 ImGui::EndChild();
@@ -207,32 +209,39 @@ namespace ImGuiX::Windows {
             }
         } else {
             ImGui::SetCursorPos(body_start);
-            if (ImGui::BeginChild(u8"##imguix_side_panel",
-                                  ImVec2(side_panel_width, 0.0f),
-                                  ImGuiChildFlags_None,
-                                  ImGuiWindowFlags_NoScrollbar |
-                                      ImGuiWindowFlags_NoDecoration |
-                                      ImGuiWindowFlags_NoBackground)) {
+            if (ImGui::BeginChild(
+                    u8"##imguix_side_panel",
+                    ImVec2(side_panel_width, 0.0f),
+                    ImGuiChildFlags_None,
+                    ImGuiWindowFlags_NoScrollbar |
+                    ImGuiWindowFlags_NoDecoration |
+                    ImGuiWindowFlags_NoBackground
+                )) {
                 drawSidePanel();
             }
             ImGui::EndChild();
             ImGui::SameLine(0.0f, 0.0f);
 
-            if (ImGui::BeginChild(u8"##imguix_main_region",
-                                  ImVec2(main_region_width, 0.0f),
-                                  ImGuiChildFlags_AlwaysUseWindowPadding,
-                                  ImGuiWindowFlags_NoScrollbar |
-                                  ImGuiWindowFlags_NoDecoration |
-                                  ImGuiWindowFlags_NoBackground)) {
+<<<<<<< HEAD
+            if (ImGui::BeginChild(
+                    u8"##imguix_main_region",
+                    ImVec2(main_region_width, 0.0f),
+                    ImGuiChildFlags_AlwaysUseWindowPadding,
+                    ImGuiWindowFlags_NoScrollbar |
+                    ImGuiWindowFlags_NoDecoration |
+                    ImGuiWindowFlags_NoBackground
+                )) {
                 // --- Menu Bar
                 if (hasFlag(m_flags, WindowFlags::HasMenuBar)) {
                     ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 0.0f);
-                    if (ImGui::BeginChild(u8"##imguix_menu_bar",
-                                          ImVec2(0.0f, menu_bar_height),
-                                          ImGuiChildFlags_None,
-                                          ImGuiWindowFlags_MenuBar |
-                                              ImGuiWindowFlags_NoScrollbar |
-                                              ImGuiWindowFlags_NoDecoration)) {
+                    if (ImGui::BeginChild(
+                        u8"##imguix_menu_bar",
+                        ImVec2(0.0f, menu_bar_height),
+                        ImGuiChildFlags_None,
+                        ImGuiWindowFlags_MenuBar |
+                        ImGuiWindowFlags_NoScrollbar |
+                        ImGuiWindowFlags_NoDecoration
+                    )) {
                         drawMenuBar();
                     }
                     ImGui::EndChild();
