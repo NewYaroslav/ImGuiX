@@ -139,18 +139,18 @@ namespace ImGuiX::Windows {
             ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0));
         }
 
-        const float inset = style.WindowBorderSize; 
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(inset, inset));
+        const float inset = style.WindowBorderSize;
         ImGui::Begin(u8"##imguix_framed_window", nullptr, flags);
-        ImGui::PopStyleVar();
+        const ImVec2 padded_start = ImGui::GetCursorPos();
         
         if (hasFlag(m_flags, WindowFlags::DisableBackground) || m_disable_background) {
             ImGui::PopStyleColor(2);
         }
 
         // --- Title bar
-        //ImGui::SetCursorPosY(1.0f);
-        ImGui::BeginChild(u8"##imguix_title_bar", ImVec2(0, m_config.title_bar_height), false,
+        ImGui::SetCursorPos(ImVec2(inset, inset));
+        const float title_w = ImMax(0.0f, ImGui::GetWindowSize().x - 2.0f * inset);
+        ImGui::BeginChild(u8"##imguix_title_bar", ImVec2(title_w, m_config.title_bar_height), false,
                           ImGuiWindowFlags_NoScrollbar | 
                           ImGuiWindowFlags_NoDecoration);
                  
@@ -174,11 +174,12 @@ namespace ImGuiX::Windows {
         }
 
         ImGui::EndChild();
+        ImGui::SetCursorPos(ImVec2(padded_start.x, padded_start.y + m_config.title_bar_height));
         
         // --- Menu Bar
         if (hasFlag(m_flags, WindowFlags::HasMenuBar)) {
             ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 0.0f);
-            ImGui::SetCursorPosY(m_config.title_bar_height + inset);
+            ImGui::SetCursorPosY(padded_start.y + m_config.title_bar_height);
             if (ImGui::BeginChild(u8"##imguix_menu_bar",
                                   ImVec2(0.0f, menu_bar_height),
                                   ImGuiChildFlags_None,
@@ -192,15 +193,9 @@ namespace ImGuiX::Windows {
         }
 
         // --- Main content
-        if (ImGui::BeginChild(u8"##imguix_content",
-                              ImVec2(0.0f, 0.0f),
-                              ImGuiChildFlags_None,
-                              ImGuiWindowFlags_NoDecoration)) {
-            for (auto& ctrl : m_controllers) {
-                ctrl->drawUi();
-            }
+        for (auto& ctrl : m_controllers) {
+            ctrl->drawUi();
         }
-        ImGui::EndChild();
 
         ImGui::End();
         
