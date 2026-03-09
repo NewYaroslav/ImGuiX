@@ -78,12 +78,6 @@ public:
     }
 
     void drawUi() override {
-        if (!ImGui::BeginChild(
-            u8"##imguix_content",
-            ImVec2(0.0f, 0.0f),
-            ImGuiChildFlags_None,
-            ImGuiWindowFlags_NoDecoration)
-        ) return;
         // --- Top toolbar -----------------------------------------------------
         if (ImGui::Begin("Showcase Controls", nullptr,
                          ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize)) {
@@ -175,8 +169,6 @@ public:
             ImGui::ShowDemoWindow(&m_show_imgui_demo);
 
         ImGui::End();
-
-        ImGui::EndChild();
     }
 
 private:
@@ -326,4 +318,3 @@ int main() {
     app.run();
     return 0;
 }
-
