@@ -222,8 +222,8 @@ namespace ImGuiX::Windows {
                                   ImVec2(main_region_width, 0.0f),
                                   ImGuiChildFlags_AlwaysUseWindowPadding,
                                   ImGuiWindowFlags_NoScrollbar |
-                                      ImGuiWindowFlags_NoDecoration |
-                                      ImGuiWindowFlags_NoBackground)) {
+                                  ImGuiWindowFlags_NoDecoration |
+                                  ImGuiWindowFlags_NoBackground)) {
                 // --- Menu Bar
                 if (hasFlag(m_flags, WindowFlags::HasMenuBar)) {
                     ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 0.0f);
