@@ -98,7 +98,8 @@ namespace ImGuiX::Windows {
         const float title_w = ImMax(0.0f, ImGui::GetWindowSize().x - 2.0f * inset);
         ImGui::BeginChild(u8"##imguix_title_bar", ImVec2(title_w, m_config.title_bar_height), false,
                           ImGuiWindowFlags_NoScrollbar |
-                          ImGuiWindowFlags_NoDecoration);
+                          ImGuiWindowFlags_NoDecoration |
+                          ImGuiWindowFlags_NoBackground);
 
         {
             ImVec2 p_min = ImGui::GetWindowPos();
@@ -160,6 +161,9 @@ namespace ImGuiX::Windows {
                     ImGuiWindowFlags_NoDecoration |
                     ImGuiWindowFlags_NoBackground
                 )) {
+                ImVec2 p_min = ImGui::GetWindowPos();
+                ImVec2 p_max = ImVec2(p_min.x + ImGui::GetWindowWidth(), p_min.y + ImGui::GetWindowHeight());
+                ImGui::GetWindowDrawList()->AddRectFilled(p_min, p_max, ImGui::GetColorU32(ImGuiCol_TitleBgActive));
                 drawSidePanel();
             }
             ImGui::EndChild();
