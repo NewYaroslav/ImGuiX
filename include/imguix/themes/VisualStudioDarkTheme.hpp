@@ -24,6 +24,7 @@ namespace ImGuiX::Themes {
         // 0/255=0.000, 119/255=0.467, 200/255=0.784
 
         // Base backgrounds
+        constexpr ImVec4 WindowShellBg      = ImVec4(0.100f, 0.100f, 0.104f, 1.00f);
         constexpr ImVec4 Bg                 = ImVec4(0.145f, 0.145f, 0.149f, 1.00f); // (37,37,38)
         constexpr ImVec4 LightBg            = ImVec4(0.322f, 0.322f, 0.333f, 1.00f); // (82,82,85)
         constexpr ImVec4 VeryLightBg        = ImVec4(0.353f, 0.353f, 0.373f, 1.00f); // (90,90,95)
@@ -100,7 +101,7 @@ namespace ImGuiX::Themes {
             colors[ImGuiCol_TextDisabled]          = TextDisabled;
             colors[ImGuiCol_TextSelectedBg]        = TextSelectedBg;
 
-            colors[ImGuiCol_WindowBg]              = Bg;
+            colors[ImGuiCol_WindowBg]              = WindowShellBg;
             colors[ImGuiCol_ChildBg]               = Bg;
             colors[ImGuiCol_PopupBg]               = Bg;
 

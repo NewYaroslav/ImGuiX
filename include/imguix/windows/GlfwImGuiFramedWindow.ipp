@@ -62,6 +62,7 @@ namespace ImGuiX::Windows {
         ImGui::PushID(id());
         const ImGuiStyle& style = ImGui::GetStyle();
 
+        // --- Root host window
         int fb_w = 0, fb_h = 0;
         glfwGetFramebufferSize(m_window, &fb_w, &fb_h);
         ImGui::SetNextWindowPos(ImVec2(0, 0));
@@ -78,6 +79,8 @@ namespace ImGuiX::Windows {
             ImGuiWindowFlags_NoScrollbar |
             ImGuiWindowFlags_NoBringToFrontOnFocus;
 
+        // --- Optional transparent host background
+        // Blend border and window colors so frame border remains visible when root background is transparent.
         if (hasFlag(m_flags, WindowFlags::DisableBackground) || m_disable_background) {
             ImVec4 border_color = style.Colors[ImGuiCol_Border];
             ImVec4 background_color = style.Colors[ImGuiCol_WindowBg];
@@ -94,8 +97,10 @@ namespace ImGuiX::Windows {
             ImGui::PopStyleColor(2);
         }
 
+        // --- Title bar
         ImGui::SetCursorPos(ImVec2(inset, inset));
         const float title_w = ImMax(0.0f, ImGui::GetWindowSize().x - 2.0f * inset);
+        // Child background is disabled intentionally: title bar fill is drawn manually for exact geometry control.
         ImGui::BeginChild(u8"##imguix_title_bar",
                           ImVec2(title_w, m_config.title_bar_height),
                           ImGuiChildFlags_AlwaysUseWindowPadding,
@@ -107,6 +112,11 @@ namespace ImGuiX::Windows {
             ImVec2 p_min = ImGui::GetWindowPos();
             ImVec2 p_max = ImVec2(p_min.x + ImGui::GetWindowWidth(), p_min.y + m_config.title_bar_height);
             ImGui::GetWindowDrawList()->AddRectFilled(p_min, p_max, ImGui::GetColorU32(ImGuiCol_TitleBgActive));
+            const ImU32 sep_col = ImGui::GetColorU32(ImGuiCol_Border);
+            ImGui::GetWindowDrawList()->AddLine(
+                ImVec2(p_min.x, p_max.y - 1.0f),
+                ImVec2(p_max.x, p_max.y - 1.0f),
+                sep_col);
         }
 
         drawTitleBarText();
@@ -123,6 +133,8 @@ namespace ImGuiX::Windows {
 
         ImGui::EndChild();
 
+        // --- Body layout metrics
+        // Explicit body_y/body_h keeps side/main regions aligned and prevents top/bottom visual gaps.
         const float body_y = inset + m_config.title_bar_height;
         const float body_h = ImMax(0.0f, ImGui::GetWindowSize().y - body_y - inset);
         const ImVec2 body_start(inset, body_y);
@@ -133,8 +145,10 @@ namespace ImGuiX::Windows {
         const float main_region_width = ImMax(0.0f, body_width - side_panel_width);
 
         if (side_panel_width <= 0.0f) {
+            // --- Main region
             ImGui::SetCursorPos(ImVec2(padded_start.x, padded_start.y + m_config.title_bar_height));
 
+            // --- Optional menu bar
             if (hasFlag(m_flags, WindowFlags::HasMenuBar)) {
                 ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 0.0f);
                 ImGui::SetCursorPosY(padded_start.y + m_config.title_bar_height);
@@ -156,7 +170,9 @@ namespace ImGuiX::Windows {
                 ctrl->drawUi();
             }
         } else {
+            // --- Side panel
             ImGui::SetCursorPos(body_start);
+            // Child background is disabled intentionally: side panel fill is drawn manually for exact geometry control.
             if (ImGui::BeginChild(
                     u8"##imguix_side_panel",
                     ImVec2(side_panel_width, body_h),
@@ -168,11 +184,17 @@ namespace ImGuiX::Windows {
                 ImVec2 p_min = ImGui::GetWindowPos();
                 ImVec2 p_max = ImVec2(p_min.x + ImGui::GetWindowWidth(), p_min.y + ImGui::GetWindowHeight());
                 ImGui::GetWindowDrawList()->AddRectFilled(p_min, p_max, ImGui::GetColorU32(ImGuiCol_TitleBgActive));
+                const ImU32 sep_col = ImGui::GetColorU32(ImGuiCol_Border);
+                ImGui::GetWindowDrawList()->AddLine(
+                    ImVec2(p_max.x - 1.0f, p_min.y),
+                    ImVec2(p_max.x - 1.0f, p_max.y),
+                    sep_col);
                 drawSidePanel();
             }
             ImGui::EndChild();
             ImGui::SameLine(0.0f, 0.0f);
 
+            // --- Main region
             if (ImGui::BeginChild(
                     u8"##imguix_main_region",
                     ImVec2(main_region_width, body_h),
@@ -181,6 +203,7 @@ namespace ImGuiX::Windows {
                     ImGuiWindowFlags_NoDecoration |
                     ImGuiWindowFlags_NoBackground
                 )) {
+                // --- Optional menu bar
                 if (hasFlag(m_flags, WindowFlags::HasMenuBar)) {
                     ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 0.0f);
                     if (ImGui::BeginChild(

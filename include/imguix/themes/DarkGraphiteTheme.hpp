@@ -23,6 +23,7 @@ namespace ImGuiX::Themes {
         constexpr ImVec4 TextDisabled          = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
 
         // Backgrounds
+        constexpr ImVec4 WindowShellBg         = ImVec4(0.09f, 0.10f, 0.11f, 1.00f);
         constexpr ImVec4 WindowBg              = ImVec4(0.13f, 0.14f, 0.15f, 1.00f);
         constexpr ImVec4 ChildBg               = ImVec4(0.13f, 0.14f, 0.15f, 1.00f);
         constexpr ImVec4 PopupBg               = ImVec4(0.13f, 0.14f, 0.15f, 1.00f);
@@ -110,7 +111,7 @@ namespace ImGuiX::Themes {
             colors[ImGuiCol_InputTextCursor]            = CyanBase;
             colors[ImGuiCol_TextDisabled]          = TextDisabled;
 
-            colors[ImGuiCol_WindowBg]              = WindowBg;
+            colors[ImGuiCol_WindowBg]              = WindowShellBg;
             colors[ImGuiCol_ChildBg]               = ChildBg;
             colors[ImGuiCol_PopupBg]               = PopupBg;
 

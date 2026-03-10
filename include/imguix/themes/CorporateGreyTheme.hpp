@@ -29,6 +29,7 @@ namespace ImGuiX::Themes {
         constexpr ImVec4 HoverGrey        = ImVec4(0.42f, 0.42f, 0.42f, 0.40f);
         constexpr ImVec4 ActiveGrey       = ImVec4(0.56f, 0.56f, 0.56f, 0.67f);
         constexpr ImVec4 DarkGrey25       = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
+        constexpr ImVec4 DarkGrey20       = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
         constexpr ImVec4 DarkGrey22       = ImVec4(0.22f, 0.22f, 0.22f, 1.00f);
         constexpr ImVec4 DarkGrey19       = ImVec4(0.19f, 0.19f, 0.19f, 1.00f);
         constexpr ImVec4 DarkGrey17       = ImVec4(0.17f, 0.17f, 0.17f, 0.90f);
@@ -61,7 +62,7 @@ namespace ImGuiX::Themes {
             colors[ImGuiCol_Text]                   = White;
             colors[ImGuiCol_InputTextCursor]        = Highlight;
             colors[ImGuiCol_TextDisabled]           = TextDisabled;
-            colors[ImGuiCol_WindowBg]               = DarkGrey25;
+            colors[ImGuiCol_WindowBg]               = DarkGrey20;
             colors[ImGuiCol_ChildBg]                = DarkGrey25;
             colors[ImGuiCol_PopupBg]                = DarkGrey25;
             colors[ImGuiCol_Border]                 = ImVec4(0.12f, 0.12f, 0.12f, 0.71f);
@@ -183,4 +184,3 @@ namespace ImGuiX::Themes {
 } // namespace ImGuiX::Themes
 
 #endif // _IMGUIX_THEMES_CORPORATE_GREY_THEME_HPP_INCLUDED
-
