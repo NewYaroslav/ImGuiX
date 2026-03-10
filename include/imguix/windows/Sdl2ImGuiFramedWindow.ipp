@@ -100,7 +100,9 @@ namespace ImGuiX::Windows {
 
         ImGui::SetCursorPos(ImVec2(inset, inset));
         const float title_w = ImMax(0.0f, ImGui::GetWindowSize().x - 2.0f * inset);
-        ImGui::BeginChild(u8"##imguix_title_bar", ImVec2(title_w, m_config.title_bar_height), false,
+        ImGui::BeginChild(u8"##imguix_title_bar",
+                          ImVec2(title_w, m_config.title_bar_height),
+                          ImGuiChildFlags_AlwaysUseWindowPadding,
                           ImGuiWindowFlags_NoScrollbar |
                           ImGuiWindowFlags_NoDecoration |
                           ImGuiWindowFlags_NoBackground);
@@ -125,7 +127,9 @@ namespace ImGuiX::Windows {
 
         ImGui::EndChild();
 
-        const ImVec2 body_start(inset, padded_start.y + m_config.title_bar_height);
+        const float body_y = inset + m_config.title_bar_height;
+        const float body_h = ImMax(0.0f, ImGui::GetWindowSize().y - body_y - inset);
+        const ImVec2 body_start(inset, body_y);
         const float body_width = ImMax(0.0f, ImGui::GetWindowSize().x - 2.0f * inset);
         const float requested_side_panel_width =
             m_config.side_panel_width > 0 ? static_cast<float>(m_config.side_panel_width) : 0.0f;
@@ -159,8 +163,8 @@ namespace ImGuiX::Windows {
             ImGui::SetCursorPos(body_start);
             if (ImGui::BeginChild(
                 u8"##imguix_side_panel",
-                ImVec2(side_panel_width, 0.0f),
-                ImGuiChildFlags_None,
+                ImVec2(side_panel_width, body_h),
+                ImGuiChildFlags_AlwaysUseWindowPadding,
                 ImGuiWindowFlags_NoScrollbar |
                 ImGuiWindowFlags_NoDecoration |
                 ImGuiWindowFlags_NoBackground
@@ -175,7 +179,7 @@ namespace ImGuiX::Windows {
 
             if (ImGui::BeginChild(
                     u8"##imguix_main_region",
-                    ImVec2(main_region_width, 0.0f),
+                    ImVec2(main_region_width, body_h),
                     ImGuiChildFlags_AlwaysUseWindowPadding,
                     ImGuiWindowFlags_NoScrollbar |
                     ImGuiWindowFlags_NoDecoration |
