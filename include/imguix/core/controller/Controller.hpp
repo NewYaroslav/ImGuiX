@@ -8,8 +8,6 @@
 
 namespace ImGuiX {
 
-    class WindowInterface;
-
     /// \brief Base class for controllers that attach to a window.
     /// \note Provides access to window-level context, including event bus and resources.
     /// \note Override `drawContent()` and `drawUi()` to render content and interface.
@@ -85,6 +83,14 @@ namespace ImGuiX {
         /// \return Language store.
         const ImGuiX::I18N::LangStore& langStore() const {
             return m_window.langStore();
+        }
+        
+        /// \brief Get font by logical role.
+        /// \param role Logical font role.
+        /// \return Font pointer or nullptr if role is unavailable.
+        /// \note Caller should fall back to current ImGui font when nullptr is returned.
+        ImFont* getFont(ImGuiX::Fonts::FontRole role) const {
+            return static_cast<const WindowInterface&>(m_window).getFont(role);
         }
 
         /// \brief Access the theme manager.

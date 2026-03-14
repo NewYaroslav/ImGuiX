@@ -68,7 +68,6 @@ namespace ImGuiX::Windows {
         ImGui::SetNextWindowPos(ImVec2(0, 0));
         ImGui::SetNextWindowSize(ImVec2((float)fb_w, (float)fb_h));
 
-        const float title_padding_x = 0.0f;
         const float menu_bar_height = ImGui::GetFrameHeight();
 
         const ImGuiWindowFlags flags =
@@ -90,141 +89,15 @@ namespace ImGuiX::Windows {
         }
 
         ImGui::Begin(u8"##imguix_framed_window", nullptr, flags);
-        const float inset = style.WindowBorderSize;
-        const ImVec2 padded_start = ImGui::GetCursorPos();
 
         if (hasFlag(m_flags, WindowFlags::DisableBackground) || m_disable_background) {
             ImGui::PopStyleColor(2);
         }
 
-        // --- Title bar
-        ImGui::SetCursorPos(ImVec2(inset, inset));
-        const float title_w = ImMax(0.0f, ImGui::GetWindowSize().x - 2.0f * inset);
-        // Child background is disabled intentionally: title bar fill is drawn manually for exact geometry control.
-        ImGui::BeginChild(u8"##imguix_title_bar",
-                          ImVec2(title_w, m_config.title_bar_height),
-                          ImGuiChildFlags_AlwaysUseWindowPadding,
-                          ImGuiWindowFlags_NoScrollbar |
-                          ImGuiWindowFlags_NoDecoration |
-                          ImGuiWindowFlags_NoBackground);
-
-        {
-            ImVec2 p_min = ImGui::GetWindowPos();
-            ImVec2 p_max = ImVec2(p_min.x + ImGui::GetWindowWidth(), p_min.y + m_config.title_bar_height);
-            ImGui::GetWindowDrawList()->AddRectFilled(p_min, p_max, ImGui::GetColorU32(ImGuiCol_TitleBgActive));
-            const ImU32 sep_col = ImGui::GetColorU32(ImGuiCol_Border);
-            ImGui::GetWindowDrawList()->AddLine(
-                ImVec2(p_min.x, p_max.y - 1.0f),
-                ImVec2(p_max.x, p_max.y - 1.0f),
-                sep_col);
-        }
-
-        drawTitleBarText();
-
-        if (hasFlag(m_flags, WindowFlags::ShowControlButtons)) {
-            if (hasFlag(m_flags, WindowFlags::MacStyledControlButtons)) {
-                drawMacStyledControlButtons(title_padding_x);
-            } else if (hasFlag(m_flags, WindowFlags::ImGuiStyledControlButtons)) {
-                drawImGuiStyledControlButtons(title_padding_x);
-            } else {
-                drawControlButtons(title_padding_x);
-            }
-        }
-
-        ImGui::EndChild();
-
-        // --- Body layout metrics
-        // Explicit body_y/body_h keeps side/main regions aligned and prevents top/bottom visual gaps.
-        const float body_y = inset + m_config.title_bar_height;
-        const float body_h = ImMax(0.0f, ImGui::GetWindowSize().y - body_y - inset);
-        const ImVec2 body_start(inset, body_y);
-        const float body_width = ImMax(0.0f, ImGui::GetWindowSize().x - 2.0f * inset);
-        const float requested_side_panel_width =
-            m_config.side_panel_width > 0 ? static_cast<float>(m_config.side_panel_width) : 0.0f;
-        const float side_panel_width = ImMin(requested_side_panel_width, body_width);
-        const float main_region_width = ImMax(0.0f, body_width - side_panel_width);
-
-        if (side_panel_width <= 0.0f) {
-            // --- Main region
-            ImGui::SetCursorPos(ImVec2(padded_start.x, padded_start.y + m_config.title_bar_height));
-
-            // --- Optional menu bar
-            if (hasFlag(m_flags, WindowFlags::HasMenuBar)) {
-                ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 0.0f);
-                ImGui::SetCursorPosY(padded_start.y + m_config.title_bar_height);
-                if (ImGui::BeginChild(
-                    u8"##imguix_menu_bar",
-                    ImVec2(0.0f, menu_bar_height),
-                    ImGuiChildFlags_None,
-                    ImGuiWindowFlags_MenuBar |
-                    ImGuiWindowFlags_NoScrollbar |
-                    ImGuiWindowFlags_NoDecoration
-                )) {
-                    drawMenuBar();
-                }
-                ImGui::EndChild();
-                ImGui::PopStyleVar();
-            }
-
-            for (auto& ctrl : m_controllers) {
-                ctrl->drawUi();
-            }
+        if (hasFlag(m_flags, WindowFlags::HasCornerIconArea)) {
+            drawCornerLayout(menu_bar_height);
         } else {
-            // --- Side panel
-            ImGui::SetCursorPos(body_start);
-            // Child background is disabled intentionally: side panel fill is drawn manually for exact geometry control.
-            if (ImGui::BeginChild(
-                    u8"##imguix_side_panel",
-                    ImVec2(side_panel_width, body_h),
-                    ImGuiChildFlags_AlwaysUseWindowPadding,
-                    ImGuiWindowFlags_NoScrollbar |
-                    ImGuiWindowFlags_NoDecoration |
-                    ImGuiWindowFlags_NoBackground
-                )) {
-                ImVec2 p_min = ImGui::GetWindowPos();
-                ImVec2 p_max = ImVec2(p_min.x + ImGui::GetWindowWidth(), p_min.y + ImGui::GetWindowHeight());
-                ImGui::GetWindowDrawList()->AddRectFilled(p_min, p_max, ImGui::GetColorU32(ImGuiCol_TitleBgActive));
-                const ImU32 sep_col = ImGui::GetColorU32(ImGuiCol_Border);
-                ImGui::GetWindowDrawList()->AddLine(
-                    ImVec2(p_max.x - 1.0f, p_min.y),
-                    ImVec2(p_max.x - 1.0f, p_max.y),
-                    sep_col);
-                drawSidePanel();
-            }
-            ImGui::EndChild();
-            ImGui::SameLine(0.0f, 0.0f);
-
-            // --- Main region
-            if (ImGui::BeginChild(
-                    u8"##imguix_main_region",
-                    ImVec2(main_region_width, body_h),
-                    ImGuiChildFlags_AlwaysUseWindowPadding,
-                    ImGuiWindowFlags_NoScrollbar |
-                    ImGuiWindowFlags_NoDecoration |
-                    ImGuiWindowFlags_NoBackground
-                )) {
-                // --- Optional menu bar
-                if (hasFlag(m_flags, WindowFlags::HasMenuBar)) {
-                    ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 0.0f);
-                    if (ImGui::BeginChild(
-                            u8"##imguix_menu_bar",
-                            ImVec2(0.0f, menu_bar_height),
-                            ImGuiChildFlags_None,
-                            ImGuiWindowFlags_MenuBar |
-                            ImGuiWindowFlags_NoScrollbar |
-                            ImGuiWindowFlags_NoDecoration
-                        )) {
-                        drawMenuBar();
-                    }
-                    ImGui::EndChild();
-                    ImGui::PopStyleVar();
-                }
-
-                for (auto& ctrl : m_controllers) {
-                    ctrl->drawUi();
-                }
-            }
-            ImGui::EndChild();
+            drawClassicLayout(menu_bar_height);
         }
 
         ImGui::End();

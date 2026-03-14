@@ -19,6 +19,7 @@ namespace ImGuiX::Windows {
         ShowControlButtons         = 1 << 3, ///< Show minimize/maximize/close buttons
         MacStyledControlButtons    = 1 << 4, ///< macOS style control buttons
         ImGuiStyledControlButtons  = 1 << 5, ///< ImGui style control buttons
+        HasCornerIconArea          = 1 << 6, ///< Reserve top-left icon slot and offset title/side panel layout
 
         /// \brief Shortcut flag to enable both control buttons and ImGui styling.
         DefaultControlButtons      = ShowControlButtons | ImGuiStyledControlButtons

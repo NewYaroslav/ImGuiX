@@ -212,6 +212,11 @@ namespace ImGuiX {
         /// \return Language store.
         const ImGuiX::I18N::LangStore& langStore() const override;
         
+        /// \brief Get font by role from the current font atlas.
+        /// \param role Logical font role.
+        /// \return Font pointer or nullptr if role is unavailable.
+        ImFont* getFont(ImGuiX::Fonts::FontRole role) const override;
+        
         /// \brief Read-only view of the font manager.
         /// \return Font manager view.
         ImGuiX::Fonts::FontManager::View& fontsView() noexcept;

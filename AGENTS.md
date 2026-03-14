@@ -246,6 +246,11 @@ if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Days", preview.c_str(),
 
 ## 10. Agent Playbooks (Recipes)
 
+### Local agent playbooks in this submodule
+
+* Prefer `agents/imguix-smoke-build.md` for Windows MinGW smoke-example configure/build commands.
+* Treat `external/ImGuiX/agents/` as the concise, execution-focused playbook set.
+
 ### Add a new module/aggregate/service
 
 1. Place headers under `include/imguix/<domain>`.

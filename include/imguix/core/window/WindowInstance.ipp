@@ -102,6 +102,10 @@ namespace ImGuiX {
         return m_lang_store;
     }
     
+    ImFont* WindowInstance::getFont(ImGuiX::Fonts::FontRole role) const {
+        return m_font_manager.getFont(role);
+    }
+    
     ImGuiX::Fonts::FontManager::View& WindowInstance::fontsView() noexcept { 
         return m_font_manager.view(); 
     }

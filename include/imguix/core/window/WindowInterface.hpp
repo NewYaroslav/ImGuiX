@@ -10,7 +10,13 @@
 #   include <SFML/Graphics/RenderWindow.hpp>
 #endif
 
+struct ImFont;
+
 namespace ImGuiX {
+    
+    namespace Fonts {
+        enum class FontRole;
+    }
 
     /// \brief Control and query a single window instance.
     ///
@@ -122,6 +128,12 @@ namespace ImGuiX {
         /// \brief Get language store.
         /// \return Language store.
         virtual const ImGuiX::I18N::LangStore& langStore() const = 0;
+        
+        /// \brief Get font by logical role.
+        /// \param role Logical font role requested by UI code.
+        /// \return Font pointer or nullptr if the role is unavailable.
+        /// \note Caller should fall back to current ImGui font when nullptr is returned.
+        virtual ImFont* getFont(ImGuiX::Fonts::FontRole role) const = 0;
 
         /// \brief Access the theme manager.
         /// \return Theme manager.
