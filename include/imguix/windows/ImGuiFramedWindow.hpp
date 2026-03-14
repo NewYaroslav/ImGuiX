@@ -44,7 +44,6 @@
 ///                   ImGuiX::Windows::ImGuiFramedWindowConfig cfg{};
 ///                   cfg.side_panel_width = 56;
 ///                   cfg.title_bar_height = 34;
-///                   cfg.corner_icon_mode_border = true;
 ///                   return cfg;
 ///               }()) {}
 ///
@@ -61,23 +60,10 @@
 
 #include <imgui.h>
 
+#include "corner_layout_options.hpp"
 #include "window_flags.hpp"
 
 namespace ImGuiX::Windows {
-
-    /// \brief Corner-mode menu bar placement strategy.
-    /// \details Effective only when \ref WindowFlags::HasCornerIconArea and \ref WindowFlags::HasMenuBar are enabled.
-    enum class CornerMenuBarPlacement {
-        MainRegion,  ///< Backward-compatible behavior: menu bar is rendered in main region.
-        InTitleBar,  ///< Menu bar is rendered inside title bar, after title text and before control buttons.
-        BelowTitleBar ///< Menu bar is rendered in a dedicated child directly below corner title bar.
-    };
-
-    /// \brief Corner-mode style for title/side rounding mask.
-    enum class CornerRoundingStyle {
-        Legacy,                  ///< Preserve existing rounding flags.
-        NoTopLeftOnTitleAndSide  ///< Remove top-left rounding for title bar and side panel.
-    };
 
     /// \brief Runtime configuration for framed window geometry and chrome labels.
     /// \details
@@ -86,9 +72,10 @@ namespace ImGuiX::Windows {
     /// otherwise `title_bar_height + corner_icon_mode_gap`).
     /// `title_bar_height` controls both title region height and default side panel button sizing.
     /// Corner icon mode options apply only when \ref WindowFlags::HasCornerIconArea is enabled.
-    /// `corner_icon_mode_icon_border` is effective only when `corner_icon_mode_border` is true.
+    /// Corner mode rounding/border toggles are controlled by
+    /// \ref WindowFlags::CornerModeRounding and \ref WindowFlags::CornerModeBorder.
     /// `corner_menu_bar_placement` selects where menu bar is rendered in corner mode.
-    /// `corner_rounding_style` is effective only when `corner_icon_mode_rounding` is true.
+    /// `corner_rounding_style` is effective only when \ref WindowFlags::CornerModeRounding is enabled.
     struct ImGuiFramedWindowConfig {
         int min_width = 640;           ///< Minimum client width in pixels.
         int min_height = 480;          ///< Minimum client height in pixels.
@@ -101,11 +88,8 @@ namespace ImGuiX::Windows {
         float frame_stroke_thickness = 1.0f; ///< Thickness in px for classic/corner separator strokes (title/side split lines).
         float frame_outer_stroke_thickness = 2.0f; ///< Thickness in px for the outer host-frame stroke (background-colored line).
         float frame_inner_stroke_thickness = 1.0f; ///< Thickness in px for the inner host-frame stroke (ImGui border-colored line).
-        bool corner_icon_mode_rounding = false; ///< Enable additional corner-mode rounding for title/side surfaces.
-        float corner_icon_mode_rounding_radius = 6.0f; ///< Rounding radius in pixels used when corner_icon_mode_rounding is true.
+        float corner_icon_mode_rounding_radius = 6.0f; ///< Rounding radius in pixels used when \ref WindowFlags::CornerModeRounding is enabled.
         CornerRoundingStyle corner_rounding_style = CornerRoundingStyle::Legacy; ///< Corner rounding style for title/side in corner layout.
-        bool corner_icon_mode_border = false; ///< Draw corner-mode borders for title bar and side panel; icon-area border is controlled separately.
-        bool corner_icon_mode_icon_border = true; ///< Apply corner-mode border to icon-area when corner_icon_mode_border is enabled.
         float corner_icon_mode_area_width = -1.0f; ///< Width in px of reserved corner icon area; `< 0` uses `title_bar_height + corner_icon_mode_gap`.
         float corner_icon_mode_icon_size = -1.0f; ///< Icon size in px for corner icon slot; `< 0` uses auto-fit from current corner icon area geometry with frame-chrome compensation on left/top.
         float corner_icon_mode_gap = -1.0f; ///< Gap between icon-area and title/side; `< 0` uses runtime `style.WindowPadding.x`.
@@ -121,10 +105,12 @@ namespace ImGuiX::Windows {
     /// Feature switches are controlled by \ref WindowFlags:
     /// - \ref WindowFlags::HasMenuBar enables menu bar region and calls \ref drawMenuBar.
     /// - \ref WindowFlags::ShowControlButtons shows system controls in title bar.
-    /// - \ref WindowFlags::MacStyledControlButtons or \ref WindowFlags::ImGuiStyledControlButtons selects button style.
+    /// - \ref WindowFlags::ClassicStyledControlButtons, \ref WindowFlags::ImGuiStyledControlButtons or
+    ///   \ref WindowFlags::MacStyledControlButtons selects button style (mutually exclusive).
     /// - \ref WindowFlags::DisableBackground makes root ImGui host transparent while keeping a visible border.
     /// - \ref WindowFlags::EnableTransparency requests transparent native surface on supported backends.
     /// - \ref WindowFlags::HasCornerIconArea reserves top-left square icon slot and offsets title bar/side panel layout.
+    /// - \ref WindowFlags::CornerModeRounding and \ref WindowFlags::CornerModeBorder control corner-layout chrome.
     class ImGuiFramedWindow : public WindowInstance {
     public:
         /// \brief Constructs a framed window instance.
@@ -272,6 +258,12 @@ namespace ImGuiX::Windows {
         void renderFrameManually();
 
     private:
+        enum class ControlButtonsStyle {
+            Classic,
+            ImGui,
+            Mac
+        };
+
         /// \brief Compute baseline left inset for title-bar content.
         /// \param style Active Dear ImGui style.
         /// \return Left inset in pixels applied by layout before \ref drawTitleBarText.
@@ -302,6 +294,12 @@ namespace ImGuiX::Windows {
         /// \param button_h Final button height in pixels.
         /// \return Pixel-snapped local Y coordinate for stable button placement.
         static float computeCenteredButtonY(const ControlButtonsBand& band, float button_h);
+
+        /// \brief Resolve active control-button style from flags.
+        /// \details Expects exactly one style flag (`Classic/ImGui/Mac`) in debug builds.
+        /// If multiple are set in release builds, falls back to ImGui style.
+        /// \return Resolved control-buttons style.
+        ControlButtonsStyle resolveControlButtonsStyle() const;
     };
 
 } // namespace ImGuiX::Windows

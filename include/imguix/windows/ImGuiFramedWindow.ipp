@@ -1,4 +1,5 @@
 #include <imgui.h>
+#include <cassert>
 #include <imguix/widgets/controls/circle_button.hpp>
 #include <imguix/widgets/controls/system_button.hpp>
 #include <imguix/utils/path_utils.hpp>
@@ -227,13 +228,17 @@ namespace ImGuiX::Windows {
         drawTitleBarText();
 
         if (hasFlag(m_flags, WindowFlags::ShowControlButtons)) {
-            if (hasFlag(m_flags, WindowFlags::MacStyledControlButtons)) {
-                drawMacStyledControlButtons();
-            } else
-            if (hasFlag(m_flags, WindowFlags::ImGuiStyledControlButtons)) {
-                drawImGuiStyledControlButtons();
-            } else {
-                drawControlButtons();
+            switch (resolveControlButtonsStyle()) {
+                case ControlButtonsStyle::Mac:
+                    drawMacStyledControlButtons();
+                    break;
+                case ControlButtonsStyle::ImGui:
+                    drawImGuiStyledControlButtons();
+                    break;
+                case ControlButtonsStyle::Classic:
+                default:
+                    drawControlButtons();
+                    break;
             }
         }
 
@@ -361,7 +366,7 @@ namespace ImGuiX::Windows {
         ImGui::SetCursorPos(ImVec2(icon_surface_w, 0.0f));
         const float stroke = ImMax(0.0f, m_config.frame_stroke_thickness);
         const float title_w = ImMax(0.0f, body_width - icon_surface_w);
-        const bool enable_rounding = m_config.corner_icon_mode_rounding;
+        const bool enable_rounding = hasFlag(m_flags, WindowFlags::CornerModeRounding);
         const float rounding = enable_rounding ? m_config.corner_icon_mode_rounding_radius : 0.0f;
         const bool no_top_left_corner = enable_rounding &&
             m_config.corner_rounding_style == CornerRoundingStyle::NoTopLeftOnTitleAndSide;
@@ -402,17 +407,21 @@ namespace ImGuiX::Windows {
         }
 
         if (hasFlag(m_flags, WindowFlags::ShowControlButtons)) {
-            if (hasFlag(m_flags, WindowFlags::MacStyledControlButtons)) {
-                drawMacStyledControlButtons();
-            } else 
-            if (hasFlag(m_flags, WindowFlags::ImGuiStyledControlButtons)) {
-                drawImGuiStyledControlButtons();
-            } else {
-                drawControlButtons();
+            switch (resolveControlButtonsStyle()) {
+                case ControlButtonsStyle::Mac:
+                    drawMacStyledControlButtons();
+                    break;
+                case ControlButtonsStyle::ImGui:
+                    drawImGuiStyledControlButtons();
+                    break;
+                case ControlButtonsStyle::Classic:
+                default:
+                    drawControlButtons();
+                    break;
             }
         }
 
-        if (m_config.corner_icon_mode_border && stroke > 0.0f) {
+        if (hasFlag(m_flags, WindowFlags::CornerModeBorder) && stroke > 0.0f) {
             const ImVec2 p_min = ImGui::GetWindowPos();
             const ImVec2 p_max = ImVec2(p_min.x + ImGui::GetWindowWidth(), p_min.y + m_config.title_bar_height);
             const ImU32 sep_col = ImGui::GetColorU32(ImGuiCol_Border);
@@ -460,7 +469,7 @@ namespace ImGuiX::Windows {
                 ImGui::GetColorU32(ImGuiCol_TitleBgActive),
                 rounding,
                 side_rounding_flags);
-            if (m_config.corner_icon_mode_border && stroke > 0.0f) {
+            if (hasFlag(m_flags, WindowFlags::CornerModeBorder) && stroke > 0.0f) {
                 const ImU32 sep_col = ImGui::GetColorU32(ImGuiCol_Border);
                 ImGui::GetWindowDrawList()->AddRect(
                     p_min,
@@ -508,7 +517,8 @@ namespace ImGuiX::Windows {
     // Compact control-buttons geometry is enabled only for corner chrome with explicit border.
     // In this mode the button strip is slightly reduced/inset to align with the custom border.
     bool ImGuiFramedWindow::isCompactControlButtonsMode() const {
-        return hasFlag(m_flags, WindowFlags::HasCornerIconArea) && m_config.corner_icon_mode_border;
+        return hasFlag(m_flags, WindowFlags::HasCornerIconArea) &&
+            hasFlag(m_flags, WindowFlags::CornerModeBorder);
     }
 
     // Per-button size reduction (in px) used by all button styles in compact mode.
@@ -539,8 +549,28 @@ namespace ImGuiX::Windows {
         return ImFloor(y + 0.5f);
     }
 
+    ImGuiFramedWindow::ControlButtonsStyle ImGuiFramedWindow::resolveControlButtonsStyle() const {
+        const bool classic = hasFlag(m_flags, WindowFlags::ClassicStyledControlButtons);
+        const bool imgui = hasFlag(m_flags, WindowFlags::ImGuiStyledControlButtons);
+        const bool mac = hasFlag(m_flags, WindowFlags::MacStyledControlButtons);
+        const int selected_styles = static_cast<int>(classic) + static_cast<int>(imgui) + static_cast<int>(mac);
+
+        assert(selected_styles <= 1 && "ImGuiFramedWindow: control button style flags are mutually exclusive");
+        if (selected_styles > 1) {
+            return ControlButtonsStyle::ImGui;
+        }
+        if (mac) {
+            return ControlButtonsStyle::Mac;
+        }
+        if (imgui) {
+            return ControlButtonsStyle::ImGui;
+        }
+        return ControlButtonsStyle::Classic;
+    }
+
     float ImGuiFramedWindow::getControlButtonsReservedWidth() const {
         const ImGuiStyle& style = ImGui::GetStyle();
+        const ControlButtonsStyle control_style = resolveControlButtonsStyle();
         // Compact mode slightly shrinks each button to visually fit corner-border chrome.
         const float compact_delta = getControlButtonsCompactDelta();
         const ControlButtonsBand band = computeControlButtonsBand();
@@ -549,7 +579,7 @@ namespace ImGuiX::Windows {
         const float inner_frame_stroke = ImMax(0.0f, m_config.frame_inner_stroke_thickness);
         const float right_gap = outer_frame_stroke + inner_frame_stroke;
 
-        if (hasFlag(m_flags, WindowFlags::MacStyledControlButtons)) {
+        if (control_style == ControlButtonsStyle::Mac) {
             float btn_diameter = ImGui::GetTextLineHeight() * style.FramePadding.y * 2.0f;
             btn_diameter = ImMax(8.0f, btn_diameter - compact_delta);
             if (band.usable_h > 0.0f) {
@@ -559,7 +589,7 @@ namespace ImGuiX::Windows {
             return btn_diameter * 3.0f + right_gap;
         }
 
-        if (hasFlag(m_flags, WindowFlags::ImGuiStyledControlButtons)) {
+        if (control_style == ControlButtonsStyle::ImGui) {
             float btn_height = m_config.title_bar_height - outer_frame_stroke - inner_frame_stroke;
             if (band.separator_context) {
                 // Corner/side-panel layouts add an explicit separator line around title chrome.

@@ -43,7 +43,9 @@ public:
               std::move(name),
               std::move(title),
               WindowFlags::DefaultControlButtons |
-                  WindowFlags::HasCornerIconArea,
+                  WindowFlags::HasCornerIconArea |
+                  WindowFlags::CornerModeRounding |
+                  WindowFlags::CornerModeBorder,
               makeConfig()) {}
 
     void onInit() override {
@@ -77,11 +79,8 @@ private:
         ImGuiX::Windows::ImGuiFramedWindowConfig cfg{};
         cfg.title_bar_height = 40;
         cfg.side_panel_width = 0;
-        cfg.corner_icon_mode_rounding = true;
         cfg.corner_icon_mode_rounding_radius = 8.0f;
         cfg.corner_rounding_style = ImGuiX::Windows::CornerRoundingStyle::NoTopLeftOnTitleAndSide;
-        cfg.corner_icon_mode_border = true;
-        cfg.corner_icon_mode_icon_border = false;
         cfg.corner_menu_bar_placement = ImGuiX::Windows::CornerMenuBarPlacement::MainRegion;
         return cfg;
     }
