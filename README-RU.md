@@ -27,6 +27,7 @@
 - [Установка SDK](#установка-sdk)
 - [Подключение как зависимость](#подключение-как-зависимость)
 - [Быстрый старт / Примеры](#быстрый-старт--примеры)
+- [Гайд по окнам](#гайд-по-окнам)
 - [Структура проекта](#структура-проекта)
 - [Архитектура](#архитектура)
 - [Web/Emscripten](#webemscripten)
@@ -150,6 +151,14 @@ target_link_libraries(myapp PRIVATE ImGuiX::imguix)
 ## Быстрый старт / Примеры
 
 SDK может включать папку `quickstart/` с минимальным примером приложения. Скопируйте директорию `quickstart` в свой проект или добавьте её как исходники, соберите — и готово.
+
+## Гайд по окнам
+
+Для практической работы с окнами и их настройкой используйте:
+
+- [docs/WINDOWS-GUIDE.md](docs/WINDOWS-GUIDE.md) - полный гайд по `WindowInstance` и `ImGuiFramedWindow` (каноничная EN-версия).
+- [docs/WINDOWS-GUIDE-RU.md](docs/WINDOWS-GUIDE-RU.md) - русская локализация.
+- [agents/imguix-windowing-playbook.md](agents/imguix-windowing-playbook.md) - короткий checklist для AI-агентов и ревью windowing-правок.
 
 ## Структура проекта
 

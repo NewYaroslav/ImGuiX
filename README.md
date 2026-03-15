@@ -27,6 +27,7 @@ independently of rendering.
 - [SDK Installation](#sdk-installation)
 - [Using as a Dependency](#using-as-a-dependency)
 - [Quick Start / Examples](#quick-start--examples)
+- [Windowing Guide](#windowing-guide)
 - [Project Structure](#project-structure)
 - [Architecture](#architecture)
 - [Web/Emscripten](#webemscripten)
@@ -151,6 +152,14 @@ target_link_libraries(myapp PRIVATE ImGuiX::imguix)
 ## Quick Start / Examples
 
 The SDK can include a `quickstart/` folder with a minimal application example. Copy the `quickstart` directory into your project or add it as sources, build, and you're ready to go.
+
+## Windowing Guide
+
+For practical window usage and configuration details, use:
+
+- [docs/WINDOWS-GUIDE.md](docs/WINDOWS-GUIDE.md) - complete guide for `WindowInstance` and `ImGuiFramedWindow`.
+- [docs/WINDOWS-GUIDE-RU.md](docs/WINDOWS-GUIDE-RU.md) - Russian mirror.
+- [agents/imguix-windowing-playbook.md](agents/imguix-windowing-playbook.md) - concise agent checklist for windowing tasks.
 
 ## Project Structure
 

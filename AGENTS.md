@@ -250,8 +250,11 @@ if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Days", preview.c_str(),
 
 * Prefer `agents/imguix-smoke-build.md` for Windows MinGW smoke-example configure/build commands.
 * Prefer `agents/imguix-fonts-i18n-playbook.md` for fonts + i18n API checks and doc updates.
+* Prefer `agents/imguix-windowing-playbook.md` for `WindowInstance` / `ImGuiFramedWindow` tasks.
 * Treat `external/ImGuiX/agents/` as the concise, execution-focused playbook set.
 * In controller-facing docs and snippets, prefer `Controller::getFont(...)`; do not expose `WindowInstance` internals as primary usage.
+* For windowing docs, use `docs/WINDOWS-GUIDE.md` as canonical and keep `docs/WINDOWS-GUIDE-RU.md` synchronized.
+* For framed-window changes, validate both classic and corner smoke examples before finalizing.
 
 ### Add a new module/aggregate/service
 
@@ -385,9 +388,11 @@ Format: `type(scope): short description` where the scope is optional. Keep messa
 | Path                     | Role                                                   |
 | ------------------------ | ------------------------------------------------------ |
 | `docs/ARCHITECTURE.md`   | System architecture overview (Russian: `docs/ARCHITECTURE-RU.md`) |
+| `docs/WINDOWS-GUIDE.md`  | Practical windowing usage for `WindowInstance` and `ImGuiFramedWindow` (Russian: `docs/WINDOWS-GUIDE-RU.md`) |
 | `docs/FONTS-GUIDE.md`    | FontManager usage; init/runtime boundaries; role-based lookup (`getFont`) |
 | `docs/I18N-GUIDE.md`     | LangStore, PluralRules, resource layout, language-switch flow |
 | `docs/THEMES.md`         | Theme guide for built-in styles and creating custom themes |
+| `agents/imguix-windowing-playbook.md` | Short agent checklist for windowing changes and backend-aware verification |
 
 ### Dependency Map
 

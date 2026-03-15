@@ -6,6 +6,7 @@ Files:
 
 - `imguix-smoke-build.md` - Known-good commands to configure and rebuild smoke examples with MinGW.
 - `imguix-fonts-i18n-playbook.md` - Quick operational checklist for documenting and validating fonts + i18n behavior.
+- `imguix-windowing-playbook.md` - Practical checklist for `WindowInstance` / `ImGuiFramedWindow` changes and docs sync.
 
 When to use `imguix-fonts-i18n-playbook.md`:
 
@@ -18,6 +19,12 @@ Expected outputs:
 - API-aligned snippets for font role switching and i18n language flow.
 - No stale signatures/roles in docs.
 - EN/RU guides consistent in behavior and terminology.
+
+When to use `imguix-windowing-playbook.md`:
+
+- You touch `include/imguix/core/window/*` or `include/imguix/windows/*`.
+- You update corner/classic smoke examples (`corner_icon_area_*`) or framed-window behavior docs.
+- You need backend-aware verification (SFML vs GLFW/SDL2) before finalizing windowing changes.
 
 Toolchain policy:
 
