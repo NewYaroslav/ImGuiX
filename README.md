@@ -33,6 +33,7 @@ independently of rendering.
 - [CMake Options (Summary)](#cmake-options-summary)
 - [Compile-Time Macros](#compile-time-macros)
 - [Themes](#themes)
+- [Internationalization](#internationalization)
 - [Fonts and Licensing](#fonts-and-licensing)
 - [License](#license)
 
@@ -329,12 +330,27 @@ ImGuiX::Widgets::ThemePicker("demo.theme", this);
 
 See [docs/THEMES.md](docs/THEMES.md) for the full API and theme list.
 
+## Internationalization
+
+ImGuiX uses `ImGuiX::I18N::LangStore` for localized strings, markdown docs,
+formatting, and plural forms.
+
+Quick pointers:
+
+- Language resources are read from `data/resources/i18n/<lang>/`.
+- Short strings are loaded from all `*.json` files in language folder.
+- Markdown docs are loaded by key as `<doc_key>.md`.
+- Plural rules are loaded from `data/resources/i18n/plurals.json` when present.
+- Runtime language switching is done via `LangChangeEvent`.
+
+See [docs/I18N-GUIDE.md](docs/I18N-GUIDE.md) for full workflow and examples.
+
 ## Fonts and Licensing
 
 ImGuiX ships with a `FontManager` that can auto-load fonts from a JSON config or
 be configured manually. By default, fonts are read from
 `data/resources/fonts/fonts.json`. For full details see
-[FONTS-GUIDE-RU.md](docs/FONTS-GUIDE-RU.md).
+[docs/FONTS-GUIDE.md](docs/FONTS-GUIDE.md) (RU: [docs/FONTS-GUIDE-RU.md](docs/FONTS-GUIDE-RU.md)).
 
 #### Common symbol ranges
 
@@ -357,15 +373,11 @@ An example manual setup in `WindowInstance::onInit()`:
 
 ```cpp
 fontsBeginManual();
-// include icons (PUA) + common symbols (arrows/misc/dingbats)
-fontsSetRangesPreset("Default+Punct+PUA+LatinExtA"); // include LatinExtA for œ/Œ, æ/Æ, etc.
+fontsSetRangesPreset("Default+Punct+PUA+LatinExtA");
 fontsAddBody({ "Roboto-Medium.ttf", 16.0f });
-// merge icon font (PUA); oversample=4.0f, merge=true
-fontsAddMerge(FontRole::Icons, { "forkawesome-webfont.ttf", 16.0f, 4.0f, true }));
-// (optional) merge a symbols-capable font if Roboto lacks glyphs
-// fontsAddMerge(ImGuiX::Fonts::FontRole::Symbols,{ 
-//     "NotoSansSymbols-Regular.ttf", 16.0f, 1.0f, true 
-// });
+fontsAddMerge(ImGuiX::Fonts::FontRole::Icons,
+              { "forkawesome-webfont.ttf", 16.0f, 0.0f, true });
+fontsAddHeadline(ImGuiX::Fonts::FontRole::H1, { "Roboto-Bold.ttf", 24.0f });
 fontsBuildNow();
 ```
 
@@ -374,6 +386,7 @@ fontsBuildNow();
 - **Icon shows as □/missing:** ensure `PUA` is in ranges **and** the icon font is merged.
 - **Unicode symbols (⚠ ✈ ←) not rendered:** add `MiscSymbols` / `Dingbats` / `Arrows` to ranges and merge a font that contains them.
 - **Markers fallback:** widgets try `U+26A0` (⚠) → `U+E002` (Material PUA) → `"(!)"` if neither glyph exists.
+- **`getFont(role)` returned `nullptr`:** role is not available in current atlas. Use fallback to current ImGui font.
 
 > **Tip:** For Western European languages (French, Polish, Czech, etc.) it is recommended to add `+LatinExtA`
 > since characters like `œ/Œ` are located in the Latin Extended-A block.
@@ -383,14 +396,14 @@ This repository bundles third-party fonts under their original licenses:
 
 - **Noto Sans (Latin/Cyrillic/Greek/Vietnamese)**, **Noto Sans CJK (SC/TC/JP/KR)**,
   **Noto Sans Arabic / Devanagari / Thai** — licensed under the
-  [SIL Open Font License 1.1](licenses/OFL.txt).
+  [SIL Open Font License 1.1](assets/data/resources/fonts/licenses/OFL.txt).
   Copyright © The Noto Project Authors.
 
 - **Font Awesome Free (fonts only)**, **Fork Awesome**, **Fontaudio** —
-  [SIL Open Font License 1.1](licenses/OFL.txt).
+  [SIL Open Font License 1.1](assets/data/resources/fonts/licenses/OFL.txt).
   *Note:* brand icons remain subject to trademark rights.
 
-- **Material Icons**, **Roboto** — [Apache License 2.0](licenses/LICENSE-APACHE-2.0.txt)
+- **Material Icons**, **Roboto** — [Apache License 2.0](assets/data/resources/fonts/licenses/LICENSE-APACHE-2.0.txt)
   (see also `licenses/NOTICE` if provided upstream).
 
 All fonts are included unmodified. See `THIRD-PARTY-NOTICES.md` for per-family attributions.

@@ -33,6 +33,7 @@
 - [Опции CMake (сводка)](#опции-cmake-сводка)
 - [Макросы компиляции](#макросы-компиляции)
 - [Темы](#темы)
+- [Интернационализация](#интернационализация)
 - [Шрифты и лицензии](#шрифты-и-лицензии)
 - [Лицензия](#лицензия)
 
@@ -328,9 +329,23 @@ ImGuiX::Widgets::ThemePicker("demo.theme", this);
 
 Полный список тем и API см. в [docs/THEMES.md](docs/THEMES.md).
 
+## Интернационализация
+
+ImGuiX использует `ImGuiX::I18N::LangStore` для локализованных строк, markdown-документов, форматирования и множественных форм.
+
+Коротко:
+
+- Ресурсы языка читаются из `data/resources/i18n/<lang>/`.
+- Короткие строки читаются из всех `*.json` в папке языка.
+- Markdown читается по ключу как `<doc_key>.md`.
+- Правила множественных форм читаются из `data/resources/i18n/plurals.json`.
+- Runtime-переключение языка выполняется через `LangChangeEvent`.
+
+Полный workflow: [docs/I18N-GUIDE-RU.md](docs/I18N-GUIDE-RU.md) (EN: [docs/I18N-GUIDE.md](docs/I18N-GUIDE.md)).
+
 ## Шрифты и лицензии
 
-ImGuiX поставляется с `FontManager`, который может автоматически загружать шрифты из JSON-конфига или настраиваться вручную. По умолчанию шрифты читаются из `data/resources/fonts/fonts.json`. Подробности см. в [FONTS-GUIDE-RU.md](docs/FONTS-GUIDE-RU.md).
+ImGuiX поставляется с `FontManager`, который может автоматически загружать шрифты из JSON-конфига или настраиваться вручную. По умолчанию шрифты читаются из `data/resources/fonts/fonts.json`. Подробности см. в [docs/FONTS-GUIDE.md](docs/FONTS-GUIDE.md) (RU: [docs/FONTS-GUIDE-RU.md](docs/FONTS-GUIDE-RU.md)).
 
 #### Общие диапазоны символов
 
@@ -353,37 +368,33 @@ ImGuiX поставляется с `FontManager`, который может ав
 
 ```cpp
 fontsBeginManual();
-// включаем иконки (PUA) + общие символы (стрелки/misc/dingbats)
-fontsSetRangesPreset("Default+Punct+PUA+LatinExtA"); // LatinExtA для œ/Œ, æ/Æ и т.п.
+fontsSetRangesPreset("Default+Punct+PUA+LatinExtA");
 fontsAddBody({ "Roboto-Medium.ttf", 16.0f });
-// мерджим иконный шрифт (PUA); oversample=4.0f, merge=true
-fontsAddMerge(FontRole::Icons, { "forkawesome-webfont.ttf", 16.0f, 4.0f, true });
-// (опц.) мерджим шрифт с символами, если в Roboto нет глифов
-// fontsAddMerge(ImGuiX::Fonts::FontRole::Symbols,{
-//     "NotoSansSymbols-Regular.ttf", 16.0f, 1.0f, true
-// });
+fontsAddMerge(ImGuiX::Fonts::FontRole::Icons,
+              { "forkawesome-webfont.ttf", 16.0f, 0.0f, true });
+fontsAddHeadline(ImGuiX::Fonts::FontRole::H1, { "Roboto-Bold.ttf", 24.0f });
 fontsBuildNow();
 ```
-
 #### Устранение неполадок
 
 - **Иконка отображается как □/отсутствует:** убедитесь, что `PUA` есть в диапазонах **и** иконный шрифт замерджен.
 - **Unicode-символы (⚠ ✈ ←) не рендерятся:** добавьте `MiscSymbols` / `Dingbats` / `Arrows` в диапазоны и мерджите шрифт, содержащий их.
 - **Фолбэк для маркеров:** виджеты пробуют `U+26A0` (⚠) → `U+E002` (Material PUA) → `"(!)"`, если глифы отсутствуют.
+- **`getFont(role)` вернул `nullptr`:** роль не загружена в текущем atlas. Используйте fallback на текущий ImGui-шрифт.
 
 > **Совет:** для западноевропейских языков (французский, польский, чешский и т.п.) рекомендуется добавить `+LatinExtA`, так как символы вроде `œ/Œ` находятся в блоке Latin Extended-A. При необходимости включайте `+Latin1Sup`, `+LatinExtB` или `+LatinExtAdditional`.
 
 В репозитории поставляются сторонние шрифты под их исходными лицензиями:
 
 - **Noto Sans (Latin/Cyrillic/Greek/Vietnamese)**, **Noto Sans CJK (SC/TC/JP/KR)**,
-  **Noto Sans Arabic / Devanagari / Thai** — лицензия [SIL Open Font License 1.1](licenses/OFL.txt).
+  **Noto Sans Arabic / Devanagari / Thai** — лицензия [SIL Open Font License 1.1](assets/data/resources/fonts/licenses/OFL.txt).
   Copyright © The Noto Project Authors.
 
 - **Font Awesome Free (только шрифты)**, **Fork Awesome**, **Fontaudio** —
-  [SIL Open Font License 1.1](licenses/OFL.txt).
+  [SIL Open Font License 1.1](assets/data/resources/fonts/licenses/OFL.txt).
   *Примечание:* брендовые иконки остаются объектом товарных знаков.
 
-- **Material Icons**, **Roboto** — [Apache License 2.0](licenses/LICENSE-APACHE-2.0.txt)
+- **Material Icons**, **Roboto** — [Apache License 2.0](assets/data/resources/fonts/licenses/LICENSE-APACHE-2.0.txt)
   (см. также `licenses/NOTICE`, если предоставлен апстримом).
 
 Все шрифты включены без изменений. См. `THIRD-PARTY-NOTICES.md` для указания авторства по семействам.
@@ -406,4 +417,3 @@ ImGuiX включает ряд внешних библиотек в качест
 ## Лицензия
 
 MIT — см. [LICENSE](./LICENSE)
-

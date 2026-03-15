@@ -249,6 +249,7 @@ if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Days", preview.c_str(),
 ### Local agent playbooks in this submodule
 
 * Prefer `agents/imguix-smoke-build.md` for Windows MinGW smoke-example configure/build commands.
+* Prefer `agents/imguix-fonts-i18n-playbook.md` for fonts + i18n API checks and doc updates.
 * Treat `external/ImGuiX/agents/` as the concise, execution-focused playbook set.
 
 ### Add a new module/aggregate/service
@@ -303,6 +304,9 @@ if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Days", preview.c_str(),
 | Blocked shutdown          | Threaded model not checking `isClosing()`        | Poll flag and join threads in destructor                                         |
 | Text shows as squares     | Ranges include only PUA (icons)                  | Use `fontsSetRangesPreset("Default+...+PUA")` or add non-PUA ranges explicitly   |
 | Icons missing             | PUA not included in ranges                       | Add `PUA` token to preset or explicit pair `0xE000–0xF8FF`                       |
+| Language switched, glyphs still broken | `LangStore` switched but atlas locale/ranges were not updated | In `onBeforeLanguageApply(lang)` call `fontsControl().setLocale(lang)` and let `rebuildIfNeeded()` run |
+| Compile/docs mismatch on font role | Using nonexistent `FontRole::Symbols` | Use supported roles only: `Body/H1/H2/H3/Monospace/Bold/Italic/BoldItalic/Icons/Emoji` |
+| Compile/docs mismatch on locale API | Using old `fontsSetLocale(..., bool)` signature | Use runtime facade: `fontsControl().setLocale(lang)` then `rebuildIfNeeded()` |
 | PopStyleColor / PopID mismatch | PushStyleColor/PushID/PushVar called asymmetrically | Always use a flag pattern: `bool pushed = false; if (cond) { ImGui::PushStyleColor(...); pushed = true; } ... if (pushed) ImGui::PopStyleColor();` |
 | Misc symbols not rendered | Missing `MiscSymbols`/`Dingbats`/`Arrows` ranges | Add these presets or merge a symbol font (e.g., Noto Sans Symbols)               |
 | Atlas bloat               | Too many ranges/fonts merged                     | Audit ranges; split icon font; check atlas size in logs/metrics                  |
@@ -378,8 +382,9 @@ Format: `type(scope): short description` where the scope is optional. Keep messa
 | Path                     | Role                                                   |
 | ------------------------ | ------------------------------------------------------ |
 | `docs/ARCHITECTURE.md`   | System architecture overview (Russian: `docs/ARCHITECTURE-RU.md`) |
-| `docs/FONTS-GUIDE.md` | FontManager usage; preset tokens including `MiscSymbols`, `Dingbats`, `Arrows`, `PUA` |
-| `docs/THEMES.md`        | Theme guide for built-in styles and creating custom themes |
+| `docs/FONTS-GUIDE.md`    | FontManager usage; init/runtime boundaries; role-based lookup (`getFont`) |
+| `docs/I18N-GUIDE.md`     | LangStore, PluralRules, resource layout, language-switch flow |
+| `docs/THEMES.md`         | Theme guide for built-in styles and creating custom themes |
 
 ### Dependency Map
 

@@ -1,72 +1,80 @@
-# ImGuiX Fonts: руководство по FontManager и `fonts*` методам окна
+# ImGuiX Fonts Guide (RU)
 
-Этот документ объясняет, как подключать и использовать шрифты в ImGuiX c помощью `FontManager` и обёрток `WindowInstance` (`fontsBeginManual`, `fontsAddBody`, …). Описаны два сценария: **автоконфиг из JSON** и **ручная сборка**.
+Этот гайд описывает текущую работу шрифтов в ImGuiX и безопасные сценарии использования из окна и контроллеров.
 
-> Требования: ImGui 1.92+, опционально ImGui FreeType; SFML/GLFW/SDL2 backend. Все вызовы, затрагивающие `ImGuiIO::Fonts`, выполняйте **на GUI-потоке между кадрами**.
+## Что делает FontManager
 
-**Контекст вызовов:** если не указано иначе, примеры ниже выполняются в методе `WindowInstance::onInit()`. Рантайм‑операции (например, `fontsSetLocale()` и `fontsControl().rebuildIfNeeded()`) допустимы между кадрами в основном цикле после инициализации.
+- Централизованно управляет atlas'ом Dear ImGui.
+- Поддерживает два режима настройки:
+  - Auto из `data/resources/fonts/fonts.json`.
+  - Manual в `onInit()` окна через `fonts*` методы.
+- Работает с ролями (`FontRole`): `Body`, `H1`, `H2`, `H3`, `Monospace`, `Bold`, `Italic`, `BoldItalic`, `Icons`, `Emoji`.
+- Поддерживает runtime-пересборку после изменений конфигурации (`locale`, DPI, scale, markdown sizes).
 
----
+## Контекст API: init-only и runtime-safe
 
-## Базовые понятия
+### Только на инициализации (обычно `WindowInstance::onInit()`)
 
-* **FontManager** — единая точка управления атласом шрифтов (добавляет TTF/OTF, мерджит иконки/эмодзи, строит атлас, обновляет текстуру бэкенда).
-* **FontRole** — логические роли: `Body`, `H1`, `H2`, `H3`, `Monospace`, `Bold`, `Italic`, `BoldItalic`, `Icons`, `Emoji`.
-* **Два режима**:
+Используйте только при первичной сборке atlas:
 
-  1. **Auto (JSON)** — конфиг в `data/resources/fonts/fonts.json`. Подходит для большинства случаев и хот‑reload из кода.
-  2. **Manual** — полный контроль в `onInit()` через обёртки окна `fonts*`.
-* **m\_dirty** — ленивый флаг пересборки: сеттеры помечают «грязно», `rebuildIfNeeded()` пересобирает в безопасный момент.
-* **FreeType флаги** — агрегируются по всем файлам и применяются к атласу (`FontLoaderFlags`/`FontBuilderFlags`). Пер-шрифт флагов в вашей версии ImGui нет.
+- `fontsBeginManual()`
+- `fontsSetRangesPreset(...)`
+- `fontsSetRangesExplicit(...)`
+- `fontsClearRanges()`
+- `fontsAddBody(...)`
+- `fontsAddHeadline(...)`
+- `fontsAddMerge(...)`
+- `fontsBuildNow()`
 
----
+### Безопасно в runtime (между кадрами)
 
-## Быстрый старт (Manual, в `WindowInstance::onInit()`)
+Используйте runtime control facade:
+
+- `fontsControl().setLocale(...)`
+- `fontsControl().setDpi(...)`
+- `fontsControl().setUiScale(...)`
+- `fontsControl().setMarkdownSizes(...)`
+- `fontsControl().rebuildIfNeeded()`
+- `fontsControl().getFont(...)`
+
+Read-only facade:
+
+- `fontsView().getFont(...)`
+- `fontsView().activeLocale()`
+- `fontsView().params()`
+
+В контроллерах используйте `Controller::getFont(FontRole)`.
+
+## Быстрый старт: Manual
 
 ```cpp
 void onInit() override {
-    createController<I18nController>();
-    create(id() == 0 ? 800 : 640, id() == 0 ? 600 : 480);
-    setWindowIcon("data/resources/icons/icon.png");
-
-    // Необязательно: локаль влияет на fallback диапазонов в manual,
-    // если вы не зададите их явно (см. ниже). Латиница (Default) включена всегда.
-    // fontsSetLocale("ru");
+    createController<MyController>();
+    create(1280, 720);
 
     fontsBeginManual();
+    fontsSetRangesPreset("Default+Cyrillic+Punct+PUA+LatinExtA");
 
-    // Объединённые диапазоны глифов пресетом:
-    // Default (латиница) + кириллица + вьетнамский + пунктуация + PUA (иконки)
-    fontsSetRangesPreset("Default+Cyrillic+Vietnamese+Punct+PUA");
-
-    // Базовый текстовый шрифт
-    fontsAddBody({ "Roboto-Medium.ttf", 18.0f });
-
-    // Иконки мерджим в цепочку Body
+    fontsAddBody({"NotoSans-Regular.ttf", 18.0f});
     fontsAddMerge(ImGuiX::Fonts::FontRole::Icons,
-                  { "forkawesome-webfont.ttf", 18.0f, /*merge*/ true });
+                  {"MaterialIcons-Regular.ttf", 18.0f, 3.0f, true});
+    fontsAddHeadline(ImGuiX::Fonts::FontRole::H1,
+                     {"NotoSans-Bold.ttf", 24.0f});
 
-    // Заголовок H1 (можно переиспользовать тот же TTF с другим размером)
-    fontsAddHeadline(ImGuiX::Fonts::FontRole::H1, { "Roboto-Bold.ttf", 24.0f });
-
-    fontsBuildNow();
-    // при желании проверьте res.success / res.message
+    const bool ok = fontsBuildNow();
+    (void)ok;
 }
 ```
 
-### Когда задавать локаль
+## Быстрый старт: Auto (JSON)
 
-* Manual + **заданы пресеты/явные диапазоны** → локаль не обязательна.
-* Manual + **нет пресетов/явных** → применяется fallback по локали (`Default + специфический диапазон для locale`). Например, `ru` добавит кириллицу.
+Если manual-методы не вызваны, `WindowManager` запускает auto-init через `FontManager::initFromJsonOrDefaults()`.
 
-Под рукой есть метод окна `fontsSetLocale(std::string locale, bool rebuild_now = true)` — для рантайма (смена языка и пересборка).
+Путь по умолчанию:
 
----
+- `data/resources/fonts/fonts.json`
 
-## Автоконфиг из JSON (Auto)
-
-* Путь по умолчанию: `data/resources/fonts/fonts.json` (настраивается `setConfigPath`).
-* Пример минимального `fonts.json`:
+Минимальный пример:
 
 ```json
 {
@@ -76,185 +84,129 @@ void onInit() override {
     "default": {
       "ranges": "Default+Punct+PUA",
       "roles": {
-        "Body":  [{ "path": "Roboto-Medium.ttf", "size_px": 16 }],
-        "Icons": [{ "path": "forkawesome-webfont.ttf", "size_px": 16, "merge": true }]
+        "Body":  [{ "path": "NotoSans-Regular.ttf", "size_px": 16 }],
+        "Icons": [{ "path": "MaterialIcons-Regular.ttf", "size_px": 16, "merge": true }]
       }
     },
     "ru": {
       "inherits": "default",
-      "ranges": "Default+Cyrillic+Punct"
+      "ranges": "Default+Cyrillic+Punct+PUA"
     }
   }
 }
 ```
 
-* В `onInit()` без manual:
+## Семантика ranges/preset
+
+Ключевые правила:
+
+- `fontsSetRangesPreset(...)` и `fontsSetRangesExplicit(...)` взаимоисключающие.
+- Побеждает последний вызов.
+- Если в manual не задан ни preset, ни explicit, берутся locale-based ranges.
+
+Частые токены:
+
+- `Default`
+- `Cyrillic`
+- `Vietnamese`
+- `Japanese`, `Chinese`, `ChineseFull`, `Korean`
+- `Punct`
+- `PUA` (алиасы `Icons`, `PrivateUse`)
+- `Latin1Sup`, `LatinExtA`, `LatinExtB`, `LatinExtAdditional`
+- `MiscSymbols` (`Misc`)
+- `Dingbats`
+- `Arrows`
+- `MiscTechnical` (`MiscTech`)
+- `EmojiBasic`, `EmojiSupp`, `EmojiPict`, `EmojiTransport`, `EmojiExtA`, `EmojiAll`, `EmojiTGCore`
+
+## Как использовать H1 в `Text` из контроллера
 
 ```cpp
-void onInit() override {
-    createController<I18nController>();
-    create(800, 600);
-    setWindowIcon("data/resources/icons/icon.png");
-    // Автозагрузка по JSON (или дефолты, если файла нет)
-    // fontsSetLocale("ru"); - (опц.) сменить локаль
+void drawUi() override {
+    ImGui::Begin("Font Switch");
+
+    ImGui::TextUnformatted("Обычный body текст");
+
+    if (ImFont* h1 = getFont(ImGuiX::Fonts::FontRole::H1)) {
+        ImGui::PushFont(h1);
+        ImGui::TextUnformatted("Заголовок H1");
+        ImGui::PopFont();
+    } else {
+        ImGui::TextUnformatted("H1 недоступен, fallback на текущий шрифт");
+    }
+
+    if (ImFont* body = getFont(ImGuiX::Fonts::FontRole::Body)) {
+        ImGui::PushFont(body);
+        ImGui::TextUnformatted("Явный Body role");
+        ImGui::PopFont();
+    }
+
+    ImGui::End();
 }
 ```
 
-### `ranges` в JSON
+Если роль не загружена, `getFont(...)` вернет `nullptr`.
 
-* Строка‑пресет: `"Default+Cyrillic+Vietnamese+Punct"` — человеческий способ объединять наборы.
-* Массив пар `[start, end, start, end, …, 0]` — явное указание диапазонов. Ноль в конце можно опустить — менеджер добавит.
-* `inherits` — можно наследовать роли/диапазоны от базовой локали.
+## Merge-цепочка (`Icons`/`Emoji`)
 
-Поддерживаемые токены пресета:
+- `Body` - корневой шрифт текста.
+- `Icons` и `Emoji` мержатся в body chain (`merge=true` во время build).
+- Для `Icons`/`Emoji` lookup возвращает указатель на body chain при наличии merge.
 
-* `Default` — латиница и базовые символы UI (встроено в ImGui)
-* `Cyrillic`
-* `Vietnamese`
-* `Japanese` / `JapaneseFull`
-* `Chinese` / `ChineseFull`
-* `Korean` (осторожно: крупные наборы)
-* `Punct` — `U+2000–U+206F` (General Punctuation: `– — … • “ ” ‘ ’`)
-* **`PUA`** (алиасы: `Icons`, `PrivateUse`) — `U+E000–U+F8FF` (большинство иконных шрифтов)
-* `Latin1Sup` — `U+0080–U+00FF` (Latin-1 Supplement)
-* `LatinExtA` — `U+0100–U+017F` (Latin Extended-A)
-* `LatinExtB` — `U+0180–U+024F` (Latin Extended-B)
-* `LatinExtAdditional` — `U+1E00–U+1EFF` (Latin Extended Additional)
-* **`MiscSymbols`** (алиас: `Misc`) — `U+2600–U+26FF` (например, `⚠ ☀ ☂ ☺`)
-* **`Dingbats`** — `U+2700–U+27BF` (например, `✂ ✈ ✔ ✖`)
-* **`Arrows`** — `U+2190–U+21FF` (например, `← ↑ → ↔`)
+## Runtime locale + rebuild
 
-> **Почему важен PUA:** Material Icons (`U+E8F4`) и Font Awesome/Fork Awesome (`U+Fxxx`) находятся в PUA. Без `PUA` в диапазонах иконки не отрисуются, даже если шрифт замерджен.
-
-### Иконные шрифты (PUA) — пример использования
-
-```cpp
-fontsBeginManual();
-fontsSetRangesPreset("Default+Cyrillic+Punct+PUA");    // включаем PUA
-fontsAddBody({ "NotoSans-Regular.ttf", 18.0f });
-fontsAddMerge(FontRole::Icons, { "MaterialIcons-Regular.ttf", 18.0f, true });
-fontsBuildNow();
-
-// Позже
-ImGui::TextUnformatted(u8"\uE8F4"); // пример: иконка Material 'visibility'
-```
-
-**Проверка наличия глифов** (диагностика):
-
-```cpp
-ImFont* f = ImGui::GetFont();
-bool has_text  = f->FindGlyphNoFallback((ImWchar)'A');
-bool has_cyr   = f->FindGlyphNoFallback((ImWchar)0x0410); // 'А'
-bool has_icon  = f->FindGlyphNoFallback((ImWchar)0xE8F4); // иконка Material
-```
-
----
-
-## Обёртки `WindowInstance`: что есть
-
-**Инициализация (только в `onInit()`; защищены фазой init):**
-
-* `fontsBeginManual()` — старт ручной сессии.
-* `fontsAddBody(FontFile)` — базовый шрифт.
-* `fontsAddHeadline(FontRole::H1|H2|H3, FontFile)` — заголовки.
-* `fontsAddMerge(FontRole::Icons|Emoji, FontFile)` — мердж шрифтов иконок/эмодзи в цепочку Body.
-* `fontsBuildNow()` — сборка атласа и обновление текстуры.
-* `fontsSetRangesPreset(std::string)` — задать диапазоны пресетом (manual).
-* `fontsSetRangesExplicit(std::vector<ImWchar>)` — явные пары диапазонов (manual).
-* `fontsClearRanges()` — убрать ручные диапазоны (вернуться к локали).
-
-**Рантайм‑фасады (безопасные между кадрами):**
-
-* `fontsSetLocale(std::string locale, bool rebuild_now = true)` — сменить локаль; опц. сразу пересобрать.
-* `fontsControl()` — CRTP‑контрол: `setDpi`, `setUiScale`, `setMarkdownSizes`, `rebuildIfNeeded`, `getFont`, `activeLocale`, `params`.
-* `fontsView()` — CRTP‑view: только доступ к `getFont`, `activeLocale`, `params`.
-
-> Опасных методов в рантайме нет: `beginManual/addFont*/buildNow/clearPacks/setBaseDir` доступны только в `onInit()` через сам `FontManager`/обёртки окна.
-
----
-
-## Нюансы и инварианты
-
-* **Поток/фаза:** любые операции со шрифтами — только на GUI‑треде, между кадрами. `buildNow()`/`rebuildIfNeeded()` недопустимы внутри активного `NewFrame/Render`.
-* **m\_dirty:** сеттеры (`setLocale`, `setDpi`, `setUiScale`, `setMarkdownSizes`, `setRanges*`) помечают конфиг грязным; сборка делается один раз при `rebuildIfNeeded()`/`buildNow()`.
-* **FreeType:**
-
-  * Переключение билдера включается автоматически, если собран с `IMGUI_ENABLE_FREETYPE` и `use_freetype = true`.
-  * Флаги копятся из `FontFile::freetype_flags` и выставляются на весь атлас (`FontLoaderFlags`/`FontBuilderFlags`).
-* **Диапазоны:** CJK заметно увеличивают атлас — разумно держать отдельные локали/пакеты и переключать по требованию.
-* **`extra_glyphs`:** UTF‑8 строка дополнительных символов (например, спец‑пунктуация). В C++17 `u8"…"` — `const char*` (ОК).
-
-### Семантика ручного режима (пресеты vs явные)
-
-* `fontsSetRangesPreset(...)` и `fontsSetRangesExplicit(...)` **взаимоисключающие** — последнее вызванное побеждает.
-* Чтобы комбинировать латиницу/кириллицу и т.п. с иконками, **предпочитайте пресеты с `+PUA`** вместо смешивания пресета и явных пар.
-* Если нужны явные пары, убедитесь, что они охватывают **все необходимые скрипты**, иначе текст превратится в квадраты.
-
----
-
-## Частые ошибки
-
-* **Передача "ru,en" в `setLocale`** — неверно; локаль одна. Для объединения используйте пресет диапазонов (`fontsSetRangesPreset`).
-* **Забыли вызвать `fontsBuildNow()` в manual** — шрифты не загрузятся, `io.FontDefault` будет `nullptr`.
-* **Сборка в неправильной фазе** — артефакты или падение. Стройте атлас между кадрами.
-* **Ожидание пер‑шрифтовых FreeType‑флагов** — в этой версии они применяются ко всему атласу.
-
----
-
-## Полезные фрагменты
-
-### Минимальный manual без пресетов
-
-```cpp
-fontsBeginManual();
-fontsSetLocale("ru");               // даст Default + кириллица
-fontsAddBody({"Roboto-Medium.ttf", 16.0f});
-fontsAddMerge(FontRole::Icons, {"forkawesome-webfont.ttf", 16.0f, true});
-fontsBuildNow();
-```
-
-### Переиспользование Body TTF для H1/H2/H3
-
-```cpp
-fontsBeginManual();
-fontsAddBody({"Roboto-Medium.ttf", 16.0f});
-// Если не задать явный путь, FontManager возьмёт путь Body и изменит размер
-fontsAddHeadline(FontRole::H1, {"", 24.0f});
-fontsAddHeadline(FontRole::H2, {"", 20.0f});
-fontsAddHeadline(FontRole::H3, {"", 18.0f});
-fontsBuildNow();
-```
-
-### Смена DPI/масштаба в рантайме
+Рекомендуемый runtime-паттерн:
 
 ```cpp
 auto& fc = fontsControl();
-fc.setDpi(120.0f);
-fc.setUiScale(1.0f);
+fc.setLocale("ru");
 auto br = fc.rebuildIfNeeded();
+(void)br;
 ```
 
----
+Для глобальной смены языка через `LangChangeEvent` можно обновлять font locale в window hook:
 
-## Где лежат файлы
+```cpp
+void onBeforeLanguageApply(const std::string& lang) override {
+    fontsControl().setLocale(lang); // помечает atlas dirty
+}
+```
 
-* Шрифты: `data/resources/fonts` (по умолчанию). База меняется `setBaseDir()`.
-* i18n: `data/resources/i18n` (в т.ч. `plurals.json`).
-* Конфиг шрифтов (JSON): `data/resources/fonts/fonts.json` по умолчанию; путь меняется `setConfigPath()`.
-
----
+`WindowInstance` затем применит язык и вызовет `m_font_manager.rebuildIfNeeded()`.
 
 ## Диагностика
 
-* `BuildResult { success, message, fonts }` возвращается из `buildNow()`/`initFromJsonOrDefaults()`/`rebuildIfNeeded()`.
-* При ошибке сборки: проверьте пути к TTF (абсолютные/относительные к `base_dir`), корректность диапазонов, наличие FreeType и совместимость версии ImGui.
+### Квадраты вместо текста
 
----
+- Не хватает нужных диапазонов для скрипта.
+- Добавьте диапазоны (`Default+Cyrillic+...`) и пересоберите.
 
-## Чек‑лист интеграции
+### Пропали иконки
 
-* [ ] Подключён `FontManager.hpp` (или `IMGUIX_HEADER_ONLY` для `.ipp`).
-* [ ] В `onInit()` выбран режим: auto (JSON) **или** manual (`fontsBeginManual` → `fontsAdd*` → `fontsBuildNow`).
-* [ ] Диапазоны заданы: пресетом/явно/локалью.
-* [ ] Для рантайма используете только `fontsControl()/fontsView()` и `fontsSetLocale()`.
-* [ ] Пересборка — только между кадрами (`rebuildIfNeeded()`/`buildNow()`).
+- Нет `PUA` в ranges или не замержен icon-font.
+- Нужны оба условия.
+
+### Atlas слишком большой
+
+- Слишком много диапазонов/merge-паков.
+- Разделите локали или уберите редко используемые блоки.
+- Смотрите размер atlas через ImGui metrics (`io.Fonts->TexWidth`, `TexHeight`).
+
+### Роль недоступна (`nullptr`)
+
+- Роль не загружена в текущем pack/manual-конфиге.
+- Делайте fallback и проверяйте конфигурацию.
+
+## Полезные пути
+
+- Шрифты: `data/resources/fonts`
+- JSON-конфиг шрифтов: `data/resources/fonts/fonts.json`
+- i18n ресурсы: `data/resources/i18n`
+
+## Краткий checklist
+
+- Выберите один путь: auto JSON или manual.
+- Убедитесь, что ranges покрывают все нужные алфавиты и символы.
+- Мержите icon-font для иконок.
+- В контроллерах используйте `getFont(...)` + `PushFont/PopFont` с fallback.
+- Пересобирайте atlas только между кадрами через `rebuildIfNeeded()`.

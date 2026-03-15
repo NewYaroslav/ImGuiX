@@ -1,72 +1,80 @@
-# ImGuiX Fonts: guide to FontManager and `fonts*` window methods
+# ImGuiX Fonts Guide
 
-This document explains how to load and use fonts in ImGuiX via the `FontManager` and the `WindowInstance` helpers (`fontsBeginManual`, `fontsAddBody`, …). Two scenarios are covered: **JSON auto-config** and **manual assembly**.
+This guide explains how fonts work in ImGuiX today and how to use them safely from window code and controllers.
 
-> Requirements: ImGui 1.92+, optional ImGui FreeType; SFML/GLFW/SDL2 backend. Perform all calls touching `ImGuiIO::Fonts` **on the GUI thread between frames**.
+## What FontManager provides
 
-**Call context:** unless stated otherwise, examples below run inside `WindowInstance::onInit()`. Runtime operations (e.g. `fontsSetLocale()` and `fontsControl().rebuildIfNeeded()`) are allowed between frames in the main loop after initialization.
+- One owner for the Dear ImGui font atlas.
+- Two setup modes:
+  - Auto mode from `data/resources/fonts/fonts.json`.
+  - Manual mode from window `onInit()` via `fonts*` helpers.
+- Logical roles (`FontRole`): `Body`, `H1`, `H2`, `H3`, `Monospace`, `Bold`, `Italic`, `BoldItalic`, `Icons`, `Emoji`.
+- Runtime rebuild path when configuration changes (`setLocale`, DPI, scale, markdown sizes).
 
----
+## API Context: Init-only vs Runtime-safe
 
-## Basics
+### Init-only (window setup, typically in `WindowInstance::onInit()`)
 
-* **FontManager** — single point of control for the font atlas (adds TTF/OTF, merges icons/emoji, builds the atlas, updates backend texture).
-* **FontRole** — logical roles: `Body`, `H1`, `H2`, `H3`, `Monospace`, `Bold`, `Italic`, `BoldItalic`, `Icons`, `Emoji`.
-* **Two modes:**
-  1. **Auto (JSON)** — config in `data/resources/fonts/fonts.json`. Suitable for most cases and hot‑reload from code.
-  2. **Manual** — full control in `onInit()` through `fonts*` window wrappers.
-* **m_dirty** — lazy rebuild flag: setters mark as dirty, `rebuildIfNeeded()` rebuilds at a safe moment.
-* **FreeType flags** — aggregated across all files and applied to the entire atlas (`FontLoaderFlags`/`FontBuilderFlags`). Per-font flags are unavailable in this ImGui version.
+Use these only while building initial atlas:
 
----
+- `fontsBeginManual()`
+- `fontsSetRangesPreset(...)`
+- `fontsSetRangesExplicit(...)`
+- `fontsClearRanges()`
+- `fontsAddBody(...)`
+- `fontsAddHeadline(...)`
+- `fontsAddMerge(...)`
+- `fontsBuildNow()`
 
-## Quick start (Manual in `WindowInstance::onInit()`)
+### Runtime-safe (between frames)
+
+Use runtime control facade when UI is already running:
+
+- `fontsControl().setLocale(...)`
+- `fontsControl().setDpi(...)`
+- `fontsControl().setUiScale(...)`
+- `fontsControl().setMarkdownSizes(...)`
+- `fontsControl().rebuildIfNeeded()`
+- `fontsControl().getFont(...)`
+
+Read-only facade:
+
+- `fontsView().getFont(...)`
+- `fontsView().activeLocale()`
+- `fontsView().params()`
+
+From controllers, use `Controller::getFont(FontRole)` (delegates through `WindowInterface`).
+
+## Quick Start: Manual mode
 
 ```cpp
 void onInit() override {
-    createController<I18nController>();
-    create(id() == 0 ? 800 : 640, id() == 0 ? 600 : 480);
-    setWindowIcon("data/resources/icons/icon.png");
-
-    // Optional: locale influences fallback ranges in manual mode
-    // if you don't set them explicitly (see below). Latin (Default) is always included.
-    // fontsSetLocale("ru");
+    createController<MyController>();
+    create(1280, 720);
 
     fontsBeginManual();
+    fontsSetRangesPreset("Default+Cyrillic+Punct+PUA+LatinExtA");
 
-    // Combined glyph ranges via preset:
-    // Default (Latin) + Cyrillic + Vietnamese + useful punctuation + PUA (icons)
-    // PUA is required for icon fonts like Material / (Fork) Awesome.
-    fontsSetRangesPreset("Default+Cyrillic+Vietnamese+Punct+PUA");
-
-    // Base text font
-    fontsAddBody({ "Roboto-Medium.ttf", 18.0f });
-
-    // Merge icons into the Body chain
+    fontsAddBody({"NotoSans-Regular.ttf", 18.0f});
     fontsAddMerge(ImGuiX::Fonts::FontRole::Icons,
-                  { "forkawesome-webfont.ttf", 18.0f, /*merge*/ true });
+                  {"MaterialIcons-Regular.ttf", 18.0f, 3.0f, true});
+    fontsAddHeadline(ImGuiX::Fonts::FontRole::H1,
+                     {"NotoSans-Bold.ttf", 24.0f});
 
-    // H1 headline (can reuse the same TTF with a different size)
-    fontsAddHeadline(ImGuiX::Fonts::FontRole::H1, { "Roboto-Bold.ttf", 24.0f });
-
-    fontsBuildNow();
-    // check res.success / res.message if desired
+    const bool ok = fontsBuildNow();
+    (void)ok;
 }
 ```
 
-### When to set locale
+## Quick Start: Auto mode (JSON)
 
-* Manual + **preset/explicit ranges set** → locale optional.
-* Manual + **no preset/explicit ranges** → locale fallback applies (`Default + locale-specific range`). For example, `ru` adds Cyrillic.
+If you do not call manual `fonts*` setup, `WindowManager` triggers auto init via `FontManager::initFromJsonOrDefaults()`.
 
-The window method `fontsSetLocale(std::string locale, bool rebuild_now = true)` is available for runtime changes (switch language and rebuild).
+Default config path:
 
----
+- `data/resources/fonts/fonts.json`
 
-## JSON auto-config (Auto)
-
-* Default path: `data/resources/fonts/fonts.json` (customizable via `setConfigPath`).
-* Minimal `fonts.json` example:
+Minimal example:
 
 ```json
 {
@@ -76,186 +84,131 @@ The window method `fontsSetLocale(std::string locale, bool rebuild_now = true)` 
     "default": {
       "ranges": "Default+Punct+PUA",
       "roles": {
-        "Body":  [{ "path": "Roboto-Medium.ttf", "size_px": 16 }],
-        "Icons": [{ "path": "forkawesome-webfont.ttf", "size_px": 16, "merge": true }]
+        "Body":  [{ "path": "NotoSans-Regular.ttf", "size_px": 16 }],
+        "Icons": [{ "path": "MaterialIcons-Regular.ttf", "size_px": 16, "merge": true }]
       }
     },
     "ru": {
       "inherits": "default",
-      "ranges": "Default+Cyrillic+Punct"
+      "ranges": "Default+Cyrillic+Punct+PUA"
     }
   }
 }
 ```
 
-* In `onInit()` without manual steps:
+## Range presets and semantics
+
+Important behavior:
+
+- `fontsSetRangesPreset(...)` and `fontsSetRangesExplicit(...)` are mutually exclusive.
+- Last call wins.
+- If neither preset nor explicit ranges are set in manual mode, fallback is locale-based ranges.
+
+Common preset tokens:
+
+- `Default`
+- `Cyrillic`
+- `Vietnamese`
+- `Japanese`, `Chinese`, `ChineseFull`, `Korean`
+- `Punct`
+- `PUA` (`Icons`, `PrivateUse` aliases)
+- `Latin1Sup`, `LatinExtA`, `LatinExtB`, `LatinExtAdditional`
+- `MiscSymbols` (`Misc` alias)
+- `Dingbats`
+- `Arrows`
+- `MiscTechnical` (`MiscTech` alias)
+- `EmojiBasic`, `EmojiSupp`, `EmojiPict`, `EmojiTransport`, `EmojiExtA`, `EmojiAll`, `EmojiTGCore`
+
+## H1 / Body font switching in controllers
+
+Use role lookup and standard ImGui push/pop pattern:
 
 ```cpp
-void onInit() override {
-    createController<I18nController>();
-    create(800, 600);
-    setWindowIcon("data/resources/icons/icon.png");
-    // Auto-load from JSON (or defaults if file missing)
-    // fontsSetLocale("ru"); // (opt.) switch locale
+void drawUi() override {
+    ImGui::Begin("Font Switch");
+
+    ImGui::TextUnformatted("Default body text");
+
+    if (ImFont* h1 = getFont(ImGuiX::Fonts::FontRole::H1)) {
+        ImGui::PushFont(h1);
+        ImGui::TextUnformatted("Headline rendered with H1");
+        ImGui::PopFont();
+    } else {
+        ImGui::TextUnformatted("H1 missing, fallback to current font");
+    }
+
+    if (ImFont* body = getFont(ImGuiX::Fonts::FontRole::Body)) {
+        ImGui::PushFont(body);
+        ImGui::TextUnformatted("Explicit Body role");
+        ImGui::PopFont();
+    }
+
+    ImGui::End();
 }
 ```
 
-### `ranges` in JSON
+If role is unavailable, `getFont(...)` returns `nullptr`. Always keep a fallback branch.
 
-* String preset: `"Default+Cyrillic+Vietnamese+Punct"` — human-friendly way to combine sets.
-* Array of pairs `[start, end, start, end, …, 0]` — explicit ranges. Trailing zero can be omitted—manager adds it.
-* `inherits` — inherit roles/ranges from a base locale.
+## Merge chain behavior (`Icons`/`Emoji`)
 
-Supported preset tokens:
+- `Body` is the root font for text.
+- `Icons` and `Emoji` are merged into body chain (`merge=true` during build).
+- Role lookup for `Icons`/`Emoji` returns the body chain pointer when merge exists.
 
-* `Default` — Latin and basic UI symbols (ImGui built-in)
-* `Cyrillic`
-* `Vietnamese`
-* `Japanese` / `JapaneseFull`
-* `Chinese` / `ChineseFull`
-* `Korean` (beware: large sets)
-* `Punct` — `U+2000–U+206F` (General Punctuation; e.g. `– — … • “ ” ‘ ’`)
-* **`PUA`** (aliases: `Icons`, `PrivateUse`) — `U+E000–U+F8FF` (most icon fonts, e.g. Material Icons `U+E8xx`, Font Awesome `U+Fxxx`)
-* `Latin1Sup` — `U+0080–U+00FF` (Latin-1 Supplement)
-* `LatinExtA` — `U+0100–U+017F` (Latin Extended-A)
-* `LatinExtB` — `U+0180–U+024F` (Latin Extended-B)
-* `LatinExtAdditional` — `U+1E00–U+1EFF` (Latin Extended Additional)
-* **`MiscSymbols`** (alias: `Misc`) — `U+2600–U+26FF` (e.g. `⚠ ☀ ☂ ☺`)
-* **`Dingbats`** — `U+2700–U+27BF` (e.g. `✂ ✈ ✔ ✖`)
-* **`Arrows`** — `U+2190–U+21FF` (e.g. `← ↑ → ↔`)
+## Runtime locale and rebuild
 
-> **Why PUA matters:** Material Icons (e.g., `U+E8F4`) and Font Awesome/Fork Awesome (`U+Fxxx`) reside in PUA.  
-> Without `PUA` in ranges icons won’t render even if the font is merged.
-
-### Icon fonts (PUA) — usage example
-
-```cpp
-fontsBeginManual();
-fontsSetRangesPreset("Default+Cyrillic+Punct+PUA");    // include PUA
-fontsAddBody({ "NotoSans-Regular.ttf", 18.0f });
-fontsAddMerge(FontRole::Icons, { "MaterialIcons-Regular.ttf", 18.0f, true });
-fontsBuildNow();
-
-// Later
-ImGui::TextUnformatted(u8"\uE8F4"); // Material icon 'visibility' for example
-```
-
-**Glyph presence check** (diagnostics):
-
-```cpp
-ImFont* f = ImGui::GetFont();
-bool has_text  = f->FindGlyphNoFallback((ImWchar)'A');
-bool has_cyr   = f->FindGlyphNoFallback((ImWchar)0x0410); // Cyrillic 'A'
-bool has_icon  = f->FindGlyphNoFallback((ImWchar)0xE8F4); // Material icon
-```
-
----
-
-## WindowInstance wrappers: what's available
-
-**Initialization only (inside `onInit()`; guarded by init phase):**
-
-* `fontsBeginManual()` — start manual session.
-* `fontsAddBody(FontFile)` — base font.
-* `fontsAddHeadline(FontRole::H1|H2|H3, FontFile)` — headlines.
-* `fontsAddMerge(FontRole::Icons|Emoji, FontFile)` — merge icon/emoji fonts into the Body chain.
-* `fontsBuildNow()` — build atlas and update texture.
-* `fontsSetRangesPreset(std::string)` — set ranges via preset (manual).
-* `fontsSetRangesExplicit(std::vector<ImWchar>)` — explicit range pairs (manual).
-* `fontsClearRanges()` — remove manual ranges (back to locale).
-
-**Runtime facades (safe between frames):**
-
-* `fontsSetLocale(std::string locale, bool rebuild_now = true)` — change locale; optionally rebuild immediately.
-* `fontsControl()` — CRTP control: `setDpi`, `setUiScale`, `setMarkdownSizes`, `rebuildIfNeeded`, `getFont`, `activeLocale`, `params`.
-* `fontsView()` — CRTP view: access to `getFont`, `activeLocale`, `params` only.
-
-> No unsafe methods at runtime: `beginManual/addFont*/buildNow/clearPacks/setBaseDir` are init-only via `FontManager`/window wrappers.
-
----
-
-## Nuances and invariants
-
-* **Thread/phase:** any font operations only on the GUI thread between frames. `buildNow()`/`rebuildIfNeeded()` are invalid inside active `NewFrame/Render`.
-* **m_dirty:** setters (`setLocale`, `setDpi`, `setUiScale`, `setMarkdownSizes`, `setRanges*`) mark config dirty; rebuild occurs once during `rebuildIfNeeded()`/`buildNow()`.
-* **FreeType:**
-  * Builder switches automatically if compiled with `IMGUI_ENABLE_FREETYPE` and `use_freetype = true`.
-  * Flags accumulate from `FontFile::freetype_flags` and apply to the whole atlas (`FontLoaderFlags`/`FontBuilderFlags`).
-* **Ranges:** CJK ranges inflate atlas size—keep separate locales/packs and switch on demand.
-* **`extra_glyphs`:** UTF‑8 string of extra characters (e.g. special punctuation). In C++17 `u8"…"` is `const char*` (OK).
-
-### Manual mode semantics (preset vs explicit)
-
-* `fontsSetRangesPreset(...)` and `fontsSetRangesExplicit(...)` are **mutually exclusive** — the **last call wins**.
-* To combine Latin/Cyrillic/etc. with icons, **prefer presets with `+PUA`** instead of mixing preset + explicit pairs.
-* If you must use explicit pairs, ensure they **cover all needed scripts** (not only PUA), otherwise text will turn into squares.
-
----
-
-## Common pitfalls
-
-* **Passing "ru,en" to `setLocale`** — invalid; only one locale. Use range presets (`fontsSetRangesPreset`) to combine.
-* **Forgot to call `fontsBuildNow()` in manual mode** — fonts not loaded, `io.FontDefault` remains `nullptr`.
-* **Building in wrong phase** — artifacts or crash. Build atlas between frames.
-* **Expecting per-font FreeType flags** — in this version they apply to the entire atlas.
-* **Only icons show, all text is squares** — your ranges include **only PUA**. Use `"Default+...+PUA"` (preset) or add non-PUA ranges explicitly.
-
----
-
-## Useful snippets
-
-### Minimal manual without presets
-
-```cpp
-fontsBeginManual();
-fontsSetLocale("ru");               // gives Default + Cyrillic
-fontsAddBody({"Roboto-Medium.ttf", 16.0f});
-fontsAddMerge(FontRole::Icons, {"forkawesome-webfont.ttf", 16.0f, true});
-fontsBuildNow();
-```
-
-### Reusing Body TTF for H1/H2/H3
-
-```cpp
-fontsBeginManual();
-fontsAddBody({"Roboto-Medium.ttf", 16.0f});
-// If path is empty, FontManager reuses Body path with a different size
-fontsAddHeadline(FontRole::H1, {"", 24.0f});
-fontsAddHeadline(FontRole::H2, {"", 20.0f});
-fontsAddHeadline(FontRole::H3, {"", 18.0f});
-fontsBuildNow();
-```
-
-### Changing DPI/scale at runtime
+Preferred runtime pattern:
 
 ```cpp
 auto& fc = fontsControl();
-fc.setDpi(120.0f);
-fc.setUiScale(1.0f);
+fc.setLocale("ru");
 auto br = fc.rebuildIfNeeded();
+(void)br;
 ```
 
----
+For app-wide language switching via `LangChangeEvent`, hook font updates in window override:
 
-## File locations
+```cpp
+void onBeforeLanguageApply(const std::string& lang) override {
+    fontsControl().setLocale(lang); // marks atlas dirty
+}
+```
 
-* Fonts: `data/resources/fonts` (default). Base dir changes via `setBaseDir()`.
-* i18n: `data/resources/i18n` (including `plurals.json`).
-* Font config (JSON): `data/resources/fonts/fonts.json` by default; path changes via `setConfigPath()`.
+`WindowInstance` then applies language and calls `m_font_manager.rebuildIfNeeded()`.
 
----
+## Diagnostics and troubleshooting
 
-## Diagnostics
+### Squares instead of text
 
-* `BuildResult { success, message, fonts }` returned from `buildNow()`/`initFromJsonOrDefaults()`/`rebuildIfNeeded()`.
-* On build error: verify TTF paths (absolute/relative to `base_dir`), range correctness, presence of FreeType and ImGui version compatibility.
+- Your ranges do not include the script you render.
+- Add proper ranges (`Default+Cyrillic+...`) and rebuild.
 
----
+### Icons missing
 
-## Integration checklist
+- Missing `PUA` in ranges, or icon font is not merged.
+- Ensure both are true.
 
-* [ ] `FontManager.hpp` included (or `IMGUIX_HEADER_ONLY` for `.ipp`).
-* [ ] In `onInit()` pick mode: auto (JSON) **or** manual (`fontsBeginManual` → `fontsAdd*` → `fontsBuildNow`).
-* [ ] Ranges set: preset/explicit/locale.
-* [ ] For runtime use only `fontsControl()/fontsView()` and `fontsSetLocale()`.
-* [ ] Rebuild only between frames (`rebuildIfNeeded()`/`buildNow()`).
+### Atlas too large
+
+- Too many ranges / merged packs.
+- Split locales or reduce rarely used blocks.
+- Check atlas size via ImGui metrics (`io.Fonts->TexWidth`, `TexHeight`).
+
+### Role unavailable (`nullptr`)
+
+- Role was not loaded in current pack/manual setup.
+- Fallback to current ImGui font and verify configuration.
+
+## Useful paths
+
+- Fonts directory: `data/resources/fonts`
+- Default font config: `data/resources/fonts/fonts.json`
+- i18n resources: `data/resources/i18n`
+
+## Practical checklist
+
+- Choose one setup path: auto JSON or manual.
+- Set ranges to include all needed scripts and symbols.
+- Merge icon font when using icon codepoints.
+- Use `getFont(...)` + `PushFont/PopFont` with nullptr fallback.
+- Rebuild only between frames via `rebuildIfNeeded()`.
