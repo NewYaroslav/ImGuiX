@@ -40,6 +40,11 @@ Use this playbook when you need to review or update docs around font loading, ro
 - Fallback chains for strings and plurals.
 - Resource layout and file naming (`<base>/<lang>/*.json`, `<base>/<lang>/<doc_key>.md`, `plurals.json`).
 - JSON merge caveat: keys should be unique across files in one language folder.
+- Plural rules authoring basics for `plurals.json`:
+  - `cardinal` exists per language.
+  - each rule has `cat`.
+  - final catch-all `other` rule is present.
+  - emitted categories match `base_key.<cat>` keys in language JSON.
 - `LangChangeEvent` -> `WindowManager` -> `WindowInstance::applyPendingLanguageChange()` flow.
 - i18n + fonts coupling: language switch does not guarantee glyph coverage without proper font locale/ranges.
 
@@ -50,7 +55,13 @@ Use this playbook when you need to review or update docs around font loading, ro
 - Controller snippets use `getFont(FontRole::...)` with `ImGui::PushFont/PopFont` and `nullptr` fallback.
 - i18n layout explains `<base>/<lang>/*.json` + `<doc_key>.md` + `plurals.json`.
 - i18n docs mention duplicate-key risk across JSON files and warn against relying on file order.
+- i18n docs explain `plurals.json` rule order and first-match behavior.
+- i18n docs show how plural categories map to localized keys (`Items.one/few/many/other`).
 - Language switch flow includes `onBeforeLanguageApply(lang) -> fontsControl().setLocale(lang)`.
+
+Common anti-pattern:
+
+- `plurals.json` updated, but localized keys for emitted categories were not added (`Items.<cat>` missing).
 
 ## 6) Anti-pattern grep checks
 

@@ -307,6 +307,7 @@ if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Days", preview.c_str(),
 | Icons missing             | PUA not included in ranges                       | Add `PUA` token to preset or explicit pair `0xE000–0xF8FF`                       |
 | Language switched, glyphs still broken | `LangStore` switched but atlas locale/ranges were not updated | In `onBeforeLanguageApply(lang)` call `fontsControl().setLocale(lang)` and let `rebuildIfNeeded()` run |
 | Inconsistent i18n text after file split | Duplicate keys across multiple `<lang>/*.json` files | Keep keys unique per language folder; do not rely on cross-file override order |
+| Plural text falls back unexpectedly | `plurals.json` categories do not match localized keys, or no catch-all `other` rule | Keep `cardinal` rules aligned with `base_key.<cat>` keys and finish each language with `{ "cat": "other", "true": true }` |
 | Compile/docs mismatch on font role | Using nonexistent `FontRole::Symbols` | Use supported roles only: `Body/H1/H2/H3/Monospace/Bold/Italic/BoldItalic/Icons/Emoji` |
 | Compile/docs mismatch on locale API | Using old `fontsSetLocale(..., bool)` signature | Use runtime facade: `fontsControl().setLocale(lang)` then `rebuildIfNeeded()` |
 | PopStyleColor / PopID mismatch | PushStyleColor/PushID/PushVar called asymmetrically | Always use a flag pattern: `bool pushed = false; if (cond) { ImGui::PushStyleColor(...); pushed = true; } ... if (pushed) ImGui::PopStyleColor();` |

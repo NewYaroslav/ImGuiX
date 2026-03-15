@@ -150,6 +150,82 @@ Example fragment:
 }
 ```
 
+## Plural rules authoring (`plurals.json`)
+
+Use `data/resources/i18n/plurals.json` (or your configured
+`IMGUIX_I18N_PLURALS_FILENAME`) to define per-language plural categories.
+
+Authoring rules:
+
+- Top-level keys are language codes (`"en"`, `"ru"`, ...).
+- Each language provides a `cardinal` array.
+- Each item must contain `cat` and a condition (`eq`, `in`, `range`, `mod_*`, `all/any/not`, or `true`).
+- Rules are evaluated top-to-bottom.
+- First matching rule wins.
+- Always keep a catch-all tail rule: `{ "cat": "other", "true": true }`.
+
+Category-to-text contract:
+
+- `text_plural("Items", n)` resolves a category and then looks up `Items.<cat>`.
+- If your rules emit `one/few/many/other`, your language JSON must provide these keys.
+
+Failure behavior:
+
+- If `plurals.json` is missing or invalid, loaded custom rules are skipped.
+- Plural category falls back to built-in behavior (`en`, `ru`, then English-like default).
+- `LangStore` fallback chain still applies for missing localized keys.
+
+Example `plurals.json`:
+
+```json
+{
+  "en": {
+    "cardinal": [
+      { "cat": "one", "eq": 1 },
+      { "cat": "other", "true": true }
+    ]
+  },
+  "ru": {
+    "cardinal": [
+      {
+        "cat": "one",
+        "all": [
+          { "mod_eq": { "mod": 10, "eq": 1 } },
+          { "not": { "mod_eq": { "mod": 100, "eq": 11 } } }
+        ]
+      },
+      {
+        "cat": "few",
+        "all": [
+          { "mod_in_list": { "mod": 10, "list": [2, 3, 4] } },
+          { "not": { "mod_in_range": { "mod": 100, "range": [12, 14] } } }
+        ]
+      },
+      {
+        "cat": "many",
+        "any": [
+          { "mod_eq": { "mod": 10, "eq": 0 } },
+          { "mod_in_range": { "mod": 10, "range": [5, 9] } },
+          { "mod_in_range": { "mod": 100, "range": [11, 14] } }
+        ]
+      },
+      { "cat": "other", "true": true }
+    ]
+  }
+}
+```
+
+Matching short-string keys:
+
+```json
+{
+  "Items.one": "{n} item",
+  "Items.few": "{n} items",
+  "Items.many": "{n} items",
+  "Items.other": "{n} items"
+}
+```
+
 ## End-to-end language switching
 
 ### 1) Emit event

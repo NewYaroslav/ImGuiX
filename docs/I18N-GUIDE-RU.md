@@ -150,6 +150,82 @@ ImGui::Text("%s", langStore().textf_plural("Items", n, fmt::arg("n", n)).c_str()
 }
 ```
 
+## Как настраивать plural rules (`plurals.json`)
+
+Файл правил: `data/resources/i18n/plurals.json` (или путь по
+`IMGUIX_I18N_PLURALS_FILENAME`).
+
+Правила заполнения:
+
+- На верхнем уровне: коды языков (`"en"`, `"ru"`, ...).
+- Для каждого языка: массив `cardinal`.
+- Каждый элемент должен содержать `cat` и условие (`eq`, `in`, `range`, `mod_*`, `all/any/not` или `true`).
+- Правила проверяются сверху вниз.
+- Срабатывает первое совпавшее правило.
+- Добавляйте завершающее правило-перехватчик: `{ "cat": "other", "true": true }`.
+
+Контракт с ключами строк:
+
+- `text_plural("Items", n)` выбирает категорию и ищет ключ `Items.<cat>`.
+- Если правила выдают `one/few/many/other`, такие ключи должны существовать в языковых JSON.
+
+Поведение при ошибках:
+
+- Если `plurals.json` отсутствует или невалиден, кастомные правила не применяются.
+- Категория берется из встроенного fallback (`en`, `ru`, затем English-like default).
+- Для отсутствующих ключей продолжает работать fallback-цепочка `LangStore`.
+
+Пример `plurals.json`:
+
+```json
+{
+  "en": {
+    "cardinal": [
+      { "cat": "one", "eq": 1 },
+      { "cat": "other", "true": true }
+    ]
+  },
+  "ru": {
+    "cardinal": [
+      {
+        "cat": "one",
+        "all": [
+          { "mod_eq": { "mod": 10, "eq": 1 } },
+          { "not": { "mod_eq": { "mod": 100, "eq": 11 } } }
+        ]
+      },
+      {
+        "cat": "few",
+        "all": [
+          { "mod_in_list": { "mod": 10, "list": [2, 3, 4] } },
+          { "not": { "mod_in_range": { "mod": 100, "range": [12, 14] } } }
+        ]
+      },
+      {
+        "cat": "many",
+        "any": [
+          { "mod_eq": { "mod": 10, "eq": 0 } },
+          { "mod_in_range": { "mod": 10, "range": [5, 9] } },
+          { "mod_in_range": { "mod": 100, "range": [11, 14] } }
+        ]
+      },
+      { "cat": "other", "true": true }
+    ]
+  }
+}
+```
+
+Пример соответствующих ключей строк:
+
+```json
+{
+  "Items.one": "{n} предмет",
+  "Items.few": "{n} предмета",
+  "Items.many": "{n} предметов",
+  "Items.other": "{n} предмета(ов)"
+}
+```
+
 ## End-to-end смена языка
 
 ### 1) Отправить событие

@@ -55,8 +55,15 @@ From controllers, use `Controller::getFont(FontRole)` (delegates through `Window
 
 ## Quick Start: Manual mode
 
-`FontFile` fields in positional form are:
-`{ path, size_px, baseline_offset_px, merge, freetype_flags, extra_glyphs }`.
+`FontFile` fields in positional form:
+
+- `path` - font file path (absolute or relative to fonts base dir).
+- `size_px` - font size at 96 DPI.
+- `baseline_offset_px` - vertical glyph offset (`+` down, `-` up).
+- `merge` - merge glyphs into previously added font chain.
+- `freetype_flags` - optional FreeType builder flags.
+- `extra_glyphs` - optional UTF-8 string with extra glyphs to include.
+
 In most setups only `path` and `size_px` are required.
 
 ```cpp

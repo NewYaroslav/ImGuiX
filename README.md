@@ -345,6 +345,12 @@ Quick pointers:
 - Runtime language switching is done via `LangChangeEvent`.
 - For language-dependent glyph coverage, update fonts locale in `onBeforeLanguageApply(lang)` and rebuild.
 
+How to configure plural rules:
+
+- Define per-language `cardinal` rules in `data/resources/i18n/plurals.json`.
+- Keep categories aligned with localized keys (`Items.one`, `Items.few`, `Items.many`, `Items.other`).
+- End each language rule set with a catch-all `other` rule.
+
 See [docs/I18N-GUIDE.md](docs/I18N-GUIDE.md) for full workflow and examples.
 
 ## Fonts and Licensing
@@ -389,7 +395,14 @@ fontsAddHeadline(ImGuiX::Fonts::FontRole::H1, { "Roboto-Bold.ttf", 24.0f });
 fontsBuildNow();
 ```
 
-`FontFile` positional fields are `{ path, size_px, baseline_offset_px, merge, freetype_flags, extra_glyphs }`.
+`FontFile` positional fields:
+
+- `path` - font file path.
+- `size_px` - size at 96 DPI.
+- `baseline_offset_px` - vertical glyph offset.
+- `merge` - merge with previous font chain.
+- `freetype_flags` - optional FreeType flags.
+- `extra_glyphs` - optional UTF-8 extra glyphs.
 
 #### Troubleshooting
 

@@ -56,7 +56,14 @@ Read-only facade:
 ## Быстрый старт: Manual
 
 Поля `FontFile` при позиционной инициализации:
-`{ path, size_px, baseline_offset_px, merge, freetype_flags, extra_glyphs }`.
+
+- `path` - путь к файлу шрифта (абсолютный или относительно fonts base dir).
+- `size_px` - размер шрифта при 96 DPI.
+- `baseline_offset_px` - вертикальное смещение глифов (`+` вниз, `-` вверх).
+- `merge` - мердж глифов в ранее добавленную цепочку шрифта.
+- `freetype_flags` - дополнительные флаги билдера FreeType.
+- `extra_glyphs` - UTF-8 строка дополнительных глифов.
+
 Обычно достаточно только `path` и `size_px`.
 
 ```cpp
