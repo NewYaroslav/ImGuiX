@@ -45,6 +45,8 @@ data/resources/i18n/
 Notes:
 
 - `LangStore` loads every `*.json` file inside `<base>/<lang>/` and merges objects.
+- Keep keys unique across files in the same language folder.
+- Do not rely on cross-file override order when duplicate keys exist.
 - Markdown docs are resolved as `<base>/<lang>/<doc_key>.md`.
 - `doc("Docs.GettingStarted")` looks for `Docs.GettingStarted.md`.
 
@@ -171,6 +173,15 @@ Inside `applyPendingLanguageChange()`:
 - Calls `onBeforeLanguageApply(lang)` hook.
 - Calls `m_lang_store.set_language(lang)`.
 - Calls `m_font_manager.rebuildIfNeeded()`.
+
+## Minimal end-to-end recipe
+
+1. Create resources under `data/resources/i18n/<lang>/` (`*.json` + optional `<doc_key>.md`), keep keys unique.
+2. Read localized text in controllers/widgets via `langStore().text(...)`, `label(...)`, `doc(...)`, `text_plural(...)`.
+3. Emit language change event: `notify(ImGuiX::Events::LangChangeEvent::ForAll("ru"));`.
+4. In window hook, map language to fonts locale:
+   `onBeforeLanguageApply(lang) { fontsControl().setLocale(lang); }`.
+5. Let `WindowInstance` call `rebuildIfNeeded()`; atlas rebuild applies new glyph coverage.
 
 ## i18n + fonts interaction
 

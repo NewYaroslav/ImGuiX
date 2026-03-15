@@ -11,6 +11,14 @@ This guide explains how fonts work in ImGuiX today and how to use them safely fr
 - Logical roles (`FontRole`): `Body`, `H1`, `H2`, `H3`, `Monospace`, `Bold`, `Italic`, `BoldItalic`, `Icons`, `Emoji`.
 - Runtime rebuild path when configuration changes (`setLocale`, DPI, scale, markdown sizes).
 
+## Who calls what
+
+| Call context | Recommended API |
+| --- | --- |
+| `WindowInstance::onInit()` / initial atlas setup | `fontsBeginManual()`, `fontsSetRanges*()`, `fontsAdd*()`, `fontsBuildNow()` |
+| Runtime hooks (`onBeforeLanguageApply`, service updates) | `fontsControl().set*()`, `fontsControl().rebuildIfNeeded()` |
+| Controller render path (`drawUi()`, `drawContent()`) | `getFont(FontRole)` + `ImGui::PushFont/ImGui::PopFont` |
+
 ## API Context: Init-only vs Runtime-safe
 
 ### Init-only (window setup, typically in `WindowInstance::onInit()`)
@@ -46,6 +54,10 @@ Read-only facade:
 From controllers, use `Controller::getFont(FontRole)` (delegates through `WindowInterface`).
 
 ## Quick Start: Manual mode
+
+`FontFile` fields in positional form are:
+`{ path, size_px, baseline_offset_px, merge, freetype_flags, extra_glyphs }`.
+In most setups only `path` and `size_px` are required.
 
 ```cpp
 void onInit() override {
@@ -148,6 +160,7 @@ void drawUi() override {
 ```
 
 If role is unavailable, `getFont(...)` returns `nullptr`. Always keep a fallback branch.
+`nullptr` means the role is absent in the current atlas.
 
 ## Merge chain behavior (`Icons`/`Emoji`)
 
@@ -198,6 +211,11 @@ void onBeforeLanguageApply(const std::string& lang) override {
 
 - Role was not loaded in current pack/manual setup.
 - Fallback to current ImGui font and verify configuration.
+
+### Init-only API called in runtime
+
+- Avoid `fontsBeginManual()`, `fontsAdd*()`, `fontsBuildNow()` during active frame loop.
+- Use `fontsControl().set*()` and `rebuildIfNeeded()` between frames.
 
 ## Useful paths
 

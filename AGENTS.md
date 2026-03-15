@@ -251,6 +251,7 @@ if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Days", preview.c_str(),
 * Prefer `agents/imguix-smoke-build.md` for Windows MinGW smoke-example configure/build commands.
 * Prefer `agents/imguix-fonts-i18n-playbook.md` for fonts + i18n API checks and doc updates.
 * Treat `external/ImGuiX/agents/` as the concise, execution-focused playbook set.
+* In controller-facing docs and snippets, prefer `Controller::getFont(...)`; do not expose `WindowInstance` internals as primary usage.
 
 ### Add a new module/aggregate/service
 
@@ -305,6 +306,7 @@ if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Days", preview.c_str(),
 | Text shows as squares     | Ranges include only PUA (icons)                  | Use `fontsSetRangesPreset("Default+...+PUA")` or add non-PUA ranges explicitly   |
 | Icons missing             | PUA not included in ranges                       | Add `PUA` token to preset or explicit pair `0xE000–0xF8FF`                       |
 | Language switched, glyphs still broken | `LangStore` switched but atlas locale/ranges were not updated | In `onBeforeLanguageApply(lang)` call `fontsControl().setLocale(lang)` and let `rebuildIfNeeded()` run |
+| Inconsistent i18n text after file split | Duplicate keys across multiple `<lang>/*.json` files | Keep keys unique per language folder; do not rely on cross-file override order |
 | Compile/docs mismatch on font role | Using nonexistent `FontRole::Symbols` | Use supported roles only: `Body/H1/H2/H3/Monospace/Bold/Italic/BoldItalic/Icons/Emoji` |
 | Compile/docs mismatch on locale API | Using old `fontsSetLocale(..., bool)` signature | Use runtime facade: `fontsControl().setLocale(lang)` then `rebuildIfNeeded()` |
 | PopStyleColor / PopID mismatch | PushStyleColor/PushID/PushVar called asymmetrically | Always use a flag pattern: `bool pushed = false; if (cond) { ImGui::PushStyleColor(...); pushed = true; } ... if (pushed) ImGui::PopStyleColor();` |

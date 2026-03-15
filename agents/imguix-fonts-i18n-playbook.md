@@ -39,20 +39,30 @@ Use this playbook when you need to review or update docs around font loading, ro
 - `LangStore` API: `text`, `label`, `doc`, `textf_key`, `text_plural`, `textf_plural`.
 - Fallback chains for strings and plurals.
 - Resource layout and file naming (`<base>/<lang>/*.json`, `<base>/<lang>/<doc_key>.md`, `plurals.json`).
+- JSON merge caveat: keys should be unique across files in one language folder.
 - `LangChangeEvent` -> `WindowManager` -> `WindowInstance::applyPendingLanguageChange()` flow.
 - i18n + fonts coupling: language switch does not guarantee glyph coverage without proper font locale/ranges.
 
-## 5) Anti-pattern grep checks
+## 5) Mid-level sanity checklist
+
+- Call-context boundaries are explicit:
+  - init-only (`fontsBeginManual/fontsAdd*/fontsBuildNow`) vs runtime (`fontsControl().set*`, `rebuildIfNeeded`).
+- Controller snippets use `getFont(FontRole::...)` with `ImGui::PushFont/PopFont` and `nullptr` fallback.
+- i18n layout explains `<base>/<lang>/*.json` + `<doc_key>.md` + `plurals.json`.
+- i18n docs mention duplicate-key risk across JSON files and warn against relying on file order.
+- Language switch flow includes `onBeforeLanguageApply(lang) -> fontsControl().setLocale(lang)`.
+
+## 6) Anti-pattern grep checks
 
 Run before commit:
 
 ```powershell
-rg -n "FontRole::Symbols|oversample=|fontsSetLocale\(std::string locale, bool rebuild_now" README*.md docs
+rg -n "FontRole::Symbols|oversample=|fontsSetLocale\(.*bool" README*.md docs
 ```
 
 Expected: no matches.
 
-## 6) Minimal doc validation checklist
+## 7) Minimal doc validation checklist
 
 - All links to guides are valid and use correct language target.
 - README has both `Internationalization` and `Fonts` pointers.

@@ -45,6 +45,8 @@ data/resources/i18n/
 Важно:
 
 - `LangStore` читает все `*.json` в `<base>/<lang>/` и мержит объекты.
+- Ключи внутри одной языковой папки должны быть уникальными.
+- Не полагайтесь на порядок переопределения между файлами при дублирующихся ключах.
 - Markdown ищется как `<base>/<lang>/<doc_key>.md`.
 - `doc("Docs.GettingStarted")` -> `Docs.GettingStarted.md`.
 
@@ -171,6 +173,15 @@ notify(ImGuiX::Events::LangChangeEvent::ForAll("ru"));
 - Вызывает hook `onBeforeLanguageApply(lang)`.
 - Вызывает `m_lang_store.set_language(lang)`.
 - Вызывает `m_font_manager.rebuildIfNeeded()`.
+
+## Минимальный end-to-end рецепт
+
+1. Создайте ресурсы в `data/resources/i18n/<lang>/` (`*.json` и при необходимости `<doc_key>.md`), ключи держите уникальными.
+2. В UI используйте `langStore().text(...)`, `label(...)`, `doc(...)`, `text_plural(...)`.
+3. Отправьте событие смены языка: `notify(ImGuiX::Events::LangChangeEvent::ForAll("ru"));`.
+4. В window hook синхронизируйте locale шрифтов:
+   `onBeforeLanguageApply(lang) { fontsControl().setLocale(lang); }`.
+5. `WindowInstance` вызовет `rebuildIfNeeded()`, и atlas применит новое покрытие глифов.
 
 ## Связка i18n + fonts
 

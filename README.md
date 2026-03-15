@@ -339,9 +339,11 @@ Quick pointers:
 
 - Language resources are read from `data/resources/i18n/<lang>/`.
 - Short strings are loaded from all `*.json` files in language folder.
+- Keep i18n keys unique across files in the same language folder.
 - Markdown docs are loaded by key as `<doc_key>.md`.
 - Plural rules are loaded from `data/resources/i18n/plurals.json` when present.
 - Runtime language switching is done via `LangChangeEvent`.
+- For language-dependent glyph coverage, update fonts locale in `onBeforeLanguageApply(lang)` and rebuild.
 
 See [docs/I18N-GUIDE.md](docs/I18N-GUIDE.md) for full workflow and examples.
 
@@ -351,6 +353,12 @@ ImGuiX ships with a `FontManager` that can auto-load fonts from a JSON config or
 be configured manually. By default, fonts are read from
 `data/resources/fonts/fonts.json`. For full details see
 [docs/FONTS-GUIDE.md](docs/FONTS-GUIDE.md) (RU: [docs/FONTS-GUIDE-RU.md](docs/FONTS-GUIDE-RU.md)).
+
+Quick usage:
+
+- Init phase: manual setup with `fontsBeginManual()/fontsAdd*/fontsBuildNow()`.
+- Runtime: use `fontsControl().set*()` + `rebuildIfNeeded()` between frames.
+- Controllers: switch role-based fonts with `getFont(FontRole::H1)` + `ImGui::PushFont/PopFont` and `nullptr` fallback.
 
 #### Common symbol ranges
 
@@ -380,6 +388,8 @@ fontsAddMerge(ImGuiX::Fonts::FontRole::Icons,
 fontsAddHeadline(ImGuiX::Fonts::FontRole::H1, { "Roboto-Bold.ttf", 24.0f });
 fontsBuildNow();
 ```
+
+`FontFile` positional fields are `{ path, size_px, baseline_offset_px, merge, freetype_flags, extra_glyphs }`.
 
 #### Troubleshooting
 

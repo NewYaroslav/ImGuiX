@@ -11,6 +11,14 @@
 - Работает с ролями (`FontRole`): `Body`, `H1`, `H2`, `H3`, `Monospace`, `Bold`, `Italic`, `BoldItalic`, `Icons`, `Emoji`.
 - Поддерживает runtime-пересборку после изменений конфигурации (`locale`, DPI, scale, markdown sizes).
 
+## Кто что вызывает
+
+| Контекст вызова | Рекомендуемый API |
+| --- | --- |
+| `WindowInstance::onInit()` / первичная сборка atlas | `fontsBeginManual()`, `fontsSetRanges*()`, `fontsAdd*()`, `fontsBuildNow()` |
+| Runtime-хуки (`onBeforeLanguageApply`, сервисные обновления) | `fontsControl().set*()`, `fontsControl().rebuildIfNeeded()` |
+| Рендер в контроллере (`drawUi()`, `drawContent()`) | `getFont(FontRole)` + `ImGui::PushFont/ImGui::PopFont` |
+
 ## Контекст API: init-only и runtime-safe
 
 ### Только на инициализации (обычно `WindowInstance::onInit()`)
@@ -46,6 +54,10 @@ Read-only facade:
 В контроллерах используйте `Controller::getFont(FontRole)`.
 
 ## Быстрый старт: Manual
+
+Поля `FontFile` при позиционной инициализации:
+`{ path, size_px, baseline_offset_px, merge, freetype_flags, extra_glyphs }`.
+Обычно достаточно только `path` и `size_px`.
 
 ```cpp
 void onInit() override {
@@ -146,6 +158,7 @@ void drawUi() override {
 ```
 
 Если роль не загружена, `getFont(...)` вернет `nullptr`.
+`nullptr` означает, что роль отсутствует в текущем atlas.
 
 ## Merge-цепочка (`Icons`/`Emoji`)
 
@@ -196,6 +209,11 @@ void onBeforeLanguageApply(const std::string& lang) override {
 
 - Роль не загружена в текущем pack/manual-конфиге.
 - Делайте fallback и проверяйте конфигурацию.
+
+### Init-only API вызван в runtime
+
+- Не вызывайте `fontsBeginManual()`, `fontsAdd*()`, `fontsBuildNow()` в активном frame loop.
+- Между кадрами используйте `fontsControl().set*()` и `rebuildIfNeeded()`.
 
 ## Полезные пути
 
