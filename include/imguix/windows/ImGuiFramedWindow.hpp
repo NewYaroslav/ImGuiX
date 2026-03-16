@@ -65,6 +65,12 @@
 
 namespace ImGuiX::Windows {
 
+    /// \brief Side-panel content alignment policy.
+    enum class SidePanelContentAlignment {
+        LegacyLeftInset, ///< Preserve legacy left-inset placement.
+        SymmetricInset   ///< Apply symmetric horizontal inset without changing side-panel width.
+    };
+
     /// \brief Runtime configuration for framed window geometry and chrome labels.
     /// \details
     /// In classic mode, `side_panel_width <= 0` disables side panel region completely.
@@ -85,6 +91,7 @@ namespace ImGuiX::Windows {
         int side_panel_width = 0;      ///< Classic mode: `<= 0` disables side panel. Corner mode: `<= 0` means auto width (`corner_icon_mode_area_width` when set, otherwise `title_bar_height + corner_icon_mode_gap`).
         float title_content_left_inset = -1.0f; ///< Left inset in px for title content baseline (`drawTitleBarText`); `< 0` uses auto style-based inset.
         float side_panel_content_left_inset = -1.0f; ///< Left inset in px for side-panel content baseline (`drawSidePanel`); `< 0` uses auto style-based inset.
+        SidePanelContentAlignment side_panel_content_alignment = SidePanelContentAlignment::LegacyLeftInset; ///< Alignment policy for side-panel content region.
         float frame_stroke_thickness = 1.0f; ///< Thickness in px for classic/corner separator strokes (title/side split lines).
         float frame_outer_stroke_thickness = 2.0f; ///< Thickness in px for the outer host-frame stroke (background-colored line).
         float frame_inner_stroke_thickness = 1.0f; ///< Thickness in px for the inner host-frame stroke (ImGui border-colored line).
@@ -264,6 +271,28 @@ namespace ImGuiX::Windows {
             Mac
         };
 
+        /// \brief Resolved side-panel content region inside the panel child.
+        struct SidePanelContentRegion {
+            float x = 0.0f;     ///< Local X offset from side-panel origin.
+            float width = 0.0f; ///< Content width available for drawSidePanel().
+        };
+
+        /// \brief Host-frame stroke insets applied to layout regions that touch outer window edges.
+        struct HostFrameStrokeInsets {
+            float left = 0.0f;   ///< Left inset from outer+inner host-frame strokes.
+            float top = 0.0f;    ///< Top inset from outer+inner host-frame strokes.
+            float right = 0.0f;  ///< Right inset from outer+inner host-frame strokes.
+            float bottom = 0.0f; ///< Bottom inset from outer+inner host-frame strokes.
+        };
+
+        /// \brief Rect geometry used by frame-aware layout helpers.
+        struct LayoutRect {
+            float x = 0.0f;      ///< Local X offset in current host window coordinates.
+            float y = 0.0f;      ///< Local Y offset in current host window coordinates.
+            float width = 0.0f;  ///< Rect width in pixels.
+            float height = 0.0f; ///< Rect height in pixels.
+        };
+
         /// \brief Compute baseline left inset for title-bar content.
         /// \param style Active Dear ImGui style.
         /// \return Left inset in pixels applied by layout before \ref drawTitleBarText.
@@ -273,6 +302,38 @@ namespace ImGuiX::Windows {
         /// \param style Active Dear ImGui style.
         /// \return Left inset in pixels applied by layout before \ref drawSidePanel.
         float computeSidePanelContentLeftInset(const ImGuiStyle& style) const;
+
+        /// \brief Compute nested content region for side-panel widgets.
+        /// \param style Active Dear ImGui style.
+        /// \param side_panel_width Width of the outer side-panel child.
+        /// \return Content region geometry for drawSidePanel().
+        SidePanelContentRegion computeSidePanelContentRegion(
+            const ImGuiStyle& style,
+            float side_panel_width) const;
+
+        /// \brief Compute host-frame stroke insets for the active backend.
+        /// \return Insets contributed by outer+inner host-frame strokes.
+        HostFrameStrokeInsets computeHostFrameStrokeInsets() const;
+
+        /// \brief Inset a layout rect by host-frame strokes on touched outer edges.
+        /// \param x Local X offset in current host window coordinates.
+        /// \param y Local Y offset in current host window coordinates.
+        /// \param width Rect width in pixels.
+        /// \param height Rect height in pixels.
+        /// \param touches_left True when the rect touches the left outer host-frame edge.
+        /// \param touches_top True when the rect touches the top outer host-frame edge.
+        /// \param touches_right True when the rect touches the right outer host-frame edge.
+        /// \param touches_bottom True when the rect touches the bottom outer host-frame edge.
+        /// \return Frame-aware rect clamped to non-negative size.
+        LayoutRect insetRectByHostFrameAdjacency(
+            float x,
+            float y,
+            float width,
+            float height,
+            bool touches_left,
+            bool touches_top,
+            bool touches_right,
+            bool touches_bottom) const;
 
         /// \brief Precomputed vertical band used to place control buttons inside title-bar chrome.
         /// \details

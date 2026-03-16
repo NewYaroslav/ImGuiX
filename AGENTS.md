@@ -251,6 +251,7 @@ if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Days", preview.c_str(),
 * Prefer `agents/imguix-smoke-build.md` for Windows MinGW smoke-example configure/build commands.
 * Prefer `agents/imguix-fonts-i18n-playbook.md` for fonts + i18n API checks and doc updates.
 * Prefer `agents/imguix-windowing-playbook.md` for `WindowInstance` / `ImGuiFramedWindow` tasks.
+* For any windowing task, first verify expected behavior against `docs/WINDOWS-GUIDE.md` before editing code or docs.
 * Treat `external/ImGuiX/agents/` as the concise, execution-focused playbook set.
 * In controller-facing docs and snippets, prefer `Controller::getFont(...)`; do not expose `WindowInstance` internals as primary usage.
 * For windowing docs, use `docs/WINDOWS-GUIDE.md` as canonical and keep `docs/WINDOWS-GUIDE-RU.md` synchronized.

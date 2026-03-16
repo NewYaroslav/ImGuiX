@@ -16,6 +16,7 @@ Use this file if the task changes or documents any of:
 - Core window API:
   - `include/imguix/core/window/WindowInterface.hpp`
   - `include/imguix/core/window/WindowInstance.hpp`
+  - `include/imguix/core/window/WindowInstance.tpp`
   - `include/imguix/core/window/WindowInstance.ipp`
   - `include/imguix/core/window/WindowManager.hpp`
   - `include/imguix/core/window/WindowManager.ipp`
@@ -51,17 +52,17 @@ Use this file if the task changes or documents any of:
 
 Build at least representative smoke targets after windowing changes:
 
+When running from the `mgc-platform` superproject, resolve `--parallel` from `agents/local-machine-settings.json`.
+If that file is missing on Windows, create it with `scripts/detect-machine-settings.ps1`.
+Current superproject machine example: `36`.
+
 ```powershell
-cmake --build external/ImGuiX/build-mingw --target \
-  corner_icon_area_off_demo \
-  corner_icon_area_off_no_side_demo \
-  corner_icon_area_demo \
-  corner_icon_area_demo_v2 \
-  corner_icon_area_demo_v3 \
-  --parallel 8
+cmake --build external/ImGuiX/build-mingw --target corner_icon_area_off_demo corner_icon_area_off_no_side_demo corner_icon_area_demo corner_icon_area_demo_v2 corner_icon_area_demo_v3 --parallel 36
 ```
 
 Also run the target directly related to the change (for example `corner_icon_area_demo_v3_no_top_left` or `corner_icon_area_demo_v3_mac`).
+
+If you change `frame_outer_stroke_thickness` or `frame_inner_stroke_thickness`, verify that `main_region` content does not visually slide under the right/bottom host frame in the SFML framed backend.
 
 ## Documentation sync checklist
 
@@ -72,6 +73,15 @@ When changing windowing docs:
 3. Ensure `README.md` and `README-RU.md` keep only short navigation pointers.
 4. Ensure `AGENTS.md` and `agents/README.md` include this playbook link.
 
+## Doc QA order
+
+Apply doc QA in this exact order:
+
+1. EN canonical guide (`WINDOWS-GUIDE.md`)
+2. RU mirror (`WINDOWS-GUIDE-RU.md`)
+3. Navigation links in `README*`
+4. Agent navigation links in `AGENTS.md` and `agents/README.md`
+
 ## Anti-patterns
 
 Do not:
@@ -81,3 +91,6 @@ Do not:
 3. Ignore style-flag conflicts for control buttons.
 4. Place long implementation details in README; keep deep details in docs guide.
 5. Change vendor-independent API docs without checking actual `.ipp` behavior.
+6. Use shell syntax that does not match the declared code fence (for example bash `\` in `powershell` blocks).
+7. Tell an ImGuiX static-lib consumer to include ImGuiX `.ipp` files directly from application code; first decide whether the fix belongs in ImGuiX itself or in app-local state.
+8. Put public `WindowInstance` template helpers only in `.ipp`; consumer-instantiated templates must live in `.hpp` or an always-included `.tpp`, and static-lib builds must compile without forcing `IMGUIX_HEADER_ONLY`.

@@ -2,6 +2,7 @@
 #include <imguix/windows/ImGuiFramedWindow.hpp>
 #include <imguix/controllers/ExtendedController.hpp>
 #include <imguix/themes/CorporateGreyTheme.hpp>
+#include <algorithm>
 
 #if defined(IMGUIX_USE_SFML_BACKEND)
 
@@ -64,7 +65,7 @@ public:
 
     void drawTitleBarText() override {
         const float text_y = (m_config.title_bar_height - ImGui::GetTextLineHeight()) * 0.5f;
-        ImGui::SetCursorPosY(ImMax(0.0f, text_y));
+        ImGui::SetCursorPosY(std::max(0.0f, text_y));
         ImGui::TextUnformatted("HasCornerIconArea Demo");
     }
 

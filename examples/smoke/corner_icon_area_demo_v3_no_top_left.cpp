@@ -2,6 +2,7 @@
 #include <imguix/windows/ImGuiFramedWindow.hpp>
 #include <imguix/controllers/ExtendedController.hpp>
 #include <imguix/themes/CorporateGreyTheme.hpp>
+#include <algorithm>
 
 #if defined(IMGUIX_USE_SFML_BACKEND)
 
@@ -60,14 +61,18 @@ public:
 
     void drawTitleBarText() override {
         const float text_y = (m_config.title_bar_height - ImGui::GetTextLineHeight()) * 0.5f;
-        ImGui::SetCursorPosY(ImMax(0.0f, text_y));
+        ImGui::SetCursorPosY(std::max(0.0f, text_y));
         ImGui::TextUnformatted("HasCornerIconArea Demo V3 (No Top-Left)");
     }
 
     void drawSidePanel() override {
-        ImGui::TextUnformatted("A1");
-        ImGui::TextUnformatted("A2");
-        ImGui::TextUnformatted("A3");
+        const ImVec2 avail = ImGui::GetContentRegionAvail();
+        const float preferred = static_cast<float>(m_config.title_bar_height);
+        const float button_size = std::max(1.0f, std::min(preferred, avail.x));
+
+        ImGui::Button("A1##demo_side_panel_account_1", ImVec2(button_size, button_size));
+        ImGui::Button("A2##demo_side_panel_account_2", ImVec2(button_size, button_size));
+        ImGui::Button("A3##demo_side_panel_account_3", ImVec2(button_size, button_size));
     }
 
     void drawCornerIcon() override {
@@ -79,6 +84,7 @@ private:
         ImGuiX::Windows::ImGuiFramedWindowConfig cfg{};
         cfg.title_bar_height = 40;
         cfg.side_panel_width = 0;
+        cfg.side_panel_content_alignment = ImGuiX::Windows::SidePanelContentAlignment::SymmetricInset;
         cfg.corner_icon_mode_rounding_radius = 8.0f;
         cfg.corner_rounding_style = ImGuiX::Windows::CornerRoundingStyle::NoTopLeftOnTitleAndSide;
         cfg.corner_menu_bar_placement = ImGuiX::Windows::CornerMenuBarPlacement::MainRegion;

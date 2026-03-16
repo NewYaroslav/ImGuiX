@@ -1,33 +1,77 @@
-﻿# Гайд По Окнам
+﻿# Гайд по окнам
 
 English version: [WINDOWS-GUIDE.md](WINDOWS-GUIDE.md).
 
 Практический гайд по оконной модели ImGuiX с фокусом на:
 
-- `include/imguix/core/window/WindowInstance.hpp`
 - `include/imguix/core/window/WindowInterface.hpp`
+- `include/imguix/core/window/WindowInstance.hpp`
+- `include/imguix/core/window/WindowManager.ipp`
 - `include/imguix/windows/ImGuiFramedWindow.hpp`
+- `include/imguix/windows/ImGuiFramedWindow.ipp`
 
-Цель: быстро понять, как выбирать тип окна, настраивать layout/chrome, включать прозрачность и избегать частых артефактов.
+## Содержание
 
-## 1. Какой базовый класс выбирать
+- [Быстрый путь (10 минут)](#быстрый-путь-10-минут)
+- [Какой базовый класс выбрать](#какой-базовый-класс-выбрать)
+- [Жизненный цикл выполнения и конвейер кадра (frame pipeline)](#жизненный-цикл-выполнения-и-конвейер-кадра-frame-pipeline)
+- [Карта API: WindowInterface и WindowInstance](#карта-api-windowinterface-и-windowinstance)
+- [Модель ImGuiFramedWindow](#модель-imguiframedwindow)
+- [Матрица WindowFlags](#матрица-windowflags)
+- [Матрица ImGuiFramedWindowConfig](#матрица-imguiframedwindowconfig)
+- [Матрица возможностей backend-ов](#матрица-возможностей-backend-ов)
+- [Матрица поведения прозрачности](#матрица-поведения-прозрачности)
+- [Практические рецепты](#практические-рецепты)
+- [Что переопределять по сценариям](#что-переопределять-по-сценариям)
+- [Карта smoke-примеров](#карта-smoke-примеров)
+- [Частые подводные камни (gotchas)](#частые-подводные-камни-gotchas)
+- [Чеклист отладки (Debug Checklist)](#чеклист-отладки-debug-checklist)
+
+## Быстрый путь (10 минут)
+
+1. Выберите базовый класс:
+- `ImGuiFramedWindow` для большинства операторских UI.
+- `WindowInstance` только если нужна полностью кастомная геометрия/рамка.
+
+2. Выберите режим layout через flags:
+- Classic layout: не включать `WindowFlags::HasCornerIconArea`.
+- Corner layout: включить `WindowFlags::HasCornerIconArea`.
+
+3. Задайте базовый config:
+- `title_bar_height`
+- `side_panel_width`
+- stroke-поля рамки (`frame_stroke_thickness`, `frame_outer_stroke_thickness`, `frame_inner_stroke_thickness`)
+
+4. Переопределите только нужные hooks:
+- `drawTitleBarText()`
+- `drawSidePanel()`
+- `drawMenuBar()` (только при `HasMenuBar`)
+- `drawCornerIcon()` (только в corner mode)
+
+5. Проверьте хотя бы один smoke-таргет:
+
+```powershell
+cmake --build external/ImGuiX/build-mingw --target corner_icon_area_demo_v3 --parallel 36
+```
+
+## Какой базовый класс выбрать
 
 | Сценарий | Рекомендуемый класс | Почему |
 | --- | --- | --- |
-| Нужен полностью свой цикл отрисовки и свой chrome | `WindowInstance` | Низкоуровневый контроль окна и lifecycle. |
-| Нужна готовая рамка: title bar, side panel, corner icon, системные кнопки | `Windows::ImGuiFramedWindow` | Поверх `WindowInstance`, добавляет готовую геометрию и флаги стиля. |
+| Нужен полностью кастомный цикл отрисовки и собственная рамка | `WindowInstance` | Низкоуровневый контроль lifecycle и window state. |
+| Нужна готовая framed-модель (title, side panel, corner icon, системные кнопки) | `Windows::ImGuiFramedWindow` | Поверх `WindowInstance`, даёт готовую геометрию и style-переключатели. |
 
 Правило:
 
-- Обычно начинайте с `ImGuiFramedWindow`.
-- Переходите на `WindowInstance`, только если framed-layout ограничивает задачу.
+- Начинайте с `ImGuiFramedWindow`.
+- Переходите на `WindowInstance`, только если ограничения framed-layout мешают задаче.
 
-## 2. Lifecycle и pipeline кадра
+## Жизненный цикл выполнения и конвейер кадра (frame pipeline)
 
-Есть 2 уровня:
+Есть два уровня:
 
-1. `WindowManager` управляет всеми окнами.
-2. Каждый `WindowInstance` рендерится в своем frame-cycle.
+1. `WindowManager` оркестрирует все окна.
+2. Каждый `WindowInstance` проходит свой frame-cycle.
 
 ### Lifecycle в WindowManager
 
@@ -35,9 +79,10 @@ English version: [WINDOWS-GUIDE.md](WINDOWS-GUIDE.md).
 
 - `prepareFrame()`:
   - `flushPending()`
-  - `initializePending()` -> `fontsStartInit()`, `onInit()`, `buildFonts()`
+  - `initializePending()` -> `window->fontsStartInit()`, `window->onInit()`, `window->buildFonts()`
   - `removeClosed()`
   - `initializeControllers()`
+
 - `processFrame()`:
   - `handleEvents()`
   - `tickAll()`
@@ -57,22 +102,22 @@ English version: [WINDOWS-GUIDE.md](WINDOWS-GUIDE.md).
 - `drawUi()`
 - `present()`
 
-`ImGuiFramedWindow` переопределяет `drawUi()` (backend-specific `.ipp`) и внутри выбирает:
+`ImGuiFramedWindow` переопределяет `drawUi()` в backend-specific файлах и внутри вызывает:
 
-- `drawClassicLayout(...)` без `HasCornerIconArea`
-- `drawCornerLayout(...)` с `HasCornerIconArea`
+- `drawClassicLayout(...)`, когда `WindowFlags::HasCornerIconArea` выключен
+- `drawCornerLayout(...)`, когда `WindowFlags::HasCornerIconArea` включен
 
-## 3. Карта API WindowInterface / WindowInstance
+## Карта API: WindowInterface и WindowInstance
 
-### 3.1 Геометрия и состояние
+### Геометрия и состояние
 
 - Идентичность: `id()`, `name()`
 - Размеры: `width()`, `height()`, `setSize(int, int)`
-- Фокус и видимость: `setVisible(bool)`, `setActive(bool)`, `isActive()`
+- Видимость/фокус: `setVisible(bool)`, `setActive(bool)`, `isActive()`
 - Жизненный цикл: `isOpen()`, `close()`
 - Состояние окна: `minimize()`, `maximize()`, `restore()`, `isMaximized()`, `toggleMaximizeRestore()`
 
-### 3.2 Theme / options / bus / registry
+### Theme, options, event bus, resources
 
 - Тема: `setTheme(std::string)`, `themeManager()`
 - Опции: `options()`
@@ -80,11 +125,11 @@ English version: [WINDOWS-GUIDE.md](WINDOWS-GUIDE.md).
 - Ресурсы: `registry()`
 - Уведомления: `notifications()`
 
-### 3.3 Шрифты и i18n
+### Шрифты и i18n
 
-- `getFont(FontRole)`
-- `fontsView()`, `fontsControl()`
-- `langStore()`, `requestLanguageChange(...)`, `applyPendingLanguageChange()`
+- Поиск шрифта: `getFont(FontRole)`
+- Доступ к FontManager: `fontsView()`, `fontsControl()`
+- Язык: `langStore()`, `requestLanguageChange(...)`, `applyPendingLanguageChange()`
 - Init-only API для ручной сборки atlas:
   - `fontsBeginManual()`
   - `fontsSetLocale(...)`
@@ -96,16 +141,16 @@ English version: [WINDOWS-GUIDE.md](WINDOWS-GUIDE.md).
   - `fontsAddMerge(...)`
   - `fontsBuildNow()`
 
-### 3.4 ImGui ini
+### Сохранение ImGui ini
 
 - `iniPath()`
 - `initIni()`
 - `loadIni()`
 - `saveIniNow()`
 
-## 4. Модель ImGuiFramedWindow
+## Модель ImGuiFramedWindow
 
-Главные override-хуки:
+Главные hooks для кастомизации:
 
 - `drawTitleBarText()`
 - `drawSidePanel()`
@@ -115,182 +160,211 @@ English version: [WINDOWS-GUIDE.md](WINDOWS-GUIDE.md).
 Режимы layout:
 
 1. Classic mode:
-- без `WindowFlags::HasCornerIconArea`.
-- title row есть всегда.
-- side panel только если `side_panel_width > 0`.
+- Активен, если `WindowFlags::HasCornerIconArea` выключен.
+- Строка title есть всегда.
+- Side panel есть только если `side_panel_width > 0`.
 
 2. Corner mode:
-- с `WindowFlags::HasCornerIconArea`.
-- выделяется top-left зона под corner icon.
-- ширина side panel:
-  - `side_panel_width > 0` -> явная
-  - `side_panel_width <= 0` -> auto.
+- Активен, если `WindowFlags::HasCornerIconArea` включен.
+- Резервируется top-left зона под icon slot.
+- Ширина side panel:
+  - `side_panel_width > 0`: явная
+  - `side_panel_width <= 0`: auto-width из corner-параметров
 
-## 5. Матрица WindowFlags
+## Матрица WindowFlags
 
 Источник: `include/imguix/windows/window_flags.hpp`.
 
 | Флаг | Эффект | Важно |
 | --- | --- | --- |
-| `HasMenuBar` | Включает menu row и вызов `drawMenuBar()` | В corner mode позиция задается `corner_menu_bar_placement`. |
-| `EnableTransparency` | Включает прозрачный native/clear path | Backend-зависимо, см. раздел 7. |
-| `DisableBackground` | Делает фон root ImGui host прозрачным | Рамка/бордер при этом остаются видимыми. |
+| `HasMenuBar` | Включает menu bar region и вызов `drawMenuBar()` | В corner mode позиция зависит от `corner_menu_bar_placement`. |
+| `EnableTransparency` | Включает прозрачный backend/native clear path | Поведение зависит от backend-а. |
+| `DisableBackground` | Делает фон root ImGui host прозрачным | Рамка/бордер при этом могут оставаться видимыми. |
 | `ShowControlButtons` | Показывает min/max/close | Геометрия зависит от style и stroke config. |
-| `MacStyledControlButtons` | Круглые кнопки в стиле macOS | Взаимоисключается с другими style-флагами. |
-| `ImGuiStyledControlButtons` | Кнопки через `Widgets::SystemButton` | Используется как release fallback при конфликте style-флагов. |
-| `ClassicStyledControlButtons` | Текстовые `Button`-кнопки | Взаимоисключается с другими style-флагами. |
-| `HasCornerIconArea` | Переключает на corner-layout с icon slot | Меняет геометрию title/side. |
-| `CornerModeRounding` | Скругление title/side в corner mode | Радиус из `corner_icon_mode_rounding_radius`. |
-| `CornerModeBorder` | Включает border-штрихи title/side в corner mode | Толщина из `frame_stroke_thickness`. |
+| `MacStyledControlButtons` | Круглые кнопки в стиле macOS | Взаимоисключаемо с другими style-флагами. |
+| `ImGuiStyledControlButtons` | Стиль `Widgets::SystemButton` | Release fallback при конфликте style-флагов. |
+| `ClassicStyledControlButtons` | Текстовые кнопки | Взаимоисключаемо с другими style-флагами. |
+| `HasCornerIconArea` | Включает corner layout и icon slot | Переключает classic -> corner layout. |
+| `CornerModeRounding` | Включает скругление title/side в corner mode | Радиус из `corner_icon_mode_rounding_radius`. |
+| `CornerModeBorder` | Включает border-штрихи title/side в corner mode | Использует `frame_stroke_thickness`. |
 | `DefaultControlButtons` | `ShowControlButtons | ImGuiStyledControlButtons` | Shortcut. |
 
 Политика конфликта стилей кнопок (`resolveControlButtonsStyle()`):
 
-- Debug: assert при нескольких style-флагах.
+- Debug: assert, если включено больше одного style-флага.
 - Release: fallback к ImGui style.
 
-## 6. Матрица ImGuiFramedWindowConfig
+## Матрица ImGuiFramedWindowConfig
 
 Источник: `include/imguix/windows/ImGuiFramedWindow.hpp`.
 
-### 6.1 Геометрия и рамка
+### Геометрия и рамка
 
 | Поле | Назначение | Default / auto |
 | --- | --- | --- |
 | `min_width`, `min_height` | Минимальный размер client area | `640x480` |
-| `frame_corner_radius` | Радиус native region + округление root host | `8` |
-| `resize_border` | Толщина manual resize hit-test | `8` |
+| `frame_corner_radius` | Радиус native region и источник скругления root host | `8` |
+| `resize_border` | Толщина manual resize hit-test (Win32 borderless path) | `8` |
 | `title_bar_height` | Высота title row | `32` |
-| `side_panel_width` | Classic: `<=0` выключает side; Corner: `<=0` auto-width | `0` |
+| `side_panel_width` | Classic: `<=0` выключает side panel; Corner: `<=0` включает auto-width | `0` |
 | `frame_stroke_thickness` | Толщина разделителей title/side | `1.0f` |
 | `frame_outer_stroke_thickness` | Толщина внешнего host-frame штриха | `2.0f` |
 | `frame_inner_stroke_thickness` | Толщина внутреннего host-frame штриха | `1.0f` |
 
-### 6.2 Insets контента
+Примечания:
 
-| Поле | Назначение | Auto-режим |
+- В SFML framed backend сумма `frame_outer_stroke_thickness` + `frame_inner_stroke_thickness` уменьшает доступную геометрию `main_region` и menu slices основного столбца по тем внешним сторонам, которых они касаются.
+- Этот frame-aware inset не меняет геометрию title bar, side panel и corner icon chrome.
+
+### Insets контента
+
+| Поле | Назначение | Auto-правило |
 | --- | --- | --- |
-| `title_content_left_inset` | Базовый левый inset для `drawTitleBarText` | `<0` -> auto по style |
-| `side_panel_content_left_inset` | Базовый левый inset для `drawSidePanel` | `<0` -> auto по style |
+| `title_content_left_inset` | Базовый левый inset для title content | `<0`: auto по style |
+| `side_panel_content_left_inset` | Базовый левый inset для side content | `<0`: auto по style |
+| `side_panel_content_alignment` | Политика выравнивания контента внутри side panel | `LegacyLeftInset`: старое выравнивание только слева; `SymmetricInset`: ширина panel не меняется, а внутренняя content-area получает симметричные horizontal inset-ы |
 
-### 6.3 Corner-параметры
+Примечания:
+
+- `SymmetricInset` не меняет ширину самой side panel; он только сужает и центрирует внутреннюю область контента.
+- `SymmetricInset` лучше всего подходит для контролов одинаковой ширины или виджетов, которые берут размер из `GetContentRegionAvail().x`.
+- `SymmetricInset` не означает автоматическое поэлементное центрирование узкого текста или ссылок.
+
+### Corner-параметры
 
 | Поле | Назначение | Важно |
 | --- | --- | --- |
-| `corner_icon_mode_rounding_radius` | Радиус скругления corner title/side | Работает при `CornerModeRounding` |
-| `corner_rounding_style` | Политика скругления (`Legacy`, `NoTopLeftOnTitleAndSide`) | Работает при `CornerModeRounding` |
-| `corner_icon_mode_area_width` | Ширина зоны corner icon | `<0` -> fallback |
-| `corner_icon_mode_icon_size` | Размер иконки в corner slot | `<0` -> auto-fit с frame-aware компенсацией |
-| `corner_icon_mode_gap` | Gap между icon area и title/side | `<0` -> `style.WindowPadding.x` |
-| `corner_menu_bar_placement` | `MainRegion`, `InTitleBar`, `BelowTitleBar` | Имеет смысл только с `HasMenuBar` |
+| `corner_icon_mode_rounding_radius` | Радиус скругления corner title/side | Работает только при `CornerModeRounding`. |
+| `corner_rounding_style` | Политика скругления (`Legacy`, `NoTopLeftOnTitleAndSide`) | Работает только при `CornerModeRounding`. |
+| `corner_icon_mode_area_width` | Ширина зоны corner icon | `<0`: fallback формула. |
+| `corner_icon_mode_icon_size` | Размер corner icon | `<0`: auto-fit с frame-aware компенсацией. |
+| `corner_icon_mode_gap` | Gap между icon area и title/side | `<0`: runtime `style.WindowPadding.x`. |
+| `corner_menu_bar_placement` | `MainRegion`, `InTitleBar`, `BelowTitleBar` | Имеет смысл только при `HasMenuBar`. |
 
-### 6.4 Кнопки и clear color
+### Подписи кнопок и clear color
 
-- `close_button_text`, `minimize_button_text`, `maximize_button_text`: label + hidden ImGui ID для classic text buttons.
-- `clear_color`: цвет очистки при выключенной прозрачности.
+- `close_button_text`, `minimize_button_text`, `maximize_button_text`: labels/IDs для classic text-buttons.
+- `clear_color`: цвет очистки backend-а при выключенной прозрачности.
 
-## 7. Прозрачность и фон: что чем управляет
+## Матрица возможностей backend-ов
 
-Часто путают 3 механизма:
+| Возможность | SFML | GLFW | SDL2 |
+| --- | --- | --- | --- |
+| Native rounded region (`SetWindowRgn`) во framed backend | Да (Win32 path) | Нет | Нет |
+| Поддержка `EnableTransparency` во framed backend | Да | Да | Да |
+| Meaningful успех `ImGuiFramedWindow::setWindowIcon(...)` | Да | Нет (`false`) | Нет (`false`) |
+| Manual Win32 hit-test resize во framed backend | Да (SFML Win32 path) | Нет | Нет |
 
-1. `WindowFlags::EnableTransparency`
-- backend/native-уровень прозрачности.
-- В SFML/Win32 включает DWM-путь из `SfmlImGuiFramedWindow.ipp`.
+## Матрица поведения прозрачности
 
-2. `WindowFlags::DisableBackground`
-- прозрачный root ImGui host background.
+| Управление | Область | Типичный визуальный результат |
+| --- | --- | --- |
+| `WindowFlags::EnableTransparency` | Backend/native clear path | Прозрачный clear path (backend-зависимо). |
+| `WindowFlags::DisableBackground` | Фон root ImGui host | Фон host-прозрачный, рамка может оставаться видимой. |
+| `setDisableBackground(bool)` | Runtime-тоггл фонового поведения | То же поведение, переключаемое во время работы. |
 
-3. `setDisableBackground(bool)`
-- runtime toggle того же поведения.
+Практическая последовательность:
 
-Практика:
+1. Сначала проверяйте визуал через `DisableBackground`.
+2. Добавляйте `EnableTransparency`, если нужна именно native/translucent поверхность backend-окна.
 
-- Сначала проверяйте визуал на `DisableBackground`.
-- Добавляйте `EnableTransparency`, только если нужна именно native прозрачность backend-окна.
+## Практические рецепты
 
-## 8. Backend differences
-
-### SFML (`SfmlImGuiFramedWindow.ipp`)
-
-- Win32 path использует:
-  - borderless окно + manual hit-test
-  - `SetWindowRgn(CreateRoundRectRgn(...))`
-  - DWM path при прозрачности
-- `setWindowIcon(...)` в `ImGuiFramedWindow` грузит native icon и texture для corner icon.
-
-Следствие:
-
-- Вне `SetWindowRgn` пикселей нет. Если бордер "пропадает" в углах, геометрию штриха надо держать внутри usable region.
-
-### GLFW / SDL2
-
-- Нет SFML/Win32 rounded-region path.
-- `EnableTransparency` влияет на OpenGL clear color, но не на SFML-specific native region.
-- `ImGuiFramedWindow::setWindowIcon(...)` сейчас возвращает `false` вне SFML.
-
-## 9. Практические рецепты
-
-### 9.1 Classic: title + menu + side
+### Минимальный skeleton класса framed-окна (полный пример)
 
 ```cpp
-using namespace ImGuiX::Windows;
+#include <imguix/windows/ImGuiFramedWindow.hpp>
 
-ImGuiFramedWindowConfig cfg{};
-cfg.title_bar_height = 40;
-cfg.side_panel_width = 48;
+class DemoWindow final : public ImGuiX::Windows::ImGuiFramedWindow {
+public:
+    DemoWindow(int id, ImGuiX::ApplicationContext& app)
+        : ImGuiFramedWindow(id, app, "demo_window", "Demo Window", buildFlags(), buildConfig()) {}
 
-WindowFlags flags =
-    WindowFlags::HasMenuBar |
-    WindowFlags::DefaultControlButtons;
+    void onInit() override {
+        setWindowIcon("data/resources/icons/icon.png");
+        create(1280, 720);
+    }
+
+protected:
+    void drawTitleBarText() override {
+        ImGui::TextUnformatted("Demo Window");
+    }
+
+    void drawSidePanel() override {
+        ImGui::TextUnformatted("A1");
+        ImGui::TextUnformatted("A2");
+    }
+
+    void drawMenuBar() override {
+        if (ImGui::BeginMenuBar()) {
+            if (ImGui::BeginMenu("File")) {
+                ImGui::EndMenu();
+            }
+            ImGui::EndMenuBar();
+        }
+    }
+
+private:
+    static ImGuiX::Windows::WindowFlags buildFlags() {
+        using namespace ImGuiX::Windows;
+        return WindowFlags::HasMenuBar | WindowFlags::DefaultControlButtons;
+    }
+
+    static ImGuiX::Windows::ImGuiFramedWindowConfig buildConfig() {
+        ImGuiX::Windows::ImGuiFramedWindowConfig cfg{};
+        cfg.title_bar_height = 40;
+        cfg.side_panel_width = 48;
+        return cfg;
+    }
+};
 ```
 
-Override:
-
-- `drawTitleBarText()`
-- `drawMenuBar()`
-- `drawSidePanel()`
-
-### 9.2 Corner V3: icon + side, без menu
+### Полный setup для classic mode
 
 ```cpp
-using namespace ImGuiX::Windows;
+static ImGuiX::Windows::WindowFlags buildClassicFlags() {
+    using namespace ImGuiX::Windows;
+    return WindowFlags::HasMenuBar | WindowFlags::DefaultControlButtons;
+}
 
-ImGuiFramedWindowConfig cfg{};
-cfg.title_bar_height = 40;
-cfg.side_panel_width = 0; // corner auto-width
-cfg.corner_menu_bar_placement = CornerMenuBarPlacement::MainRegion;
-
-WindowFlags flags =
-    WindowFlags::DefaultControlButtons |
-    WindowFlags::HasCornerIconArea |
-    WindowFlags::CornerModeRounding |
-    WindowFlags::CornerModeBorder;
+static ImGuiX::Windows::ImGuiFramedWindowConfig buildClassicConfig() {
+    ImGuiX::Windows::ImGuiFramedWindowConfig cfg{};
+    cfg.title_bar_height = 40;
+    cfg.side_panel_width = 48;
+    cfg.frame_stroke_thickness = 1.0f;
+    return cfg;
+}
 ```
 
-Для SFML corner-иконки вызывайте `setWindowIcon("...")` в `onInit()`.
-
-### 9.3 Corner без top-left скругления у title/side
+### Полный setup для corner V3
 
 ```cpp
-cfg.corner_rounding_style = CornerRoundingStyle::NoTopLeftOnTitleAndSide;
+static ImGuiX::Windows::WindowFlags buildCornerV3Flags() {
+    using namespace ImGuiX::Windows;
+    return WindowFlags::DefaultControlButtons |
+        WindowFlags::HasCornerIconArea |
+        WindowFlags::CornerModeRounding |
+        WindowFlags::CornerModeBorder;
+}
+
+static ImGuiX::Windows::ImGuiFramedWindowConfig buildCornerV3Config() {
+    ImGuiX::Windows::ImGuiFramedWindowConfig cfg{};
+    cfg.title_bar_height = 40;
+    cfg.side_panel_width = 0; // corner auto-width
+    cfg.corner_menu_bar_placement = ImGuiX::Windows::CornerMenuBarPlacement::MainRegion;
+    return cfg;
+}
 ```
 
-Нужен включенный `WindowFlags::CornerModeRounding`.
+## Что переопределять по сценариям
 
-### 9.4 Mac-style кнопки
+| Сценарий | Обязательные overrides | Опциональные overrides |
+| --- | --- | --- |
+| Classic app (title + menu + side) | `drawTitleBarText()`, `drawMenuBar()`, `drawSidePanel()` | `drawCornerIcon()` (обычно не нужен) |
+| Corner app (icon + side, без menu) | `drawTitleBarText()`, `drawSidePanel()` | `drawCornerIcon()` |
+| Menu in title bar (corner mode) | `drawTitleBarText()`, `drawMenuBar()` | `drawSidePanel()`, `drawCornerIcon()` |
 
-```cpp
-WindowFlags flags =
-    WindowFlags::ShowControlButtons |
-    WindowFlags::MacStyledControlButtons |
-    WindowFlags::HasCornerIconArea |
-    WindowFlags::CornerModeRounding |
-    WindowFlags::CornerModeBorder;
-```
-
-Не комбинируйте несколько style-флагов кнопок одновременно.
-
-## 10. Карта smoke-примеров
+## Карта smoke-примеров
 
 Источник: `examples/smoke/`.
 
@@ -302,9 +376,9 @@ WindowFlags flags =
 | `corner_icon_area_off_no_menu_odd_title_demo` | Проверка выравнивания при odd высоте title |
 | `corner_icon_area_demo` | Corner layout + menu in title bar |
 | `corner_icon_area_demo_v2` | Corner layout + menu below title |
-| `corner_icon_area_demo_v3` | Corner layout baseline без menu |
+| `corner_icon_area_demo_v3` | Corner layout baseline без menu bar |
 | `corner_icon_area_demo_v3_no_top_left` | Corner layout с `NoTopLeftOnTitleAndSide` |
-| `corner_icon_area_demo_v3_mac` | Corner layout + Mac control buttons |
+| `corner_icon_area_demo_v3_mac` | Corner layout + Mac-style control buttons |
 
 Сборка одного smoke-target из корня:
 
@@ -312,31 +386,34 @@ WindowFlags flags =
 cmake --build external/ImGuiX/build-mingw --target corner_icon_area_demo_v3 --parallel 36
 ```
 
-Полный профиль: `agents/imguix-smoke-build.md`.
+Полный профиль сборки smoke-таргетов: `agents/imguix-smoke-build.md`.
 
-## 11. Частые gotchas
+## Частые подводные камни (gotchas)
 
-1. Клиппинг углов при SFML/Win32 rounded region
-- Вне `SetWindowRgn` пикселей нет.
+1. Клиппинг углов в SFML/Win32
+- При `SetWindowRgn` пикселей вне региона нет.
 
 2. Разное поведение `setWindowIcon`
-- В `ImGuiFramedWindow` meaningful `true` сейчас только на SFML.
+- В текущем `ImGuiFramedWindow` meaningful успех есть только на SFML.
 
 3. Разная семантика `side_panel_width`
-- Classic: `<=0` выключает side panel.
-- Corner: `<=0` включает auto-width.
+- Classic: `<= 0` выключает side panel.
+- Corner: `<= 0` включает auto width.
 
-4. `corner_menu_bar_placement` без `HasMenuBar` не работает
-- Placement учитывается только при активном menu flag.
+4. `side_panel_content_alignment = SymmetricInset` центрирует content-area, а не каждый виджет отдельно
+- Контролы одинаковой ширины ведут себя ожидаемо.
+- Узкий текст/ссылки всё ещё следуют обычному ImGui flow, если не центрировать их вручную.
 
-5. Конфликты style-флагов control buttons
-- Debug assert + release fallback.
+5. `corner_menu_bar_placement` без `HasMenuBar` не влияет
+- Логика placement выполняется только при активном menu-флаге.
 
-## 12. Короткий чеклист для нового окна
+6. Конфликт style-флагов control buttons
+- Несколько style-флагов дают debug assert и release fallback.
 
-1. Выбрать базовый класс (`WindowInstance` или `ImGuiFramedWindow`).
-2. Сначала определить `WindowFlags` (режим layout и стиль кнопок).
-3. Настроить геометрию/stroke в `ImGuiFramedWindowConfig`.
-4. Переопределить только нужные hooks.
-5. Проверить как минимум на одном classic и одном corner smoke-сценарии.
-6. Для SFML/Win32 проверить углы и бордер во время resize.
+## Чеклист отладки (Debug Checklist)
+
+1. Проверить выбранный layout mode (`HasCornerIconArea` вкл/выкл).
+2. Проверить, что style-флаги control buttons не конфликтуют.
+3. Проверить семантику `side_panel_width` для текущего режима.
+4. Для SFML/Win32 проверить углы и бордер во время resize при rounded region.
+5. Проверить комбинацию прозрачности (`EnableTransparency`, `DisableBackground`, runtime toggle).

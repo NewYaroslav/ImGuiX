@@ -156,9 +156,9 @@ SDK может включать папку `quickstart/` с минимальны
 
 Для практической работы с окнами и их настройкой используйте:
 
-- [docs/WINDOWS-GUIDE.md](docs/WINDOWS-GUIDE.md) - полный гайд по `WindowInstance` и `ImGuiFramedWindow` (каноничная EN-версия).
-- [docs/WINDOWS-GUIDE-RU.md](docs/WINDOWS-GUIDE-RU.md) - русская локализация.
-- [agents/imguix-windowing-playbook.md](agents/imguix-windowing-playbook.md) - короткий checklist для AI-агентов и ревью windowing-правок.
+- Start here: [docs/WINDOWS-GUIDE.md](docs/WINDOWS-GUIDE.md) - каноничный EN-гайд по `WindowInstance` и `ImGuiFramedWindow`.
+- RU mirror: [docs/WINDOWS-GUIDE-RU.md](docs/WINDOWS-GUIDE-RU.md) - русская локализация.
+- Agent playbook: [agents/imguix-windowing-playbook.md](agents/imguix-windowing-playbook.md) - короткий checklist для AI-агентов и ревью windowing-правок.
 
 ## Структура проекта
 

@@ -35,6 +35,11 @@
 
 #include "WindowInterface.hpp"
 #include <imguix/config/paths.hpp>
+#include <memory>
+#include <string>
+#include <type_traits>
+#include <utility>
+#include <vector>
 
 namespace ImGuiX {
 
@@ -370,6 +375,8 @@ namespace ImGuiX {
     };
 
 } // namespace ImGuiX
+
+#include "WindowInstance.tpp"
 
 #ifdef IMGUIX_HEADER_ONLY
 #    include "WindowInstance.ipp"

@@ -424,7 +424,6 @@ if(IMGUIX_BUILD_TESTS)
         get_filename_component(TEST_NAME "${TEST_FILE}" NAME_WE)
         add_executable(${TEST_NAME} "${TEST_FILE}")
 
-        target_compile_definitions(${TEST_NAME} PRIVATE IMGUIX_HEADER_ONLY)
         target_compile_definitions(${TEST_NAME} PRIVATE IMGUIX_DEMO)
 
         if(IMGUIX_USE_SFML_BACKEND)
@@ -452,6 +451,7 @@ if(IMGUIX_BUILD_TESTS)
             target_link_libraries(${TEST_NAME} PRIVATE ${FREETYPE_TARGET})
         endif()
 
+        target_link_libraries(${TEST_NAME} PRIVATE ImGuiX::imguix)
         target_link_libraries(${TEST_NAME} PRIVATE ${IMGUI_LIB} ${BACKEND_LIBS})
         target_link_libraries(${TEST_NAME} PRIVATE fmt::fmt nlohmann_json::nlohmann_json)
 
@@ -560,7 +560,6 @@ if(IMGUIX_BUILD_EXAMPLES)
         get_filename_component(EXAMPLE_NAME "${EXAMPLE_FILE}" NAME_WE)
         add_executable(${EXAMPLE_NAME} "${EXAMPLE_FILE}")
 
-        target_compile_definitions(${EXAMPLE_NAME} PRIVATE IMGUIX_HEADER_ONLY)
         target_compile_definitions(${EXAMPLE_NAME} PRIVATE IMGUIX_DEMO)
 
         if(IMGUIX_USE_SFML_BACKEND)
@@ -587,6 +586,7 @@ if(IMGUIX_BUILD_EXAMPLES)
             target_link_libraries(${EXAMPLE_NAME} PRIVATE ${FREETYPE_TARGET})
         endif()
 
+        target_link_libraries(${EXAMPLE_NAME} PRIVATE ImGuiX::imguix)
         target_link_libraries(${EXAMPLE_NAME} PRIVATE ${IMGUI_LIB} ${BACKEND_LIBS})
         target_link_libraries(${EXAMPLE_NAME} PRIVATE fmt::fmt nlohmann_json::nlohmann_json)
 

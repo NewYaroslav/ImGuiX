@@ -2,27 +2,71 @@
 
 For the Russian version, see [WINDOWS-GUIDE-RU.md](WINDOWS-GUIDE-RU.md).
 
-This guide explains how windowing works in ImGuiX today, with a practical focus on:
+Practical guide for ImGuiX windowing with focus on:
 
-- `include/imguix/core/window/WindowInstance.hpp`
 - `include/imguix/core/window/WindowInterface.hpp`
+- `include/imguix/core/window/WindowInstance.hpp`
+- `include/imguix/core/window/WindowManager.ipp`
 - `include/imguix/windows/ImGuiFramedWindow.hpp`
+- `include/imguix/windows/ImGuiFramedWindow.ipp`
 
-It is intended for developers who are new to ImGuiX and need to configure, style, and extend windows without reading all source files first.
+## Table of Contents
 
-## 1. Which base class to use
+- [Quick Start Path (10 minutes)](#quick-start-path-10-minutes)
+- [Which Base Class to Use](#which-base-class-to-use)
+- [Runtime Lifecycle and Frame Pipeline](#runtime-lifecycle-and-frame-pipeline)
+- [WindowInterface and WindowInstance API Map](#windowinterface-and-windowinstance-api-map)
+- [ImGuiFramedWindow Model](#imguiframedwindow-model)
+- [WindowFlags Matrix](#windowflags-matrix)
+- [ImGuiFramedWindowConfig Matrix](#imguiframedwindowconfig-matrix)
+- [Backend Capability Matrix](#backend-capability-matrix)
+- [Transparency Behavior Matrix](#transparency-behavior-matrix)
+- [Practical Recipes](#practical-recipes)
+- [What to Override by Scenario](#what-to-override-by-scenario)
+- [Smoke Demo Map](#smoke-demo-map)
+- [Common Gotchas](#common-gotchas)
+- [Debug Checklist](#debug-checklist)
+
+## Quick Start Path (10 minutes)
+
+1. Choose base class:
+- Use `ImGuiFramedWindow` for most operator UIs.
+- Use `WindowInstance` only when you need fully custom window chrome/layout.
+
+2. Choose layout mode via flags:
+- Classic layout: do not set `WindowFlags::HasCornerIconArea`.
+- Corner layout: set `WindowFlags::HasCornerIconArea`.
+
+3. Set minimal config:
+- `title_bar_height`
+- `side_panel_width`
+- frame strokes (`frame_stroke_thickness`, `frame_outer_stroke_thickness`, `frame_inner_stroke_thickness`)
+
+4. Add only required virtual hooks:
+- `drawTitleBarText()`
+- `drawSidePanel()`
+- `drawMenuBar()` (only with `HasMenuBar`)
+- `drawCornerIcon()` (only in corner mode)
+
+5. Validate with one smoke target:
+
+```powershell
+cmake --build external/ImGuiX/build-mingw --target corner_icon_area_demo_v3 --parallel 36
+```
+
+## Which Base Class to Use
 
 | Use case | Recommended base class | Why |
 | --- | --- | --- |
-| You need full custom render loop and custom chrome (or no chrome helpers) | `WindowInstance` | Lowest-level window abstraction with full lifecycle control. |
-| You want a ready custom frame: title bar, optional side panel, optional corner icon area, system buttons | `Windows::ImGuiFramedWindow` | Built on top of `WindowInstance`, adds window chrome/layout helpers and style flags. |
+| Full custom rendering loop and custom native/chrome behavior | `WindowInstance` | Lowest-level window abstraction with full lifecycle control. |
+| Ready framed host window (title, side, corner icon area, control buttons) | `Windows::ImGuiFramedWindow` | Builds on `WindowInstance` and gives reusable framed geometry/styling. |
 
 Rule of thumb:
 
-- Start with `ImGuiFramedWindow` for operator apps and tools.
-- Drop to `WindowInstance` only when framed layout rules become a constraint.
+- Start with `ImGuiFramedWindow`.
+- Drop to `WindowInstance` only when framed layout rules are a limitation.
 
-## 2. Runtime lifecycle and frame pipeline
+## Runtime Lifecycle and Frame Pipeline
 
 Two levels are involved:
 
@@ -38,6 +82,7 @@ Source: `include/imguix/core/window/WindowManager.ipp`.
   - `initializePending()` -> `window->fontsStartInit()`, `window->onInit()`, `window->buildFonts()`
   - `removeClosed()`
   - `initializeControllers()`
+
 - `processFrame()` order:
   - `handleEvents()`
   - `tickAll()`
@@ -57,37 +102,35 @@ Base hooks in `WindowInstance`:
 - `drawUi()`
 - `present()`
 
-`ImGuiFramedWindow` overrides `drawUi()` (backend-specific `.ipp` files) and internally dispatches into:
+`ImGuiFramedWindow` overrides `drawUi()` in backend-specific files and dispatches to:
 
 - `drawClassicLayout(...)` when `WindowFlags::HasCornerIconArea` is not set
 - `drawCornerLayout(...)` when `WindowFlags::HasCornerIconArea` is set
 
-## 3. WindowInterface and WindowInstance API map
+## WindowInterface and WindowInstance API Map
 
-### 3.1 Geometry and state
-
-Core API (via `WindowInterface` / `WindowInstance`):
+### Geometry and state
 
 - Identity: `id()`, `name()`
 - Size: `width()`, `height()`, `setSize(int, int)`
-- Visibility and activation: `setVisible(bool)`, `setActive(bool)`, `isActive()`
+- Visibility/focus: `setVisible(bool)`, `setActive(bool)`, `isActive()`
 - Open/close: `isOpen()`, `close()`
 - Window state: `minimize()`, `maximize()`, `restore()`, `isMaximized()`, `toggleMaximizeRestore()`
 
-### 3.2 Theme, options, bus, resources
+### Theme, options, event bus, resources
 
 - Theme: `setTheme(std::string)`, `themeManager()`
-- Options store: `options()` (control/view)
+- Options: `options()` (control/view)
 - Event bus: `eventBus()`
 - Resources: `registry()`
 - Notifications: `notifications()`
 
-### 3.3 Fonts and i18n
+### Fonts and i18n
 
 - Font lookup: `getFont(FontRole)`
 - Font manager access: `fontsView()`, `fontsControl()`
 - Language: `langStore()`, `requestLanguageChange(...)`, `applyPendingLanguageChange()`
-- Manual font build hooks (init-only):
+- Manual atlas init API (init-only):
   - `fontsBeginManual()`
   - `fontsSetLocale(...)`
   - `fontsSetRangesPreset(...)`
@@ -98,16 +141,14 @@ Core API (via `WindowInterface` / `WindowInstance`):
   - `fontsAddMerge(...)`
   - `fontsBuildNow()`
 
-### 3.4 ImGui ini persistence
+### ImGui ini persistence
 
 - `iniPath()`
 - `initIni()`
 - `loadIni()`
 - `saveIniNow()`
 
-## 4. ImGuiFramedWindow model
-
-`ImGuiFramedWindow` is a framed host over `WindowInstance`.
+## ImGuiFramedWindow Model
 
 Main customization hooks:
 
@@ -119,228 +160,260 @@ Main customization hooks:
 Layout modes:
 
 1. Classic mode:
-- active when `WindowFlags::HasCornerIconArea` is not set.
-- title row always exists.
-- side panel exists only if `side_panel_width > 0`.
+- Active when `WindowFlags::HasCornerIconArea` is not set.
+- Title row always exists.
+- Side panel exists only if `side_panel_width > 0`.
 
 2. Corner mode:
-- active when `WindowFlags::HasCornerIconArea` is set.
-- top-left icon area is reserved.
-- side width:
-  - if `side_panel_width > 0`, explicit width
-  - if `side_panel_width <= 0`, auto width based on `corner_icon_mode_area_width` or fallback formula.
+- Active when `WindowFlags::HasCornerIconArea` is set.
+- Top-left icon area is reserved.
+- Side width:
+  - `side_panel_width > 0`: explicit width
+  - `side_panel_width <= 0`: auto width from corner parameters
 
-## 5. WindowFlags matrix
+## WindowFlags Matrix
 
 Source: `include/imguix/windows/window_flags.hpp`.
 
 | Flag | Effect | Notes |
 | --- | --- | --- |
-| `HasMenuBar` | Enables menu bar region and `drawMenuBar()` calls | In corner mode, placement is controlled by `corner_menu_bar_placement`. |
-| `EnableTransparency` | Requests transparent native clear path | Backend-dependent behavior; see section 7. |
-| `DisableBackground` | Makes root ImGui host background transparent | Useful with custom frame strokes still visible. |
-| `ShowControlButtons` | Shows minimize/maximize/close | Position/size depends on control button style and frame config. |
+| `HasMenuBar` | Enables menu bar region and `drawMenuBar()` calls | In corner mode, placement depends on `corner_menu_bar_placement`. |
+| `EnableTransparency` | Requests transparent backend/native clear path | Backend-dependent behavior. |
+| `DisableBackground` | Makes root ImGui host background transparent | Frame/border can remain visible. |
+| `ShowControlButtons` | Shows minimize/maximize/close buttons | Geometry depends on style and stroke config. |
 | `MacStyledControlButtons` | Circular mac-like buttons | Mutually exclusive with other style flags. |
-| `ImGuiStyledControlButtons` | `Widgets::SystemButton` style | Default when conflicts occur in release fallback. |
-| `ClassicStyledControlButtons` | Text button style (`Button`) | Mutually exclusive with other style flags. |
-| `HasCornerIconArea` | Enables corner layout with icon slot | Switches from classic to corner layout. |
+| `ImGuiStyledControlButtons` | `Widgets::SystemButton` style | Release fallback style if style flags conflict. |
+| `ClassicStyledControlButtons` | Text-button style | Mutually exclusive with other style flags. |
+| `HasCornerIconArea` | Enables corner layout and icon slot | Switches from classic to corner layout. |
 | `CornerModeRounding` | Enables rounded title/side geometry in corner mode | Radius from `corner_icon_mode_rounding_radius`. |
-| `CornerModeBorder` | Enables title/side border strokes in corner mode | Uses `frame_stroke_thickness`. |
+| `CornerModeBorder` | Enables corner-mode border strokes for title/side | Uses `frame_stroke_thickness`. |
 | `DefaultControlButtons` | `ShowControlButtons | ImGuiStyledControlButtons` | Convenience alias. |
 
-Control button style conflict policy (implemented in `resolveControlButtonsStyle()`):
+Control-button style conflict policy (`resolveControlButtonsStyle()`):
 
-- Debug builds: assert if multiple style flags are set.
+- Debug builds: assert if more than one style flag is set.
 - Release builds: fallback to ImGui style.
 
-## 6. ImGuiFramedWindowConfig matrix
+## ImGuiFramedWindowConfig Matrix
 
 Source: `include/imguix/windows/ImGuiFramedWindow.hpp`.
 
-### 6.1 Geometry and frame
+### Geometry and frame
 
 | Field | Meaning | Default / auto semantics |
 | --- | --- | --- |
-| `min_width`, `min_height` | Minimum client size (Win32 hit-test path uses these) | Defaults `640x480` |
-| `frame_corner_radius` | Native rounded region radius and root host rounding source | Default `8` |
-| `resize_border` | Manual resize hit-test thickness (Win32 borderless window) | Default `8` |
-| `title_bar_height` | Title row height | Default `32` |
-| `side_panel_width` | Classic: `<=0` disables side panel; Corner: `<=0` means auto width | Default `0` |
-| `frame_stroke_thickness` | Title/side separator stroke thickness | Default `1.0f` |
-| `frame_outer_stroke_thickness` | Outer host frame stroke thickness | Default `2.0f` |
-| `frame_inner_stroke_thickness` | Inner host frame stroke thickness | Default `1.0f` |
+| `min_width`, `min_height` | Minimum client size | `640x480` |
+| `frame_corner_radius` | Native rounded region radius and root host rounding source | `8` |
+| `resize_border` | Manual resize hit-test thickness (Win32 borderless path) | `8` |
+| `title_bar_height` | Title row height | `32` |
+| `side_panel_width` | Classic: `<=0` disables side panel; Corner: `<=0` means auto width | `0` |
+| `frame_stroke_thickness` | Title/side separator stroke thickness | `1.0f` |
+| `frame_outer_stroke_thickness` | Outer host frame stroke thickness | `2.0f` |
+| `frame_inner_stroke_thickness` | Inner host frame stroke thickness | `1.0f` |
 
-### 6.2 Content insets
+Notes:
+
+- In the SFML framed backend, `frame_outer_stroke_thickness` + `frame_inner_stroke_thickness` reduce the available layout space of `main_region` and menu slices rendered in the main column on the outer edges they touch.
+- This frame-aware inset does not change title-bar, side-panel, or corner-icon chrome geometry.
+
+### Content insets
 
 | Field | Meaning | Auto rule |
 | --- | --- | --- |
 | `title_content_left_inset` | Baseline left inset for title content | `<0`: style-based auto inset |
-| `side_panel_content_left_inset` | Baseline left inset for side panel content | `<0`: style-based auto inset |
+| `side_panel_content_left_inset` | Baseline left inset for side-panel content | `<0`: style-based auto inset |
+| `side_panel_content_alignment` | Side-panel content alignment policy | `LegacyLeftInset`: left-only legacy placement; `SymmetricInset`: keep panel width, center the inner content region with equal horizontal inset |
 
-### 6.3 Corner mode options
+Notes:
+
+- `SymmetricInset` does not resize the side panel itself; it only narrows and centers the content region inside it.
+- `SymmetricInset` is best for equal-width controls or widgets sized from `GetContentRegionAvail().x`.
+- `SymmetricInset` does not automatically center arbitrary intrinsic-width text or links item-by-item.
+
+### Corner options
 
 | Field | Meaning | Notes |
 | --- | --- | --- |
-| `corner_icon_mode_rounding_radius` | Radius for corner mode title/side rounding | Used only when `CornerModeRounding` is enabled |
-| `corner_rounding_style` | Corner rounding policy (`Legacy`, `NoTopLeftOnTitleAndSide`) | Effective only with `CornerModeRounding` |
-| `corner_icon_mode_area_width` | Reserved width for corner icon area | `<0`: fallback formula |
-| `corner_icon_mode_icon_size` | Icon content size in corner slot | `<0`: auto-fit with frame-aware compensation |
-| `corner_icon_mode_gap` | Gap between icon area and title/side | `<0`: runtime `style.WindowPadding.x` |
-| `corner_menu_bar_placement` | `MainRegion`, `InTitleBar`, `BelowTitleBar` | Works only if `HasMenuBar` is set |
+| `corner_icon_mode_rounding_radius` | Radius for corner-mode title/side rounding | Effective only with `CornerModeRounding`. |
+| `corner_rounding_style` | Corner rounding policy (`Legacy`, `NoTopLeftOnTitleAndSide`) | Effective only with `CornerModeRounding`. |
+| `corner_icon_mode_area_width` | Reserved width for corner icon area | `<0`: fallback formula. |
+| `corner_icon_mode_icon_size` | Corner icon content size | `<0`: auto-fit with frame-aware compensation. |
+| `corner_icon_mode_gap` | Gap between icon area and title/side | `<0`: runtime `style.WindowPadding.x`. |
+| `corner_menu_bar_placement` | `MainRegion`, `InTitleBar`, `BelowTitleBar` | Effective only with `HasMenuBar`. |
 
-### 6.4 Buttons and clear color
+### Button labels and clear color
 
-- `close_button_text`, `minimize_button_text`, `maximize_button_text`: label + ImGui ID suffix for classic text buttons.
-- `clear_color`: backend clear color when transparency is not active.
+- `close_button_text`, `minimize_button_text`, `maximize_button_text`: labels/IDs for classic text buttons.
+- `clear_color`: backend clear color when transparency is disabled.
 
-## 7. Transparency and background behavior
+## Backend Capability Matrix
 
-Three independent controls are often confused:
+| Capability | SFML | GLFW | SDL2 |
+| --- | --- | --- | --- |
+| Native rounded region (`SetWindowRgn`) in framed backend | Yes (Win32 path) | No | No |
+| `EnableTransparency` clear-path handling in framed backend | Yes | Yes | Yes |
+| `ImGuiFramedWindow::setWindowIcon(...)` meaningful success | Yes | No (returns `false`) | No (returns `false`) |
+| Manual Win32 hit-test resize in framed backend | Yes (SFML Win32 path) | No | No |
 
-1. `WindowFlags::EnableTransparency`
-- Affects backend clear/native surface path.
-- SFML Win32 path also applies DWM setup in `SfmlImGuiFramedWindow.ipp`.
+## Transparency Behavior Matrix
 
-2. `WindowFlags::DisableBackground`
-- Makes root ImGui host background transparent while still rendering frame/border paths.
+| Control | Scope | Typical result |
+| --- | --- | --- |
+| `WindowFlags::EnableTransparency` | Backend/native clear path | Transparent clear path (backend-dependent). |
+| `WindowFlags::DisableBackground` | Root ImGui host background | Host background transparent; frame can stay visible. |
+| `setDisableBackground(bool)` | Runtime toggle for background behavior | Same visual effect as disable-background mode, toggled at runtime. |
 
-3. `setDisableBackground(bool)`
-- Runtime toggle equivalent to background-disable behavior.
+Practical sequence:
 
-Practical pattern:
+1. Start with `DisableBackground` to validate framed visuals.
+2. Add `EnableTransparency` only when native/translucent surface behavior is required.
 
-- Start with `DisableBackground` for visual experimentation.
-- Add `EnableTransparency` only when backend/native transparency is required.
+## Practical Recipes
 
-## 8. Backend differences you must account for
-
-### SFML backend (`SfmlImGuiFramedWindow.ipp`)
-
-- Win32 path uses:
-  - borderless native window + custom hit testing
-  - `SetWindowRgn(CreateRoundRectRgn(...))` for rounded native region
-  - DWM extension when transparency is enabled
-- `setWindowIcon(...)` in `ImGuiFramedWindow` loads both native icon and corner icon texture on SFML.
-
-Important consequence:
-
-- Pixels outside `SetWindowRgn` do not exist. Border strokes must be visually aligned inside region-aware geometry.
-
-### GLFW / SDL2 framed backends
-
-- No Win32 rounded-region shaping in current framed backend code.
-- `EnableTransparency` affects OpenGL clear color path, but not SFML-specific native region logic.
-- `ImGuiFramedWindow::setWindowIcon(...)` returns `false` outside SFML in current implementation.
-
-## 9. Practical recipes
-
-### 9.1 Classic layout: title + menu + side panel
+### Minimal framed-window skeleton (complete class)
 
 ```cpp
-using namespace ImGuiX::Windows;
+#include <imguix/windows/ImGuiFramedWindow.hpp>
 
-ImGuiFramedWindowConfig cfg{};
-cfg.title_bar_height = 40;
-cfg.side_panel_width = 48;
+class DemoWindow final : public ImGuiX::Windows::ImGuiFramedWindow {
+public:
+    DemoWindow(int id, ImGuiX::ApplicationContext& app)
+        : ImGuiFramedWindow(id, app, "demo_window", "Demo Window", buildFlags(), buildConfig()) {}
 
-WindowFlags flags =
-    WindowFlags::HasMenuBar |
-    WindowFlags::DefaultControlButtons;
+    void onInit() override {
+        setWindowIcon("data/resources/icons/icon.png");
+        create(1280, 720);
+    }
+
+protected:
+    void drawTitleBarText() override {
+        ImGui::TextUnformatted("Demo Window");
+    }
+
+    void drawSidePanel() override {
+        ImGui::TextUnformatted("A1");
+        ImGui::TextUnformatted("A2");
+    }
+
+    void drawMenuBar() override {
+        if (ImGui::BeginMenuBar()) {
+            if (ImGui::BeginMenu("File")) {
+                ImGui::EndMenu();
+            }
+            ImGui::EndMenuBar();
+        }
+    }
+
+private:
+    static ImGuiX::Windows::WindowFlags buildFlags() {
+        using namespace ImGuiX::Windows;
+        return WindowFlags::HasMenuBar | WindowFlags::DefaultControlButtons;
+    }
+
+    static ImGuiX::Windows::ImGuiFramedWindowConfig buildConfig() {
+        ImGuiX::Windows::ImGuiFramedWindowConfig cfg{};
+        cfg.title_bar_height = 40;
+        cfg.side_panel_width = 48;
+        return cfg;
+    }
+};
 ```
 
-Override:
-
-- `drawTitleBarText()`
-- `drawMenuBar()`
-- `drawSidePanel()`
-
-### 9.2 Corner V3 style: icon + side panel, no menu bar
+### Complete classic-mode setup
 
 ```cpp
-using namespace ImGuiX::Windows;
+static ImGuiX::Windows::WindowFlags buildClassicFlags() {
+    using namespace ImGuiX::Windows;
+    return WindowFlags::HasMenuBar | WindowFlags::DefaultControlButtons;
+}
 
-ImGuiFramedWindowConfig cfg{};
-cfg.title_bar_height = 40;
-cfg.side_panel_width = 0; // corner auto-width
-cfg.corner_menu_bar_placement = CornerMenuBarPlacement::MainRegion;
-
-WindowFlags flags =
-    WindowFlags::DefaultControlButtons |
-    WindowFlags::HasCornerIconArea |
-    WindowFlags::CornerModeRounding |
-    WindowFlags::CornerModeBorder;
+static ImGuiX::Windows::ImGuiFramedWindowConfig buildClassicConfig() {
+    ImGuiX::Windows::ImGuiFramedWindowConfig cfg{};
+    cfg.title_bar_height = 40;
+    cfg.side_panel_width = 48;
+    cfg.frame_stroke_thickness = 1.0f;
+    return cfg;
+}
 ```
 
-Call `setWindowIcon("...")` in `onInit()` for SFML corner icon rendering.
-
-### 9.3 Corner style without top-left rounding on title/side
+### Complete corner V3 setup
 
 ```cpp
-cfg.corner_rounding_style = CornerRoundingStyle::NoTopLeftOnTitleAndSide;
+static ImGuiX::Windows::WindowFlags buildCornerV3Flags() {
+    using namespace ImGuiX::Windows;
+    return WindowFlags::DefaultControlButtons |
+        WindowFlags::HasCornerIconArea |
+        WindowFlags::CornerModeRounding |
+        WindowFlags::CornerModeBorder;
+}
+
+static ImGuiX::Windows::ImGuiFramedWindowConfig buildCornerV3Config() {
+    ImGuiX::Windows::ImGuiFramedWindowConfig cfg{};
+    cfg.title_bar_height = 40;
+    cfg.side_panel_width = 0; // corner auto-width
+    cfg.corner_menu_bar_placement = ImGuiX::Windows::CornerMenuBarPlacement::MainRegion;
+    return cfg;
+}
 ```
 
-Keep `WindowFlags::CornerModeRounding` enabled; otherwise this style does nothing.
+## What to Override by Scenario
 
-### 9.4 Mac-style control buttons
+| Scenario | Required overrides | Optional overrides |
+| --- | --- | --- |
+| Classic app (title + menu + side) | `drawTitleBarText()`, `drawMenuBar()`, `drawSidePanel()` | `drawCornerIcon()` (not used) |
+| Corner app (icon + side, no menu) | `drawTitleBarText()`, `drawSidePanel()` | `drawCornerIcon()` |
+| Menu in title bar (corner mode) | `drawTitleBarText()`, `drawMenuBar()` | `drawSidePanel()`, `drawCornerIcon()` |
 
-```cpp
-WindowFlags flags =
-    WindowFlags::ShowControlButtons |
-    WindowFlags::MacStyledControlButtons |
-    WindowFlags::HasCornerIconArea |
-    WindowFlags::CornerModeRounding |
-    WindowFlags::CornerModeBorder;
-```
-
-Do not combine multiple style flags (`MacStyledControlButtons`, `ImGuiStyledControlButtons`, `ClassicStyledControlButtons`).
-
-## 10. Smoke demo map
+## Smoke Demo Map
 
 Source: `examples/smoke/`.
 
 | Demo | What it demonstrates |
 | --- | --- |
-| `corner_icon_area_off_demo` | Classic layout, menu + side panel, no corner icon mode |
+| `corner_icon_area_off_demo` | Classic layout, menu + side panel |
 | `corner_icon_area_off_no_side_demo` | Classic layout, menu, no side panel |
-| `corner_icon_area_off_no_menu_demo` | Classic layout with title only (no menu row) |
-| `corner_icon_area_off_no_menu_odd_title_demo` | Classic layout with odd title height alignment checks |
+| `corner_icon_area_off_no_menu_demo` | Classic layout with title only |
+| `corner_icon_area_off_no_menu_odd_title_demo` | Classic layout with odd title-height alignment checks |
 | `corner_icon_area_demo` | Corner layout + menu in title bar |
 | `corner_icon_area_demo_v2` | Corner layout + menu below title bar |
-| `corner_icon_area_demo_v3` | Corner layout, no menu bar, V3 baseline |
-| `corner_icon_area_demo_v3_no_top_left` | Corner layout with `NoTopLeftOnTitleAndSide` |
-| `corner_icon_area_demo_v3_mac` | Corner layout with Mac control button style |
+| `corner_icon_area_demo_v3` | Corner layout baseline (no menu bar) |
+| `corner_icon_area_demo_v3_no_top_left` | Corner layout + `NoTopLeftOnTitleAndSide` |
+| `corner_icon_area_demo_v3_mac` | Corner layout + Mac-style control buttons |
 
-Build one smoke target from repo root:
+Build one smoke target from repository root:
 
 ```powershell
 cmake --build external/ImGuiX/build-mingw --target corner_icon_area_demo_v3 --parallel 36
 ```
 
-For full smoke build profile, see `agents/imguix-smoke-build.md`.
+For full smoke profile, see `agents/imguix-smoke-build.md`.
 
-## 11. Common gotchas
+## Common Gotchas
 
 1. Rounded region clipping on SFML/Win32
-- With `SetWindowRgn`, outside pixels are clipped by OS region. If border appears "missing" at corners, verify stroke geometry is drawn inside effective region.
+- With `SetWindowRgn`, pixels outside region do not exist.
 
-2. `setWindowIcon` behavior mismatch by backend
-- In current `ImGuiFramedWindow`, meaningful success is SFML-only. Non-SFML returns `false`.
+2. `setWindowIcon` behavior differs by backend
+- In current `ImGuiFramedWindow`, meaningful success is SFML-only.
 
-3. `side_panel_width` semantic changes by layout mode
+3. `side_panel_width` semantics differ by layout mode
 - Classic: `<= 0` disables side panel.
 - Corner: `<= 0` enables auto width.
 
-4. `corner_menu_bar_placement` has no effect without `HasMenuBar`
-- Placement is evaluated only when menu bar flag is active.
+4. `side_panel_content_alignment = SymmetricInset` centers the content region, not each widget
+- Equal-width controls behave as expected.
+- Narrow text/link items still use normal ImGui flow unless you center them explicitly.
 
-5. Control button style flag conflicts
+5. `corner_menu_bar_placement` has no effect without `HasMenuBar`
+- Placement logic runs only when menu flag is active.
+
+6. Control-button style flag conflicts
 - Multiple style flags trigger debug assert and release fallback.
 
-## 12. Quick implementation checklist for new windows
+## Debug Checklist
 
-1. Choose base class (`WindowInstance` or `ImGuiFramedWindow`).
-2. Define `WindowFlags` first (layout mode and button style).
-3. Tune `ImGuiFramedWindowConfig` geometry/strokes.
-4. Implement only needed virtual hooks.
-5. Verify on at least one corner demo and one classic demo scenario.
-6. If using SFML/Win32 rounded corners, validate corner border continuity during resize.
+1. Verify layout mode first (`HasCornerIconArea` on/off).
+2. Verify style flag exclusivity for control buttons.
+3. Verify `side_panel_width` semantics for the active layout mode.
+4. On SFML/Win32, validate corner borders during resize with rounded region enabled.
+5. Validate background/transparency combination (`EnableTransparency`, `DisableBackground`, runtime toggle).

@@ -26,9 +26,21 @@ When to use `imguix-windowing-playbook.md`:
 - You update corner/classic smoke examples (`corner_icon_area_*`) or framed-window behavior docs.
 - You need backend-aware verification (SFML vs GLFW/SDL2) before finalizing windowing changes.
 
+Expected outputs from `imguix-windowing-playbook.md`:
+
+- Consistent behavior statements for classic/corner layouts and config semantics.
+- Backend-aware notes (SFML vs GLFW/SDL2) without over-generalization.
+- At least one representative smoke build check tied to the changed windowing scenario.
+
 Toolchain policy:
 
 - Use CMake generator `MinGW Makefiles`.
 - Use MinGW compilers `gcc` and `g++`.
 - Do not use `Ninja`.
 - Do not use `NMake` / `nmake`.
+
+Template placement policy:
+
+- Public template APIs must remain visible in both header-only and static-lib modes.
+- Put consumer-facing template definitions in `.hpp` or in `.tpp` files that are always included from `.hpp`.
+- Use `.ipp` only for non-template implementation or header-only/backend-specific implementation details.

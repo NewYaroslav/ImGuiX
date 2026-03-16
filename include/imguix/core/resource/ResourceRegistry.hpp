@@ -9,14 +9,15 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <memory>
+#include <mutex>
 #include <typeindex>
 #if defined(__EMSCRIPTEN__)
-#   include <mutex>
 #else
 #   include <shared_mutex>
 #endif
 #include <optional>
 #include <functional>
+#include <stdexcept>
 
 namespace ImGuiX {
 
@@ -73,6 +74,8 @@ namespace ImGuiX {
     };
 
 } // namespace ImGuiX
+
+#include "ResourceRegistry.tpp"
 
 #ifdef IMGUIX_HEADER_ONLY
 #   include "ResourceRegistry.ipp"

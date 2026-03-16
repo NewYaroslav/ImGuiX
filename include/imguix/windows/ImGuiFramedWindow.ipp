@@ -57,6 +57,67 @@ namespace ImGuiX::Windows {
         return style.WindowPadding.x * 2.0f;
     }
 
+    ImGuiFramedWindow::SidePanelContentRegion ImGuiFramedWindow::computeSidePanelContentRegion(
+        const ImGuiStyle& style,
+        float side_panel_width) const {
+        SidePanelContentRegion region{};
+        region.x = ImMax(0.0f, computeSidePanelContentLeftInset(style));
+
+        if (m_config.side_panel_content_alignment == SidePanelContentAlignment::SymmetricInset) {
+            region.width = ImMax(0.0f, side_panel_width - (region.x * 2.0f));
+            return region;
+        }
+
+        region.width = ImMax(0.0f, side_panel_width - region.x - ImMax(0.0f, style.WindowPadding.x));
+        return region;
+    }
+
+    ImGuiFramedWindow::HostFrameStrokeInsets ImGuiFramedWindow::computeHostFrameStrokeInsets() const {
+        HostFrameStrokeInsets insets{};
+#       ifdef IMGUIX_USE_SFML_BACKEND
+        const float total_stroke =
+            ImMax(0.0f, m_config.frame_outer_stroke_thickness) +
+            ImMax(0.0f, m_config.frame_inner_stroke_thickness);
+        insets.left = total_stroke;
+        insets.top = total_stroke;
+        insets.right = total_stroke;
+        insets.bottom = total_stroke;
+#       endif
+        return insets;
+    }
+
+    ImGuiFramedWindow::LayoutRect ImGuiFramedWindow::insetRectByHostFrameAdjacency(
+        float x,
+        float y,
+        float width,
+        float height,
+        bool touches_left,
+        bool touches_top,
+        bool touches_right,
+        bool touches_bottom) const {
+        const HostFrameStrokeInsets insets = computeHostFrameStrokeInsets();
+        LayoutRect rect{x, y, width, height};
+
+        if (touches_left) {
+            rect.x += insets.left;
+            rect.width -= insets.left;
+        }
+        if (touches_top) {
+            rect.y += insets.top;
+            rect.height -= insets.top;
+        }
+        if (touches_right) {
+            rect.width -= insets.right;
+        }
+        if (touches_bottom) {
+            rect.height -= insets.bottom;
+        }
+
+        rect.width = ImMax(0.0f, rect.width);
+        rect.height = ImMax(0.0f, rect.height);
+        return rect;
+    }
+
     void ImGuiFramedWindow::drawTitleBarText() {
         const float padding_y = (m_config.title_bar_height - ImGui::GetTextLineHeight()) * 0.5f;
         ImGui::SetCursorPosY(ImMax(0.0f, padding_y));
@@ -256,11 +317,33 @@ namespace ImGuiX::Windows {
         ImGui::PopStyleVar();
 
         if (side_panel_width <= 0.0f) {
-            const float main_menu_height = drawClassicMainMenuRegion(0.0f, body_y, body_width, menu_bar_height);
-            ImGui::SetCursorPos(ImVec2(0.0f, body_y + main_menu_height));
+            const LayoutRect main_menu_rect = insetRectByHostFrameAdjacency(
+                0.0f,
+                body_y,
+                body_width,
+                menu_bar_height,
+                true,
+                false,
+                true,
+                false);
+            const float main_menu_height = drawClassicMainMenuRegion(
+                main_menu_rect.x,
+                main_menu_rect.y,
+                main_menu_rect.width,
+                main_menu_rect.height);
+            const LayoutRect main_region_rect = insetRectByHostFrameAdjacency(
+                0.0f,
+                body_y + main_menu_height,
+                body_width,
+                ImMax(0.0f, body_h - main_menu_height),
+                true,
+                false,
+                true,
+                true);
+            ImGui::SetCursorPos(ImVec2(main_region_rect.x, main_region_rect.y));
             if (ImGui::BeginChild(
                     u8"##imguix_main_region",
-                    ImVec2(body_width, ImMax(0.0f, body_h - main_menu_height)),
+                    ImVec2(main_region_rect.width, main_region_rect.height),
                     ImGuiChildFlags_AlwaysUseWindowPadding,
                     ImGuiWindowFlags_NoScrollbar |
                     ImGuiWindowFlags_NoDecoration |
@@ -292,25 +375,55 @@ namespace ImGuiX::Windows {
                     sep_col,
                     stroke);
             }
-            const float side_left_inset = computeSidePanelContentLeftInset(style);
-            const float base_left = style.WindowPadding.x;
-            const float extra_indent = side_left_inset - base_left;
-            if (extra_indent != 0.0f) {
-                ImGui::Indent(extra_indent);
-            }
-            drawSidePanel();
-            if (extra_indent != 0.0f) {
-                ImGui::Unindent(extra_indent);
+            const SidePanelContentRegion content_region =
+                computeSidePanelContentRegion(style, side_panel_width);
+            if (content_region.width > 0.0f) {
+                const float content_y = ImGui::GetCursorPosY();
+                const float content_h = ImMax(0.0f, ImGui::GetContentRegionAvail().y);
+                ImGui::SetCursorPos(ImVec2(content_region.x, content_y));
+                if (ImGui::BeginChild(
+                        u8"##imguix_side_panel_content",
+                        ImVec2(content_region.width, content_h),
+                        ImGuiChildFlags_None,
+                        ImGuiWindowFlags_NoScrollbar |
+                        ImGuiWindowFlags_NoDecoration |
+                        ImGuiWindowFlags_NoBackground
+                    )) {
+                    drawSidePanel();
+                }
+                ImGui::EndChild();
             }
         }
         ImGui::EndChild();
 
         const float main_region_x = side_panel_width;
-        const float main_menu_height = drawClassicMainMenuRegion(main_region_x, body_y, main_region_width, menu_bar_height);
-        ImGui::SetCursorPos(ImVec2(main_region_x, body_y + main_menu_height));
+        const LayoutRect main_menu_rect = insetRectByHostFrameAdjacency(
+            main_region_x,
+            body_y,
+            main_region_width,
+            menu_bar_height,
+            false,
+            false,
+            true,
+            false);
+        const float main_menu_height = drawClassicMainMenuRegion(
+            main_menu_rect.x,
+            main_menu_rect.y,
+            main_menu_rect.width,
+            main_menu_rect.height);
+        const LayoutRect main_region_rect = insetRectByHostFrameAdjacency(
+            main_region_x,
+            body_y + main_menu_height,
+            main_region_width,
+            ImMax(0.0f, body_h - main_menu_height),
+            false,
+            false,
+            true,
+            true);
+        ImGui::SetCursorPos(ImVec2(main_region_rect.x, main_region_rect.y));
         if (ImGui::BeginChild(
                 u8"##imguix_main_region",
-                ImVec2(main_region_width, ImMax(0.0f, body_h - main_menu_height)),
+                ImVec2(main_region_rect.width, main_region_rect.height),
                 ImGuiChildFlags_AlwaysUseWindowPadding,
                 ImGuiWindowFlags_NoScrollbar |
                 ImGuiWindowFlags_NoDecoration |
@@ -443,12 +556,57 @@ namespace ImGuiX::Windows {
         if (side_panel_width <= 0.0f) {
             float menu_height = 0.0f;
             if (menu_below_title) {
-                menu_height = drawCornerBelowTitleMenuRegion(0.0f, body_y, body_width, menu_bar_height);
+                const LayoutRect corner_menu_rect = insetRectByHostFrameAdjacency(
+                    0.0f,
+                    body_y,
+                    body_width,
+                    menu_bar_height,
+                    true,
+                    false,
+                    true,
+                    false);
+                menu_height = drawCornerBelowTitleMenuRegion(
+                    corner_menu_rect.x,
+                    corner_menu_rect.y,
+                    corner_menu_rect.width,
+                    corner_menu_rect.height);
             } else if (menu_main_region) {
-                menu_height = drawClassicMainMenuRegion(0.0f, body_y, body_width, menu_bar_height);
+                const LayoutRect main_menu_rect = insetRectByHostFrameAdjacency(
+                    0.0f,
+                    body_y,
+                    body_width,
+                    menu_bar_height,
+                    true,
+                    false,
+                    true,
+                    false);
+                menu_height = drawClassicMainMenuRegion(
+                    main_menu_rect.x,
+                    main_menu_rect.y,
+                    main_menu_rect.width,
+                    main_menu_rect.height);
             }
-            ImGui::SetCursorPos(ImVec2(0.0f, body_y + menu_height));
-            drawControllersContent();
+            const LayoutRect main_region_rect = insetRectByHostFrameAdjacency(
+                0.0f,
+                body_y + menu_height,
+                body_width,
+                ImMax(0.0f, body_h - menu_height),
+                true,
+                false,
+                true,
+                true);
+            ImGui::SetCursorPos(ImVec2(main_region_rect.x, main_region_rect.y));
+            if (ImGui::BeginChild(
+                    u8"##imguix_main_region",
+                    ImVec2(main_region_rect.width, main_region_rect.height),
+                    ImGuiChildFlags_AlwaysUseWindowPadding,
+                    ImGuiWindowFlags_NoScrollbar |
+                    ImGuiWindowFlags_NoDecoration |
+                    ImGuiWindowFlags_NoBackground
+                )) {
+                drawControllersContent();
+            }
+            ImGui::EndChild();
             return;
         }
 
@@ -479,31 +637,80 @@ namespace ImGuiX::Windows {
                     side_rounding_flags,
                     stroke);
             }
-            const float side_left_inset = computeSidePanelContentLeftInset(style);
-            const float base_left = style.WindowPadding.x;
-            const float extra_indent = side_left_inset - base_left;
-            if (extra_indent != 0.0f) {
-                ImGui::Indent(extra_indent);
-            }
-            drawSidePanel();
-            if (extra_indent != 0.0f) {
-                ImGui::Unindent(extra_indent);
+            const SidePanelContentRegion content_region =
+                computeSidePanelContentRegion(style, side_panel_width);
+            if (content_region.width > 0.0f) {
+                const float content_y = ImGui::GetCursorPosY();
+                const float content_h = ImMax(0.0f, ImGui::GetContentRegionAvail().y);
+                ImGui::SetCursorPos(ImVec2(content_region.x, content_y));
+                if (ImGui::BeginChild(
+                        u8"##imguix_side_panel_content",
+                        ImVec2(content_region.width, content_h),
+                        ImGuiChildFlags_None,
+                        ImGuiWindowFlags_NoScrollbar |
+                        ImGuiWindowFlags_NoDecoration |
+                        ImGuiWindowFlags_NoBackground
+                    )) {
+                    drawSidePanel();
+                }
+                ImGui::EndChild();
             }
         }
         ImGui::EndChild();
 
         const float main_region_x = side_panel_width;
-        const float corner_menu_height = menu_below_title
-            ? drawCornerBelowTitleMenuRegion(main_region_x, body_y, main_region_width, menu_bar_height)
-            : 0.0f;
-        const float main_menu_height = menu_main_region
-            ? drawClassicMainMenuRegion(main_region_x, body_y, main_region_width, menu_bar_height)
-            : 0.0f;
+        const float corner_menu_height = [&]() {
+            if (!menu_below_title) {
+                return 0.0f;
+            }
+            const LayoutRect corner_menu_rect = insetRectByHostFrameAdjacency(
+                main_region_x,
+                body_y,
+                main_region_width,
+                menu_bar_height,
+                false,
+                false,
+                true,
+                false);
+            return drawCornerBelowTitleMenuRegion(
+                corner_menu_rect.x,
+                corner_menu_rect.y,
+                corner_menu_rect.width,
+                corner_menu_rect.height);
+        }();
+        const float main_menu_height = [&]() {
+            if (!menu_main_region) {
+                return 0.0f;
+            }
+            const LayoutRect main_menu_rect = insetRectByHostFrameAdjacency(
+                main_region_x,
+                body_y,
+                main_region_width,
+                menu_bar_height,
+                false,
+                false,
+                true,
+                false);
+            return drawClassicMainMenuRegion(
+                main_menu_rect.x,
+                main_menu_rect.y,
+                main_menu_rect.width,
+                main_menu_rect.height);
+        }();
+        const LayoutRect main_region_rect = insetRectByHostFrameAdjacency(
+            main_region_x,
+            body_y + corner_menu_height + main_menu_height,
+            main_region_width,
+            ImMax(0.0f, body_h - corner_menu_height - main_menu_height),
+            false,
+            false,
+            true,
+            true);
 
-        ImGui::SetCursorPos(ImVec2(main_region_x, body_y + corner_menu_height + main_menu_height));
+        ImGui::SetCursorPos(ImVec2(main_region_rect.x, main_region_rect.y));
         if (ImGui::BeginChild(
                 u8"##imguix_main_region",
-                ImVec2(main_region_width, ImMax(0.0f, body_h - corner_menu_height - main_menu_height)),
+                ImVec2(main_region_rect.width, main_region_rect.height),
                 ImGuiChildFlags_AlwaysUseWindowPadding,
                 ImGuiWindowFlags_NoScrollbar |
                 ImGuiWindowFlags_NoDecoration |

@@ -157,9 +157,9 @@ The SDK can include a `quickstart/` folder with a minimal application example. C
 
 For practical window usage and configuration details, use:
 
-- [docs/WINDOWS-GUIDE.md](docs/WINDOWS-GUIDE.md) - complete guide for `WindowInstance` and `ImGuiFramedWindow`.
-- [docs/WINDOWS-GUIDE-RU.md](docs/WINDOWS-GUIDE-RU.md) - Russian mirror.
-- [agents/imguix-windowing-playbook.md](agents/imguix-windowing-playbook.md) - concise agent checklist for windowing tasks.
+- Start here: [docs/WINDOWS-GUIDE.md](docs/WINDOWS-GUIDE.md) - canonical guide for `WindowInstance` and `ImGuiFramedWindow`.
+- RU mirror: [docs/WINDOWS-GUIDE-RU.md](docs/WINDOWS-GUIDE-RU.md).
+- Agent playbook: [agents/imguix-windowing-playbook.md](agents/imguix-windowing-playbook.md) - concise checklist for windowing tasks.
 
 ## Project Structure
 
