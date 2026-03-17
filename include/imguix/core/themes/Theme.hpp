@@ -6,6 +6,9 @@
 /// \brief Theme definitions and helpers.
 
 #include <imgui.h>
+#include <cstdint>
+#include <string_view>
+#include <variant>
 #ifdef IMGUIX_ENABLE_IMPLOT
 #   include <implot.h>
 #endif
@@ -16,6 +19,8 @@
 #include <imguix/config/theme_config.hpp>
 
 namespace ImGuiX::Themes {
+
+    using ThemeCustomValue = std::variant<float, int, bool, ImVec2, ImVec4>;
 
     /// \brief Interface for style themes.
     class Theme {
@@ -37,6 +42,64 @@ namespace ImGuiX::Themes {
         /// \param style Style to modify.
         virtual void apply(ImPlot3DStyle& style) const = 0;
 #       endif
+
+        /// \brief Get custom color by string key.
+        /// \param key Custom color key.
+        /// \param out Resolved color value.
+        /// \return True when value exists.
+        virtual bool tryGetCustomColor(std::string_view key, ImVec4& out) const {
+            (void)key;
+            (void)out;
+            return false;
+        }
+
+        /// \brief Get custom color by numeric key.
+        /// \param key Numeric custom color key.
+        /// \param out Resolved color value.
+        /// \return True when value exists.
+        virtual bool tryGetCustomColor(std::uint32_t key, ImVec4& out) const {
+            (void)key;
+            (void)out;
+            return false;
+        }
+
+        /// \brief Get custom value by string key.
+        /// \param key Custom value key.
+        /// \param out Resolved custom value.
+        /// \return True when value exists.
+        virtual bool tryGetCustomValue(std::string_view key, ThemeCustomValue& out) const {
+            (void)key;
+            (void)out;
+            return false;
+        }
+
+        /// \brief Get custom value by numeric key.
+        /// \param key Numeric custom value key.
+        /// \param out Resolved custom value.
+        /// \return True when value exists.
+        virtual bool tryGetCustomValue(std::uint32_t key, ThemeCustomValue& out) const {
+            (void)key;
+            (void)out;
+            return false;
+        }
+
+        /// \brief Get custom color with string-first fallback to numeric key.
+        /// \param key Primary string key.
+        /// \param fallback_id Numeric fallback key.
+        /// \param out Resolved color value.
+        /// \return True when either key resolves.
+        bool tryGetCustomColor(std::string_view key, std::uint32_t fallback_id, ImVec4& out) const {
+            return tryGetCustomColor(key, out) || tryGetCustomColor(fallback_id, out);
+        }
+
+        /// \brief Get custom value with string-first fallback to numeric key.
+        /// \param key Primary string key.
+        /// \param fallback_id Numeric fallback key.
+        /// \param out Resolved custom value.
+        /// \return True when either key resolves.
+        bool tryGetCustomValue(std::string_view key, std::uint32_t fallback_id, ThemeCustomValue& out) const {
+            return tryGetCustomValue(key, out) || tryGetCustomValue(fallback_id, out);
+        }
 
     };
 

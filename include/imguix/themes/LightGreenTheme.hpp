@@ -67,9 +67,9 @@ namespace ImGuiX::Themes {
         constexpr ImVec4 SeparatorHovered       = ImVec4(0.14f, 0.44f, 0.80f, 0.78f);
         constexpr ImVec4 SeparatorActive        = ImVec4(0.14f, 0.44f, 0.80f, 1.00f);
 
-        constexpr ImVec4 ResizeGrip             = ImVec4(1.00f, 1.00f, 1.00f, 0.00f);
-        constexpr ImVec4 ResizeGripHovered      = ImVec4(0.26f, 0.59f, 0.98f, 0.45f);
-        constexpr ImVec4 ResizeGripActive       = ImVec4(0.26f, 0.59f, 0.98f, 0.78f);
+        constexpr ImVec4 ResizeGrip             = ImVec4(0.71f, 0.78f, 0.69f, 0.20f);
+        constexpr ImVec4 ResizeGripHovered      = ImVec4(0.725f, 0.805f, 0.702f, 0.62f);
+        constexpr ImVec4 ResizeGripActive       = ImVec4(0.184f, 0.407f, 0.193f, 0.82f);
 
         // Tabs
         constexpr ImVec4 Tab                    = ImVec4(0.71f, 0.78f, 0.69f, 0.80f);

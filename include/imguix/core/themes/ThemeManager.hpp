@@ -73,19 +73,86 @@ namespace ImGuiX::Themes {
         /// \brief Apply currently selected theme to style.
         void updateCurrentTheme() {
             if (!m_dirty || m_current.empty()) return;
-            if (auto it = m_themes.find(m_current); it != m_themes.end() && it->second) {
-                it->second->apply(ImGui::GetStyle());
+            if (const Theme* theme = currentTheme()) {
+                theme->apply(ImGui::GetStyle());
 #               ifdef IMGUIX_ENABLE_IMPLOT
-                it->second->apply(ImPlot::GetStyle());
+                theme->apply(ImPlot::GetStyle());
 #               endif
 #               ifdef IMGUIX_ENABLE_IMPLOT3D
-                it->second->apply(ImPlot3D::GetStyle());
+                theme->apply(ImPlot3D::GetStyle());
 #               endif
             }
             m_dirty = false;
         }
 
+        /// \brief Get custom color from the active theme by string key.
+        /// \param key Custom color key.
+        /// \param out Resolved color value.
+        /// \return True when value exists.
+        bool tryGetCurrentThemeCustomColor(std::string_view key, ImVec4& out) const {
+            const Theme* theme = currentTheme();
+            return theme != nullptr && theme->tryGetCustomColor(key, out);
+        }
+
+        /// \brief Get custom color from the active theme by numeric key.
+        /// \param key Numeric custom color key.
+        /// \param out Resolved color value.
+        /// \return True when value exists.
+        bool tryGetCurrentThemeCustomColor(std::uint32_t key, ImVec4& out) const {
+            const Theme* theme = currentTheme();
+            return theme != nullptr && theme->tryGetCustomColor(key, out);
+        }
+
+        /// \brief Get custom color from the active theme with string-first fallback.
+        /// \param key Primary string key.
+        /// \param fallback_id Numeric fallback key.
+        /// \param out Resolved color value.
+        /// \return True when value exists.
+        bool tryGetCurrentThemeCustomColor(std::string_view key, std::uint32_t fallback_id, ImVec4& out) const {
+            const Theme* theme = currentTheme();
+            return theme != nullptr && theme->tryGetCustomColor(key, fallback_id, out);
+        }
+
+        /// \brief Get custom value from the active theme by string key.
+        /// \param key Custom value key.
+        /// \param out Resolved value.
+        /// \return True when value exists.
+        bool tryGetCurrentThemeCustomValue(std::string_view key, ThemeCustomValue& out) const {
+            const Theme* theme = currentTheme();
+            return theme != nullptr && theme->tryGetCustomValue(key, out);
+        }
+
+        /// \brief Get custom value from the active theme by numeric key.
+        /// \param key Numeric custom value key.
+        /// \param out Resolved value.
+        /// \return True when value exists.
+        bool tryGetCurrentThemeCustomValue(std::uint32_t key, ThemeCustomValue& out) const {
+            const Theme* theme = currentTheme();
+            return theme != nullptr && theme->tryGetCustomValue(key, out);
+        }
+
+        /// \brief Get custom value from the active theme with string-first fallback.
+        /// \param key Primary string key.
+        /// \param fallback_id Numeric fallback key.
+        /// \param out Resolved value.
+        /// \return True when value exists.
+        bool tryGetCurrentThemeCustomValue(std::string_view key, std::uint32_t fallback_id, ThemeCustomValue& out) const {
+            const Theme* theme = currentTheme();
+            return theme != nullptr && theme->tryGetCustomValue(key, fallback_id, out);
+        }
+
     private:
+        const Theme* currentTheme() const {
+            if (m_current.empty()) {
+                return nullptr;
+            }
+            auto it = m_themes.find(m_current);
+            if (it == m_themes.end() || !it->second) {
+                return nullptr;
+            }
+            return it->second.get();
+        }
+
         std::unordered_map<std::string, std::unique_ptr<Theme>> m_themes;
         std::string m_current;
         bool m_dirty = false;
@@ -94,4 +161,3 @@ namespace ImGuiX::Themes {
 } // namespace ImGuiX::Themes
 
 #endif // _IMGUIX_CORE_THEME_MANAGER_HPP_INCLUDED
-

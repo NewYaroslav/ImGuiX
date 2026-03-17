@@ -27,7 +27,8 @@ namespace ImGuiX::Windows {
     bool ImGuiFramedWindow::setWindowIcon(const std::string& path) {
 #       ifdef IMGUIX_USE_SFML_BACKEND
         const bool applied = WindowInstance::setWindowIcon(path);
-        m_has_corner_icon_texture = m_corner_icon_texture.loadFromFile(ImGuiX::Utils::resolveExecPath(path));
+        m_has_corner_icon_texture =
+            m_corner_icon_texture.loadFromFile(ImGuiX::Utils::resolveExecPathFs(std::filesystem::u8path(path)));
         if (m_has_corner_icon_texture) {
             m_corner_icon_texture.setSmooth(true);
         }

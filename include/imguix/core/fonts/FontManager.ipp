@@ -390,25 +390,47 @@ namespace ImGuiX::Fonts {
             const FontFile &ff,
             const BuildParams &params,
             const std::vector<ImWchar> &ranges,
-            const std::string &base_dir_abs,
+            const fs::path &base_dir_abs,
+            std::vector<std::vector<unsigned char>> &owned_font_data,
             const ImFontConfig &base_cfg
         ) {
         ImFontConfig cfg = base_cfg;
         cfg.MergeMode = cfg.MergeMode || ff.merge;
         cfg.GlyphOffset.y += ff.baseline_offset_px;
+        cfg.FontDataOwnedByAtlas = false;
         
         const float px = (ff.size_px > 0.0f ? ff.size_px : 16.0f);
         const float eff_px = scalePx(px, params);
 
         fs::path p = fs::u8path(ff.path);
-        fs::path resolved_p = p.is_absolute() ? p : (fs::u8path(base_dir_abs) / p);
-        const std::string resolved = resolved_p.lexically_normal().u8string();
+        const fs::path resolved_p = (p.is_absolute() ? p : (base_dir_abs / p)).lexically_normal();
 
-        return ImGui::GetIO().Fonts->AddFontFromFileTTF(
-            resolved.c_str(), eff_px, &cfg, ranges.empty() ? 
-                nullptr : 
-                ranges.data()
-        );
+        std::ifstream input(resolved_p, std::ios::binary);
+        if (!input.good()) {
+            return nullptr;
+        }
+
+        input.seekg(0, std::ios::end);
+        const std::streamoff size = input.tellg();
+        if (size <= 0) {
+            return nullptr;
+        }
+        input.seekg(0, std::ios::beg);
+
+        owned_font_data.emplace_back(static_cast<size_t>(size));
+        std::vector<unsigned char>& font_data = owned_font_data.back();
+        input.read(reinterpret_cast<char*>(font_data.data()), static_cast<std::streamsize>(size));
+        if (!input.good() && !input.eof()) {
+            owned_font_data.pop_back();
+            return nullptr;
+        }
+
+        return ImGui::GetIO().Fonts->AddFontFromMemoryTTF(
+            font_data.data(),
+            static_cast<int>(font_data.size()),
+            eff_px,
+            &cfg,
+            ranges.empty() ? nullptr : ranges.data());
     }
 
     /// \brief Switch FreeType builder for ImGui if requested and available.
@@ -475,15 +497,16 @@ namespace ImGuiX::Fonts {
     inline BuildResult FontManager::buildNow() {
         BuildResult br{};
 
-        std::string base_dir_abs;
+        fs::path base_dir_abs;
 #       ifdef __EMSCRIPTEN__
-        base_dir_abs = m_params.base_dir; // as is
+        base_dir_abs = fs::u8path(m_params.base_dir);
 #       else
-        base_dir_abs = ImGuiX::Utils::resolveExecPath(m_params.base_dir);
+        base_dir_abs = ImGuiX::Utils::resolveExecPathFs(fs::u8path(m_params.base_dir));
 #       endif
 
         // We support either manual buffer (if active) or the active locale pack.
         ImGuiIO &io = ImGui::GetIO();
+        m_owned_font_data.clear();
         io.Fonts->Clear();
         io.FontDefault = nullptr;
 
@@ -520,7 +543,7 @@ namespace ImGuiX::Fonts {
             for (const auto& ff : m_manual.merges_unknown) ft_flags |= ff.freetype_flags;
         }
 
-        // 3) Apply flags to atlas BEFORE AddFontFromFileTTF
+        // 3) Apply flags to atlas before adding any fonts into the atlas.
 #   ifdef IMGUI_ENABLE_FREETYPE
 #       if IMGUI_VERSION_NUM >= 19200
         ImGui::GetIO().Fonts->FontLoaderFlags = ft_flags;
@@ -590,7 +613,7 @@ namespace ImGuiX::Fonts {
                 local.MergeMode = (i > 0) ? 
                     (local.MergeMode || vec[i].merge) : 
                     vec[i].merge;
-                ImFont *f = addFontFile(vec[i], m_params, ranges, base_dir_abs, local);
+                ImFont *f = addFontFile(vec[i], m_params, ranges, base_dir_abs, m_owned_font_data, local);
                 if (!f) {
                     br.message = u8"Failed to load font: " + vec[i].path;
                 }
@@ -601,7 +624,7 @@ namespace ImGuiX::Fonts {
         };
 
         auto add_single = [&](FontRole role, const FontFile &ff) -> ImFont * {
-            ImFont *f = addFontFile(ff, m_params, ranges, base_dir_abs, cfg);
+            ImFont *f = addFontFile(ff, m_params, ranges, base_dir_abs, m_owned_font_data, cfg);
             if (f) m_fonts[role] = f;
             else br.message = u8"Failed to load font: " + ff.path;
             return f;
@@ -622,7 +645,7 @@ namespace ImGuiX::Fonts {
             for (const auto &ff : it->second) {
               FontFile mff = ff;
               mff.merge = true;
-              ImFont *f = addFontFile(mff, m_params, ranges, base_dir_abs, cfg);
+              ImFont *f = addFontFile(mff, m_params, ranges, base_dir_abs, m_owned_font_data, cfg);
               (void)f; // merged; no separate role pointer necessary
             }
             // record role as present (point to Body for retrieval semantics)
@@ -634,7 +657,7 @@ namespace ImGuiX::Fonts {
             for (const auto &ff : it->second) {
               FontFile mff = ff;
               mff.merge = true;
-              ImFont *f = addFontFile(mff, m_params, ranges, base_dir_abs, cfg);
+              ImFont *f = addFontFile(mff, m_params, ranges, base_dir_abs, m_owned_font_data, cfg);
               (void)f;
             }
             if (body)
@@ -692,7 +715,7 @@ namespace ImGuiX::Fonts {
           ic.path = IMGUIX_FONTS_FALLBACK_ICONS_BASENAME;
           ic.size_px = m_px_body;
           ic.merge = true;
-          addFontFile(ic, m_params, ranges, base_dir_abs, cfg);
+          addFontFile(ic, m_params, ranges, base_dir_abs, m_owned_font_data, cfg);
           if (body)
             m_fonts[FontRole::Icons] = body;
 
@@ -715,7 +738,7 @@ namespace ImGuiX::Fonts {
                 auto do_merge_vec = [&](const std::vector<FontFile> &vec) {
                     for (auto ff : vec) {
                         ff.merge = true;
-                        (void)addFontFile(ff, m_params, ranges, base_dir_abs, cfg);
+                        (void)addFontFile(ff, m_params, ranges, base_dir_abs, m_owned_font_data, cfg);
                     }
                 };
 
@@ -805,15 +828,15 @@ namespace ImGuiX::Fonts {
         BuildResult br{};
 
         // Load JSON text (if exists)
-        std::string cfg_path;
+        fs::path cfg_path;
 #       ifdef __EMSCRIPTEN__
-        cfg_path = m_config_path; // as is
+        cfg_path = fs::u8path(m_config_path);
 #       else
-        cfg_path = ImGuiX::Utils::resolveExecPath(m_config_path);
+        cfg_path = ImGuiX::Utils::resolveExecPathFs(fs::u8path(m_config_path));
         // Fallback: if empty or not found, try base_dir/fonts.json
         if (readTextFile(cfg_path).empty()) {
-            const auto base_abs = ImGuiX::Utils::resolveExecPath(m_params.base_dir);
-            cfg_path = ImGuiX::Utils::joinPaths(base_abs, IMGUIX_FONTS_CONFIG_BASENAME);
+            const fs::path base_abs = ImGuiX::Utils::resolveExecPathFs(fs::u8path(m_params.base_dir));
+            cfg_path = (base_abs / IMGUIX_FONTS_CONFIG_BASENAME).lexically_normal();
         }
 #       endif
 
@@ -962,7 +985,7 @@ namespace ImGuiX::Fonts {
 #   endif
     }
 
-    inline std::string FontManager::readTextFile(const std::string &path) {
+    inline std::string FontManager::readTextFile(const std::filesystem::path &path) {
         std::ifstream ifs(path, std::ios::in | std::ios::binary);
         if (!ifs) return {};
         std::ostringstream oss;

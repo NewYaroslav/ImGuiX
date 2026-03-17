@@ -33,9 +33,9 @@ namespace ImGuiX::Utils {
     /// \return Executable path.
     /// \throws std::runtime_error on failure.
     template<typename Dummy = void>
-    std::string getExecPath() {
+    fs::path getExecPathFs() {
 #ifdef __EMSCRIPTEN__
-        static_assert(detail::dependent_false_v<Dummy>, u8"getExecPath is not supported on Emscripten");
+        static_assert(detail::dependent_false_v<Dummy>, u8"getExecPathFs is not supported on Emscripten");
         return {};
 #elif defined(_WIN32)
         std::vector<wchar_t> buffer(MAX_PATH);
@@ -47,28 +47,57 @@ namespace ImGuiX::Utils {
             size = GetModuleFileNameW(hModule, buffer.data(), static_cast<DWORD>(buffer.size()));
         }
 
-        if (size == 0)
+        if (size == 0) {
             throw std::runtime_error(u8"Failed to get executable path.");
+        }
 
-        std::wstring exe_path(buffer.begin(), buffer.begin() + size);
-        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-        return converter.to_bytes(exe_path);
+        return fs::path(std::wstring(buffer.begin(), buffer.begin() + size)).lexically_normal();
 #elif defined(__APPLE__)
         std::vector<char> buffer(PATH_MAX);
         uint32_t size = buffer.size();
         if (_NSGetExecutablePath(buffer.data(), &size) != 0) {
             buffer.resize(size);
-            if (_NSGetExecutablePath(buffer.data(), &size) != 0)
+            if (_NSGetExecutablePath(buffer.data(), &size) != 0) {
                 throw std::runtime_error(u8"Failed to get executable path.");
+            }
         }
-        return std::string(buffer.data());
+        return fs::path(buffer.data()).lexically_normal();
 #else
         char result[PATH_MAX];
-        ssize_t count = readlink(u8"/proc/self/exe", result, PATH_MAX);
-        if (count == -1)
+        const ssize_t count = readlink(u8"/proc/self/exe", result, PATH_MAX);
+        if (count == -1) {
             throw std::runtime_error(u8"Failed to get executable path.");
+        }
 
-        return std::string(result, count);
+        return fs::path(std::string(result, count)).lexically_normal();
+#endif
+    }
+
+    /// \brief Get full path to current executable.
+    /// \tparam Dummy Dummy template parameter for SFINAE.
+    /// \return Executable path.
+    /// \throws std::runtime_error on failure.
+    template<typename Dummy = void>
+    std::string getExecPath() {
+#ifdef __EMSCRIPTEN__
+        static_assert(detail::dependent_false_v<Dummy>, u8"getExecPath is not supported on Emscripten");
+        return {};
+#else
+        return getExecPathFs<Dummy>().u8string();
+#endif
+    }
+
+    /// \brief Get directory of executable.
+    /// \tparam Dummy Dummy template parameter for SFINAE.
+    /// \return Directory path.
+    /// \throws std::runtime_error if getExecPath fails.
+    template<typename Dummy = void>
+    fs::path getExecDirFs() {
+#ifdef __EMSCRIPTEN__
+        static_assert(detail::dependent_false_v<Dummy>, u8"getExecDirFs is not supported on Emscripten");
+        return {};
+#else
+        return getExecPathFs<Dummy>().parent_path().lexically_normal();
 #endif
     }
 
@@ -82,8 +111,24 @@ namespace ImGuiX::Utils {
         static_assert(detail::dependent_false_v<Dummy>, u8"getExecDir is not supported on Emscripten");
         return {};
 #else
-        fs::path path = fs::u8path(getExecPath());
-        return path.parent_path().u8string();
+        return getExecDirFs<Dummy>().u8string();
+#endif
+    }
+
+    /// \brief Resolve path against executable directory.
+    /// \tparam Dummy Dummy template parameter for SFINAE.
+    /// \param relative_path Path relative to executable directory.
+    /// \return Absolute path.
+    template<typename Dummy = void>
+    fs::path resolveExecPathFs(const fs::path& relative_path) {
+#ifdef __EMSCRIPTEN__
+        static_assert(detail::dependent_false_v<Dummy>, u8"resolveExecPathFs is not supported on Emscripten");
+        return relative_path;
+#else
+        if (relative_path.is_absolute()) {
+            return relative_path.lexically_normal();
+        }
+        return (getExecDirFs<Dummy>() / relative_path).lexically_normal();
 #endif
     }
 
@@ -97,7 +142,7 @@ namespace ImGuiX::Utils {
         static_assert(detail::dependent_false_v<Dummy>, u8"resolveExecPath is not supported on Emscripten");
         return relative_path;
 #else
-        return (fs::u8path(getExecDir()) / fs::u8path(relative_path)).u8string();
+        return resolveExecPathFs<Dummy>(fs::u8path(relative_path)).u8string();
 #endif
     }
 
@@ -142,18 +187,32 @@ namespace ImGuiX::Utils {
     /// \param path Directory path.
     /// \throws std::runtime_error when creation fails.
     template<typename Dummy = void>
+    void createDirectories(const fs::path& path) {
+#ifdef __EMSCRIPTEN__
+        static_assert(detail::dependent_false_v<Dummy>, u8"createDirectories is not supported on Emscripten");
+        (void)path;
+#else
+        if (path.empty() || fs::exists(path)) {
+            return;
+        }
+        std::error_code ec;
+        if (!fs::create_directories(path, ec)) {
+            throw std::runtime_error(u8"Failed to create directories: " + path.u8string());
+        }
+#endif
+    }
+
+    /// \brief Create directories recursively if missing.
+    /// \tparam Dummy Dummy template parameter for SFINAE.
+    /// \param path Directory path.
+    /// \throws std::runtime_error when creation fails.
+    template<typename Dummy = void>
     void createDirectories(const std::string& path) {
 #ifdef __EMSCRIPTEN__
         static_assert(detail::dependent_false_v<Dummy>, u8"createDirectories is not supported on Emscripten");
         (void)path;
 #else
-        fs::path dir = fs::u8path(path);
-        if (!fs::exists(dir)) {
-            std::error_code ec;
-            if (!fs::create_directories(dir, ec)) {
-                throw std::runtime_error(u8"Failed to create directories: " + dir.u8string());
-            }
-        }
+        createDirectories<Dummy>(fs::u8path(path));
 #endif
     }
 

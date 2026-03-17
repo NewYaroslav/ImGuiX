@@ -145,7 +145,7 @@ namespace ImGuiX {
     }
     
     bool WindowInstance::setWindowIcon(const std::string& path) {
-        std::string icon_path = Utils::resolveExecPath(path);
+        const std::filesystem::path icon_path = Utils::resolveExecPathFs(std::filesystem::u8path(path));
         sf::Image icon;
         if (!icon.loadFromFile(icon_path))
             return false;

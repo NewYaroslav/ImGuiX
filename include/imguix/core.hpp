@@ -54,6 +54,7 @@
 
 // --- Theme system ---
 #include "core/themes/ThemeManager.hpp"            ///< Theme manager for ImGui styles
+#include "core/themes/theme_value_utils.hpp"       ///< Typed helpers for custom theme values
 
 // --- Notification system ---
 #include "core/notify/NotificationManager.hpp"     ///< Toast notification manager

@@ -1,5 +1,6 @@
 #include <nlohmann/json.hpp>
 #include <chrono>
+#include <filesystem>
 #include <fstream>
 #include <optional>
 #include <cstdio>
@@ -16,10 +17,11 @@ namespace ImGuiX {
 
     using json = nlohmann::json;
     using Clock = std::chrono::steady_clock;
+    namespace fs = std::filesystem;
 
     struct OptionsStore::Impl {
-        std::string m_path;
-        std::string m_tmp_path;
+        fs::path m_path;
+        fs::path m_tmp_path;
         double m_save_delay{IMGUIX_OPTIONS_SAVE_DELAY_SEC};
 
         mutable std::mutex m_mutex;
@@ -54,6 +56,10 @@ namespace ImGuiX {
 
         void saveLockedNoexcept() {
             try {
+                if (!m_path.parent_path().empty()) {
+                    std::error_code ec;
+                    fs::create_directories(m_path.parent_path(), ec);
+                }
                 {
                     std::ofstream tf(
                             m_tmp_path,
@@ -63,18 +69,23 @@ namespace ImGuiX {
                     tf.flush();
                 }
 #ifdef _WIN32
-                MoveFileExA(
+                if (!MoveFileExW(
                         m_tmp_path.c_str(),
                         m_path.c_str(),
-                        MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH);
+                        MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH)) {
+                    throw std::runtime_error(u8"tmp replace failed");
+                }
 #else
-                std::rename(m_tmp_path.c_str(), m_path.c_str());
+                if (std::rename(m_tmp_path.c_str(), m_path.c_str()) != 0) {
+                    throw std::runtime_error(u8"tmp rename failed");
+                }
 #   if defined(__EMSCRIPTEN__) && defined(IMGUIX_EMSCRIPTEN_IDBFS)
                 EM_ASM({ FS.syncfs(false, function(err){}); });
 #   endif
 #endif
             } catch (...) {
-                std::remove(m_tmp_path.c_str());
+                std::error_code ec;
+                fs::remove(m_tmp_path, ec);
             }
         }
 
@@ -170,8 +181,9 @@ namespace ImGuiX {
             path = ImGuiX::Utils::joinPaths("/imguix_fs", path);
         }
 #endif
-        m_impl->m_path = std::move(path);
-        m_impl->m_tmp_path = m_impl->m_path + u8".tmp";
+        m_impl->m_path = fs::u8path(path).lexically_normal();
+        m_impl->m_tmp_path = m_impl->m_path;
+        m_impl->m_tmp_path += u8".tmp";
         m_impl->m_save_delay = save_delay_sec;
         load();
     }
@@ -183,17 +195,13 @@ namespace ImGuiX {
         const auto base_abs = ImGuiX::Utils::joinPaths(
                 "/imguix_fs",
                 IMGUIX_CONFIG_DIR);
-        m_impl->m_path = ImGuiX::Utils::joinPaths(
-                base_abs,
-                IMGUIX_OPTIONS_FILENAME);
-        m_impl->m_tmp_path = m_impl->m_path + u8".tmp";
+        m_impl->m_path = fs::u8path(ImGuiX::Utils::joinPaths(base_abs, IMGUIX_OPTIONS_FILENAME)).lexically_normal();
 #else
-        const std::string base_dir(IMGUIX_CONFIG_DIR);
-        const auto base_abs = ImGuiX::Utils::resolveExecPath(base_dir);
-        std::string path = ImGuiX::Utils::joinPaths(base_abs, IMGUIX_OPTIONS_FILENAME);
-        m_impl->m_path = std::move(path);
-        m_impl->m_tmp_path = m_impl->m_path + u8".tmp";
+        const fs::path base_dir = ImGuiX::Utils::resolveExecPathFs(fs::u8path(IMGUIX_CONFIG_DIR));
+        m_impl->m_path = (base_dir / fs::u8path(IMGUIX_OPTIONS_FILENAME)).lexically_normal();
 #endif
+        m_impl->m_tmp_path = m_impl->m_path;
+        m_impl->m_tmp_path += u8".tmp";
         load();
     }
 
@@ -201,7 +209,7 @@ namespace ImGuiX {
 
     inline void OptionsStore::load() noexcept {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
-        std::ifstream f(m_impl->m_path);
+        std::ifstream f(m_impl->m_path, std::ios::binary);
         if (!f.good()) return;
         try {
             json j2;

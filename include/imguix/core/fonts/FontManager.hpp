@@ -15,6 +15,7 @@
 #define _IMGUIX_FONTS_FONT_MANAGER_HPP_INCLUDED
 
 #include <imgui.h> // ImFont, ImWchar, ImGuiIO
+#include <filesystem>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -206,6 +207,8 @@ namespace ImGuiX::Fonts {
 
         // Manual configuration buffer
         PendingManual m_manual{};
+        // Keeps raw font bytes alive while the atlas uses AddFontFromMemoryTTF with external ownership.
+        std::vector<std::vector<unsigned char>> m_owned_font_data;
 
         // Internal static helpers
         static float scalePx(float px_96, const BuildParams& p);
@@ -231,7 +234,8 @@ namespace ImGuiX::Fonts {
             const FontFile& ff,
             const BuildParams& params,
             const std::vector<ImWchar>& ranges,
-            const std::string& base_dir_abs,
+            const std::filesystem::path& base_dir_abs,
+            std::vector<std::vector<unsigned char>>& owned_font_data,
             const ImFontConfig& base_cfg
         );
 
@@ -240,7 +244,7 @@ namespace ImGuiX::Fonts {
         static bool updateBackendTexture();
 
         /// \brief Read all file to string. Returns empty string on error.
-        static inline std::string readTextFile(const std::string& path);
+        static inline std::string readTextFile(const std::filesystem::path& path);
 
         /// \brief Add UTF-8 extra glyphs to builder.
         static inline void addExtraGlyphs(

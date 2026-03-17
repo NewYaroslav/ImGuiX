@@ -37,9 +37,9 @@ namespace ImGuiX::Themes {
         constexpr ImVec4 ScrollbarActive  = ImVec4(0.76f, 0.76f, 0.76f, 1.00f);
         constexpr ImVec4 ButtonBase       = ImVec4(0.54f, 0.54f, 0.54f, 0.35f);
         constexpr ImVec4 HeaderBase       = ImVec4(0.38f, 0.38f, 0.38f, 1.00f);
-        constexpr ImVec4 ResizeBase       = ImVec4(0.26f, 0.59f, 0.98f, 0.25f);
-        constexpr ImVec4 ResizeHover      = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
-        constexpr ImVec4 ResizeActive     = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
+        constexpr ImVec4 ResizeBase       = ImVec4(0.44f, 0.44f, 0.44f, 0.18f);
+        constexpr ImVec4 ResizeHover      = ImVec4(0.58f, 0.58f, 0.58f, 0.45f);
+        constexpr ImVec4 ResizeActive     = ImVec4(0.76f, 0.76f, 0.76f, 0.82f);
         constexpr ImVec4 Highlight        = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
         constexpr ImVec4 PlotLine         = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
         constexpr ImVec4 TextDisabled     = ImVec4(0.62f, 0.62f, 0.62f, 1.00f);

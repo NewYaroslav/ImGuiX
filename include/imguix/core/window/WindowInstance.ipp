@@ -1,5 +1,7 @@
 #include <imgui.h>
 #include <imguix/utils/path_utils.hpp>
+#include <fstream>
+#include <iterator>
 
 namespace ImGuiX {
 
@@ -107,26 +109,31 @@ namespace ImGuiX {
         return m_notification_manager;
     }
 
-    std::string WindowInstance::iniPath() const {
+    std::filesystem::path WindowInstance::iniPathFs() const {
 #   ifdef __EMSCRIPTEN__
 #       ifdef IMGUIX_EMSCRIPTEN_IDBFS
-        return u8"/imguix_fs/imgui-" + std::to_string(m_window_id) + u8".ini";
+        return std::filesystem::path(
+            u8"/imguix_fs/imgui-" + std::to_string(m_window_id) + u8".ini").lexically_normal();
 #       else
         return {};
 #       endif
 #   else
-        return ImGuiX::Utils::resolveExecPath(
-            std::string(IMGUIX_CONFIG_DIR) + u8"/imgui-" + std::to_string(m_window_id) + u8".ini");
+        return ImGuiX::Utils::resolveExecPathFs(
+            std::filesystem::path(IMGUIX_CONFIG_DIR) / ("imgui-" + std::to_string(m_window_id) + ".ini"));
 #   endif
+    }
+
+    std::string WindowInstance::iniPath() const {
+        return iniPathFs().u8string();
     }
 
     void WindowInstance::initIni() {
         if (m_is_ini_once) return;
         setCurrentWindow();
-        m_ini_path = iniPath();
+        m_ini_path = iniPathFs();
 #   ifdef __EMSCRIPTEN__
 #       ifdef IMGUIX_EMSCRIPTEN_IDBFS
-        ImGui::GetIO().IniFilename = m_ini_path.c_str();
+        ImGui::GetIO().IniFilename = nullptr;
 #       else
         ImGui::GetIO().IniFilename = nullptr;
 #       endif
@@ -139,32 +146,41 @@ namespace ImGuiX {
     void WindowInstance::loadIni() {
         if (m_is_ini_loaded) return;
         setCurrentWindow();
-#   ifdef __EMSCRIPTEN__
-#       ifdef IMGUIX_EMSCRIPTEN_IDBFS
-        // Ini settings will be loaded from mounted IDBFS automatically
-        ImGui::LoadIniSettingsFromDisk(m_ini_path.c_str());
-#       else
-        ImGui::GetIO().IniFilename = nullptr;
-#       endif
-#   else
-        Utils::createDirectories(Utils::resolveExecPath(IMGUIX_CONFIG_DIR));
-        ImGui::LoadIniSettingsFromDisk(m_ini_path.c_str());
-#   endif
+        if (!m_ini_path.parent_path().empty()) {
+            Utils::createDirectories(m_ini_path.parent_path());
+        }
+        std::ifstream input(m_ini_path, std::ios::binary);
+        if (input.good()) {
+            const std::string content(
+                (std::istreambuf_iterator<char>(input)),
+                std::istreambuf_iterator<char>());
+            if (!content.empty()) {
+                ImGui::LoadIniSettingsFromMemory(content.c_str(), content.size());
+            }
+        }
         m_is_ini_loaded = true;
     }
 
     void WindowInstance::saveIniNow() {
         setCurrentWindow();
-        ImGui::SaveIniSettingsToDisk(iniPath().c_str());
-        if (!ImGui::GetIO().WantSaveIniSettings) return;
-#   ifdef __EMSCRIPTEN__
-#       ifdef IMGUIX_EMSCRIPTEN_IDBFS
-        ImGui::SaveIniSettingsToDisk(m_ini_path.c_str());
+        if (m_ini_path.empty()) {
+            m_ini_path = iniPathFs();
+        }
+        size_t ini_size = 0;
+        const char* ini_data = ImGui::SaveIniSettingsToMemory(&ini_size);
+        if (ini_data == nullptr) {
+            ImGui::GetIO().WantSaveIniSettings = false;
+            return;
+        }
+        if (!m_ini_path.parent_path().empty()) {
+            Utils::createDirectories(m_ini_path.parent_path());
+        }
+        std::ofstream output(m_ini_path, std::ios::binary | std::ios::trunc);
+        if (output.good() && ini_size > 0) {
+            output.write(ini_data, static_cast<std::streamsize>(ini_size));
+        }
+#   if defined(__EMSCRIPTEN__) && defined(IMGUIX_EMSCRIPTEN_IDBFS)
         EM_ASM({ FS.syncfs(false, function(){}); });
-#       endif
-#   else
-        Utils::createDirectories(Utils::resolveExecPath(IMGUIX_CONFIG_DIR));
-        ImGui::SaveIniSettingsToDisk(m_ini_path.c_str());
 #   endif
         ImGui::GetIO().WantSaveIniSettings = false;
     }

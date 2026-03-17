@@ -34,6 +34,7 @@
 #endif
 
 #include "WindowInterface.hpp"
+#include <filesystem>
 #include <imguix/config/paths.hpp>
 #include <memory>
 #include <string>
@@ -266,6 +267,11 @@ namespace ImGuiX {
         /// \brief Compute file path for storing ImGui ini settings.
         /// \return Absolute path to ini file.
         /// \note Internal use.
+        std::filesystem::path iniPathFs() const;
+
+        /// \brief Compute file path for storing ImGui ini settings as UTF-8 string.
+        /// \return Absolute path to ini file.
+        /// \note Compatibility wrapper over iniPathFs().
         std::string iniPath() const;
 
         /// \brief Prepare ImGui to use the window-specific ini file.
@@ -355,7 +361,7 @@ namespace ImGuiX {
         ApplicationContext& m_application;  ///< Reference to the owning application.
         std::vector<std::unique_ptr<Controller>> m_controllers; ///< Attached controllers.
         std::vector<Controller*> m_pending_controllers; ///< Controllers awaiting onInit.
-        std::string m_ini_path;             ///< Path to the window-specific ImGui ini file.
+        std::filesystem::path m_ini_path;   ///< Path to the window-specific ImGui ini file.
         bool m_is_ini_once = false;         ///< Ensures imgui ini is saved only once.
         bool m_is_ini_loaded = false;       ///< Indicates whether ini settings have been loaded.
     
