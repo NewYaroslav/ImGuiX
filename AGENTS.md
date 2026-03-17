@@ -251,6 +251,9 @@ if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Days", preview.c_str(),
 * Prefer `agents/imguix-smoke-build.md` for Windows MinGW smoke-example configure/build commands.
 * Prefer `agents/imguix-fonts-i18n-playbook.md` for fonts + i18n API checks and doc updates.
 * Prefer `agents/imguix-windowing-playbook.md` for `WindowInstance` / `ImGuiFramedWindow` tasks.
+* For reusable `.hpp` / `.ipp` / `.tpp` ownership and include-structure policy, prefer:
+  * developer doc: `../../docs/header-implementation-guidelines.md`
+  * agent playbook: `../../agents/header-implementation-guidelines.md`
 * For any windowing task, first verify expected behavior against `docs/WINDOWS-GUIDE.md` before editing code or docs.
 * Treat `external/ImGuiX/agents/` as the concise, execution-focused playbook set.
 * In controller-facing docs and snippets, prefer `Controller::getFont(...)`; do not expose `WindowInstance` internals as primary usage.
@@ -402,6 +405,8 @@ Format: `type(scope): short description` where the scope is optional. Keep messa
 | `docs/FONTS-GUIDE.md`    | FontManager usage; init/runtime boundaries; role-based lookup (`getFont`) |
 | `docs/I18N-GUIDE.md`     | LangStore, PluralRules, resource layout, language-switch flow |
 | `docs/THEMES.md`         | Theme guide for built-in styles and creating custom themes |
+| `../../docs/header-implementation-guidelines.md` | Reusable developer guidance for `.hpp` / `.ipp` / `.tpp` ownership and include structure |
+| `../../agents/header-implementation-guidelines.md` | Reusable execution-focused checklist for agents changing header and implementation ownership |
 | `agents/imguix-windowing-playbook.md` | Short agent checklist for windowing changes and backend-aware verification |
 
 ### Dependency Map
