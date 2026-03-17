@@ -5,11 +5,12 @@
 
 #include <imgui.h>
 
+#include <imguix/config/build.hpp>
 #include <imguix/widgets/controls/icon_combo.hpp>
 
 namespace ImGuiX::Widgets {
 
-    bool ListEditor(
+    IMGUIX_IMPL_INLINE bool ListEditor(
             const char* id,
             const char* label,
             std::vector<std::string>& items,
@@ -182,7 +183,7 @@ namespace ImGuiX::Widgets {
         return changed;
     }
 
-    bool ListEditor(
+    IMGUIX_IMPL_INLINE bool ListEditor(
             const char* id,
             const char* label,
             std::vector<int>& items,
@@ -302,4 +303,3 @@ namespace ImGuiX::Widgets {
     }
 
 } // namespace ImGuiX::Widgets
-

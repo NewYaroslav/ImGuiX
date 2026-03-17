@@ -78,4 +78,3 @@ namespace ImGuiX::Widgets {
 #endif
 
 #endif // _IMGUIX_WIDGETS_AUTH_JS_PANEL_HPP_INCLUDED
-

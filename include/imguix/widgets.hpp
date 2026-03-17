@@ -37,6 +37,10 @@
 #include <imguix/widgets/time/expiry_picker.hpp>
 
 #ifdef IMGUIX_ENABLE_IMPLOT
+#   include <imguix/widgets/plot/DualMetricBarsPlot.hpp>
+#   include <imguix/widgets/plot/DualMetricBarsSet.hpp>
+#   include <imguix/widgets/plot/MetricsPlot.hpp>
+#   include <imguix/widgets/plot/MetricsPlotSet.hpp>
 #   include <imguix/widgets/plot/PlotOHLCChart.hpp>
 #endif
 

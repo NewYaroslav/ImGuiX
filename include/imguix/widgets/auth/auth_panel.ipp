@@ -1,8 +1,9 @@
 #include "auth_panel.hpp"
+#include <imguix/config/build.hpp>
 
 namespace ImGuiX::Widgets {
 
-    inline AuthPanelResult AuthPanel(
+    IMGUIX_IMPL_INLINE AuthPanelResult AuthPanel(
             const char* id,
             AuthPanelConfig& cfg,
             AuthData& data
@@ -207,4 +208,3 @@ namespace ImGuiX::Widgets {
     }
 
 } // namespace ImGuiX::Widgets
-

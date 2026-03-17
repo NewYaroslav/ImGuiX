@@ -6,8 +6,6 @@
 /// \brief RAII helper to wait for a single event that matches a predicate and then auto-unsubscribe.
 /// \ingroup Core
 
-#include <chrono>
-
 #include "cancellation.hpp"
 #include "awaiters.hpp"
 #include "EventBus.hpp"

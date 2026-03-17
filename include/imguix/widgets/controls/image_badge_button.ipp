@@ -5,6 +5,7 @@
 #include <cstring>
 
 #include <imgui-SFML.h>
+#include <imguix/config/build.hpp>
 
 namespace ImGuiX::Widgets {
 
@@ -51,7 +52,7 @@ namespace ImGuiX::Widgets {
 
     } // namespace
 
-    bool ImageBadgeButton(
+    IMGUIX_IMPL_INLINE bool ImageBadgeButton(
         const char* id,
         const sf::Texture& texture,
         const ImageBadgeButtonConfig& cfg) {

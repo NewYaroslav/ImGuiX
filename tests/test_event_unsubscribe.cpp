@@ -1,17 +1,22 @@
+#include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <functional>
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <queue>
 #include <sstream>
 #include <string>
 #include <typeindex>
+#include <type_traits>
 #include <unordered_map>
 #include <vector>
 
 #include "imguix/core/pubsub/Event.hpp"
 #include "imguix/core/pubsub/EventListener.hpp"
+#include "imguix/core/pubsub/awaiters.hpp"
 
 #define private public
 #include "imguix/core/pubsub/EventBus.hpp"

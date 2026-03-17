@@ -2,10 +2,11 @@
 #include <cmath>
 
 #include <imgui.h>
+#include <imguix/config/build.hpp>
 
 namespace ImGuiX::Widgets {
 
-int VerticalStepperButtons(
+IMGUIX_IMPL_INLINE int VerticalStepperButtons(
         const char* id,
         ImVec2 size,
         int step,
@@ -105,4 +106,3 @@ int VerticalStepperButtons(
 }
 
 } // namespace ImGuiX::Widgets
-

@@ -1,8 +1,9 @@
 #include "proxy_panel.hpp"
+#include <imguix/config/build.hpp>
 
 namespace ImGuiX::Widgets {
 
-    inline bool ProxyPanel(const char* id, ProxyPanelConfig& cfg, ProxySettings& st) {
+    IMGUIX_IMPL_INLINE bool ProxyPanel(const char* id, ProxyPanelConfig& cfg, ProxySettings& st) {
         bool changed = false;
 
         ImGui::PushID(id);
@@ -206,4 +207,3 @@ namespace ImGuiX::Widgets {
     }
 
 } // namespace ImGuiX::Widgets
-

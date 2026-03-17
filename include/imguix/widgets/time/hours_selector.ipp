@@ -3,12 +3,13 @@
 #include <string>
 #include <algorithm>
 #include <cstdio>
+#include <imguix/config/build.hpp>
 #include <imguix/extensions/sizing.hpp> // ImGuiX::Extensions::CalcTimeComboWidth(), etc.
 #include <imguix/widgets/controls/icon_combo.hpp>
 
 namespace ImGuiX::Widgets {
 
-    inline bool HoursSelector(const char* id, std::vector<int>& selected_hours, const HoursSelectorConfig& cfg) {
+    IMGUIX_IMPL_INLINE bool HoursSelector(const char* id, std::vector<int>& selected_hours, const HoursSelectorConfig& cfg) {
         // Normalize input (unique, sorted, clamped to [0,23])
         {
             selected_hours.erase(
@@ -190,4 +191,3 @@ namespace ImGuiX::Widgets {
     }
 
 } // namespace ImGuiX::Widgets
-

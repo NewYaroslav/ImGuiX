@@ -1,8 +1,9 @@
 #include <cmath>
+#include <imguix/config/build.hpp>
 
 namespace ImGuiX::Widgets {
 
-    bool IconButtonCentered(const char* id, const char* text, const IconButtonConfig& cfg) {
+    IMGUIX_IMPL_INLINE bool IconButtonCentered(const char* id, const char* text, const IconButtonConfig& cfg) {
         ImGui::PushID(id);
 
         ImVec2 sz = cfg.size;
@@ -63,4 +64,3 @@ namespace ImGuiX::Widgets {
     }
 
 } // namespace ImGuiX::Widgets
-

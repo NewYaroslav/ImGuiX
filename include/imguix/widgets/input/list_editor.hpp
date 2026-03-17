@@ -87,4 +87,3 @@ namespace ImGuiX::Widgets {
 #endif
 
 #endif // _IMGUIX_WIDGETS_LIST_EDITOR_HPP_INCLUDED
-

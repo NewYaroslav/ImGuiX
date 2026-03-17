@@ -1,9 +1,10 @@
 #include <imgui.h>
 #include <string>
+#include <imguix/config/build.hpp>
 
 namespace ImGuiX::Widgets {
 
-bool VirtualKeyboardOverlay(
+IMGUIX_IMPL_INLINE bool VirtualKeyboardOverlay(
         const char* id,
         std::string& text,
         VirtualKeyboardConfig cfg,
@@ -68,4 +69,3 @@ bool VirtualKeyboardOverlay(
 }
 
 } // namespace ImGuiX::Widgets
-

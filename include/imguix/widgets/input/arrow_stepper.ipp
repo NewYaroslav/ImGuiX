@@ -2,10 +2,11 @@
 #include <cstdio>
 
 #include <imgui.h>
+#include <imguix/config/build.hpp>
 
 namespace ImGuiX::Widgets {
 
-bool ArrowStepper(
+IMGUIX_IMPL_INLINE bool ArrowStepper(
         const char* id,
         int& v,
         const ArrowStepperConfig& cfg,
@@ -103,4 +104,3 @@ bool ArrowStepper(
 }
 
 } // namespace ImGuiX::Widgets
-

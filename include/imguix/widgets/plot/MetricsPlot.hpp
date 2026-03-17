@@ -11,6 +11,7 @@
 
 #include <imgui.h>
 #include <implot.h>
+#include <implot_internal.h>
 
 #include <imguix/widgets/plot/MetricsPlotData.hpp>
 #include <imguix/events/MetricsPlotUpdateEvent.hpp>
@@ -76,6 +77,20 @@ namespace ImGuiX::Widgets {
         int update_counter = 0;      ///< Auto-fit counter.
         bool initialized = false;
     };
+
+    namespace detail {
+        inline constexpr int kUpdateCounterMax = 5;
+
+        inline float calc_plot_height(const MetricsPlotConfig& cfg) {
+            if (cfg.plot_height > 0.0f) return cfg.plot_height;
+            const float avail_w = ImGui::GetContentRegionAvail().x;
+            float h = avail_w / ImMax(0.5f, cfg.aspect_w_over_h);
+            if (cfg.auto_height_min > 0.0f) h = ImMax(h, cfg.auto_height_min);
+            if (cfg.auto_height_max > 0.0f) h = ImMin(h, cfg.auto_height_max);
+            if (cfg.cap_by_avail_y) h = ImMin(h, ImGui::GetContentRegionAvail().y);
+            return h;
+        }
+    } // namespace detail
 
     /// \brief Calculate default DND list width.
     /// \return Recommended width in pixels.

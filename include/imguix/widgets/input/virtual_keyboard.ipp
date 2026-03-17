@@ -7,12 +7,13 @@
 #include <algorithm>
 #include <regex>
 
+#include <imguix/config/build.hpp>
 #include <imguix/widgets/controls/icon_button.hpp>
 #include <imguix/config/icons.hpp>
 
 namespace ImGuiX::Widgets {
 
-    bool VirtualKeyboard(
+    IMGUIX_IMPL_INLINE bool VirtualKeyboard(
             const char* id, 
             std::string& text, 
             const VirtualKeyboardConfig& cfg,
@@ -515,4 +516,3 @@ namespace ImGuiX::Widgets {
     }
 
 } // namespace ImGuiX::Widgets
-

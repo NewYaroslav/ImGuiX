@@ -72,4 +72,3 @@ namespace ImGuiX::Widgets {
 #endif
 
 #endif // _IMGUIX_WIDGETS_DOMAIN_SELECTOR_HPP_INCLUDED
-

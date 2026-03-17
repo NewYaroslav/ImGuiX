@@ -1,10 +1,11 @@
 #include <algorithm>
 #include <cstdarg>
 #include <cstdio>
+#include <imguix/config/build.hpp>
 
 namespace ImGuiX::Widgets {
 
-    void TextCenteredFmt(const char* fmt, ...) {
+    IMGUIX_IMPL_INLINE void TextCenteredFmt(const char* fmt, ...) {
         char buf[1024];
         va_list args;
         va_start(args, fmt);
@@ -20,7 +21,7 @@ namespace ImGuiX::Widgets {
         ImGui::TextUnformatted(buf);
     }
 
-    void TextUnformattedCentered(const char* text) {
+    IMGUIX_IMPL_INLINE void TextUnformattedCentered(const char* text) {
         if (!text) return;
         const float avail_w = ImGui::GetContentRegionAvail().x;
         const float text_w  = ImGui::CalcTextSize(text).x;
@@ -31,7 +32,7 @@ namespace ImGuiX::Widgets {
         ImGui::TextUnformatted(text);
     }
 
-    void TextWrappedCentered(const char* text, float wrap_width) {
+    IMGUIX_IMPL_INLINE void TextWrappedCentered(const char* text, float wrap_width) {
         if (!text) return;
 
         const float avail_w = ImGui::GetContentRegionAvail().x;

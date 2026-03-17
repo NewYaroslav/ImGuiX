@@ -1,12 +1,13 @@
 #include <imgui.h>
 #include <string>
 
+#include <imguix/config/build.hpp>
 #include <imguix/config/icons.hpp>
 #include <imguix/config/colors.hpp>
 
 namespace ImGuiX::Widgets {
 
-    void TooltipWrapped(const char* desc, float wrap_cols) {
+    IMGUIX_IMPL_INLINE void TooltipWrapped(const char* desc, float wrap_cols) {
         ImGui::BeginTooltip();
         ImGui::PushTextWrapPos(ImGui::GetFontSize() * wrap_cols);
         ImGui::TextUnformatted(desc);
@@ -14,7 +15,7 @@ namespace ImGuiX::Widgets {
         ImGui::EndTooltip();
     }
 
-    void IconMarker(
+    IMGUIX_IMPL_INLINE void IconMarker(
             const char* icon_utf8,
             const ImVec4& color,
             const char* desc,
@@ -32,7 +33,7 @@ namespace ImGuiX::Widgets {
         }
     }
 
-    void ColoredMarker(
+    IMGUIX_IMPL_INLINE void ColoredMarker(
             const char* label,
             const char* desc,
             const ImVec4& color) {
@@ -43,14 +44,14 @@ namespace ImGuiX::Widgets {
             TooltipWrapped(desc);
     }
 
-    bool SelectableMarker(const std::string& text) {
+    IMGUIX_IMPL_INLINE bool SelectableMarker(const std::string& text) {
         bool clicked = ImGui::Selectable(text.c_str());
         if (ImGui::IsItemHovered())
             TooltipWrapped(text.c_str());
         return clicked;
     }
 
-    void HelpMarker(
+    IMGUIX_IMPL_INLINE void HelpMarker(
             const char* desc,
             MarkerMode mode,
             const char* icon_utf8) {
@@ -63,7 +64,7 @@ namespace ImGuiX::Widgets {
         }
     }
 
-    void WarningMarker(
+    IMGUIX_IMPL_INLINE void WarningMarker(
             const char* desc,
             MarkerMode mode,
             const ImVec4& color,
@@ -71,7 +72,7 @@ namespace ImGuiX::Widgets {
         IconMarker(icon_utf8, color, desc, mode);
     }
 
-    void InfoMarker(
+    IMGUIX_IMPL_INLINE void InfoMarker(
             const char* desc,
             MarkerMode mode,
             const ImVec4& color,
@@ -79,7 +80,7 @@ namespace ImGuiX::Widgets {
         IconMarker(icon_utf8, color, desc, mode);
     }
 
-    void SuccessMarker(
+    IMGUIX_IMPL_INLINE void SuccessMarker(
             const char* desc,
             MarkerMode mode,
             const ImVec4& color,

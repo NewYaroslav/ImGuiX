@@ -5,12 +5,13 @@
 #include <algorithm>
 #include <cstdio>
 #include <cmath>
+#include <imguix/config/build.hpp>
 #include <imguix/extensions/sizing.hpp> // ImGuiX::Extensions::CalcWeekdayComboWidth(), etc.
 #include <imguix/widgets/controls/icon_combo.hpp>
 
 namespace ImGuiX::Widgets {
 
-    inline bool DaysOfWeekSelector(
+    IMGUIX_IMPL_INLINE bool DaysOfWeekSelector(
             const char* id,
             std::vector<int>& selected_days,
             const DaysSelectorConfig& cfg) {
@@ -231,4 +232,3 @@ namespace ImGuiX::Widgets {
     }
 
 } // namespace ImGuiX::Widgets
-

@@ -30,7 +30,7 @@ namespace ImGuiX::Utils::detail {
 
 namespace ImGuiX::Utils {
 
-    std::string strip_json_comments(
+    inline std::string strip_json_comments(
             const std::string& json_string,
             const bool with_whitespace) noexcept {
         enum class Comment : unsigned char { None, Line, Block };
@@ -178,4 +178,3 @@ namespace ImGuiX::Utils {
     }
 
 } // namespace ImGuiX::Utils
-

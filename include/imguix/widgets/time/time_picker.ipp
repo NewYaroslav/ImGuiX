@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <string>
 #include <vector>
+#include <imguix/config/build.hpp>
 #include <imguix/widgets/input/arrow_stepper.hpp>
 #include <imguix/utils/time_utils.hpp>  // ImGuiX::Utils::format_hms, etc.
 #include <imguix/extensions/sizing.hpp> // ImGuiX::Extensions::CalcTimeComboWidth(), etc.
@@ -11,7 +12,7 @@
 
 namespace ImGuiX::Widgets {
 
-    inline const std::vector<TimeZoneInfo>& DefaultTimeZones() {
+    IMGUIX_IMPL_INLINE const std::vector<TimeZoneInfo>& DefaultTimeZones() {
         static const std::vector<TimeZoneInfo> tz = {
             {u8"_custom",               u8"Custom (manual)",                 0,      false},
 
@@ -84,7 +85,7 @@ namespace ImGuiX::Widgets {
         return tz;
     }
 
-    inline bool TimePicker(const char* id,
+    IMGUIX_IMPL_INLINE bool TimePicker(const char* id,
                            int& hour,
                            int& minute,
                            int& second,
@@ -143,7 +144,7 @@ namespace ImGuiX::Widgets {
         return changed;
     }
 
-    inline bool TimePicker(const char* id, int& seconds, const TimePickerConfig& cfg) {
+    IMGUIX_IMPL_INLINE bool TimePicker(const char* id, int& seconds, const TimePickerConfig& cfg) {
         bool changed = false;
         std::string preview = ImGuiX::Utils::format_hms(seconds);
 
@@ -185,7 +186,7 @@ namespace ImGuiX::Widgets {
         return changed;
     }
 
-    inline bool TimeOffsetPicker(
+    IMGUIX_IMPL_INLINE bool TimeOffsetPicker(
             const char* id,
             int64_t& offset_sec,
             bool&    has_dst_out,
@@ -329,4 +330,3 @@ namespace ImGuiX::Widgets {
     }
 
 } // namespace ImGuiX::Widgets
-

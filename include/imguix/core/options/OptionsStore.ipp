@@ -11,6 +11,7 @@
 
 #include <imguix/config/options.hpp>
 #include <imguix/config/paths.hpp>
+#include <imguix/config/build.hpp>
 #include <imguix/utils/path_utils.hpp>
 
 namespace ImGuiX {
@@ -174,7 +175,7 @@ namespace ImGuiX {
         }
     };
 
-    inline OptionsStore::OptionsStore(std::string path, double save_delay_sec)
+    IMGUIX_IMPL_INLINE OptionsStore::OptionsStore(std::string path, double save_delay_sec)
         : m_impl(std::make_unique<Impl>()) {
 #ifdef __EMSCRIPTEN__
         if (!ImGuiX::Utils::isAbsolutePath(path)) {
@@ -188,7 +189,7 @@ namespace ImGuiX {
         load();
     }
     
-    inline OptionsStore::OptionsStore()
+    IMGUIX_IMPL_INLINE OptionsStore::OptionsStore()
         : m_impl(std::make_unique<Impl>()) {
         m_impl->m_save_delay = IMGUIX_OPTIONS_SAVE_DELAY_SEC;
 #ifdef __EMSCRIPTEN__
@@ -205,9 +206,9 @@ namespace ImGuiX {
         load();
     }
 
-    inline OptionsStore::~OptionsStore() = default;
+    IMGUIX_IMPL_INLINE OptionsStore::~OptionsStore() = default;
 
-    inline void OptionsStore::load() noexcept {
+    IMGUIX_IMPL_INLINE void OptionsStore::load() noexcept {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         std::ifstream f(m_impl->m_path, std::ios::binary);
         if (!f.good()) return;
@@ -219,13 +220,13 @@ namespace ImGuiX {
         } catch (...) {}
     }
 
-    inline void OptionsStore::saveNow() noexcept {
+    IMGUIX_IMPL_INLINE void OptionsStore::saveNow() noexcept {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         m_impl->m_dirty = false;
         m_impl->saveLockedNoexcept();
     }
 
-    inline void OptionsStore::update() noexcept {
+    IMGUIX_IMPL_INLINE void OptionsStore::update() noexcept {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         if (!m_impl->m_dirty) return;
         double elapsed = std::chrono::duration<double>(
@@ -236,12 +237,12 @@ namespace ImGuiX {
         }
     }
 
-    inline bool OptionsStore::has(const std::string& key) const noexcept {
+    IMGUIX_IMPL_INLINE bool OptionsStore::has(const std::string& key) const noexcept {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         return m_impl->m_root.contains(key);
     }
 
-    inline bool OptionsStore::erase(const std::string& key) noexcept {
+    IMGUIX_IMPL_INLINE bool OptionsStore::erase(const std::string& key) noexcept {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         auto it = m_impl->m_root.find(key);
         if (it == m_impl->m_root.end()) return false;
@@ -250,7 +251,7 @@ namespace ImGuiX {
         return true;
     }
 
-    inline std::vector<std::string> OptionsStore::keys() const {
+    IMGUIX_IMPL_INLINE std::vector<std::string> OptionsStore::keys() const {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         std::vector<std::string> out;
         out.reserve(m_impl->m_root.size());
@@ -261,37 +262,37 @@ namespace ImGuiX {
         return out;
     }
 
-    inline void OptionsStore::setBool(const std::string& key, bool v) noexcept {
+    IMGUIX_IMPL_INLINE void OptionsStore::setBool(const std::string& key, bool v) noexcept {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         m_impl->m_root[key] = v;
         m_impl->touchLocked();
     }
 
-    inline void OptionsStore::setI32(const std::string& key, std::int32_t v) noexcept {
+    IMGUIX_IMPL_INLINE void OptionsStore::setI32(const std::string& key, std::int32_t v) noexcept {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         m_impl->m_root[key] = static_cast<long long>(v);
         m_impl->touchLocked();
     }
 
-    inline void OptionsStore::setI64(const std::string& key, std::int64_t v) noexcept {
+    IMGUIX_IMPL_INLINE void OptionsStore::setI64(const std::string& key, std::int64_t v) noexcept {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         m_impl->m_root[key] = static_cast<long long>(v);
         m_impl->touchLocked();
     }
 
-    inline void OptionsStore::setF32(const std::string& key, float v) noexcept {
+    IMGUIX_IMPL_INLINE void OptionsStore::setF32(const std::string& key, float v) noexcept {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         m_impl->m_root[key] = static_cast<double>(v);
         m_impl->touchLocked();
     }
 
-    inline void OptionsStore::setF64(const std::string& key, double v) noexcept {
+    IMGUIX_IMPL_INLINE void OptionsStore::setF64(const std::string& key, double v) noexcept {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         m_impl->m_root[key] = v;
         m_impl->touchLocked();
     }
 
-    inline void OptionsStore::setStr(
+    IMGUIX_IMPL_INLINE void OptionsStore::setStr(
             const std::string& key,
             const std::string& v) noexcept {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
@@ -299,7 +300,7 @@ namespace ImGuiX {
         m_impl->touchLocked();
     }
 
-    inline void OptionsStore::setStrVec(
+    IMGUIX_IMPL_INLINE void OptionsStore::setStrVec(
             const std::string& key,
             const std::vector<std::string>& v) noexcept {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
@@ -307,7 +308,7 @@ namespace ImGuiX {
         m_impl->touchLocked();
     }
 
-    inline bool OptionsStore::getBool(const std::string& key) const {
+    IMGUIX_IMPL_INLINE bool OptionsStore::getBool(const std::string& key) const {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         auto it = m_impl->m_root.find(key);
         if (it == m_impl->m_root.end())
@@ -316,7 +317,7 @@ namespace ImGuiX {
         throw std::bad_cast();
     }
 
-    inline std::int32_t OptionsStore::getI32(const std::string& key) const {
+    IMGUIX_IMPL_INLINE std::int32_t OptionsStore::getI32(const std::string& key) const {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         auto it = m_impl->m_root.find(key);
         if (it == m_impl->m_root.end())
@@ -325,7 +326,7 @@ namespace ImGuiX {
         throw std::bad_cast();
     }
 
-    inline std::int64_t OptionsStore::getI64(const std::string& key) const {
+    IMGUIX_IMPL_INLINE std::int64_t OptionsStore::getI64(const std::string& key) const {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         auto it = m_impl->m_root.find(key);
         if (it == m_impl->m_root.end())
@@ -334,7 +335,7 @@ namespace ImGuiX {
         throw std::bad_cast();
     }
 
-    inline float OptionsStore::getF32(const std::string& key) const {
+    IMGUIX_IMPL_INLINE float OptionsStore::getF32(const std::string& key) const {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         auto it = m_impl->m_root.find(key);
         if (it == m_impl->m_root.end())
@@ -343,7 +344,7 @@ namespace ImGuiX {
         throw std::bad_cast();
     }
 
-    inline double OptionsStore::getF64(const std::string& key) const {
+    IMGUIX_IMPL_INLINE double OptionsStore::getF64(const std::string& key) const {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         auto it = m_impl->m_root.find(key);
         if (it == m_impl->m_root.end())
@@ -352,7 +353,7 @@ namespace ImGuiX {
         throw std::bad_cast();
     }
 
-    inline std::string OptionsStore::getStr(const std::string& key) const {
+    IMGUIX_IMPL_INLINE std::string OptionsStore::getStr(const std::string& key) const {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         auto it = m_impl->m_root.find(key);
         if (it == m_impl->m_root.end())
@@ -361,7 +362,7 @@ namespace ImGuiX {
         throw std::bad_cast();
     }
 
-    inline std::vector<std::string> OptionsStore::getStrVec(
+    IMGUIX_IMPL_INLINE std::vector<std::string> OptionsStore::getStrVec(
             const std::string& key) const {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         auto it = m_impl->m_root.find(key);
@@ -371,7 +372,7 @@ namespace ImGuiX {
         throw std::bad_cast();
     }
 
-    inline bool OptionsStore::getBoolOr(
+    IMGUIX_IMPL_INLINE bool OptionsStore::getBoolOr(
             const std::string& key,
             bool def) const noexcept {
         try {
@@ -381,7 +382,7 @@ namespace ImGuiX {
         }
     }
 
-    inline std::int32_t OptionsStore::getI32Or(
+    IMGUIX_IMPL_INLINE std::int32_t OptionsStore::getI32Or(
             const std::string& key,
             std::int32_t def) const noexcept {
         try {
@@ -391,7 +392,7 @@ namespace ImGuiX {
         }
     }
 
-    inline std::int64_t OptionsStore::getI64Or(
+    IMGUIX_IMPL_INLINE std::int64_t OptionsStore::getI64Or(
             const std::string& key,
             std::int64_t def) const noexcept {
         try {
@@ -401,7 +402,7 @@ namespace ImGuiX {
         }
     }
 
-    inline float OptionsStore::getF32Or(
+    IMGUIX_IMPL_INLINE float OptionsStore::getF32Or(
             const std::string& key,
             float def) const noexcept {
         try {
@@ -411,7 +412,7 @@ namespace ImGuiX {
         }
     }
 
-    inline double OptionsStore::getF64Or(
+    IMGUIX_IMPL_INLINE double OptionsStore::getF64Or(
             const std::string& key,
             double def) const noexcept {
         try {
@@ -421,7 +422,7 @@ namespace ImGuiX {
         }
     }
 
-    inline std::string OptionsStore::getStrOr(
+    IMGUIX_IMPL_INLINE std::string OptionsStore::getStrOr(
             const std::string& key,
             std::string def) const noexcept {
         try {
@@ -431,7 +432,7 @@ namespace ImGuiX {
         }
     }
 
-    inline std::vector<std::string> OptionsStore::getStrVecOr(
+    IMGUIX_IMPL_INLINE std::vector<std::string> OptionsStore::getStrVecOr(
             const std::string& key,
             std::vector<std::string> def) const noexcept {
         try {
@@ -441,14 +442,14 @@ namespace ImGuiX {
         }
     }
 
-    inline void OptionsStore::setVersion(std::int32_t ver) noexcept {
+    IMGUIX_IMPL_INLINE void OptionsStore::setVersion(std::int32_t ver) noexcept {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         auto& m = Impl::ensureMeta(m_impl->m_root);
         m[u8"version"] = static_cast<long long>(ver);
         m_impl->touchLocked();
     }
 
-    inline std::int32_t OptionsStore::version() const noexcept {
+    IMGUIX_IMPL_INLINE std::int32_t OptionsStore::version() const noexcept {
         std::lock_guard<std::mutex> lk(m_impl->m_mutex);
         auto* m = Impl::meta(m_impl->m_root);
         if (!m) return 0;

@@ -39,8 +39,6 @@ namespace ImGuiX::Extensions {
 
 } // namespace ImGuiX::Extensions
 
-#ifdef IMGUIX_HEADER_ONLY
 #include "ema.ipp"
-#endif
 
 #endif // _IMGUIX_EXTENSIONS_EMA_HPP_INCLUDED

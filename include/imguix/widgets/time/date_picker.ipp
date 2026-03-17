@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <string>
+#include <imguix/config/build.hpp>
 #include <imguix/widgets/input/arrow_stepper.hpp>
 #include <imguix/utils/time_utils.hpp>  // days_from_civil, civil_from_days, num_days_in_month, clamp_ymdhms, month_short_name
 #include <imguix/extensions/sizing.hpp> // ImGuiX::Extensions::CalcDateComboWidth(), etc.
@@ -10,7 +11,7 @@
 
 namespace ImGuiX::Widgets {
 
-    inline bool DatePicker(
+    IMGUIX_IMPL_INLINE bool DatePicker(
             const char* id,
             int64_t& year,
             int& month,
@@ -119,7 +120,7 @@ namespace ImGuiX::Widgets {
         return changed;
     }
 
-    inline bool DatePicker(const char* id,
+    IMGUIX_IMPL_INLINE bool DatePicker(const char* id,
                            int64_t& ts,
                            const DatePickerConfig& cfg) {
         // 1) Decompose ts -> Y/M/D/h/m/s
@@ -239,4 +240,3 @@ namespace ImGuiX::Widgets {
     }
 
 } // namespace ImGuiX::Widgets
-

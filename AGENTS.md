@@ -257,6 +257,15 @@ if (ImGui::BeginCombo(cfg.label ? cfg.label : u8"Days", preview.c_str(),
 * For windowing docs, use `docs/WINDOWS-GUIDE.md` as canonical and keep `docs/WINDOWS-GUIDE-RU.md` synchronized.
 * For framed-window changes, validate both classic and corner smoke examples before finalizing.
 
+### Build Directory Reuse Policy
+
+* Prefer reusing compatible existing `build-mingw` and `build-mingw-implot` trees.
+* Use `build-mingw-implot` only for the explicit ImPlot / ImPlot3D validation profile.
+* Do not create ad-hoc build directories like `build`, `build-sfml`, or `build-sfml-ninja` unless the user explicitly requested a distinct profile.
+* If a canonical build tree exists, reconfigure and rebuild in place first.
+* Recreate that same canonical directory only when the existing tree has source/generator/toolchain mismatch or is known-corrupt.
+* Do not run multiple independent `cmake --build` processes concurrently against the same build tree.
+
 ### Add a new module/aggregate/service
 
 1. Place headers under `include/imguix/<domain>`.

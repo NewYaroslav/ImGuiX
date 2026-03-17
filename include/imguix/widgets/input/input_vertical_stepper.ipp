@@ -3,12 +3,13 @@
 #include <climits>
 
 #include <imgui.h>
+#include <imguix/config/build.hpp>
 
 #include "vertical_stepper_buttons.hpp"
 
 namespace ImGuiX::Widgets {
 
-bool InputIntVerticalStepper(
+IMGUIX_IMPL_INLINE bool InputIntVerticalStepper(
         const char* label,
         int* v,
         int step,
@@ -61,4 +62,3 @@ bool InputIntVerticalStepper(
 }
 
 } // namespace ImGuiX::Widgets
-

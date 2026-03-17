@@ -73,8 +73,6 @@ namespace ImGuiX::Extensions {
 
 } // namespace ImGuiX::Extensions
 
-#ifdef IMGUIX_HEADER_ONLY
-#   include "validation.ipp"
-#endif
+#include "validation.ipp"
 
 #endif // _IMGUIX_EXTENSIONS_VALIDATION_HPP_INCLUDED

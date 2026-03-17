@@ -2,7 +2,7 @@
 
 namespace ImGuiX::Utils {
 
-    int64_t days_from_civil(int64_t y, unsigned m, unsigned d) noexcept {
+    inline int64_t days_from_civil(int64_t y, unsigned m, unsigned d) noexcept {
         y -= m <= 2;
         const int64_t era = (y >= 0 ? y : y - 399) / 400;
         const unsigned yoe = static_cast<unsigned>(y - era * 400);                 // [0, 399]
@@ -11,7 +11,7 @@ namespace ImGuiX::Utils {
         return era * 146097 + static_cast<int64_t>(doe) - 719468;
     }
 
-    void civil_from_days(int64_t z, int64_t& y, unsigned& m, unsigned& d) noexcept {
+    inline void civil_from_days(int64_t z, int64_t& y, unsigned& m, unsigned& d) noexcept {
         z += 719468;
         const int64_t era = (z >= 0 ? z : z - 146096) / 146097;
         const unsigned doe = static_cast<unsigned>(z - era * 146097);              // [0, 146096]
@@ -24,7 +24,7 @@ namespace ImGuiX::Utils {
         y += (m <= 2);
     }
 
-    void clamp_ymdhms(
+    inline void clamp_ymdhms(
             int64_t& y,
             int& m,
             int& d,
@@ -41,7 +41,7 @@ namespace ImGuiX::Utils {
         ss = std::clamp(ss, 0, 59);
     }
 
-    void timestamp_to_ymdhms(
+    inline void timestamp_to_ymdhms(
             int64_t ts,
             int64_t& year,
             int& month,
@@ -61,7 +61,7 @@ namespace ImGuiX::Utils {
         second= static_cast<int>(rem % 60);
     }
 
-    int64_t ymdhms_to_timestamp(
+    inline int64_t ymdhms_to_timestamp(
             int64_t year,
             int month,
             int day,
@@ -72,13 +72,13 @@ namespace ImGuiX::Utils {
         return days * 86400 + static_cast<int64_t>(hour) * 3600 + minute * 60 + second;
     }
 
-    int weekday_sun0_from_ymd(int64_t y, int m, int d) {
+    inline int weekday_sun0_from_ymd(int64_t y, int m, int d) {
         int64_t z = days_from_civil(y, static_cast<unsigned>(m), static_cast<unsigned>(d)); // days since 1970-01-01
         int w = int((z + 4) % 7); if (w < 0) w += 7;              // 1970-01-01 is Thu
         return w;                                                 // 0=Sun..6=Sat
     }
 
-    std::string format_hms_u32(int sec) {
+    inline std::string format_hms_u32(int sec) {
         sec = std::max(0, sec);
         int h = sec / 3600;
         sec -= h * 3600;
@@ -89,13 +89,13 @@ namespace ImGuiX::Utils {
         return std::string(buf);
     }
 
-    std::string format_hms(int sec) {
+    inline std::string format_hms(int sec) {
         int h, m, s; ImGuiX::Utils::seconds_to_hms(sec, h, m, s);
         char buf[16]; std::snprintf(buf, sizeof(buf), u8"%02d:%02d:%02d", h, m, s);
         return std::string(buf);
     }
 
-    std::string format_signed_hms(int64_t off_sec) {
+    inline std::string format_signed_hms(int64_t off_sec) {
         bool pos = off_sec >= 0;
         uint32_t a = static_cast<uint32_t>(pos ? off_sec : -off_sec);
         char buf[20];
@@ -104,14 +104,14 @@ namespace ImGuiX::Utils {
         return std::string(buf);
     }
 
-    std::string format_ymd(int64_t y, int m, int d) {
+    inline std::string format_ymd(int64_t y, int m, int d) {
         char buf[32];
         std::snprintf(buf, sizeof(buf), "%04lld-%02d-%02d",
                       static_cast<long long>(y), m, d);
         return std::string(buf);
     }
 
-    std::string format_with_weekday(int64_t y, int m, int d) {
+    inline std::string format_with_weekday(int64_t y, int m, int d) {
         static const char* WD[7] = {"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
         int w_sun0 = ImGuiX::Utils::weekday_sun0_from_ymd(y, m, d);
         int w_mon0 = ImGuiX::Utils::to_monday0(w_sun0);
@@ -124,7 +124,7 @@ namespace ImGuiX::Utils {
         return std::string(buf);
     }
 
-    bool parse_signed_hms(const char* txt, int64_t& out_sec) {
+    inline bool parse_signed_hms(const char* txt, int64_t& out_sec) {
         if (!txt) return false;
         while (*txt == ' ' || *txt == '\t') ++txt;
         int sign = +1;
@@ -158,7 +158,7 @@ namespace ImGuiX::Utils {
         return true;
     }
 
-    bool parse_ymd(const char* txt, int64_t& y, int& m, int& d) {
+    inline bool parse_ymd(const char* txt, int64_t& y, int& m, int& d) {
         if (!txt) return false;
         while (*txt==' ' || *txt=='\t') ++txt;
 
@@ -196,4 +196,3 @@ namespace ImGuiX::Utils {
     }
 
 } // namespace ImGuiX::Utils
-

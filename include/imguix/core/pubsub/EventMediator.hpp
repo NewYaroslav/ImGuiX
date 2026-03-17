@@ -6,8 +6,6 @@
 /// \brief Defines the EventMediator class for managing subscriptions and notifications through EventBus.
 /// \ingroup Core
 
-#include <optional>
-
 namespace ImGuiX::Pubsub {
 
     /// \class EventMediator

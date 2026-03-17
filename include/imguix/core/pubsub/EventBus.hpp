@@ -6,8 +6,6 @@
 /// \brief Contains the EventBus class for event-based communication between modules.
 /// \ingroup Core
 
-#include "awaiters.hpp"
-
 namespace ImGuiX::Pubsub {
 
     /// \class EventBus

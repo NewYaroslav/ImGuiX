@@ -3,6 +3,7 @@
 
 #include <imgui.h>
 #include <implot.h>
+#include <imguix/config/build.hpp>
 
 namespace ImGuiX::Widgets {
 
@@ -10,7 +11,7 @@ namespace ImGuiX::Widgets {
         // reuse kUpdateCounterMax and calc_plot_height from MetricsPlot
     }
 
-    inline void MetricsPlotSet(
+    IMGUIX_IMPL_INLINE void MetricsPlotSet(
             const MetricsPlotSetData& data,
             MetricsPlotSetState& state,
             const MetricsPlotConfig& cfg
@@ -85,8 +86,8 @@ namespace ImGuiX::Widgets {
         ImGui::PopID();
     }
 
-#   ifdef IMGUIX_DEMO
-    inline void DemoMetricsPlotSet() {
+#   if 0 // demo body lives in MetricsPlotSet.hpp for IMGUIX_DEMO consumers
+    IMGUIX_IMPL_INLINE void DemoMetricsPlotSet() {
         ImGui::TextUnformatted("MetricsPlotSet / Data sets demo");
         static MetricsPlotSetData data;
         static MetricsPlotSetState state;
@@ -127,4 +128,3 @@ namespace ImGuiX::Widgets {
 #   endif
 
 } // namespace ImGuiX::Widgets
-

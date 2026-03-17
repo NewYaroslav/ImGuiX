@@ -1,8 +1,10 @@
 #include <algorithm>
 
+#include <imguix/config/build.hpp>
+
 namespace ImGuiX::Widgets {
 
-    void ToggleButton(const char* id, bool* state) {
+    IMGUIX_IMPL_INLINE void ToggleButton(const char* id, bool* state) {
         // Geometry
         const float h = ImGui::GetFrameHeight();
         const float w = h * 1.55f;
@@ -74,4 +76,3 @@ namespace ImGuiX::Widgets {
     }
 
 } // namespace ImGuiX::Widgets
-

@@ -1,8 +1,8 @@
-#include <algorithm>
+#include <imguix/config/build.hpp>
 
 namespace ImGuiX::Pubsub {
 
-    inline void EventBus::unsubscribeAll(EventListener* owner) {
+    IMGUIX_IMPL_INLINE void EventBus::unsubscribeAll(EventListener* owner) {
         std::lock_guard<std::mutex> lock(m_subscriptions_mutex);
 
         for (auto it = m_event_callbacks.begin(); it != m_event_callbacks.end(); ) {
@@ -29,7 +29,7 @@ namespace ImGuiX::Pubsub {
         }
     }
 
-    inline void EventBus::notify(const Event* const event) const {
+    IMGUIX_IMPL_INLINE void EventBus::notify(const Event* const event) const {
         auto type = event->type();
         
         callback_list_t callbacks_copy;
@@ -56,21 +56,21 @@ namespace ImGuiX::Pubsub {
         }
     }
 
-    inline void EventBus::notify(const Event& event) const {
+    IMGUIX_IMPL_INLINE void EventBus::notify(const Event& event) const {
         notify(&event);
     }
 
-    inline void EventBus::notifyAsync(std::unique_ptr<Event> event) {
+    IMGUIX_IMPL_INLINE void EventBus::notifyAsync(std::unique_ptr<Event> event) {
         std::lock_guard<std::mutex> lock(m_queue_mutex);
         m_event_queue.push(std::move(event));
     }
 
-    inline void EventBus::registerAwaiter(const std::shared_ptr<IAwaiterEx>& aw) {
+    IMGUIX_IMPL_INLINE void EventBus::registerAwaiter(const std::shared_ptr<IAwaiterEx>& aw) {
         std::lock_guard<std::mutex> lk(m_awaiters_mutex);
         m_awaiters.emplace_back(aw);
     }
 
-    inline void EventBus::pollAwaitersInternal() {
+    IMGUIX_IMPL_INLINE void EventBus::pollAwaitersInternal() {
         std::vector<std::shared_ptr<IAwaiterEx>> live;
         {
             std::lock_guard<std::mutex> lk(m_awaiters_mutex);
@@ -88,7 +88,7 @@ namespace ImGuiX::Pubsub {
         for (auto& aw : live) aw->pollTimeout();
     }
 
-    inline void EventBus::process() {
+    IMGUIX_IMPL_INLINE void EventBus::process() {
         std::unique_lock<std::mutex> lock(m_queue_mutex);
         if (m_event_queue.empty()) {
             lock.unlock();

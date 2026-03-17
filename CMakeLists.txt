@@ -415,6 +415,13 @@ if(IMGUIX_BUILD_TESTS)
     enable_testing()
     file(GLOB TESTS CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/tests/*.cpp")
 
+    imguix_stage_assets_once(
+        NAME imguix_tests_assets
+        DEST "${CMAKE_BINARY_DIR}/tests/data"
+        DIRS "${PROJECT_SOURCE_DIR}/assets/data"
+        EXCLUDE_DIRS web
+    )
+
     set(_IMGUI_DIR "${IMGUI_DIR}")
     if(NOT _IMGUI_DIR)
         set(_IMGUI_DIR "${PROJECT_SOURCE_DIR}/libs/imgui")
@@ -515,12 +522,7 @@ if(IMGUIX_BUILD_TESTS)
             target_link_libraries(${TEST_NAME} PRIVATE gdi32 user32 comctl32 dwmapi)
         endif()
 
-        # Copy assets after build
-        imguix_add_assets(${TEST_NAME}
-            DEST_RUNTIME data
-            DIRS ${PROJECT_SOURCE_DIR}/assets/data
-            EXCLUDE_DIRS web  # exclude assets/data/web
-        )
+        add_dependencies(${TEST_NAME} imguix_tests_assets)
 
         imguix_copy_and_embed_app_icon(${TEST_NAME})
 
@@ -550,6 +552,13 @@ install(TARGETS imguix
 # ===== Examples =====
 if(IMGUIX_BUILD_EXAMPLES)
     file(GLOB SMOKE_EXAMPLES CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/examples/smoke/*.cpp")
+
+    imguix_stage_assets_once(
+        NAME imguix_examples_assets
+        DEST "${CMAKE_BINARY_DIR}/examples/data"
+        DIRS "${PROJECT_SOURCE_DIR}/assets/data"
+        EXCLUDE_DIRS web
+    )
 
     set(_IMGUI_DIR "${IMGUI_DIR}")
     if(NOT _IMGUI_DIR)
@@ -649,11 +658,7 @@ if(IMGUIX_BUILD_EXAMPLES)
             target_link_libraries(${EXAMPLE_NAME} PRIVATE gdi32 user32 comctl32 dwmapi)
         endif()
 
-        imguix_add_assets(${EXAMPLE_NAME}
-            DEST_RUNTIME data
-            DIRS ${PROJECT_SOURCE_DIR}/assets/data
-            EXCLUDE_DIRS web
-        )
+        add_dependencies(${EXAMPLE_NAME} imguix_examples_assets)
 
         imguix_copy_and_embed_app_icon(${EXAMPLE_NAME})
 

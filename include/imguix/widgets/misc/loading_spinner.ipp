@@ -1,9 +1,10 @@
 #include <algorithm>
 #include <cmath>
+#include <imguix/config/build.hpp>
 
 namespace ImGuiX::Widgets {
     
-    ImU32 DefaultSpinnerColor() {
+    IMGUIX_IMPL_INLINE ImU32 DefaultSpinnerColor() {
         const ImGuiStyle& s = ImGui::GetStyle();
         // Heuristic: pick a stronger accent on light UIs, softer on dark
         const ImVec4 bg = s.Colors[ImGuiCol_WindowBg];
@@ -12,7 +13,7 @@ namespace ImGuiX::Widgets {
         return ImGui::GetColorU32(s.Colors[accent]);
     }
 
-    bool LoadingSpinner(const char* id, const LoadingSpinnerConfig& cfg) {
+    IMGUIX_IMPL_INLINE bool LoadingSpinner(const char* id, const LoadingSpinnerConfig& cfg) {
         // Validate / clamp
         const float radius    = std::max(0.0f, cfg.radius);
         const float thickness = std::max(1.0f, cfg.thickness);

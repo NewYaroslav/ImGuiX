@@ -1,9 +1,10 @@
 #include <algorithm>
 #include <cmath>
+#include <imguix/config/build.hpp>
 
 namespace ImGuiX::Widgets {
 
-    bool SystemButton(const char* id, SystemButtonType type, ImVec2 size) {
+    IMGUIX_IMPL_INLINE bool SystemButton(const char* id, SystemButtonType type, ImVec2 size) {
         ImVec2 pos = ImGui::GetCursorScreenPos();
         ImGui::InvisibleButton(id, size);
         ImDrawList* dl = ImGui::GetWindowDrawList();
@@ -95,4 +96,3 @@ namespace ImGuiX::Widgets {
     }
 
 } // namespace ImGuiX::Widgets
-

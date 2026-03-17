@@ -1,8 +1,9 @@
 #include <imgui_internal.h> // BeginComboPopup, RenderNavCursor, RenderFrameBorder
+#include <imguix/config/build.hpp>
 
 namespace ImGuiX::Widgets {
 
-    inline bool BeginIconCombo(
+    IMGUIX_IMPL_INLINE bool BeginIconCombo(
         const char* label,
         const char* preview_value,
         const char* icon_text,
@@ -104,7 +105,7 @@ namespace ImGuiX::Widgets {
         return ImGui::BeginComboPopup(popup_id, bb, flags);
     }
 
-    inline void EndIconCombo() {
+    IMGUIX_IMPL_INLINE void EndIconCombo() {
         ImGui::EndCombo();
     }
 

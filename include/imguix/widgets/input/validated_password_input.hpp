@@ -167,4 +167,3 @@ namespace ImGuiX::Widgets {
 } // namespace ImGuiX::Widgets
 
 #endif // _IMGUIX_WIDGETS_VALIDATED_PASSWORD_INPUT_HPP_INCLUDED
-

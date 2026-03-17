@@ -1,5 +1,3 @@
-#include <algorithm>
-
 namespace ImGuiX::Pubsub {
 
     template <typename EventType>

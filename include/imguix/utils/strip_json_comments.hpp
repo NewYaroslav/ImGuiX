@@ -24,8 +24,6 @@ namespace ImGuiX::Utils {
 
 } // namespace ImGuiX::Utils
 
-#ifdef IMGUIX_HEADER_ONLY
-#   include "strip_json_comments.ipp"
-#endif
+#include "strip_json_comments.ipp"
 
 #endif // _IMGUIX_UTILS_STRIP_JSON_COMMENTS_HPP_INCLUDED

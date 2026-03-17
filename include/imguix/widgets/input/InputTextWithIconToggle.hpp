@@ -36,7 +36,7 @@ namespace ImGuiX::Widgets {
     /// char buf[128]{};
     /// ImGuiX::Widgets::InputTextWithIconToggle("Password", nullptr, buf, IM_ARRAYSIZE(buf), &reveal);
     /// \endcode
-    inline bool InputTextWithIconToggle(
+    bool InputTextWithIconToggle(
             const char* label,
             const char* hint,
             char*       buf,
@@ -54,15 +54,30 @@ namespace ImGuiX::Widgets {
 
 #   ifdef IMGUIX_DEMO
     /// \brief Show demo with password toggle and virtual keyboard.
-    void DemoInputTextWithIconToggle();
+    inline void DemoInputTextWithIconToggle() {
+        static const char* kEyeOn = u8"\uE8F4";
+        static const char* kEyeOff = u8"\uE8F5";
+        static bool reveal_pwd = true;
+        static char pass_buf[128]{};
+
+        ImGuiX::Widgets::InputTextWithIconToggle(
+            "Password",
+            "Enter password...",
+            pass_buf,
+            IM_ARRAYSIZE(pass_buf),
+            &reveal_pwd,
+            ImGuiInputTextFlags_None,
+            kEyeOn,
+            kEyeOff,
+            nullptr
+        );
+    }
 #   endif
 
 } // namespace ImGuiX::Widgets
 
-#if defined(IMGUIX_HEADER_ONLY) || defined(IMGUIX_INCLUDE_IPP)
-
+#ifdef IMGUIX_HEADER_ONLY
 #   include "InputTextWithIconToggle.ipp"
-
 #endif
 
 #endif // _IMGUIX_WIDGETS_INPUT_TEXT_ICON_TOGGLE_HPP_INCLUDED

@@ -25,4 +25,3 @@ namespace ImGuiX::Widgets {
 #endif
 
 #endif // _IMGUIX_WIDGETS_TOGGLE_BUTTON_HPP_INCLUDED
-

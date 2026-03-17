@@ -31,8 +31,6 @@ namespace ImGuiX::Extensions {
 
 } // namespace ImGuiX::Extensions
 
-#ifdef IMGUIX_HEADER_ONLY
-#   include "force_opaque_style.ipp"
-#endif
+#include "force_opaque_style.ipp"
 
 #endif // _IMGUIX_EXTENSIONS_FORCE_OPAQUE_STYLE_HPP_INCLUDED

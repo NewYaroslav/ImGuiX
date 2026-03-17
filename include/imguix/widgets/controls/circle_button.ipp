@@ -1,6 +1,8 @@
+#include <imguix/config/build.hpp>
+
 namespace ImGuiX::Widgets {
 
-    bool CircleButton(const char* id, float diameter, const ImVec4& color) {
+    IMGUIX_IMPL_INLINE bool CircleButton(const char* id, float diameter, const ImVec4& color) {
         ImVec2 size = ImVec2(diameter, diameter);
         ImVec2 pos = ImGui::GetCursorScreenPos();
         ImGui::InvisibleButton(id, size);
@@ -18,4 +20,3 @@ namespace ImGuiX::Widgets {
     }
 
 } // namespace ImGuiX::Widgets
-

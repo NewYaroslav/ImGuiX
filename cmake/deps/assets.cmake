@@ -51,6 +51,47 @@ function(imguix_add_assets target)
     endforeach()
 endfunction()
 
+function(imguix_stage_assets_once)
+    set(options)
+    set(oneValueArgs NAME DEST)
+    set(multiValueArgs DIRS EXCLUDE_DIRS EXCLUDE_PATTERNS)
+    cmake_parse_arguments(IMGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    if(NOT IMGS_NAME)
+        message(FATAL_ERROR "imguix_stage_assets_once: NAME is required")
+    endif()
+    if(NOT IMGS_DEST)
+        message(FATAL_ERROR "imguix_stage_assets_once: DEST is required")
+    endif()
+    if(NOT IMGS_DIRS)
+        message(FATAL_ERROR "imguix_stage_assets_once: DIRS is required")
+    endif()
+
+    # Shared runtime trees for tests/examples must be staged once to avoid
+    # parallel POST_BUILD copy/prune races across multiple executable targets.
+    add_custom_target(${IMGS_NAME} ALL
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${IMGS_DEST}"
+        COMMENT "Stage shared assets into ${IMGS_DEST}"
+        VERBATIM
+    )
+
+    foreach(_src IN LISTS IMGS_DIRS)
+        add_custom_command(TARGET ${IMGS_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_directory "${_src}" "${IMGS_DEST}"
+            COMMENT "Copy assets '${_src}' -> ${IMGS_DEST}"
+            VERBATIM
+        )
+    endforeach()
+
+    foreach(_ex IN LISTS IMGS_EXCLUDE_DIRS)
+        add_custom_command(TARGET ${IMGS_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E rm -rf "${IMGS_DEST}/${_ex}"
+            COMMENT "Prune shared assets: remove '${_ex}' from ${IMGS_DEST}"
+            VERBATIM
+        )
+    endforeach()
+endfunction()
+
 
 # Stage assets once for tests to avoid per-test copies
 # Params:
@@ -78,5 +119,4 @@ function(imguix_stage_test_assets)
     )
     set_property(GLOBAL PROPERTY IMGUIX_TEST_ASSETS_DEST "${AA_DEST}")
 endfunction()
-
 

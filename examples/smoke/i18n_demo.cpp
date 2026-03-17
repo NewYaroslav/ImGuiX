@@ -1,5 +1,6 @@
 #include <iostream>
 #include <imguix/core.hpp>
+#include <imguix/utils.hpp>
 
 namespace i18n = ImGuiX::I18N;
 

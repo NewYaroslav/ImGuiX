@@ -6,22 +6,21 @@
 
 #include <imgui.h>
 #include <implot.h>
+#include <imguix/config/build.hpp>
 
 namespace ImGuiX::Widgets {
 
-    inline float CalcMetricsDndWidth() {
+    IMGUIX_IMPL_INLINE float CalcMetricsDndWidth() {
         const ImGuiStyle& st = ImGui::GetStyle();
         return ImGui::GetFontSize() * 8.0f + st.FramePadding.x * 2.0f;
     }
 
-    inline float CalcMetricsDndButtonWidth(float dnd_width) {
+    IMGUIX_IMPL_INLINE float CalcMetricsDndButtonWidth(float dnd_width) {
         const ImGuiStyle& st = ImGui::GetStyle();
         return dnd_width - st.FramePadding.x * 2.0f;
     }
 
     namespace detail {
-
-        inline constexpr int kUpdateCounterMax = 20;
 
         struct Ctx {
             const MetricsPlotData& data;
@@ -54,21 +53,6 @@ namespace ImGuiX::Widgets {
                     }
                 }
             }
-        }
-
-        inline float calc_plot_height(const MetricsPlotConfig& cfg) {
-            // Compute auto plot height using available region.
-            if (cfg.plot_height > 0.0f) return cfg.plot_height;
-            const float avail_w = ImGui::GetContentRegionAvail().x;
-            const float avail_y = ImGui::GetContentRegionAvail().y;
-            float h = avail_w / ImMax(0.5f, cfg.aspect_w_over_h);
-            float auto_height_min = cfg.auto_height_min > 0.0f ?
-                cfg.auto_height_min :
-                ImPlot::GetStyle().PlotDefaultSize.y;
-            h = ImMax(h, auto_height_min);
-            if (cfg.auto_height_max > 0.0f) h = ImMin(h, cfg.auto_height_max);
-            if (cfg.cap_by_avail_y && avail_y > 0.0f) h = ImMin(h, avail_y);
-            return IM_ROUND(h);
         }
 
         inline bool is_series_visible(const char* label) {
@@ -537,7 +521,7 @@ namespace ImGuiX::Widgets {
 
     } // namespace detail
 
-    inline void MetricsPlot(
+    IMGUIX_IMPL_INLINE void MetricsPlot(
             const MetricsPlotData& data,
             MetricsPlotState& state,
             const MetricsPlotConfig& cfg
@@ -595,4 +579,3 @@ namespace ImGuiX::Widgets {
     }
 
 } // namespace ImGuiX::Widgets
-

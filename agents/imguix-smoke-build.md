@@ -18,6 +18,21 @@ Use this guide to rebuild ImGuiX smoke examples with a known-good Windows MinGW 
 - If the superproject-local file is unavailable, detect logical processors on the current Windows machine and fall back to `8` only if detection fails.
 - On the current superproject machine, the detected value is `36`.
 
+## Build directory reuse policy
+
+Decision table:
+
+- Compatible `build-mingw` exists: reuse it.
+- Incompatible `build-mingw` exists: recreate that same `build-mingw`.
+- Explicit ImPlot / ImPlot3D validation requested: use `build-mingw-implot`.
+- No compatible canonical build tree exists: create the canonical one, not an ad-hoc directory.
+
+Additional rules:
+
+- Prefer reconfiguring in place before rebuilding.
+- Do not create `build`, `build-sfml`, or `build-sfml-ninja` unless the user explicitly requested a separate profile.
+- Do not run multiple independent `cmake --build` processes concurrently against the same build tree.
+
 ## Configure
 
 Choose one context and run from that working directory.

@@ -6,19 +6,22 @@
 /// \brief Entry point for the publish-subscribe system.
 /// \note Includes all necessary components for event-driven communication.
 /// \note Encapsulates Event, EventListener, EventBus, and EventMediator.
+/// \note Canonical public entrypoint for pubsub subsystem; consumers should prefer this header.
 
-#include <unordered_map>
-#include <vector>
-#include <queue>
-#include <mutex>
+#include <algorithm>
 #include <atomic>
+#include <chrono>
 #include <functional>
-#include <string>
-#include <typeindex>
-#include <type_traits>
-#include <stdexcept>
 #include <memory>
+#include <mutex>
 #include <optional>
+#include <unordered_map>
+#include <queue>
+#include <string>
+#include <type_traits>
+#include <typeindex>
+#include <stdexcept>
+#include <vector>
 
 #include "pubsub/Event.hpp"
 #include "pubsub/EventListener.hpp"

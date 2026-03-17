@@ -44,8 +44,6 @@ namespace ImGuiX::Extensions {
 
 } // namespace ImGuiX::Extensions
 
-#ifdef IMGUIX_HEADER_ONLY
-#   include "color_gradient.ipp"
-#endif
+#include "color_gradient.ipp"
 
 #endif // _IMGUIX_EXTENSIONS_COLOR_GRADIENT_HPP_INCLUDED

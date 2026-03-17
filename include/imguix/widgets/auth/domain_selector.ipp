@@ -1,8 +1,9 @@
 #include "domain_selector.hpp"
+#include <imguix/config/build.hpp>
 
 namespace ImGuiX::Widgets {
 
-    inline bool DomainSelector(
+    IMGUIX_IMPL_INLINE bool DomainSelector(
             const char* label,
             DomainSelectorConfig& cfg,
             std::string& host
@@ -116,4 +117,3 @@ namespace ImGuiX::Widgets {
     }
 
 } // namespace ImGuiX::Widgets
-

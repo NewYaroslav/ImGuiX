@@ -1,8 +1,9 @@
 #include <imgui_internal.h> // ButtonBehavior, RenderFrameBorder, etc.
+#include <imguix/config/build.hpp>
 
 namespace ImGuiX::Widgets {
 
-        bool InputTextWithIconToggle(
+        IMGUIX_IMPL_INLINE bool InputTextWithIconToggle(
                 const char* label,
                 const char* hint,
                 char*       buf,
@@ -129,27 +130,5 @@ namespace ImGuiX::Widgets {
             ImGui::PopID();
             return changed;
         }
-
-#ifdef IMGUIX_DEMO
-        void DemoInputTextWithIconToggle() {
-            // Icons: Material Symbols PUA
-            static const char* kEyeOn  = u8"\uE8F4";
-            static const char* kEyeOff = u8"\uE8F5";
-        
-            static bool reveal_pwd = true;
-            static char pass_buf[128]{};
-        
-            ImFont* material_font = /* your icon font */ nullptr;
-        
-            ImGuiX::Widgets::InputTextWithIconToggle(
-                "Password",
-                "Enter password...",
-                pass_buf, IM_ARRAYSIZE(pass_buf),
-                &reveal_pwd,
-                ImGuiInputTextFlags_None,
-                kEyeOn, kEyeOff,
-                material_font);
-        }
-#endif
 
 } // namespace ImGuiX::Widgets

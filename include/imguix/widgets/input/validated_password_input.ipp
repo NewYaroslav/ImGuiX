@@ -6,7 +6,7 @@
 
 namespace ImGuiX::Widgets {
 
-bool InputPasswordWithToggle(
+inline bool InputPasswordWithToggle(
         const char* label,
         const char* hint,
         std::string& value,
@@ -111,7 +111,7 @@ bool InputPasswordWithToggle(
     return changed;
 }
 
-bool InputPasswordWithToggleVK(
+inline bool InputPasswordWithToggleVK(
         const char* label,
         const char* hint,
         std::string& value,
@@ -279,4 +279,3 @@ bool InputPasswordWithToggleVK(
 }
 
 } // namespace ImGuiX::Widgets
-

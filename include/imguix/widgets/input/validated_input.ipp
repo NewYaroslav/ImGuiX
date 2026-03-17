@@ -2,12 +2,13 @@
 #include <vector>
 #include <cstring>
 
+#include <imguix/config/build.hpp>
 #include <imguix/extensions/validation.hpp>
 #include "InputTextWithIconToggle.hpp"
 
 namespace ImGuiX::Widgets {
 
-    bool InputTextValidated(
+    IMGUIX_IMPL_INLINE bool InputTextValidated(
             const char* label,
             const char* hint,
             std::string& value,
@@ -148,7 +149,7 @@ namespace ImGuiX::Widgets {
         return changed || external_changed;
     }
 
-    bool InputTextWithVKValidated(
+    IMGUIX_IMPL_INLINE bool InputTextWithVKValidated(
             const char* label,
             const char* hint,
             std::string& value,

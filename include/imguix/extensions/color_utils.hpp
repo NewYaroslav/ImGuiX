@@ -122,8 +122,6 @@ namespace ImGuiX::Extensions {
 
 } // namespace ImGuiX::Extensions
 
-#ifdef IMGUIX_HEADER_ONLY
-#   include "color_utils.ipp"
-#endif
+#include "color_utils.ipp"
 
 #endif // _IMGUIX_EXTENSIONS_COLOR_UTILS_HPP_INCLUDED

@@ -70,7 +70,22 @@ namespace ImGuiX::Widgets {
 
 #ifdef IMGUIX_DEMO
     /// \brief Render demo for expiry picker.
-    void DemoExpiryPicker();
+    inline void DemoExpiryPicker() {
+        static int expiry_sec = 5;
+        static const std::vector<SecRange> bans = {
+            {120, 120},
+            {300, 420},
+        };
+
+        ExpiryPickerConfig cfg;
+        cfg.label = u8"Expiration";
+        cfg.icon_text = IMGUIX_ICON_TIMER;
+        cfg.combo_width = 180.0f;
+        cfg.min_seconds = 60;
+        cfg.step_seconds = 60;
+        cfg.forbidden = &bans;
+        ExpiryPicker("expiry", expiry_sec, cfg);
+    }
 #endif
 
 } // namespace ImGuiX::Widgets

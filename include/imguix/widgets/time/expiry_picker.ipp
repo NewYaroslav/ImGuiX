@@ -4,12 +4,13 @@
 #include <string>
 #include <vector>
 
+#include <imguix/config/build.hpp>
 #include <imguix/widgets/controls/icon_combo.hpp>
 #include <imguix/utils/time_utils.hpp>
 
 namespace ImGuiX::Widgets {
 
-    inline const std::vector<ExpiryPreset>& DefaultExpiryPresets() {
+    IMGUIX_IMPL_INLINE const std::vector<ExpiryPreset>& DefaultExpiryPresets() {
         static const std::vector<ExpiryPreset> p = {
             {"S5",   5},   {"S15",   15}, {"S30",   30},
             {"M1",   60},  {"M3",   180}, {"M5",   300},
@@ -18,7 +19,7 @@ namespace ImGuiX::Widgets {
         return p;
     }
 
-    inline bool ExpiryPicker(const char* id, int& seconds, const ExpiryPickerConfig& cfg) {
+    IMGUIX_IMPL_INLINE bool ExpiryPicker(const char* id, int& seconds, const ExpiryPickerConfig& cfg) {
         const auto& P = cfg.presets ? *cfg.presets : DefaultExpiryPresets();
         seconds = std::clamp(seconds, cfg.min_seconds, cfg.max_seconds);
 
@@ -387,8 +388,8 @@ namespace ImGuiX::Widgets {
         return changed;
     }
 
-#   ifdef IMGUIX_DEMO
-    inline void DemoExpiryPicker() {
+#   if 0 // demo body lives in expiry_picker.hpp for IMGUIX_DEMO consumers
+    IMGUIX_IMPL_INLINE void DemoExpiryPicker() {
         static int expiry_sec = 5;
         static const std::vector<SecRange> bans = {
             {120,120}, {300,420} // запреты: ровно 2:00 и 5:00..7:00
@@ -406,4 +407,3 @@ namespace ImGuiX::Widgets {
 #   endif
 
 } // namespace ImGuiX::Widgets
-

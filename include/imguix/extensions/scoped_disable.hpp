@@ -33,8 +33,6 @@ namespace ImGuiX::Extensions {
 
 } // namespace ImGuiX::Extensions
 
-#ifdef IMGUIX_HEADER_ONLY
-#   include "scoped_disable.ipp"
-#endif
+#include "scoped_disable.ipp"
 
 #endif // _IMGUIX_EXTENSIONS_SCOPED_DISABLE_HPP_INCLUDED

@@ -95,4 +95,3 @@ namespace ImGuiX::Widgets {
 #endif
 
 #endif // _IMGUIX_WIDGETS_DATE_PICKER_HPP_INCLUDED
-

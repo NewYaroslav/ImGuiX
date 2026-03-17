@@ -18,8 +18,6 @@ namespace ImGuiX::Extensions {
 
 } // namespace ImGuiX::Extensions
 
-#ifdef IMGUIX_HEADER_ONLY
-#   include "blend_colors.ipp"
-#endif
+#include "blend_colors.ipp"
 
 #endif // _IMGUIX_EXTENSIONS_BLEND_COLORS_HPP_INCLUDED

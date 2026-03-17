@@ -16,14 +16,14 @@ namespace ImGuiX::Widgets {
     /// \param flags ImGuiComboFlags for BeginCombo.
     /// \param icon_font Optional font used for the icon (nullptr = current font).
     /// \return true if the combo popup is open.
-    inline bool BeginIconCombo(const char* label,
-                               const char* preview_value,
-                               const char* icon_text,
-                               ImGuiComboFlags flags = 0,
-                               ImFont* icon_font = nullptr);
+    bool BeginIconCombo(const char* label,
+                        const char* preview_value,
+                        const char* icon_text,
+                        ImGuiComboFlags flags = 0,
+                        ImFont* icon_font = nullptr);
 
     /// \brief End combo started with BeginIconCombo().
-    inline void EndIconCombo();
+    void EndIconCombo();
 
 } // namespace ImGuiX::Widgets
 

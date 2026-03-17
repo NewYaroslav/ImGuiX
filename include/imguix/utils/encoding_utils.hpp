@@ -102,8 +102,6 @@ namespace ImGuiX::Utils {
 
 #endif // ifdef _WIN32
 
-#ifdef IMGUIX_HEADER_ONLY
-#   include "encoding_utils.ipp"
-#endif
+#include "encoding_utils.ipp"
 
 #endif // _IMGUIX_UTILS_ENCODING_UTILS_HPP_INCLUDED

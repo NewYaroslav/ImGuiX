@@ -1,8 +1,9 @@
 #include "auth_js_panel.hpp"
+#include <imguix/config/build.hpp>
 
 namespace ImGuiX::Widgets {
 
-    inline bool AuthJsPanel(const char* id, AuthJsPanelConfig& cfg, AuthJsSettings& st) {
+    IMGUIX_IMPL_INLINE bool AuthJsPanel(const char* id, AuthJsPanelConfig& cfg, AuthJsSettings& st) {
         bool changed = false;
         ImGui::PushID(id);
 
@@ -95,4 +96,3 @@ namespace ImGuiX::Widgets {
     }
 
 } // namespace ImGuiX::Widgets
-

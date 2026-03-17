@@ -2,7 +2,7 @@
 
 namespace ImGuiX::Utils {
 
-    std::string Utf8ToAnsi(const std::string& utf8) noexcept {
+    inline std::string Utf8ToAnsi(const std::string& utf8) noexcept {
         int n_len = MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, NULL, 0);
         if (n_len == 0) return {};
 
@@ -17,7 +17,7 @@ namespace ImGuiX::Utils {
         return ansi_string;
     }
 
-    std::string AnsiToUtf8(const std::string& ansi) noexcept {
+    inline std::string AnsiToUtf8(const std::string& ansi) noexcept {
         int n_len = MultiByteToWideChar(CP_ACP, 0, ansi.c_str(), -1, NULL, 0);
         if (n_len == 0) return {};
 
@@ -32,7 +32,7 @@ namespace ImGuiX::Utils {
         return utf8_string;
     }
 
-    std::string Utf8ToCp866(const std::string& utf8) noexcept {
+    inline std::string Utf8ToCp866(const std::string& utf8) noexcept {
         std::string ansi = Utf8ToAnsi(utf8);
         if (ansi.empty()) return {};
 
@@ -44,7 +44,7 @@ namespace ImGuiX::Utils {
         return cp866;
     }
 
-    bool IsValidUtf8(const char* message) {
+    inline bool IsValidUtf8(const char* message) {
         if (!message) return true;
         const unsigned char* bytes = reinterpret_cast<const unsigned char*>(message);
         while (*bytes != 0x00) {
@@ -68,7 +68,7 @@ namespace ImGuiX::Utils {
         return true;
     }
 
-    std::string Cp1251ToUtf8(const std::string& cp1251) {
+    inline std::string Cp1251ToUtf8(const std::string& cp1251) {
         int len = MultiByteToWideChar(1251, 0, cp1251.c_str(), -1, NULL, 0);
         if (len == 0) return {};
 
@@ -83,14 +83,14 @@ namespace ImGuiX::Utils {
         return utf8String;
     }
 
-    std::string Utf16ToUtf8(LPWSTR utf16String) {
+    inline std::string Utf16ToUtf8(LPWSTR utf16String) {
         int bufferSize = WideCharToMultiByte(CP_UTF8, 0, utf16String, -1, nullptr, 0, nullptr, nullptr);
         std::string utf8String(bufferSize, '\0');
         WideCharToMultiByte(CP_UTF8, 0, utf16String, -1, utf8String.data(), bufferSize, nullptr, nullptr);
         return utf8String;
     }
 
-    std::wstring Utf8ToUtf16(const std::string& utf8) noexcept {
+    inline std::wstring Utf8ToUtf16(const std::string& utf8) noexcept {
         int n_len = MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, NULL, 0);
         if (n_len == 0) return {};
 
@@ -102,4 +102,3 @@ namespace ImGuiX::Utils {
 } // namespace ImGuiX::Utils
 
 #endif // #ifdef _WIN32
-

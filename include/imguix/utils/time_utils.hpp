@@ -217,8 +217,6 @@ namespace ImGuiX::Utils {
 
 } // namespace ImGuiX::Utils
 
-#ifdef IMGUIX_HEADER_ONLY
-#   include "time_utils.ipp"
-#endif
+#include "time_utils.ipp"
 
 #endif // _IMGUIX_UTILS_TIME_UTILS_HPP_INCLUDED
