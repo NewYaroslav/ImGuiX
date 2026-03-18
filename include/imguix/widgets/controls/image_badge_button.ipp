@@ -115,21 +115,12 @@ namespace ImGuiX::Widgets {
             footer_text_size = ImGui::CalcTextSize(cfg.footer_text);
             const float footer_chip_width = ImMin(
                 footer_text_size.x + cfg.footer_text_padding.x * 2.0f,
-                inner_width * 0.55f);
+                inner_width * 0.95f);
             const float footer_chip_height = ImMin(
                 ImMax(cfg.footer_min_height, footer_text_size.y + cfg.footer_text_padding.y * 2.0f),
                 inner_height * 0.40f);
             footer_chip_min = ImVec2(inner_min.x, inner_max.y - footer_chip_height);
             footer_chip_max = ImVec2(inner_min.x + footer_chip_width, inner_max.y);
-
-            const ImU32 footer_bg_col =
-                cfg.footer_bg_col != 0 ? cfg.footer_bg_col : defaultFooterColor();
-            draw_list->AddRectFilled(
-                footer_chip_min,
-                footer_chip_max,
-                footer_bg_col,
-                cfg.footer_corner_rounding,
-                ImDrawFlags_RoundCornersTopRight);
 
             const auto snap = [](float value) {
                 return std::floor(value) + 0.5f;
@@ -179,6 +170,15 @@ namespace ImGuiX::Widgets {
                     static_cast<float>(cfg.tint_color.a) / 255.0f)));
         }
 
+            const ImU32 footer_bg_col =
+                cfg.footer_bg_col != 0 ? cfg.footer_bg_col : defaultFooterColor();
+            draw_list->AddRectFilled(
+                footer_chip_min,
+                footer_chip_max,
+                footer_bg_col,
+                cfg.footer_corner_rounding,
+                ImDrawFlags_RoundCornersTopRight);
+
         if (has_footer_text) {
             const ImU32 footer_text_col =
                 cfg.footer_text_col != 0 ? cfg.footer_text_col : defaultFooterTextColor();
@@ -190,8 +190,9 @@ namespace ImGuiX::Widgets {
         }
 
         if (cfg.show_status_chip) {
-            const float status_chip_width = std::clamp(cfg.status_chip_size.x, 4.0f, 7.0f);
-            const float status_chip_height = std::clamp(cfg.status_chip_size.y, 4.0f, 7.0f);
+            /* // previous status_chip
+            const float status_chip_width = std::clamp(cfg.status_chip_size.x, 4.0f, 9.0f);
+            const float status_chip_height = std::clamp(cfg.status_chip_size.y, 4.0f, 9.0f);
             const ImVec2 status_chip_min{inner_max.x - status_chip_width, inner_min.y};
             const ImVec2 status_chip_max{inner_max.x, inner_min.y + status_chip_height};
             const ImU32 status_chip_col =
@@ -201,7 +202,29 @@ namespace ImGuiX::Widgets {
                 status_chip_max,
                 status_chip_col,
                 cfg.status_chip_corner_rounding,
-                ImDrawFlags_RoundCornersBottomLeft);
+                ImDrawFlags_RoundCornersBottomLeft | ImDrawFlags_RoundCornersTopRight);
+            */
+            float aX = inner_max.x - 11.0f;
+            float cY = inner_min.y + 11.0f;
+            float aa = 1.0f;
+            ImVec2 a(aX, inner_min.y + aa);
+            ImVec2 b(inner_max.x, inner_min.y);
+            ImVec2 c(inner_max.x - aa, cY);
+
+            float r = cfg.inner_rounding - aa;
+            ImVec2 top   = ImVec2(b.x - r, b.y + aa); // на ребре a->b
+            //ImVec2 right  = ImVec2(b.x, b.y + r); // на ребре b->c
+            ImVec2 center = ImVec2(b.x - r - aa, b.y + r + aa);
+
+            const ImU32 status_chip_col =
+                cfg.status_chip_col != 0 ? cfg.status_chip_col : defaultStatusChipColor();
+
+            draw_list->PathClear();
+            draw_list->PathLineTo(a);
+            draw_list->PathLineTo(top);
+            draw_list->PathArcTo(center, r, -IM_PI * 0.5f, 0.0f);
+            draw_list->PathLineTo(c);
+            draw_list->PathFillConvex(status_chip_col);
         }
 
         if (held) {

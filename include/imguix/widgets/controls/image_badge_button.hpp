@@ -17,8 +17,8 @@ namespace ImGuiX::Widgets {
     /// \brief Configuration for ImageBadgeButton.
     struct ImageBadgeButtonConfig {
         ImVec2 size{0.0f, 0.0f};               ///< Outer button size; `{0,0}` means square `GetFrameHeight()`.
-        float outer_rounding{6.0f};            ///< Rounding radius of the outer shell.
-        float inner_rounding{5.0f};            ///< Rounding radius of the inner card.
+        float outer_rounding{4.2f};            ///< Rounding radius of the outer shell.
+        float inner_rounding{4.0f};            ///< Rounding radius of the inner card.
         ImVec2 inner_margin{2.0f, 2.0f};       ///< Gap between the outer shell and inner card.
         ImVec2 image_padding{3.0f, 3.0f};      ///< Padding around the image area inside the card body.
         bool draw_outer_border{true};          ///< Draw border around the outer shell.
@@ -37,8 +37,8 @@ namespace ImGuiX::Widgets {
         float footer_corner_rounding{4.0f};    ///< Footer chip corner rounding.
         bool show_status_chip{false};          ///< Draw a status chip in the top-right corner.
         ImU32 status_chip_col{0};              ///< Status chip color, `0` uses widget default.
-        ImVec2 status_chip_size{6.0f, 6.0f};   ///< Status chip size in pixels.
-        float status_chip_corner_rounding{3.0f}; ///< Status chip corner rounding.
+        //ImVec2 status_chip_size{6.0f, 6.0f};   ///< Status chip size in pixels.
+        //float status_chip_corner_rounding{3.0f}; ///< Status chip corner rounding.
         sf::Color tint_color{sf::Color::White};    ///< Image tint.
     };
 
