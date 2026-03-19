@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <cctype>
 #include <fstream>
+#include <limits>
 #include <sstream>
 #include <utility>
 #include <iostream>
@@ -202,13 +203,36 @@ namespace ImGuiX::Fonts {
             const std::string& spec
         ) {
         auto split = [](const std::string& s) {
-            std::vector<std::string> out; std::string cur;
-            for (char c : s) { 
-                if (c == '+') { 
-                    if (!cur.empty()) out.push_back(cur), cur.clear(); 
-                } else cur.push_back(c); 
+            auto trim = [](const std::string& token) {
+                size_t begin = 0;
+                while (begin < token.size() && std::isspace(static_cast<unsigned char>(token[begin])) != 0) {
+                    ++begin;
+                }
+
+                size_t end = token.size();
+                while (end > begin && std::isspace(static_cast<unsigned char>(token[end - 1])) != 0) {
+                    --end;
+                }
+
+                return token.substr(begin, end - begin);
+            };
+
+            std::vector<std::string> out;
+            std::string cur;
+            auto push = [&](const std::string& token) {
+                const std::string trimmed = trim(token);
+                if (!trimmed.empty()) {
+                    out.push_back(trimmed);
+                }
+            };
+            for (char c : s) {
+                if (c == '+') {
+                    push(cur);
+                    cur.clear();
+                } else cur.push_back(c);
             }
-            if (!cur.empty()) out.push_back(cur); return out;
+            push(cur);
+            return out;
         };
         for (auto tok : split(spec)) {
             if (tok == u8"Default")          b.AddRanges(io.Fonts->GetGlyphRangesDefault());
@@ -330,9 +354,96 @@ namespace ImGuiX::Fonts {
                 // 5) Presentation helpers
                 b.AddChar(0x2764);  // ❤ (heart)
                 b.AddChar(0x2757);  // ❗
+            } else if (tryAddNumericPresetToken(b, tok)) {
+                continue;
             }
             // add more named ranges as needed (Latin, Greek, Thai, etc.)
         }
+    }
+
+    inline bool FontManager::tryParseNumericCodepointToken(
+            const std::string& token,
+            ImWchar& out
+        ) {
+        auto trim = [](const std::string& s) {
+            size_t begin = 0;
+            while (begin < s.size() && std::isspace(static_cast<unsigned char>(s[begin])) != 0) {
+                ++begin;
+            }
+
+            size_t end = s.size();
+            while (end > begin && std::isspace(static_cast<unsigned char>(s[end - 1])) != 0) {
+                --end;
+            }
+
+            return s.substr(begin, end - begin);
+        };
+
+        const std::string trimmed = trim(token);
+        if (trimmed.empty()) {
+            return false;
+        }
+
+        int base = 10;
+        std::string digits = trimmed;
+        if (digits.size() > 2 && digits[0] == '0' && (digits[1] == 'x' || digits[1] == 'X')) {
+            base = 16;
+            digits = digits.substr(2);
+            if (digits.empty() || !std::all_of(digits.begin(), digits.end(), [](unsigned char c) {
+                return std::isxdigit(c) != 0;
+            })) {
+                return false;
+            }
+        } else if (!std::all_of(digits.begin(), digits.end(), [](unsigned char c) {
+            return std::isdigit(c) != 0;
+        })) {
+            return false;
+        }
+
+        try {
+            size_t pos = 0;
+            const unsigned long long value = std::stoull(digits, &pos, base);
+            if (pos != digits.size() || value > static_cast<unsigned long long>(std::numeric_limits<ImWchar>::max())) {
+                return false;
+            }
+
+            out = static_cast<ImWchar>(value);
+            return true;
+        } catch (...) {
+            return false;
+        }
+    }
+
+    inline bool FontManager::tryAddNumericPresetToken(
+            ImFontGlyphRangesBuilder& b,
+            const std::string& token
+        ) {
+        const size_t dash_pos = token.find('-');
+        if (dash_pos == std::string::npos) {
+            ImWchar cp = 0;
+            if (!tryParseNumericCodepointToken(token, cp)) {
+                return false;
+            }
+
+            b.AddChar(cp);
+            return true;
+        }
+
+        if (token.find('-', dash_pos + 1) != std::string::npos) {
+            return false;
+        }
+
+        ImWchar start = 0;
+        ImWchar end = 0;
+        if (!tryParseNumericCodepointToken(token.substr(0, dash_pos), start) ||
+            !tryParseNumericCodepointToken(token.substr(dash_pos + 1), end) ||
+            start > end) {
+            return false;
+        }
+
+        const ImWchar range[] = { start, end, 0 };
+        b.AddRanges(range);
+        return true;
     }
 
     /// \brief Build glyph ranges from LocalePack + extra glyphs from all FontFiles.
@@ -345,7 +456,7 @@ namespace ImGuiX::Fonts {
       ImFontGlyphRangesBuilder b;
 
       if (pack) {
-        // 1) Named presets (e.g., "Default+Cyrillic+Vietnamese+Punct")
+        // 1) Preset string (named + numeric tokens).
         if (!pack->ranges_preset.empty())
           addNamedRanges(b, io, pack->ranges_preset);
 

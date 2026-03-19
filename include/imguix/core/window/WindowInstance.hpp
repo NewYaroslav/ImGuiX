@@ -298,8 +298,8 @@ namespace ImGuiX {
         /// \param locale Locale identifier.
         void fontsSetLocale(std::string locale);
 
-        /// \brief Select predefined character ranges.
-        /// \param preset Preset name.
+        /// \brief Select preset character ranges.
+        /// \param preset '+'-separated named or numeric tokens.
         void fontsSetRangesPreset(std::string preset);
 
         /// \brief Define explicit character ranges.

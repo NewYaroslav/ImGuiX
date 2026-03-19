@@ -69,7 +69,8 @@ namespace ImGuiX::Fonts {
 
         /// \brief Set glyph ranges by preset.
         /// \details Manual mode only. Clears explicit ranges().
-        /// \param preset Named range preset, e.g. "Default+Cyrillic+Punct".
+        /// \param preset Preset string with '+'-separated named or numeric
+        ///        tokens, e.g. "Default+Cyrillic+0x2010-0x205E".
         void setRanges(std::string preset);
 
         /// \brief Set glyph ranges with explicit pairs.
@@ -183,7 +184,7 @@ namespace ImGuiX::Fonts {
             std::vector<FontFile> merges_emoji;   ///< explicit Emoji
             std::vector<FontFile> merges_unknown; ///< legacy addFontMerge(ff)
             std::vector<ImWchar> ranges;          ///< Optional manual ranges
-            std::string ranges_preset;            ///< "Default+Cyrillic+Vietnamese+Punct"
+            std::string ranges_preset;            ///< "Default+Cyrillic+LatinExtA+0x2010-0x205E"
         };
 
         BuildParams m_params{};
@@ -222,6 +223,16 @@ namespace ImGuiX::Fonts {
             ImFontGlyphRangesBuilder& b,
             ImGuiIO& io,
             const std::string& spec
+        );
+
+        static bool tryParseNumericCodepointToken(
+            const std::string& token,
+            ImWchar& out
+        );
+
+        static bool tryAddNumericPresetToken(
+            ImFontGlyphRangesBuilder& b,
+            const std::string& token
         );
 
         static void buildRangesFromPack(
