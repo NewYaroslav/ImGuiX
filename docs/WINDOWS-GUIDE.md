@@ -222,10 +222,14 @@ Notes:
 | --- | --- | --- |
 | `title_content_left_inset` | Baseline left inset for title content | `<0`: style-based auto inset |
 | `side_panel_content_left_inset` | Baseline left inset for side-panel content | `<0`: style-based auto inset |
+| `main_region_padding` | Inner padding of framed-window main content area | Each component `<0`: fallback to runtime `style.WindowPadding` |
 | `side_panel_content_alignment` | Side-panel content alignment policy | `LegacyLeftInset`: left-only legacy placement; `SymmetricInset`: keep panel width, center the inner content region with equal horizontal inset |
 
 Notes:
 
+- `main_region_padding` affects only the `main_region` child where controllers/widgets are rendered.
+- `main_region_padding` does not affect title bar, menu bar, side panel, or corner icon area.
+- Frame-aware host-stroke insets are still applied first; `main_region_padding` is then used as the inner child padding inside that already reduced rect.
 - `SymmetricInset` does not resize the side panel itself; it only narrows and centers the content region inside it.
 - `SymmetricInset` is best for equal-width controls or widgets sized from `GetContentRegionAvail().x`.
 - `SymmetricInset` does not automatically center arbitrary intrinsic-width text or links item-by-item.
@@ -331,6 +335,7 @@ static ImGuiX::Windows::ImGuiFramedWindowConfig buildClassicConfig() {
     ImGuiX::Windows::ImGuiFramedWindowConfig cfg{};
     cfg.title_bar_height = 40;
     cfg.side_panel_width = 48;
+    cfg.main_region_padding = ImVec2(16.0f, 12.0f);
     cfg.frame_stroke_thickness = 1.0f;
     return cfg;
 }
@@ -377,6 +382,7 @@ Source: `examples/smoke/`.
 | `corner_icon_area_demo` | Corner layout + menu in title bar |
 | `corner_icon_area_demo_v2` | Corner layout + menu below title bar |
 | `corner_icon_area_demo_v3` | Corner layout baseline (no menu bar) |
+| `corner_icon_area_demo_v4` | Corner layout + nested child in `main_region` to inspect framed-window padding against mgc-style content flow |
 | `corner_icon_area_demo_v3_no_top_left` | Corner layout + `NoTopLeftOnTitleAndSide` |
 | `corner_icon_area_demo_v3_mac` | Corner layout + Mac-style control buttons |
 

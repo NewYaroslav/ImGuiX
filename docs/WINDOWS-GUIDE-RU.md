@@ -222,10 +222,14 @@ cmake --build external/ImGuiX/build-mingw --target corner_icon_area_demo_v3 --pa
 | --- | --- | --- |
 | `title_content_left_inset` | Базовый левый inset для title content | `<0`: auto по style |
 | `side_panel_content_left_inset` | Базовый левый inset для side content | `<0`: auto по style |
+| `main_region_padding` | Внутренний padding основной области framed-window | Каждый компонент `<0`: fallback к runtime `style.WindowPadding` |
 | `side_panel_content_alignment` | Политика выравнивания контента внутри side panel | `LegacyLeftInset`: старое выравнивание только слева; `SymmetricInset`: ширина panel не меняется, а внутренняя content-area получает симметричные horizontal inset-ы |
 
 Примечания:
 
+- `main_region_padding` влияет только на `main_region`, где рендерятся контроллеры и виджеты.
+- `main_region_padding` не меняет padding у title bar, menu bar, side panel и corner icon area.
+- Frame-aware inset от host-frame stroke сначала уменьшает доступный rect, и только потом `main_region_padding` применяется как внутренний child padding внутри уже уменьшенной области.
 - `SymmetricInset` не меняет ширину самой side panel; он только сужает и центрирует внутреннюю область контента.
 - `SymmetricInset` лучше всего подходит для контролов одинаковой ширины или виджетов, которые берут размер из `GetContentRegionAvail().x`.
 - `SymmetricInset` не означает автоматическое поэлементное центрирование узкого текста или ссылок.
@@ -331,6 +335,7 @@ static ImGuiX::Windows::ImGuiFramedWindowConfig buildClassicConfig() {
     ImGuiX::Windows::ImGuiFramedWindowConfig cfg{};
     cfg.title_bar_height = 40;
     cfg.side_panel_width = 48;
+    cfg.main_region_padding = ImVec2(16.0f, 12.0f);
     cfg.frame_stroke_thickness = 1.0f;
     return cfg;
 }
@@ -377,6 +382,7 @@ static ImGuiX::Windows::ImGuiFramedWindowConfig buildCornerV3Config() {
 | `corner_icon_area_demo` | Corner layout + menu in title bar |
 | `corner_icon_area_demo_v2` | Corner layout + menu below title |
 | `corner_icon_area_demo_v3` | Corner layout baseline без menu bar |
+| `corner_icon_area_demo_v4` | Corner layout + вложенный child в `main_region` для проверки framed-window padding в mgc-подобном content flow |
 | `corner_icon_area_demo_v3_no_top_left` | Corner layout с `NoTopLeftOnTitleAndSide` |
 | `corner_icon_area_demo_v3_mac` | Corner layout + Mac-style control buttons |
 

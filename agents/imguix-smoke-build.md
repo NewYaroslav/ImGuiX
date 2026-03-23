@@ -80,6 +80,7 @@ cmake --build external/ImGuiX/build-mingw --target `
   corner_icon_area_demo `
   corner_icon_area_demo_v2 `
   corner_icon_area_demo_v3 `
+  corner_icon_area_demo_v4 `
   --parallel 36
 ```
 
@@ -94,6 +95,7 @@ cmake --build build-mingw --target `
   corner_icon_area_demo `
   corner_icon_area_demo_v2 `
   corner_icon_area_demo_v3 `
+  corner_icon_area_demo_v4 `
   --parallel 36
 ```
 

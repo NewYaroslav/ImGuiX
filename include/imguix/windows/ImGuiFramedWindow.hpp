@@ -91,6 +91,7 @@ namespace ImGuiX::Windows {
         int side_panel_width = 0;      ///< Classic mode: `<= 0` disables side panel. Corner mode: `<= 0` means auto width (`corner_icon_mode_area_width` when set, otherwise `title_bar_height + corner_icon_mode_gap`).
         float title_content_left_inset = -1.0f; ///< Left inset in px for title content baseline (`drawTitleBarText`); `< 0` uses auto style-based inset.
         float side_panel_content_left_inset = -1.0f; ///< Left inset in px for side-panel content baseline (`drawSidePanel`); `< 0` uses auto style-based inset.
+        ImVec2 main_region_padding = ImVec2(-1.0f, -1.0f); ///< Inner padding for framed-window main content area; each component `< 0` falls back to runtime `style.WindowPadding` and does not affect title/menu/side regions.
         SidePanelContentAlignment side_panel_content_alignment = SidePanelContentAlignment::LegacyLeftInset; ///< Alignment policy for side-panel content region.
         float frame_stroke_thickness = 1.0f; ///< Thickness in px for classic/corner separator strokes (title/side split lines).
         float frame_outer_stroke_thickness = 2.0f; ///< Thickness in px for the outer host-frame stroke (background-colored line).
@@ -302,6 +303,11 @@ namespace ImGuiX::Windows {
         /// \param style Active Dear ImGui style.
         /// \return Left inset in pixels applied by layout before \ref drawSidePanel.
         float computeSidePanelContentLeftInset(const ImGuiStyle& style) const;
+
+        /// \brief Resolve effective padding for the framed-window main content area.
+        /// \param style Active Dear ImGui style.
+        /// \return Per-axis padding where negative config components fall back to `style.WindowPadding`.
+        ImVec2 computeMainRegionPadding(const ImGuiStyle& style) const;
 
         /// \brief Compute nested content region for side-panel widgets.
         /// \param style Active Dear ImGui style.

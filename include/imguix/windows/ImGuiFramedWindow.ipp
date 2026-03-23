@@ -58,6 +58,12 @@ namespace ImGuiX::Windows {
         return style.WindowPadding.x * 2.0f;
     }
 
+    ImVec2 ImGuiFramedWindow::computeMainRegionPadding(const ImGuiStyle& style) const {
+        return ImVec2(
+            m_config.main_region_padding.x >= 0.0f ? m_config.main_region_padding.x : style.WindowPadding.x,
+            m_config.main_region_padding.y >= 0.0f ? m_config.main_region_padding.y : style.WindowPadding.y);
+    }
+
     ImGuiFramedWindow::SidePanelContentRegion ImGuiFramedWindow::computeSidePanelContentRegion(
         const ImGuiStyle& style,
         float side_panel_width) const {
@@ -341,7 +347,9 @@ namespace ImGuiX::Windows {
                 false,
                 true,
                 true);
+            const ImVec2 main_region_padding = computeMainRegionPadding(style);
             ImGui::SetCursorPos(ImVec2(main_region_rect.x, main_region_rect.y));
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, main_region_padding);
             if (ImGui::BeginChild(
                     u8"##imguix_main_region",
                     ImVec2(main_region_rect.width, main_region_rect.height),
@@ -353,6 +361,7 @@ namespace ImGuiX::Windows {
                 drawControllersContent();
             }
             ImGui::EndChild();
+            ImGui::PopStyleVar();
             return;
         }
 
@@ -421,7 +430,9 @@ namespace ImGuiX::Windows {
             false,
             true,
             true);
+        const ImVec2 main_region_padding = computeMainRegionPadding(style);
         ImGui::SetCursorPos(ImVec2(main_region_rect.x, main_region_rect.y));
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, main_region_padding);
         if (ImGui::BeginChild(
                 u8"##imguix_main_region",
                 ImVec2(main_region_rect.width, main_region_rect.height),
@@ -433,6 +444,7 @@ namespace ImGuiX::Windows {
             drawControllersContent();
         }
         ImGui::EndChild();
+        ImGui::PopStyleVar();
     }
 
     void ImGuiFramedWindow::drawCornerLayout(float menu_bar_height) {
@@ -596,7 +608,9 @@ namespace ImGuiX::Windows {
                 false,
                 true,
                 true);
+            const ImVec2 main_region_padding = computeMainRegionPadding(style);
             ImGui::SetCursorPos(ImVec2(main_region_rect.x, main_region_rect.y));
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, main_region_padding);
             if (ImGui::BeginChild(
                     u8"##imguix_main_region",
                     ImVec2(main_region_rect.width, main_region_rect.height),
@@ -608,6 +622,7 @@ namespace ImGuiX::Windows {
                 drawControllersContent();
             }
             ImGui::EndChild();
+            ImGui::PopStyleVar();
             return;
         }
 
@@ -707,8 +722,10 @@ namespace ImGuiX::Windows {
             false,
             true,
             true);
+        const ImVec2 main_region_padding = computeMainRegionPadding(style);
 
         ImGui::SetCursorPos(ImVec2(main_region_rect.x, main_region_rect.y));
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, main_region_padding);
         if (ImGui::BeginChild(
                 u8"##imguix_main_region",
                 ImVec2(main_region_rect.width, main_region_rect.height),
@@ -720,6 +737,7 @@ namespace ImGuiX::Windows {
             drawControllersContent();
         }
         ImGui::EndChild();
+        ImGui::PopStyleVar();
     }
 
     // Compact control-buttons geometry is enabled only for corner chrome with explicit border.
@@ -788,13 +806,20 @@ namespace ImGuiX::Windows {
         const float right_gap = outer_frame_stroke + inner_frame_stroke;
 
         if (control_style == ControlButtonsStyle::Mac) {
-            float btn_diameter = ImGui::GetTextLineHeight() * style.FramePadding.y * 2.0f;
-            btn_diameter = ImMax(8.0f, btn_diameter - compact_delta);
+            const float usable_h = band.usable_h > 0.0f
+                ? band.usable_h
+                : ImMax(0.0f, static_cast<float>(m_config.title_bar_height) - outer_frame_stroke - inner_frame_stroke);
+            float btn_diameter = ImFloor(usable_h * 0.45f + 0.5f);
+            btn_diameter = ImClamp(btn_diameter, 12.0f, 16.0f);
+            btn_diameter = ImMax(8.0f, btn_diameter - compact_delta * 0.5f);
             if (band.usable_h > 0.0f) {
                 btn_diameter = ImMin(btn_diameter, band.usable_h);
             }
             btn_diameter = ImMax(1.0f, btn_diameter);
-            return btn_diameter * 3.0f + right_gap;
+            const float btn_spacing = ImMax(3.0f, ImFloor(btn_diameter * 0.35f + 0.5f));
+            const float right_clearance =
+                right_gap + getControlButtonsRightInset() + ImMax(2.0f, ImFloor(btn_spacing * 0.5f));
+            return btn_diameter * 3.0f + btn_spacing * 2.0f + right_clearance;
         }
 
         if (control_style == ControlButtonsStyle::ImGui) {
@@ -890,25 +915,22 @@ namespace ImGuiX::Windows {
     }
     
     void ImGuiFramedWindow::drawMacStyledControlButtons() {
-        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
-
         const ControlButtonsBand band = computeControlButtonsBand();
         const float compact_delta = getControlButtonsCompactDelta();
-        const float separator_stroke = ImMax(0.0f, m_config.frame_stroke_thickness);
-        // In corner/side-panel layouts we also keep space for separator stroke near title chrome.
-        const float separator_compensation = band.separator_context ? separator_stroke : 0.0f;
-        const float frame_compensation = band.top_chrome;
+        const float outer_frame_stroke = ImMax(0.0f, m_config.frame_outer_stroke_thickness);
+        const float inner_frame_stroke = ImMax(0.0f, m_config.frame_inner_stroke_thickness);
+        const float usable_h = band.usable_h > 0.0f
+            ? band.usable_h
+            : ImMax(0.0f, static_cast<float>(m_config.title_bar_height) - outer_frame_stroke - inner_frame_stroke);
 
-        float btn_diameter = ImGui::GetTextLineHeight() * ImGui::GetStyle().FramePadding.y * 2.0f;
-        btn_diameter = ImMax(8.0f, btn_diameter - compact_delta);
-        const float max_btn_diameter = ImMax(
-            8.0f,
-            static_cast<float>(m_config.title_bar_height) - frame_compensation - separator_compensation);
-        btn_diameter = ImMin(btn_diameter, max_btn_diameter);
+        float btn_diameter = ImFloor(usable_h * 0.45f + 0.5f);
+        btn_diameter = ImClamp(btn_diameter, 12.0f, 16.0f);
+        btn_diameter = ImMax(8.0f, btn_diameter - compact_delta * 0.5f);
         if (band.usable_h > 0.0f) {
             btn_diameter = ImMin(btn_diameter, band.usable_h);
         }
         btn_diameter = ImMax(1.0f, btn_diameter);
+        const float btn_spacing = ImMax(3.0f, ImFloor(btn_diameter * 0.35f + 0.5f));
         const float btn_padding = getControlButtonsReservedWidth();
         ImVec2 btn_size(btn_diameter, btn_diameter);
 
@@ -930,7 +952,7 @@ namespace ImGuiX::Windows {
         };
 #       endif
         
-        ImGui::SameLine(0.0f, 0.0f);
+        ImGui::SameLine(0.0f, btn_spacing);
         if (Widgets::CircleButton(u8"##imguix_btn_maximize", btn_diameter, ImVec4(0.15f, 0.79f, 0.25f, 1.0f))) {
             toggleMaximizeRestore();
         }
@@ -946,7 +968,7 @@ namespace ImGuiX::Windows {
         };
 #       endif
 
-        ImGui::SameLine(0.0f, 0.0f);
+        ImGui::SameLine(0.0f, btn_spacing);
         if (Widgets::CircleButton(u8"##imguix_btn_close", btn_diameter, ImVec4(1.0f, 0.0f, 0.0f, 1.0f))) {
             close();
         }
@@ -961,8 +983,6 @@ namespace ImGuiX::Windows {
             static_cast<LONG>(btn_max.y)
         };
 #       endif
-
-        ImGui::PopStyleVar();
     }
 
     void ImGuiFramedWindow::drawImGuiStyledControlButtons() {

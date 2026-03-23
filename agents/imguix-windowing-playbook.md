@@ -57,7 +57,7 @@ If that file is missing on Windows, create it with `scripts/detect-machine-setti
 Current superproject machine example: `36`.
 
 ```powershell
-cmake --build external/ImGuiX/build-mingw --target corner_icon_area_off_demo corner_icon_area_off_no_side_demo corner_icon_area_demo corner_icon_area_demo_v2 corner_icon_area_demo_v3 --parallel 36
+cmake --build external/ImGuiX/build-mingw --target corner_icon_area_off_demo corner_icon_area_off_no_side_demo corner_icon_area_demo corner_icon_area_demo_v2 corner_icon_area_demo_v3 corner_icon_area_demo_v4 --parallel 36
 ```
 
 Also run the target directly related to the change (for example `corner_icon_area_demo_v3_no_top_left` or `corner_icon_area_demo_v3_mac`).
