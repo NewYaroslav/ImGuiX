@@ -2,9 +2,11 @@
 #include <imguix/core.hpp>
 #include <imguix/themes/CorporateGreyTheme.hpp>
 #include <imguix/themes/JsonBackedTheme.hpp>
+#include <imguix/utils/path_utils.hpp>
 
 #include <cstdint>
 #include <cstdio>
+#include <filesystem>
 #include <string>
 
 #if defined(IMGUIX_USE_SFML_BACKEND)
@@ -89,7 +91,10 @@ public:
 
     void drawJsonSetup() {
         ImGui::SeparatorText("JSON Setup");
-        ImGui::Text("Theme file: %s", kThemePath);
+        const std::filesystem::path resolved_theme_path =
+            ImGuiX::Utils::resolveExecPathFs(std::filesystem::u8path(kThemePath));
+        ImGui::Text("Theme file: %s", resolved_theme_path.u8string().c_str());
+        ImGui::TextUnformatted("The path is resolved relative to the executable directory.");
         ImGui::TextUnformatted("The file is auto-generated on first run if it does not exist yet.");
         ImGui::TextUnformatted("Edit the JSON file, restart the demo, and the custom values will be picked up.");
         ImGui::TextUnformatted("Add or merge the following section into the generated file:");
@@ -284,10 +289,12 @@ public:
         setWindowIcon("data/resources/icons/icon.png");
 
         auto& tm = themeManager();
+        const std::filesystem::path resolved_theme_path =
+            ImGuiX::Utils::resolveExecPathFs(std::filesystem::u8path(kThemePath));
         ImGuiX::Themes::registerJsonBackedTheme<ImGuiX::Themes::CorporateGreyTheme>(
             tm,
             kThemeId,
-            kThemePath);
+            resolved_theme_path);
         setTheme(kThemeId);
         updateCurrentTheme();
     }
