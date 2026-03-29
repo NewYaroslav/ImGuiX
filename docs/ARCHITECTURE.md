@@ -57,6 +57,9 @@ maintainable.
   subclasses merge controller and view logic, and models hold persistent state.
 - **Event-driven communication**: components post events to `EventBus`; listeners
   are notified during `EventBus::process()`.
+- **Model-to-controller boundary**: app-level `Model` objects should publish DTO
+  events through `EventBus`; do not inject those models directly into windows or
+  controllers as ownership/reference dependencies.
 - **Controller-local models**: controllers may host small feature models via a
   type-safe registry; each runs on the UI thread and avoids direct ImGui calls.
 - **Lifecycle / Template Method**: windows and controllers expose hooks such as
@@ -77,6 +80,9 @@ maintainable.
 - **Model Restrictions**: direct synchronous `notify` calls are deleted; use
   `notifyAsync` outside `process()`. Inside `process()` models can use the
   provided `SyncNotifier`.
+- **State split**: keep app-wide persistent state and services in `Model`, and
+  keep controller-local derived/render state in `FeatureModel` or controller
+  members.
 
 ## Feature Models
 `FeatureModel` provides tiny state objects tied to a single controller.
@@ -113,6 +119,11 @@ public:
 
 Call `requestClose()` to stop background work and
 `resetFeature<Counter>()` to remove a model.
+
+When a controller needs shared application state, prefer a DTO event flow such
+as `Model -> EventBus -> Controller/FeatureModel`. A controller-local
+`FeatureModel` is the right place for per-frame derived values such as cached
+formatted text, timers, or widget-facing view state.
 
 ## System Overview
 ```mermaid
