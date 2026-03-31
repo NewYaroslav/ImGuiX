@@ -299,6 +299,10 @@ else()
     )
     add_library(ImGuiX::imguix ALIAS imguix)
 
+    if(MINGW)
+        target_compile_options(imguix PRIVATE -Wa,-mbig-obj)
+    endif()
+
     target_include_directories(imguix
         PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
