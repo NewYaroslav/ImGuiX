@@ -30,8 +30,11 @@ namespace ImGuiX::Widgets {
         // Linear approach to target with ~0.08s time to settle (like old kAnimSpeed)
         const float dt = ImGui::GetIO().DeltaTime;
         const float step = (dt > 0 ? dt / 0.08f : 1.0f); // 0.08s to travel 0->1
-        if (target > anim) anim = std::min(1.0f, anim + step);
-        else               anim = std::max(0.0f, anim - step);
+        if (target > anim) {
+            anim = std::min(target, anim + step);
+        } else if (target < anim) {
+            anim = std::max(target, anim - step);
+        }
 
         st->SetFloat(key_anim, anim);
         const float t = anim; // 0..1

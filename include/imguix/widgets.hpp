@@ -21,6 +21,7 @@
 #include <imguix/widgets/input/input_vertical_stepper.hpp>
 #include <imguix/widgets/input/list_editor.hpp>
 #include <imguix/widgets/input/validated_input.hpp>
+#include <imguix/widgets/input/validated_multiline_input.hpp>
 #include <imguix/widgets/input/validated_password_input.hpp>
 #include <imguix/widgets/input/vertical_stepper_buttons.hpp>
 #include <imguix/widgets/input/virtual_keyboard.hpp>
@@ -40,6 +41,8 @@
 #   include <imguix/widgets/plot/DualMetricBarsPlot.hpp>
 #   include <imguix/widgets/plot/DualMetricBarsSet.hpp>
 #   include <imguix/widgets/plot/MetricsPlot.hpp>
+#   include <imguix/widgets/plot/StylizedDualMetricBarsPlot.hpp>
+#   include <imguix/widgets/plot/StylizedMetricsPlot.hpp>
 #   include <imguix/widgets/plot/MetricsPlotSet.hpp>
 #   include <imguix/widgets/plot/PlotOHLCChart.hpp>
 #endif
